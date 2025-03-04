@@ -49,6 +49,7 @@ patchesStrategicMerge:
   - patches/etcd-backup-schedule.yml
 {{- end }}
 
+secretGenerator:
 {{- if eq .spec.distribution.common.provider.type "none" }}
 {{- if and (index .spec.distribution.modules.dr "etcdBackup") (.spec.distribution.modules.dr.etcdBackup.s3.enabled) }}
 configMapGenerator:
