@@ -575,6 +575,9 @@ const (
 
 // Configuration for the Disaster Recovery module.
 type SpecDistributionModulesDr struct {
+	// EtcdBackup corresponds to the JSON schema field "etcdBackup".
+	EtcdBackup *SpecDistributionModulesDrEtcdBackup `json:"etcdBackup,omitempty" yaml:"etcdBackup,omitempty" mapstructure:"etcdBackup,omitempty"`
+
 	// Overrides corresponds to the JSON schema field "overrides".
 	Overrides *TypesFuryModuleOverrides `json:"overrides,omitempty" yaml:"overrides,omitempty" mapstructure:"overrides,omitempty"`
 
@@ -587,6 +590,41 @@ type SpecDistributionModulesDr struct {
 
 	// Velero corresponds to the JSON schema field "velero".
 	Velero *SpecDistributionModulesDrVelero `json:"velero,omitempty" yaml:"velero,omitempty" mapstructure:"velero,omitempty"`
+}
+
+// Configuration for the ETCD backup-restore package.
+type SpecDistributionModulesDrEtcdBackup struct {
+	// Configuration for the remote S3 backend, where Etcd backup-restore will
+	// (optionally) send its backups.
+	S3 *SpecDistributionModulesDrEtcdBackupS3 `json:"s3,omitempty" yaml:"s3,omitempty" mapstructure:"s3,omitempty"`
+
+	// The cron expression for the `full` backup schedule (default `0 1 * * *`).
+	Schedule *string `json:"schedule,omitempty" yaml:"schedule,omitempty" mapstructure:"schedule,omitempty"`
+}
+
+// Configuration for the remote S3 backend, where Etcd backup-restore will
+// (optionally) send its backups.
+type SpecDistributionModulesDrEtcdBackupS3 struct {
+	// The access key ID (username) for the external S3-compatible bucket.
+	AccessKeyId *string `json:"accessKeyId,omitempty" yaml:"accessKeyId,omitempty" mapstructure:"accessKeyId,omitempty"`
+
+	// The bucket name of the external S3-compatible object storage.
+	BucketName *string `json:"bucketName,omitempty" yaml:"bucketName,omitempty" mapstructure:"bucketName,omitempty"`
+
+	// If true, Etcd backup will save snapshots on S3.
+	Enabled *bool `json:"enabled,omitempty" yaml:"enabled,omitempty" mapstructure:"enabled,omitempty"`
+
+	// External S3-compatible endpoint for Etcd backup's storage.
+	Endpoint *string `json:"endpoint,omitempty" yaml:"endpoint,omitempty" mapstructure:"endpoint,omitempty"`
+
+	// If true, will use HTTP as protocol instead of HTTPS.
+	Insecure *bool `json:"insecure,omitempty" yaml:"insecure,omitempty" mapstructure:"insecure,omitempty"`
+
+	// The retention time of the external S3-compatible object storage.
+	RetentionTime *string `json:"retentionTime,omitempty" yaml:"retentionTime,omitempty" mapstructure:"retentionTime,omitempty"`
+
+	// The secret access key (password) for the external S3-compatible bucket.
+	SecretAccessKey *string `json:"secretAccessKey,omitempty" yaml:"secretAccessKey,omitempty" mapstructure:"secretAccessKey,omitempty"`
 }
 
 type SpecDistributionModulesDrType string

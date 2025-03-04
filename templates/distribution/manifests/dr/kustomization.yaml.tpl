@@ -7,6 +7,10 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
+{{- if index .spec.distribution.modules.dr "etcdBackup" }}
+  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/dr/katalog/etcd-backup" }}
+{{- end}}
+
 {{- if eq .spec.distribution.common.provider.type "eks" }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/dr/katalog/velero/velero-aws" }}
 {{- else if eq .spec.distribution.common.provider.type "none" }}
@@ -41,13 +45,23 @@ patchesStrategicMerge:
   - patches/velero-schedule-manifests.yml
   - patches/velero-schedule-full.yml
 {{- end }}
+{{- if and (index .spec.distribution.modules.dr "etcdBackup") (.spec.distribution.modules.dr.etcdBackup.s3.enabled) }}
+  - patches/etcd-backup-schedule.yml
+  - patches/etcd-backup-s3-bucket-name.yml
+{{- end }}
 
+secretGenerator:
 {{- if eq .spec.distribution.common.provider.type "none" }}
 {{- if eq .spec.distribution.modules.dr.velero.backend "externalEndpoint" }}
-secretGenerator:
 - name: cloud-credentials
   namespace: kube-system
   files:
     - cloud=secrets/cloud-credentials.config
+{{- end }}
+{{- if and (index .spec.distribution.modules.dr "etcdBackup") (.spec.distribution.modules.dr.etcdBackup.s3.enabled) }}
+- name: rclone-etcdbackup-conf
+  namespace: kube-system
+  files:
+    - rclone.conf=secrets/rclone.conf
 {{- end }}
 {{- end }}
