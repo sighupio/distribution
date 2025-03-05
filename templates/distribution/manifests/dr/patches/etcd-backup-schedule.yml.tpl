@@ -7,7 +7,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: etcd-backup
+  name: etcd-backup-s3
   namespace: kube-system
 spec:
   schedule: "{{ .spec.distribution.modules.dr.etcdBackup.schedule }}"

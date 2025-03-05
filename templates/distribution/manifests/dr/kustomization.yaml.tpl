@@ -8,7 +8,7 @@ kind: Kustomization
 
 resources:
 {{- if index .spec.distribution.modules.dr "etcdBackup" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/dr/katalog/etcd-backup" }}
+  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/dr/katalog/etcd-backup/etcd-backup-s3" }}
 {{- end}}
 
 {{- if eq .spec.distribution.common.provider.type "eks" }}
@@ -47,7 +47,17 @@ patchesStrategicMerge:
 {{- end }}
 {{- if and (index .spec.distribution.modules.dr "etcdBackup") (.spec.distribution.modules.dr.etcdBackup.s3.enabled) }}
   - patches/etcd-backup-schedule.yml
-  - patches/etcd-backup-s3-bucket-name.yml
+{{- end }}
+
+{{- if eq .spec.distribution.common.provider.type "none" }}
+{{- if and (index .spec.distribution.modules.dr "etcdBackup") (.spec.distribution.modules.dr.etcdBackup.s3.enabled) }}
+configMapGenerator:
+  - name: etcd-backup-config
+    behavior: replace
+    literals:
+      - target={{ print "minio:" .spec.distribution.modules.dr.etcdBackup.s3.bucketName }}
+      - retention={{ .spec.distribution.modules.dr.etcdBackup.s3.retentionTime }}
+{{- end }}
 {{- end }}
 
 secretGenerator:
@@ -59,9 +69,9 @@ secretGenerator:
     - cloud=secrets/cloud-credentials.config
 {{- end }}
 {{- if and (index .spec.distribution.modules.dr "etcdBackup") (.spec.distribution.modules.dr.etcdBackup.s3.enabled) }}
-- name: rclone-etcdbackup-conf
-  namespace: kube-system
-  files:
-    - rclone.conf=secrets/rclone.conf
+  - name: etcd-backup-s3-rclone-conf
+    behavior: replace
+    files:
+      - secrets/rclone.conf
 {{- end }}
 {{- end }}
