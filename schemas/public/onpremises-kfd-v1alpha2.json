@@ -9,7 +9,9 @@
     },
     "kind": {
       "type": "string",
-      "enum": ["OnPremises"]
+      "enum": [
+        "OnPremises"
+      ]
     },
     "metadata": {
       "$ref": "#/$defs/Metadata"
@@ -19,7 +21,12 @@
     }
   },
   "additionalProperties": false,
-  "required": ["apiVersion", "kind", "metadata", "spec"],
+  "required": [
+    "apiVersion",
+    "kind",
+    "metadata",
+    "spec"
+  ],
   "$defs": {
     "Metadata": {
       "type": "object",
@@ -32,7 +39,9 @@
           "maxLength": 56
         }
       },
-      "required": ["name"]
+      "required": [
+        "name"
+      ]
     },
     "Spec": {
       "type": "object",
@@ -53,7 +62,10 @@
           "$ref": "./spec-plugins.json"
         }
       },
-      "required": ["distributionVersion", "distribution"]
+      "required": [
+        "distributionVersion",
+        "distribution"
+      ]
     },
     "Spec.Kubernetes": {
       "type": "object",
@@ -131,7 +143,10 @@
           "description": "The path to the private key to use to connect to the hosts"
         }
       },
-      "required": ["username", "keyPath"]
+      "required": [
+        "username",
+        "keyPath"
+      ]
     },
     "Spec.Kubernetes.Proxy": {
       "type": "object",
@@ -177,7 +192,9 @@
           "description": "Additional configuration to append to HAProxy's configuration file."
         }
       },
-      "required": ["enabled"],
+      "required": [
+        "enabled"
+      ],
       "if": {
         "properties": {
           "enabled": {
@@ -186,7 +203,11 @@
         }
       },
       "then": {
-        "required": ["hosts", "keepalived", "stats"]
+        "required": [
+          "hosts",
+          "keepalived",
+          "stats"
+        ]
       }
     },
     "Spec.Kubernetes.LoadBalancers.Host": {
@@ -202,7 +223,10 @@
           "description": "The IP address of the host."
         }
       },
-      "required": ["name", "ip"]
+      "required": [
+        "name",
+        "ip"
+      ]
     },
     "Spec.Kubernetes.LoadBalancers.Keepalived": {
       "type": "object",
@@ -230,7 +254,9 @@
           "maxLength": 8
         }
       },
-      "required": ["enabled"],
+      "required": [
+        "enabled"
+      ],
       "if": {
         "properties": {
           "enabled": {
@@ -239,7 +265,12 @@
         }
       },
       "then": {
-        "required": ["interface", "ip", "virtualRouterId", "passphrase"]
+        "required": [
+          "interface",
+          "ip",
+          "virtualRouterId",
+          "passphrase"
+        ]
       }
     },
     "Spec.Kubernetes.LoadBalancers.Stats": {
@@ -256,7 +287,10 @@
           "description": "The basic-auth password for HAProxy's stats page."
         }
       },
-      "required": ["username", "password"]
+      "required": [
+        "username",
+        "password"
+      ]
     },
     "Spec.Kubernetes.Masters": {
       "type": "object",
@@ -278,7 +312,9 @@
           "$ref": "#/$defs/Types.KubeAnnotations"
         }
       },
-      "required": ["hosts"]
+      "required": [
+        "hosts"
+      ]
     },
     "Spec.Kubernetes.Masters.Host": {
       "type": "object",
@@ -293,7 +329,10 @@
           "description": "The IP address of the host"
         }
       },
-      "required": ["name", "ip"]
+      "required": [
+        "name",
+        "ip"
+      ]
     },
     "Spec.Kubernetes.Etcd": {
       "type": "object",
@@ -353,7 +392,10 @@
           }
         },
         "taints": {
-          "type": ["array", "null"],
+          "type": [
+            "array",
+            "null"
+          ],
           "items": {
             "$ref": "#/$defs/Types.KubeTaints"
           }
@@ -367,7 +409,10 @@
           "$ref": "#/$defs/Types.KubeAnnotations"
         }
       },
-      "required": ["name", "hosts"]
+      "required": [
+        "name",
+        "hosts"
+      ]
     },
     "Spec.Kubernetes.Nodes.Node.Host": {
       "type": "object",
@@ -382,7 +427,10 @@
           "type": "string"
         }
       },
-      "required": ["name", "ip"]
+      "required": [
+        "name",
+        "ip"
+      ]
     },
     "Spec.Kubernetes.AdvancedAnsible": {
       "type": "object",
@@ -599,7 +647,12 @@
                   "description": "The GPG key ID of the Apt repository. Example: `36A1D7869245C8950F966E92D8576A8BA88D21E9`"
                 }
               },
-              "required": ["name", "repo", "gpg_key", "gpg_key_id"]
+              "required": [
+                "name",
+                "repo",
+                "gpg_key",
+                "gpg_key_id"
+              ]
             },
             "yum": {
               "type": "object",
@@ -652,16 +705,22 @@
           "$ref": "../public/spec-distribution-custompatches.json"
         }
       },
-      "required": ["modules"],
+      "required": [
+        "modules"
+      ],
       "if": {
         "allOf": [
           {
-            "required": ["common"]
+            "required": [
+              "common"
+            ]
           },
           {
             "properties": {
               "common": {
-                "required": ["provider"]
+                "required": [
+                  "provider"
+                ]
               }
             }
           },
@@ -670,7 +729,9 @@
               "common": {
                 "properties": {
                   "provider": {
-                    "required": ["type"]
+                    "required": [
+                      "type"
+                    ]
                   }
                 }
               }
@@ -736,7 +797,9 @@
           "description": "The provider type. Don't set. FOR INTERNAL USE ONLY."
         }
       },
-      "required": ["type"]
+      "required": [
+        "type"
+      ]
     },
     "Spec.Distribution.Modules": {
       "type": "object",
@@ -767,7 +830,12 @@
           "$ref": "#/$defs/Spec.Distribution.Modules.Policy"
         }
       },
-      "required": ["dr", "ingress", "logging", "policy"]
+      "required": [
+        "dr",
+        "ingress",
+        "logging",
+        "policy"
+      ]
     },
     "Spec.Distribution.Modules.Ingress": {
       "type": "object",
@@ -807,10 +875,15 @@
           }
         },
         "then": {
-          "required": ["certManager"]
+          "required": [
+            "certManager"
+          ]
         }
       },
-      "required": ["baseDomain", "nginx"]
+      "required": [
+        "baseDomain",
+        "nginx"
+      ]
     },
     "Spec.Distribution.Modules.Ingress.Overrides": {
       "type": "object",
@@ -857,7 +930,11 @@
       "properties": {
         "type": {
           "type": "string",
-          "enum": ["none", "single", "dual"],
+          "enum": [
+            "none",
+            "single",
+            "dual"
+          ],
           "description": "The type of the Ingress nginx controller, options are:\n- `none`: no ingress controller will be installed and no infrastructural ingresses will be created.\n- `single`: a single ingress controller with ingress class `nginx` will be installed to manage all the ingress resources, infrastructural ingresses will be created.\n- `dual`: two independent ingress controllers will be installed, one for the `internal` ingress class intended for private ingresses and one for the `external` ingress class intended for public ingresses. KFD infrastructural ingresses wil use the `internal` ingress class when using the dual type.\n\nDefault is `single`."
         },
         "tls": {
@@ -867,7 +944,9 @@
           "$ref": "#/$defs/Types.FuryModuleComponentOverrides"
         }
       },
-      "required": ["type"]
+      "required": [
+        "type"
+      ]
     },
     "Spec.Distribution.Modules.Ingress.Nginx.TLS": {
       "type": "object",
@@ -875,14 +954,20 @@
       "properties": {
         "provider": {
           "type": "string",
-          "enum": ["certManager", "secret", "none"],
+          "enum": [
+            "certManager",
+            "secret",
+            "none"
+          ],
           "description": "The provider of the TLS certificates for the ingresses, one of: `none`, `certManager`, or `secret`."
         },
         "secret": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.Nginx.TLS.Secret"
         }
       },
-      "required": ["provider"],
+      "required": [
+        "provider"
+      ],
       "if": {
         "properties": {
           "provider": {
@@ -891,7 +976,9 @@
         }
       },
       "then": {
-        "required": ["secret"]
+        "required": [
+          "secret"
+        ]
       }
     },
     "Spec.Distribution.Modules.Ingress.Nginx.TLS.Secret": {
@@ -912,7 +999,11 @@
           "description": "The Certificate Authority certificate file's content. You can use the `\"{file://<path>}\"` notation to get the content from a file."
         }
       },
-      "required": ["ca", "cert", "key"]
+      "required": [
+        "ca",
+        "cert",
+        "key"
+      ]
     },
     "Spec.Distribution.Modules.Ingress.CertManager": {
       "type": "object",
@@ -926,7 +1017,9 @@
           "$ref": "#/$defs/Types.FuryModuleComponentOverrides"
         }
       },
-      "required": ["clusterIssuer"]
+      "required": [
+        "clusterIssuer"
+      ]
     },
     "Spec.Distribution.Modules.Ingress.CertManager.ClusterIssuer": {
       "type": "object",
@@ -944,7 +1037,9 @@
         },
         "type": {
           "type": "string",
-          "enum": ["http01"],
+          "enum": [
+            "http01"
+          ],
           "description": "The type of the clusterIssuer. Only `http01` challenge is supported for on-premises clusters. See solvers for arbitrary configurations."
         },
         "solvers": {
@@ -952,13 +1047,20 @@
           "description": "The list of challenge solvers to use instead of the default one for the `http01` challenge. Check [cert manager's documentation](https://cert-manager.io/docs/configuration/acme/#adding-multiple-solver-types) for examples for this field."
         }
       },
-      "required": ["name", "email"],
+      "required": [
+        "name",
+        "email"
+      ],
       "oneOf": [
         {
-          "required": ["type"]
+          "required": [
+            "type"
+          ]
         },
         {
-          "required": ["solvers"]
+          "required": [
+            "solvers"
+          ]
         }
       ]
     },
@@ -972,7 +1074,12 @@
         },
         "type": {
           "type": "string",
-          "enum": ["none", "opensearch", "loki", "customOutputs"],
+          "enum": [
+            "none",
+            "opensearch",
+            "loki",
+            "customOutputs"
+          ],
           "description": "Selects the logging stack. Options are:\n- `none`: will disable the centralized logging.\n- `opensearch`: will deploy and configure the Logging Operator and an OpenSearch cluster (can be single or triple for HA) where the logs will be stored.\n- `loki`: will use a distributed Grafana Loki instead of OpenSearch for storage.\n- `customOuputs`: the Logging Operator will be deployed and installed but without in-cluster storage, you will have to create the needed Outputs and ClusterOutputs to ship the logs to your desired storage.\n\nDefault is `opensearch`."
         },
         "opensearch": {
@@ -994,7 +1101,9 @@
           "$ref": "#/$defs/Spec.Distribution.Modules.Logging.CustomOutputs"
         }
       },
-      "required": ["type"],
+      "required": [
+        "type"
+      ],
       "allOf": [
         {
           "if": {
@@ -1005,7 +1114,9 @@
             }
           },
           "then": {
-            "required": ["opensearch"]
+            "required": [
+              "opensearch"
+            ]
           }
         },
         {
@@ -1017,7 +1128,9 @@
             }
           },
           "then": {
-            "required": ["loki"]
+            "required": [
+              "loki"
+            ]
           }
         },
         {
@@ -1029,7 +1142,9 @@
             }
           },
           "then": {
-            "required": ["customOutputs"]
+            "required": [
+              "customOutputs"
+            ]
           }
         }
       ]
@@ -1040,7 +1155,10 @@
       "properties": {
         "type": {
           "type": "string",
-          "enum": ["single", "triple"],
+          "enum": [
+            "single",
+            "triple"
+          ],
           "description": "The type of OpenSearch deployment. One of: `single` for a single replica or `triple` for an HA 3-replicas deployment."
         },
         "resources": {
@@ -1054,7 +1172,9 @@
           "$ref": "#/$defs/Types.FuryModuleComponentOverrides"
         }
       },
-      "required": ["type"]
+      "required": [
+        "type"
+      ]
     },
     "Spec.Distribution.Modules.Logging.Cerebro": {
       "type": "object",
@@ -1102,7 +1222,10 @@
         "backend": {
           "type": "string",
           "description": "The storage backend type for Loki. `minio` will use an in-cluster MinIO deployment for object storage, `externalEndpoint` can be used to point to an external object storage instead of deploying an in-cluster MinIO.",
-          "enum": ["minio", "externalEndpoint"]
+          "enum": [
+            "minio",
+            "externalEndpoint"
+          ]
         },
         "externalEndpoint": {
           "type": "object",
@@ -1140,7 +1263,9 @@
           "$ref": "#/$defs/Types.KubeResources"
         }
       },
-      "required": ["tsdbStartDate"]
+      "required": [
+        "tsdbStartDate"
+      ]
     },
     "Spec.Distribution.Modules.Logging.Operator": {
       "type": "object",
@@ -1208,7 +1333,12 @@
       "properties": {
         "type": {
           "type": "string",
-          "enum": ["none", "prometheus", "prometheusAgent", "mimir"],
+          "enum": [
+            "none",
+            "prometheus",
+            "prometheusAgent",
+            "mimir"
+          ],
           "description": "The type of the monitoring, must be `none`, `prometheus`, `prometheusAgent` or `mimir`.\n\n- `none`: will disable the whole monitoring stack.\n- `prometheus`: will install Prometheus Operator and a preconfigured Prometheus instance, Alertmanager, a set of alert rules, exporters needed to monitor all the components of the cluster, Grafana and a series of dashboards to view the collected metrics, and more.\n- `prometheusAgent`: will install Prometheus operator, an instance of Prometheus in Agent mode (no alerting, no queries, no storage), and all the exporters needed to get metrics for the status of the cluster and the workloads. Useful when having a centralized (remote) Prometheus where to ship the metrics and not storing them locally in the cluster.\n- `mimir`: will install the same as the `prometheus` option, plus Grafana Mimir that allows for longer retention of metrics and the usage of Object Storage.\n\nDefault is `prometheus`."
         },
         "overrides": {
@@ -1242,7 +1372,9 @@
           "$ref": "#/$defs/Spec.Distribution.Modules.Monitoring.Minio"
         }
       },
-      "required": ["type"]
+      "required": [
+        "type"
+      ]
     },
     "Spec.Distribution.Modules.Monitoring.Prometheus": {
       "type": "object",
@@ -1361,7 +1493,10 @@
         },
         "backend": {
           "type": "string",
-          "enum": ["minio", "externalEndpoint"],
+          "enum": [
+            "minio",
+            "externalEndpoint"
+          ],
           "description": "The storage backend type for Mimir. `minio` will use an in-cluster MinIO deployment for object storage, `externalEndpoint` can be used to point to an external S3-compatible object storage instead of deploying an in-cluster MinIO."
         },
         "externalEndpoint": {
@@ -1434,7 +1569,10 @@
         },
         "type": {
           "type": "string",
-          "enum": ["none", "tempo"],
+          "enum": [
+            "none",
+            "tempo"
+          ],
           "description": "The type of tracing to use, either `none` or `tempo`. `none` will disable the Tracing module and `tempo` will install a Grafana Tempo deployment.\n\nDefault is `tempo`."
         },
         "tempo": {
@@ -1444,7 +1582,9 @@
           "$ref": "#/$defs/Spec.Distribution.Modules.Tracing.Minio"
         }
       },
-      "required": ["type"]
+      "required": [
+        "type"
+      ]
     },
     "Spec.Distribution.Modules.Tracing.Tempo": {
       "type": "object",
@@ -1457,7 +1597,10 @@
         },
         "backend": {
           "type": "string",
-          "enum": ["minio", "externalEndpoint"],
+          "enum": [
+            "minio",
+            "externalEndpoint"
+          ],
           "description": "The storage backend type for Tempo. `minio` will use an in-cluster MinIO deployment for object storage, `externalEndpoint` can be used to point to an external S3-compatible object storage instead of deploying an in-cluster MinIO."
         },
         "externalEndpoint": {
@@ -1536,11 +1679,16 @@
         },
         "type": {
           "type": "string",
-          "enum": ["calico", "cilium"],
+          "enum": [
+            "calico",
+            "cilium"
+          ],
           "description": "The type of CNI plugin to use, either `calico` (Tigera Operator) or `cilium`. Default is `calico`."
         }
       },
-      "required": ["type"]
+      "required": [
+        "type"
+      ]
     },
     "Spec.Distribution.Modules.Networking.TigeraOperator": {
       "type": "object",
@@ -1578,7 +1726,11 @@
         },
         "type": {
           "type": "string",
-          "enum": ["none", "gatekeeper", "kyverno"],
+          "enum": [
+            "none",
+            "gatekeeper",
+            "kyverno"
+          ],
           "description": "The type of policy enforcement to use, either `none`, `gatekeeper` or `kyverno`.\n\nDefault is `none`."
         },
         "gatekeeper": {
@@ -1588,7 +1740,9 @@
           "$ref": "#/$defs/Spec.Distribution.Modules.Policy.Kyverno"
         }
       },
-      "required": ["type"],
+      "required": [
+        "type"
+      ],
       "allOf": [
         {
           "if": {
@@ -1599,7 +1753,9 @@
             }
           },
           "then": {
-            "required": ["gatekeeper"]
+            "required": [
+              "gatekeeper"
+            ]
           }
         },
         {
@@ -1611,7 +1767,9 @@
             }
           },
           "then": {
-            "required": ["kyverno"]
+            "required": [
+              "kyverno"
+            ]
           }
         }
       ]
@@ -1630,7 +1788,11 @@
         },
         "enforcementAction": {
           "type": "string",
-          "enum": ["deny", "dryrun", "warn"],
+          "enum": [
+            "deny",
+            "dryrun",
+            "warn"
+          ],
           "description": "The default enforcement action to use for the included constraints. `deny` will block the admission when violations to the policies are found, `warn` will show a message to the user but will admit the violating requests and `dryrun` won't give any feedback to the user but it will log the violations."
         },
         "installDefaultPolicies": {
@@ -1641,7 +1803,10 @@
           "$ref": "#/$defs/Types.FuryModuleComponentOverrides"
         }
       },
-      "required": ["enforcementAction", "installDefaultPolicies"]
+      "required": [
+        "enforcementAction",
+        "installDefaultPolicies"
+      ]
     },
     "Spec.Distribution.Modules.Policy.Kyverno": {
       "type": "object",
@@ -1657,7 +1822,10 @@
         },
         "validationFailureAction": {
           "type": "string",
-          "enum": ["Audit", "Enforce"],
+          "enum": [
+            "Audit",
+            "Enforce"
+          ],
           "description": "The validation failure action to use for the included policies, `Enforce` will block when a request does not comply with the policies and `Audit` will not block but log when a request does not comply with the policies."
         },
         "installDefaultPolicies": {
@@ -1668,7 +1836,10 @@
           "$ref": "#/$defs/Types.FuryModuleComponentOverrides"
         }
       },
-      "required": ["validationFailureAction", "installDefaultPolicies"]
+      "required": [
+        "validationFailureAction",
+        "installDefaultPolicies"
+      ]
     },
     "Spec.Distribution.Modules.Dr": {
       "type": "object",
@@ -1680,7 +1851,10 @@
         },
         "type": {
           "type": "string",
-          "enum": ["none", "on-premises"],
+          "enum": [
+            "none",
+            "on-premises"
+          ],
           "description": "The type of the Disaster Recovery, must be `none` or `on-premises`. `none` disables the module and `on-premises` will install Velero, an optional MinIO deployment and optionally etcd-backup.\n\nDefault is `none`."
         },
         "velero": {
@@ -1690,7 +1864,9 @@
           "$ref": "#/$defs/Spec.Distribution.Modules.Dr.EtcdBackup"
         }
       },
-      "required": ["type"],
+      "required": [
+        "type"
+      ],
       "if": {
         "properties": {
           "type": {
@@ -1699,7 +1875,11 @@
         }
       },
       "then": {
-        "required": ["type", "velero", "etcdBackup"]
+        "required": [
+          "type",
+          "velero",
+          "etcdBackup"
+        ]
       }
     },
     "Spec.Distribution.Modules.Dr.EtcdBackup": {
@@ -1709,7 +1889,12 @@
       "properties": {
         "type": {
           "type": "string",
-          "enum": ["s3", "pvc", "none", "all"],
+          "enum": [
+            "s3",
+            "pvc",
+            "none",
+            "all"
+          ],
           "description": "The type of the etcd backup to enable, options are:\n- `none`: no etcd backup CronJob will be installed and no etcd backup will be performed.\n- `s3`: the etcd-backup-s3 package will be enabled. It will deploy a CronJob which continuously snapshots a healthy etcd node and will save the backups in a configured S3 bucket.\n- `pvc`: the etcd-backup-pvc package will be enabled. It will deploy a CronJob which continuously snapshots a healthy etcd node and will save the backups in a configured PersistentVolumeClaim.\n- `all`: both kinds of backups will be enabled.\n\nDefault is `none`."
         },
         "backupPrefix": {
@@ -1780,7 +1965,10 @@
       "properties": {
         "backend": {
           "type": "string",
-          "enum": ["minio", "externalEndpoint"],
+          "enum": [
+            "minio",
+            "externalEndpoint"
+          ],
           "description": "The storage backend type for Velero. `minio` will use an in-cluster MinIO deployment for object storage, `externalEndpoint` can be used to point to an external S3-compatible object storage instead of deploying an in-cluster MinIO."
         },
         "externalEndpoint": {
@@ -1903,7 +2091,9 @@
           "$ref": "#/$defs/Spec.Distribution.Modules.Auth.OIDCKubernetesAuth"
         }
       },
-      "required": ["provider"],
+      "required": [
+        "provider"
+      ],
       "allOf": [
         {
           "if": {
@@ -1918,7 +2108,11 @@
             }
           },
           "then": {
-            "required": ["dex", "pomerium", "baseDomain"]
+            "required": [
+              "dex",
+              "pomerium",
+              "baseDomain"
+            ]
           }
         },
         {
@@ -1936,7 +2130,9 @@
           "then": {
             "properties": {
               "provider": {
-                "required": ["basicAuth"]
+                "required": [
+                  "basicAuth"
+                ]
               }
             }
           }
@@ -1967,7 +2163,10 @@
             }
           ],
           "then": {
-            "required": ["baseDomain", "dex"]
+            "required": [
+              "baseDomain",
+              "dex"
+            ]
           }
         }
       ]
@@ -1982,7 +2181,10 @@
           "description": "Set to override the node selector used to place the pods of the Auth module."
         },
         "tolerations": {
-          "type": ["array", "null"],
+          "type": [
+            "array",
+            "null"
+          ],
           "items": {
             "$ref": "#/$defs/Types.KubeToleration"
           },
@@ -2016,7 +2218,10 @@
           "description": "Use this ingress class for the ingress instead of the default one."
         }
       },
-      "required": ["host", "ingressClass"]
+      "required": [
+        "host",
+        "ingressClass"
+      ]
     },
     "Spec.Distribution.Modules.Auth.Provider": {
       "type": "object",
@@ -2024,14 +2229,20 @@
       "properties": {
         "type": {
           "type": "string",
-          "enum": ["none", "basicAuth", "sso"],
+          "enum": [
+            "none",
+            "basicAuth",
+            "sso"
+          ],
           "description": "The type of the Auth provider, options are:\n- `none`: will disable authentication in the infrastructural ingresses.\n- `sso`: will protect the infrastructural ingresses with Pomerium and Dex (SSO) and require authentication before accessing them.\n- `basicAuth`: will protect the infrastructural ingresses with HTTP basic auth (username and password) authentication.\n\nDefault is `none`."
         },
         "basicAuth": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Auth.Provider.BasicAuth"
         }
       },
-      "required": ["type"]
+      "required": [
+        "type"
+      ]
     },
     "Spec.Distribution.Modules.Auth.Provider.BasicAuth": {
       "type": "object",
@@ -2047,7 +2258,10 @@
           "description": "The password for logging in with the HTTP basic authentication."
         }
       },
-      "required": ["username", "password"]
+      "required": [
+        "username",
+        "password"
+      ]
     },
     "Spec.Distribution.Modules.Auth.Pomerium": {
       "$ref": "./spec-distribution-modules-auth-pomerium.json"
@@ -2083,7 +2297,9 @@
           "$ref": "#/$defs/Types.FuryModuleComponentOverrides"
         }
       },
-      "required": ["connectors"]
+      "required": [
+        "connectors"
+      ]
     },
     "Spec.Distribution.Modules.Auth.OIDCKubernetesAuth": {
       "type": "object",
@@ -2129,7 +2345,9 @@
           "description": "The namespace to set in the context of the kubeconfig file generated by Gangplank. Defaults to `default`."
         }
       },
-      "required": ["enabled"],
+      "required": [
+        "enabled"
+      ],
       "if": {
         "properties": {
           "enabled": {
@@ -2138,7 +2356,11 @@
         }
       },
       "then": {
-        "required": ["clientID", "clientSecret", "sessionSecurityKey"]
+        "required": [
+          "clientID",
+          "clientSecret",
+          "sessionSecurityKey"
+        ]
       }
     },
     "Types.SemVer": {
@@ -2175,7 +2397,10 @@
       "pattern": "^(http|https)\\:\\/\\/.+$"
     },
     "Types.KubeLabels": {
-      "type": ["object", "null"],
+      "type": [
+        "object",
+        "null"
+      ],
       "propertyNames": {
         "pattern": "^([a-zA-Z0-9][a-zA-Z0-9-.]*[a-zA-Z0-9]/)?([a-zA-Z0-9][-a-zA-Z0-9_.]*)?[a-zA-Z0-9]$",
         "maxLength": 253
@@ -2187,7 +2412,10 @@
       }
     },
     "Types.KubeAnnotations": {
-      "type": ["object", "null"],
+      "type": [
+        "object",
+        "null"
+      ],
       "propertyNames": {
         "pattern": "^([a-zA-Z0-9][a-zA-Z0-9-.]*[a-zA-Z0-9]/)?([a-zA-Z0-9][-a-zA-Z0-9_.]*)?[a-zA-Z0-9]$",
         "maxLength": 253
@@ -2202,7 +2430,11 @@
       "properties": {
         "effect": {
           "type": "string",
-          "enum": ["NoSchedule", "PreferNoSchedule", "NoExecute"]
+          "enum": [
+            "NoSchedule",
+            "PreferNoSchedule",
+            "NoExecute"
+          ]
         },
         "key": {
           "type": "string"
@@ -2211,10 +2443,17 @@
           "type": "string"
         }
       },
-      "required": ["effect", "key", "value"]
+      "required": [
+        "effect",
+        "key",
+        "value"
+      ]
     },
     "Types.KubeNodeSelector": {
-      "type": ["object", "null"],
+      "type": [
+        "object",
+        "null"
+      ],
       "additionalProperties": {
         "type": "string"
       }
@@ -2225,11 +2464,18 @@
       "properties": {
         "effect": {
           "type": "string",
-          "enum": ["NoSchedule", "PreferNoSchedule", "NoExecute"]
+          "enum": [
+            "NoSchedule",
+            "PreferNoSchedule",
+            "NoExecute"
+          ]
         },
         "operator": {
           "type": "string",
-          "enum": ["Exists", "Equal"]
+          "enum": [
+            "Exists",
+            "Equal"
+          ]
         },
         "key": {
           "type": "string",
@@ -2240,13 +2486,20 @@
           "description": "The value of the toleration"
         }
       },
-      "required": ["effect", "key"],
+      "required": [
+        "effect",
+        "key"
+      ],
       "anyOf": [
         {
-          "required": ["operator"]
+          "required": [
+            "operator"
+          ]
         },
         {
-          "required": ["value"]
+          "required": [
+            "value"
+          ]
         }
       ]
     },
@@ -2294,7 +2547,10 @@
           "description": "Set to override the node selector used to place the pods of the module."
         },
         "tolerations": {
-          "type": ["array", "null"],
+          "type": [
+            "array",
+            "null"
+          ],
           "items": {
             "$ref": "#/$defs/Types.KubeToleration"
           },
@@ -2317,7 +2573,10 @@
           "description": "Set to override the node selector used to place the pods of the package."
         },
         "tolerations": {
-          "type": ["array", "null"],
+          "type": [
+            "array",
+            "null"
+          ],
           "items": {
             "$ref": "#/$defs/Types.KubeToleration"
           },
