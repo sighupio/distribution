@@ -2,7 +2,7 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-{{- if and (index .spec.distribution.modules.dr "etcdBackup") (.spec.distribution.modules.dr.etcdBackup.s3)}}
+{{- if eq .spec.distribution.modules.dr.etcdBackup.type "all" "s3" }}
 [minio]
 type = s3
 provider = Minio

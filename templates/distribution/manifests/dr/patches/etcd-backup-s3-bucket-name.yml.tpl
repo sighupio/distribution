@@ -3,7 +3,7 @@
 # license that can be found in the LICENSE file.
 
 {{- if eq .spec.distribution.common.provider.type "none" }}
-{{- if index .spec.distribution.modules.dr "etcdBackup" }}
+{{- if eq .spec.distribution.modules.dr.etcdBackup.type "all" "s3" }}
 apiVersion: batch/v1
 kind: CronJob
 metadata:

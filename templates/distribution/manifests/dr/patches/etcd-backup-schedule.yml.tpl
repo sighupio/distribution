@@ -4,6 +4,7 @@
 
 {{- if eq .spec.distribution.common.provider.type "none" }}
 {{- if eq .spec.distribution.modules.dr.etcdBackup.type "all" "s3" }}
+---
 apiVersion: batch/v1
 kind: CronJob
 metadata:
