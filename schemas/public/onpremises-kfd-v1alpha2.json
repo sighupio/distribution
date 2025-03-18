@@ -1681,7 +1681,7 @@
         "type": {
           "type": "string",
           "enum": ["none", "on-premises"],
-          "description": "The type of the Disaster Recovery, must be `none` or `on-premises`. `none` disables the module and `on-premises` will install Velero and an optional MinIO deployment.\n\nDefault is `none`."
+          "description": "The type of the Disaster Recovery, must be `none` or `on-premises`. `none` disables the module and `on-premises` will install Velero, an optional MinIO deployment and optionally etcd-backup.\n\nDefault is `none`."
         },
         "velero": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Dr.Velero"
@@ -1699,30 +1699,55 @@
         }
       },
       "then": {
-        "required": ["type", "velero"]
+        "required": ["type", "velero", "etcdBackup"]
       }
     },
     "Spec.Distribution.Modules.Dr.EtcdBackup": {
       "type": "object",
-      "description": "Configuration for the ETCD backup-restore package.",
+      "description": "Configuration for the ETCD backup package.",
       "additionalProperties": false,
       "properties": {
-        "schedule": {
+        "type": {
           "type": "string",
-          "description": "The cron expression for the `full` backup schedule (default `0 1 * * *`)."
+          "enum": ["s3", "pvc", "none", "all"],
+          "description": "The type of the etcd backup to enable, options are:\n- `none`: no etcd backup CronJob will be installed and no etcd backup will be performed.\n- `s3`: the etcd-backup-s3 package will be enabled. It will deploy a CronJob which continuously snapshots a healthy etcd node and will save the backups in a configured S3 bucket.\n- `pvc`: the etcd-backup-pvc package will be enabled. It will deploy a CronJob which continuously snapshots a healthy etcd node and will save the backups in a configured PersistentVolumeClaim.\n- `all`: both kinds of backups will be enabled.\n\nDefault is `none`."
+        },
+        "backupPrefix": {
+          "type": "string",
+          "additionalProperties": false,
+          "description": "A prefix to be prepended to the backup filenames. If unset, the prefix defaults to the cluster's name."
+        },
+        "persistentVolumeClaim": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Configuration for the PersistentVolumeClaim where `etcd-backup-pvc` will store its backups.",
+          "properties": {
+            "schedule": {
+              "type": "string",
+              "description": "The cron expression for the `etcd-backup-pvc` backup schedule. Default is `0 1 * * *`."
+            },
+            "claimName": {
+              "type": "string",
+              "description": "The PersistentVolumeClaim name where the backup will be saved."
+            },
+            "retentionTime": {
+              "type": "string",
+              "description": "The retention time of the backups inside the PersistentVolumeClaim. Follows rclone's `min-age` format. Example: '30d' for 30 days."
+            }
+          }
         },
         "s3": {
           "type": "object",
           "additionalProperties": false,
-          "description": "Configuration for the remote S3 backend, where Etcd backup-restore will (optionally) send its backups.",
+          "description": "Configuration for the remote S3 bucket where `etcd-backup-s3` will send its backups.",
           "properties": {
-            "enabled": {
-              "type": "boolean",
-              "description": "If true, Etcd backup will save snapshots on S3."
+            "schedule": {
+              "type": "string",
+              "description": "The cron expression for the `etcd-backup-s3` backup schedule. Default is `0 1 * * *`."
             },
             "endpoint": {
               "type": "string",
-              "description": "External S3-compatible endpoint for Etcd backup's storage."
+              "description": "External S3-compatible endpoint for etcd-backup-s3's storage."
             },
             "insecure": {
               "type": "boolean",
@@ -1742,20 +1767,9 @@
             },
             "retentionTime": {
               "type": "string",
-              "description": "The retention time of the external S3-compatible object storage."
+              "description": "The retention time of the external S3-compatible object storage. Follows rclone's `min-age` format. Example: '30d' for 30 days."
             }
-          },
-          "allOf": [{
-            "if": {
-              "properties": {
-                "enabled": { "const": true }
-              },
-              "required": ["enabled"]
-            },
-            "then": {
-              "required": ["endpoint", "secretAccessKey", "accessKeyId", "bucketName", "retentionTime"]
-            }
-          }]
+          }
         }
       }
     },

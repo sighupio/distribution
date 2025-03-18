@@ -7,8 +7,12 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-{{- if index .spec.distribution.modules.dr "etcdBackup" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/dr/katalog/etcd-backup/etcd-backup-s3" }}
+{{- if eq .spec.distribution.modules.dr.etcdBackup.type "all" "s3" }}
+  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/dr/katalog/etcd-backup-s3" }}
+{{- end}}
+
+{{- if eq .spec.distribution.modules.dr.etcdBackup.type "all" "pvc" }}
+  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/dr/katalog/etcd-backup-pvc" }}
 {{- end}}
 
 {{- if eq .spec.distribution.common.provider.type "eks" }}
@@ -45,19 +49,49 @@ patchesStrategicMerge:
   - patches/velero-schedule-manifests.yml
   - patches/velero-schedule-full.yml
 {{- end }}
-{{- if and (index .spec.distribution.modules.dr "etcdBackup") (.spec.distribution.modules.dr.etcdBackup.s3.enabled) }}
+{{- if ne .spec.distribution.modules.dr.etcdBackup.type "none" }}
   - patches/etcd-backup-schedule.yml
 {{- end }}
 
 secretGenerator:
 {{- if eq .spec.distribution.common.provider.type "none" }}
-{{- if and (index .spec.distribution.modules.dr "etcdBackup") (.spec.distribution.modules.dr.etcdBackup.s3.enabled) }}
+{{- if ne .spec.distribution.modules.dr.etcdBackup.type "none" }}
 configMapGenerator:
-  - name: etcd-backup-config
+{{- if eq .spec.distribution.modules.dr.etcdBackup.type "all" "s3" }}
+  - name: etcd-backup-s3-config
     behavior: replace
     literals:
       - target={{ print "minio:" .spec.distribution.modules.dr.etcdBackup.s3.bucketName }}
       - retention={{ .spec.distribution.modules.dr.etcdBackup.s3.retentionTime }}
+    {{- if eq (index .spec.distribution.modules.dr.etcdBackup "backupPrefix") nil }}
+      - backup-prefix={{ print .metadata.name "-" }}
+    {{- else}}
+      - backup-prefix={{ .spec.distribution.modules.dr.etcdBackup.backupPrefix }}
+    {{- end}}
+  - name: etcd-backup-s3-certificates-location
+    behavior: replace
+    literals:
+      - ETCDCTL_CACERT=/etcd/etcd/ca.crt
+      - ETCDCTL_CERT=/etcd/apiserver-etcd-client.crt
+      - ETCDCTL_KEY=/etcd/apiserver-etcd-client.key
+{{- end }}
+{{- if eq .spec.distribution.modules.dr.etcdBackup.type "all" "pvc" }}
+  - name: etcd-backup-pvc-config
+    behavior: replace
+    literals:
+      - retention={{ .spec.distribution.modules.dr.etcdBackup.persistentVolumeClaim.retentionTime }}
+    {{- if eq (index .spec.distribution.modules.dr.etcdBackup "backupPrefix") nil }}
+      - backup-prefix={{ print .metadata.name "-" }}
+    {{- else}}
+      - backup-prefix={{ .spec.distribution.modules.dr.etcdBackup.backupPrefix }}
+    {{- end}}
+  - name: etcd-backup-pvc-certificates-location
+    behavior: replace
+    literals:
+      - ETCDCTL_CACERT=/etcd/etcd/ca.crt
+      - ETCDCTL_CERT=/etcd/apiserver-etcd-client.crt
+      - ETCDCTL_KEY=/etcd/apiserver-etcd-client.key
+{{- end }}
 {{- end }}
 {{- end }}
 
@@ -69,7 +103,7 @@ secretGenerator:
   files:
     - cloud=secrets/cloud-credentials.config
 {{- end }}
-{{- if and (index .spec.distribution.modules.dr "etcdBackup") (.spec.distribution.modules.dr.etcdBackup.s3.enabled) }}
+{{- if eq .spec.distribution.modules.dr.etcdBackup.type "all" "s3" }}
   - name: etcd-backup-s3-rclone-conf
     behavior: replace
     files:
