@@ -233,17 +233,18 @@ data:
       etcdBackup:
         type: "none"
         persistentVolumeClaim:
-          schedule: "* * * * *"
+          schedule: "0 1 * * *"
           claimName: test
           retentionTime: 10d
         s3:
-          schedule: "* * * * *"
+          schedule: "0 1 * * *"
           endpoint: s3.eu-west-1.amazonaws.com
           insecure: false
           accessKeyId: example
           secretAccessKey: example
           retentionTime: 10m
           bucketName: etcdbucket
+        
       velero:
         backend: minio
         externalEndpoint:
