@@ -7,14 +7,6 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-{{- if eq .spec.distribution.modules.dr.etcdBackup.type "all" "s3" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/dr/katalog/etcd-backup-s3" }}
-{{- end}}
-
-{{- if eq .spec.distribution.modules.dr.etcdBackup.type "all" "pvc" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/dr/katalog/etcd-backup-pvc" }}
-{{- end}}
-
 {{- if eq .spec.distribution.common.provider.type "eks" }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/dr/katalog/velero/velero-aws" }}
 {{- else if eq .spec.distribution.common.provider.type "none" }}
@@ -30,7 +22,12 @@ resources:
 {{- if .spec.distribution.modules.dr.velero.snapshotController.install }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/dr/katalog/velero/snapshot-controller" }}
 {{- end }}
-
+{{- if eq .spec.distribution.modules.dr.etcdBackup.type "all" "s3" }}
+  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/dr/katalog/etcd-backup-s3" }}
+{{- end}}
+{{- if eq .spec.distribution.modules.dr.etcdBackup.type "all" "pvc" }}
+  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/dr/katalog/etcd-backup-pvc" }}
+{{- end}}
 {{- end }}
 {{- if .spec.distribution.modules.dr.velero.schedules.install }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/dr/katalog/velero/velero-schedules" }}
@@ -38,6 +35,21 @@ resources:
 {{- if eq .spec.distribution.common.provider.type "eks" }}
   - resources/eks-velero-backupstoragelocation.yml
   - resources/eks-velero-volumesnapshotlocation.yml
+{{- end }}
+
+{{- if eq .spec.distribution.common.provider.type "none" }}
+{{- if eq .spec.distribution.modules.dr.etcdBackup.type "all" "pvc" }}
+patches:
+  - patch: |-
+      - op: replace
+        path: /spec/jobTemplate/spec/template/spec/volumes/2/persistentVolumeClaim/claimName
+        value: {{ .spec.distribution.modules.dr.etcdBackup.persistentVolumeClaim.claimName }}
+    target:
+      group: batch
+      version: v1
+      kind: CronJob
+      name: etcd-backup-pvc
+{{- end }}
 {{- end }}
 
 patchesStrategicMerge:
@@ -49,11 +61,12 @@ patchesStrategicMerge:
   - patches/velero-schedule-manifests.yml
   - patches/velero-schedule-full.yml
 {{- end }}
+{{- if eq .spec.distribution.common.provider.type "none" }}
 {{- if ne .spec.distribution.modules.dr.etcdBackup.type "none" }}
   - patches/etcd-backup-schedule.yml
 {{- end }}
+{{- end }}
 
-secretGenerator:
 {{- if eq .spec.distribution.common.provider.type "none" }}
 {{- if ne .spec.distribution.modules.dr.etcdBackup.type "none" }}
 configMapGenerator:
@@ -95,8 +108,8 @@ configMapGenerator:
 {{- end }}
 {{- end }}
 
-secretGenerator:
 {{- if eq .spec.distribution.common.provider.type "none" }}
+secretGenerator:
 {{- if eq .spec.distribution.modules.dr.velero.backend "externalEndpoint" }}
 - name: cloud-credentials
   namespace: kube-system
