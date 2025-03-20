@@ -1924,7 +1924,7 @@
         "s3": {
           "type": "object",
           "additionalProperties": false,
-          "description": "Configuration for the remote S3 bucket where `etcd-backup-s3` will send its backups.",
+          "description": "Configuration parameters for the `s3` type of `etcdBackup`.",
           "properties": {
             "schedule": {
               "type": "string",
