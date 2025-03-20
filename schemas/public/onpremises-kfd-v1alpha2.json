@@ -1952,7 +1952,7 @@
             },
             "retentionTime": {
               "type": "string",
-              "description": "The retention time of the external S3-compatible object storage. Follows rclone's `min-age` format. Example: '30d' for 30 days."
+              "description": "The retention time of the external S3-compatible object storage. Follows rclone's `min-age` format. Example: '30d' for 30 days. Default is `10d` (ten days)."
             }
           }
         }
