@@ -1913,7 +1913,7 @@
             },
             "claimName": {
               "type": "string",
-              "description": "The PersistentVolumeClaim name where the backup will be saved."
+              "description": "The PersistentVolumeClaim name where the backups will be saved. NOTE: The PVC must exist and must be created separately."
             },
             "retentionTime": {
               "type": "string",
