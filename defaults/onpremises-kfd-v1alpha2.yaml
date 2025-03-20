@@ -229,22 +229,17 @@ data:
       overrides:
         nodeSelector: null
         tolerations: null
-      # the standard configuration for velero on the dr module
       etcdBackup:
         type: "none"
-        persistentVolumeClaim:
+        pvc:
           schedule: "0 1 * * *"
-          claimName: test
           retentionTime: 10d
         s3:
           schedule: "0 1 * * *"
-          endpoint: s3.eu-west-1.amazonaws.com
+          retentionTime: 10d
           insecure: false
-          accessKeyId: example
-          secretAccessKey: example
-          retentionTime: 10m
           bucketName: etcdbucket
-        
+      # the standard configuration for velero on the dr module
       velero:
         backend: minio
         externalEndpoint:

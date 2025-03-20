@@ -3,9 +3,8 @@
 # license that can be found in the LICENSE file.
 
 {{- if eq .spec.distribution.modules.dr.etcdBackup.type "all" "s3" }}
-[minio]
+[s3]
 type = s3
-provider = Minio
 access_key_id = {{ .spec.distribution.modules.dr.etcdBackup.s3.accessKeyId }}
 secret_access_key = {{ .spec.distribution.modules.dr.etcdBackup.s3.secretAccessKey }}
 endpoint = {{ ternary "http" "https" .spec.distribution.modules.dr.etcdBackup.s3.insecure }}://{{ .spec.distribution.modules.dr.etcdBackup.s3.endpoint }}

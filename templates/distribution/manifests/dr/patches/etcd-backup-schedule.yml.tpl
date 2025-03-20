@@ -22,6 +22,6 @@ metadata:
   name: etcd-backup-pvc
   namespace: kube-system
 spec:
-  schedule: "{{ .spec.distribution.modules.dr.etcdBackup.persistentVolumeClaim.schedule }}"
+  schedule: "{{ .spec.distribution.modules.dr.etcdBackup.pvc.schedule }}"
 {{- end }}
 {{- end }}

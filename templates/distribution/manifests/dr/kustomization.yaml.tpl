@@ -38,17 +38,20 @@ resources:
 {{- end }}
 
 {{- if eq .spec.distribution.common.provider.type "none" }}
-{{- if eq .spec.distribution.modules.dr.etcdBackup.type "all" "pvc" }}
+{{- if ne .spec.distribution.modules.dr.etcdBackup.type "none" }}
 patches:
+  - path: patches/etcd-backup-schedule.yml
+{{- if eq .spec.distribution.modules.dr.etcdBackup.type "all" "pvc" }}
   - patch: |-
       - op: replace
         path: /spec/jobTemplate/spec/template/spec/volumes/2/persistentVolumeClaim/claimName
-        value: {{ .spec.distribution.modules.dr.etcdBackup.persistentVolumeClaim.claimName }}
+        value: {{ .spec.distribution.modules.dr.etcdBackup.pvc.claimName }}
     target:
       group: batch
       version: v1
       kind: CronJob
       name: etcd-backup-pvc
+{{- end }}
 {{- end }}
 {{- end }}
 
@@ -61,11 +64,6 @@ patchesStrategicMerge:
   - patches/velero-schedule-manifests.yml
   - patches/velero-schedule-full.yml
 {{- end }}
-{{- if eq .spec.distribution.common.provider.type "none" }}
-{{- if ne .spec.distribution.modules.dr.etcdBackup.type "none" }}
-  - patches/etcd-backup-schedule.yml
-{{- end }}
-{{- end }}
 
 {{- if eq .spec.distribution.common.provider.type "none" }}
 {{- if ne .spec.distribution.modules.dr.etcdBackup.type "none" }}
@@ -74,36 +72,32 @@ configMapGenerator:
   - name: etcd-backup-s3-config
     behavior: replace
     literals:
-      - target={{ print "minio:" .spec.distribution.modules.dr.etcdBackup.s3.bucketName }}
+      - target={{ print "s3:" .spec.distribution.modules.dr.etcdBackup.s3.bucketName }}
       - retention={{ .spec.distribution.modules.dr.etcdBackup.s3.retentionTime }}
+
+    {{/*
+      We specifically check for nil because otherwise Go's template engine considers a nil value (i.e. a non existing field) the same as the zero value (falsy-values).
+
+      The rationale here is if backupPrefix's left unset (i.e. nil value) we apply the cluster's name, if empty we want an empty prefix (i.e. only the date + .etcdb).
+    */}}
     {{- if eq (index .spec.distribution.modules.dr.etcdBackup "backupPrefix") nil }}
       - backup-prefix={{ print .metadata.name "-" }}
     {{- else}}
       - backup-prefix={{ .spec.distribution.modules.dr.etcdBackup.backupPrefix }}
     {{- end}}
-  - name: etcd-backup-s3-certificates-location
-    behavior: replace
-    literals:
-      - ETCDCTL_CACERT=/etcd/etcd/ca.crt
-      - ETCDCTL_CERT=/etcd/apiserver-etcd-client.crt
-      - ETCDCTL_KEY=/etcd/apiserver-etcd-client.key
+
 {{- end }}
 {{- if eq .spec.distribution.modules.dr.etcdBackup.type "all" "pvc" }}
   - name: etcd-backup-pvc-config
     behavior: replace
     literals:
-      - retention={{ .spec.distribution.modules.dr.etcdBackup.persistentVolumeClaim.retentionTime }}
+      - retention={{ .spec.distribution.modules.dr.etcdBackup.pvc.retentionTime }}
+    {{/* Same as above comment. */}}
     {{- if eq (index .spec.distribution.modules.dr.etcdBackup "backupPrefix") nil }}
       - backup-prefix={{ print .metadata.name "-" }}
     {{- else}}
       - backup-prefix={{ .spec.distribution.modules.dr.etcdBackup.backupPrefix }}
     {{- end}}
-  - name: etcd-backup-pvc-certificates-location
-    behavior: replace
-    literals:
-      - ETCDCTL_CACERT=/etcd/etcd/ca.crt
-      - ETCDCTL_CERT=/etcd/apiserver-etcd-client.crt
-      - ETCDCTL_KEY=/etcd/apiserver-etcd-client.key
 {{- end }}
 {{- end }}
 {{- end }}

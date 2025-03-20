@@ -1877,8 +1877,7 @@
       "then": {
         "required": [
           "type",
-          "velero",
-          "etcdBackup"
+          "velero"
         ]
       }
     },
@@ -1902,7 +1901,7 @@
           "additionalProperties": false,
           "description": "A prefix to be prepended to the backup filenames. If unset, the prefix defaults to the cluster's name."
         },
-        "persistentVolumeClaim": {
+        "pvc": {
           "type": "object",
           "additionalProperties": false,
           "description": "Configuration parameters for the `pvc` type of `etcdBackup`.",
@@ -1919,7 +1918,10 @@
               "type": "string",
               "description": "The retention time of the backups inside the PersistentVolumeClaim. Follows rclone's `min-age` format. Example: '30d' for 30 days. Default is `10d` (ten days)."
             }
-          }
+          },
+          "required": [
+            "claimName"
+          ]
         },
         "s3": {
           "type": "object",
@@ -1954,9 +1956,48 @@
               "type": "string",
               "description": "The retention time of the external S3-compatible object storage. Follows rclone's `min-age` format. Example: '30d' for 30 days. Default is `10d` (ten days)."
             }
+          },
+          "required": [
+            "endpoint",
+            "accessKeyId",
+            "secretAccessKey",
+            "bucketName"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "required": ["type"]
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": ["s3", "all"]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "s3"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": ["pvc", "all"]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "pvc"
+            ]
           }
         }
-      }
+      ]
     },
     "Spec.Distribution.Modules.Dr.Velero": {
       "type": "object",
