@@ -1905,7 +1905,7 @@
         "persistentVolumeClaim": {
           "type": "object",
           "additionalProperties": false,
-          "description": "Configuration for the PersistentVolumeClaim where `etcd-backup-pvc` will store its backups.",
+          "description": "Configuration parameters for the `pvc` type of `etcdBackup`.",
           "properties": {
             "schedule": {
               "type": "string",
