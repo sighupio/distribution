@@ -70,6 +70,7 @@ spec:
       dr:
         type: on-premises
         velero: {}
+        etcdBackup: {}
       auth:
         provider:
           type: basicAuth
