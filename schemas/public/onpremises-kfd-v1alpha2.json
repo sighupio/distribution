@@ -1928,7 +1928,7 @@
           "properties": {
             "schedule": {
               "type": "string",
-              "description": "The cron expression for the `etcd-backup-s3` backup schedule. Default is `0 1 * * *`."
+              "description": "The cron expression for the `etcd-backup-s3` backup schedule. Default is `0 1 * * *` (everyday at 01:00)."
             },
             "endpoint": {
               "type": "string",
