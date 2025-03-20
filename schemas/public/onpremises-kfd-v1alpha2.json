@@ -1917,7 +1917,7 @@
             },
             "retentionTime": {
               "type": "string",
-              "description": "The retention time of the backups inside the PersistentVolumeClaim. Follows rclone's `min-age` format. Example: '30d' for 30 days."
+              "description": "The retention time of the backups inside the PersistentVolumeClaim. Follows rclone's `min-age` format. Example: '30d' for 30 days. Default is `10d` (ten days)."
             }
           }
         },
