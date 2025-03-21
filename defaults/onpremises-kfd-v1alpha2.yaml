@@ -238,7 +238,6 @@ data:
           schedule: "0 1 * * *"
           retentionTime: 10d
           insecure: false
-          bucketName: etcdbucket
       # the standard configuration for velero on the dr module
       velero:
         backend: minio

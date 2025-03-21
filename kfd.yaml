@@ -2,11 +2,11 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-version: v1.31.0
+version: v1.32.0
 modules:
   auth: v0.4.0
   aws: v4.3.0
-  dr: v3.0.0
+  dr: main # feat/etcd-backup-pvc
   ingress: v3.0.1
   logging: v4.0.0
   monitoring: v3.3.0
