@@ -20,7 +20,7 @@
 
 SIGHUP Distribution (SKD) is a [CNCF certified](https://landscape.cncf.io/?selected=fury-distribution) battle-tested Kubernetes distribution based purely on upstream Kubernetes.
 
-It is developed and maintained by [SIGHUP][sighup-site] and the community, and it is fully open source.
+It is developed and maintained by [SIGHUP by ReeVo][sighup-site] and the community, and it is fully open source.
 
 > 🎯 The goal of SKD is to turn any standard Kubernetes cluster into a fully-configured production-grade cluster.
 
