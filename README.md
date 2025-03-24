@@ -1,9 +1,9 @@
 <!-- markdownlint-disable MD033 MD045 -->
 <h1 align="center">
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/sighupio/fury-distribution/refs/heads/feat/rebranding/docs/assets/white-logo.png">
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/sighupio/fury-distribution/refs/heads/feat/rebranding/docs/assets/black-logo.png">
-  <img alt="Shows a black logo in light color mode and a white one in dark color mode." src="https://raw.githubusercontent.com/sighupio/fury-distribution/refs/heads/feat/rebranding/docs/assets/white-logo.png">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/sighupio/distribution/refs/heads/main/docs/assets/white-logo.png">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/sighupio/distribution/refs/heads/main/docs/assets/black-logo.png">
+  <img alt="Shows a black logo in light color mode and a white one in dark color mode." src="https://raw.githubusercontent.com/sighupio/distribution/refs/heads/main/docs/assets/white-logo.png">
 </picture><br/>
   SIGHUP Distribution
 </h1>
@@ -23,7 +23,7 @@ SIGHUP Distribution (SKD) is a [CNCF certified](https://landscape.cncf.io/?selec
 It is developed and maintained by [SIGHUP by ReeVo][sighup-site] and the community, and it is fully open source.
 
 > 🎯 The goal of SKD is to turn any standard Kubernetes cluster into a fully-configured production-grade cluster.
-
+<!-- separator -->
 > Previously known as SKD and then KFD (Kubernetes Fury Distribution), the project is now officially named SIGHUP Distribution. ReeVo has acquired SIGHUP, but the project will continue to be open-source and freely available without any changes to its functionality.
 
 ## Un-distribution model 🧬
