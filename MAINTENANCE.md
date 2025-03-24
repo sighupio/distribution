@@ -1,6 +1,6 @@
 # SIGHUP Distribution Maintenance Guide
 
-In this document you can find the steps needed to cook a new release of KFD.
+In this document you can find the steps needed to cook a new release of SKD.
 
 Some things to know before starting:
 
