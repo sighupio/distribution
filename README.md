@@ -24,7 +24,7 @@ It is developed and maintained by [SIGHUP][sighup-site] and the community, and i
 
 > 🎯 The goal of SKD is to turn any standard Kubernetes cluster into a fully-configured production-grade cluster.
 
-> SKD was named SKD (Kubernetes Fury Distribution). SIGHUP has been acquired by ReeVo and the new name will be SIGHUP Distribution. The project will remain Open and Available, without additional changes.
+> Previously known as SKD and then KFD (Kubernetes Fury Distribution), the project is now officially named SIGHUP Distribution. ReeVo has acquired SIGHUP, but the project will continue to be open-source and freely available without any changes to its functionality.
 
 ## Un-distribution model 🧬
 
