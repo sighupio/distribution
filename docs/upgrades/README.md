@@ -1,4 +1,4 @@
-# SIGHUP Kubernetes Distribution Upgrade Path
+# SIGHUP Distribution Upgrade Path
 
 SKD Upgrades are now managed by furyctl.
 

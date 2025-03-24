@@ -1,4 +1,4 @@
-# SIGHUP Kubernetes Distribution Maintenance Guide
+# SIGHUP Distribution Maintenance Guide
 
 In this document you can find the steps needed to cook a new release of KFD.
 

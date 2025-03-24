@@ -5,10 +5,10 @@
   <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/sighupio/fury-distribution/refs/heads/feat/rebranding/docs/assets/black-logo.png">
   <img alt="Shows a black logo in light color mode and a white one in dark color mode." src="https://raw.githubusercontent.com/sighupio/fury-distribution/refs/heads/feat/rebranding/docs/assets/white-logo.png">
 </picture><br/>
-  SIGHUP Kubernetes Distribution
+  SIGHUP Distribution
 </h1>
 
-<p align="center">SIGHUP Kubernetes Distribution (SKD) is a certified battle-tested Kubernetes distribution based purely on upstream Kubernetes.</p>
+<p align="center">SIGHUP Distribution (SKD) is a certified battle-tested Kubernetes distribution based purely on upstream Kubernetes.</p>
 <!-- markdownlint-enable MD033 MD045 -->
 
 [![Build Status](http://ci.sighup.io/api/badges/sighupio/fury-distribution/status.svg?ref=refs/tags/v1.31.0)](http://ci.sighup.io/sighupio/fury-distribution)
@@ -18,13 +18,13 @@
 
 ## Overview
 
-SIGHUP Kubernetes Distribution (SKD) is a [CNCF certified](https://landscape.cncf.io/?selected=fury-distribution) battle-tested Kubernetes distribution based purely on upstream Kubernetes.
+SIGHUP Distribution (SKD) is a [CNCF certified](https://landscape.cncf.io/?selected=fury-distribution) battle-tested Kubernetes distribution based purely on upstream Kubernetes.
 
 It is developed and maintained by [SIGHUP][sighup-site] and the community, and it is fully open source.
 
 > 🎯 The goal of SKD is to turn any standard Kubernetes cluster into a fully-configured production-grade cluster.
 
-> SKD was named SKD (Kubernetes Fury Distribution). SIGHUP has been acquired by ReeVo and the new name will be SIGHUP Kubernetes Distribution. The project will remain Open and Available, without additional changes.
+> SKD was named SKD (Kubernetes Fury Distribution). SIGHUP has been acquired by ReeVo and the new name will be SIGHUP Distribution. The project will remain Open and Available, without additional changes.
 
 ## Un-distribution model 🧬
 
@@ -43,7 +43,7 @@ SKD uses an **un-distribution model**. This means that we:
 </p>
 <!-- markdownlint-enable MD033 MD045 -->
 
-SIGHUP Kubernetes Distribution is structured on modules, and each module has a set of packages.
+SIGHUP Distribution is structured on modules, and each module has a set of packages.
 
 - A package is a single unit of functionality.
 - A module groups packages that are functionally related together.
@@ -151,7 +151,7 @@ Also, check the [versioning documentation file][versioning] to know more about t
 
 ## CNCF Certified 🎓
 
-Each version of the SIGHUP Kubernetes Distribution that introduces compatibility with a new version of Kubernetes goes through a [conformance certification process with the CNCF][cncf-conformance]. Certified solutions are validated to ensure a set of guarantees such as consistency, timely updates and confirmability.
+Each version of the SIGHUP Distribution that introduces compatibility with a new version of Kubernetes goes through a [conformance certification process with the CNCF][cncf-conformance]. Certified solutions are validated to ensure a set of guarantees such as consistency, timely updates and confirmability.
 
 SKD has been certified by the [CNCF] (Cloud Native Computing Foundation) as a _Certified Kubernetes Distribution_ for all Kubernetes versions since [Kubernetes 1.12](https://github.com/cncf/k8s-conformance/pull/619). Clicking on the badge below you can see the certification process for the latest version of SKD:
 

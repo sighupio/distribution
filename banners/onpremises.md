@@ -1,6 +1,6 @@
 # OnPremises - SKD On Premises Cluster Schema
 
-This document explains the full schema for the `kind: OnPremises` for the `furyctl.yaml` file used by `furyctl`. This configuration file will be used to deploy the SIGHUP Kubernetes Distribution modules and cluster on premises.
+This document explains the full schema for the `kind: OnPremises` for the `furyctl.yaml` file used by `furyctl`. This configuration file will be used to deploy the SIGHUP Distribution modules and cluster on premises.
 
 An example configuration file can be created by running the following command:
 

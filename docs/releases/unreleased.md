@@ -1,4 +1,4 @@
-# SIGHUP Kubernetes Distribution Release vTBD
+# SIGHUP Distribution Release vTBD
 
 Welcome to SKD release `vTBD`.
 
