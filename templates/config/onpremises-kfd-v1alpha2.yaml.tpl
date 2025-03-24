@@ -7,7 +7,7 @@
 # This is a sample configuration file to be used as a starting point. For the
 # complete reference of the configuration file schema, please refer to the
 # official documentation:
-# https://docs.kubernetesfury.com/docs/furyctl/providers/onpremises
+# https://docs.kubernetesfury.com/docs/installation/kfd-configuration/providers/OnPremises
 
 ---
 apiVersion: kfd.sighup.io/v1alpha2
@@ -47,7 +47,7 @@ spec:
         interface: eth1
         ip: 192.168.1.201/24
         virtualRouterId: "201"
-        passphrase: "123aaaccc321"
+        passphrase: "123ab321"
       stats:
         username: admin
         password: password

@@ -7,7 +7,7 @@
 # This is a sample configuration file to be used as a starting point. For the
 # complete reference of the configuration file schema, please refer to the
 # official documentation:
-# https://docs.kubernetesfury.com/docs/furyctl/providers/kfddistribution
+# https://docs.kubernetesfury.com/docs/installation/kfd-configuration/providers/KFDDistribution
 
 ---
 apiVersion: kfd.sighup.io/v1alpha2
