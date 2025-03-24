@@ -2,7 +2,7 @@
 
 Welcome to SKD release `vTBD`.
 
-The distribution is maintained with ❤️ by the team [SIGHUP](https://sighup.io/).
+The distribution is maintained with ❤️ by the team [SIGHUP by ReeVo](https://sighup.io/).
 
 ## New Features since `v1.31.0`
 
