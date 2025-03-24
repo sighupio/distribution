@@ -1910,18 +1910,27 @@
               "type": "string",
               "description": "The cron expression for the `etcd-backup-pvc` backup schedule. Default is `0 1 * * *` (everyday at 01:00)."
             },
-            "claimName": {
+            "name": {
               "type": "string",
-              "description": "The PersistentVolumeClaim name where the backups will be saved. NOTE: The PVC must exist and must be created separately."
+              "description": "The PersistentVolumeClaim name where the backups will be saved. If set, `size` and `storageClass` will be ignored and `etcd-backup` will use the PersistentVolumeClaim that matches the name set. Please note that the PersistentVolumeClaim must be created inside the `kube-system` namespace.\n\nIf you leave `name` unset `furyctl` will create a PersistentVolumeClaim for you with an arbitrary name."
+            },
+            "size": {
+              "type": "string",
+              "description": "The size that the `furyctl`-managed PersistentVolumeClaim will use. This has no effect and is ignored if `name` is set. Default is `10G`."
+            },
+            "accessModes": {
+              "type": "array",
+              "description": "The accessModes that the `furyctl`-managed PersistentVolumeClaim will use. This has no effect and is ignored if `name` is set. Default is `[\"ReadOnlyOnce\"]`"
+            },
+            "storageClass": {
+              "type": "string",
+              "description": "The storage class that the `furyctl`-managed PersistentVolumeClaim will use. This has no effect and is ignored if `name` is set. Default is `default`."
             },
             "retentionTime": {
               "type": "string",
               "description": "The retention time of the backups inside the PersistentVolumeClaim. Follows rclone's `min-age` format. Example: '30d' for 30 days. Default is `10d` (ten days)."
             }
-          },
-          "required": [
-            "claimName"
-          ]
+          }
         },
         "s3": {
           "type": "object",

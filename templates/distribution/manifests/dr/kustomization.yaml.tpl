@@ -27,7 +27,10 @@ resources:
 {{- end}}
 {{- if eq .spec.distribution.modules.dr.etcdBackup.type "all" "pvc" }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/dr/katalog/etcd-backup-pvc" }}
-{{- end}}
+{{- if not (index .spec.distribution.modules.dr.etcdBackup.pvc "name") }}
+  - resources/etcd-backup-pvc.yml
+{{- end }}
+{{- end }}
 {{- end }}
 {{- if .spec.distribution.modules.dr.velero.schedules.install }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/dr/katalog/velero/velero-schedules" }}
@@ -45,7 +48,11 @@ patches:
   - patch: |-
       - op: replace
         path: /spec/jobTemplate/spec/template/spec/volumes/2/persistentVolumeClaim/claimName
-        value: {{ .spec.distribution.modules.dr.etcdBackup.pvc.claimName }}
+{{- if index .spec.distribution.modules.dr.etcdBackup.pvc "name" }}
+        value: {{ .spec.distribution.modules.dr.etcdBackup.pvc.name }}
+{{- else }}
+        value: "etcd-backup-pvc-storage"
+{{- end }}
     target:
       group: batch
       version: v1
@@ -82,9 +89,9 @@ configMapGenerator:
     */}}
     {{- if eq (index .spec.distribution.modules.dr.etcdBackup "backupPrefix") nil }}
       - backup-prefix={{ print .metadata.name "-" }}
-    {{- else}}
+    {{- else }}
       - backup-prefix={{ .spec.distribution.modules.dr.etcdBackup.backupPrefix }}
-    {{- end}}
+    {{- end }}
 
 {{- end }}
 {{- if eq .spec.distribution.modules.dr.etcdBackup.type "all" "pvc" }}
@@ -92,12 +99,12 @@ configMapGenerator:
     behavior: replace
     literals:
       - retention={{ .spec.distribution.modules.dr.etcdBackup.pvc.retentionTime }}
-    {{/* Same as above comment. */}}
+    {{/* Same comment as above. */}}
     {{- if eq (index .spec.distribution.modules.dr.etcdBackup "backupPrefix") nil }}
       - backup-prefix={{ print .metadata.name "-" }}
-    {{- else}}
+    {{- else }}
       - backup-prefix={{ .spec.distribution.modules.dr.etcdBackup.backupPrefix }}
-    {{- end}}
+    {{- end }}
 {{- end }}
 {{- end }}
 {{- end }}

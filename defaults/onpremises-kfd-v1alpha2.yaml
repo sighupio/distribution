@@ -234,6 +234,9 @@ data:
         pvc:
           schedule: "0 1 * * *"
           retentionTime: 10d
+          size: 10G
+          storageClass: null
+          accessModes: ["ReadWriteOnce"]
         s3:
           schedule: "0 1 * * *"
           retentionTime: 10d
