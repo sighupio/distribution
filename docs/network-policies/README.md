@@ -1,6 +1,6 @@
 # Network Policies Documentation
 
-This documentation describes all Network Policies of the KFD components for the OnPremises schema.
+This documentation describes all Network Policies of the SKD components for the OnPremises schema.
 
 ## Modules
 - [Auth](modules/auth/README.md) - Pomerium SSO

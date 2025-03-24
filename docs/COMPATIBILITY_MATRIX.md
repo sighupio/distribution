@@ -2,13 +2,13 @@
 
 ## Maintained releases
 
-Next is a table with the KFD releases that are under active maintenance and their compatibility with current Kubernetes versions.
+Next is a table with the SKD releases that are under active maintenance and their compatibility with current Kubernetes versions.
 
-For a complete list of all KFD releases and their compatibility with Kubernetes versions please see the [unmaintained releases section](#unmaintained-releases-%EF%B8%8F) below.
+For a complete list of all SKD releases and their compatibility with Kubernetes versions please see the [unmaintained releases section](#unmaintained-releases-%EF%B8%8F) below.
 
 ℹ️ **Use the latest patch release for your desired version whenever it's possible**. See [the versioning file](VERSIONING.md) for more information.
 
-| KFD / Kubernetes Version                                                      | v1.31.X   | v1.30.X            | v1.29.X            | v1.28.X            |
+| SKD / Kubernetes Version                                                      | v1.31.X   | v1.30.X            | v1.29.X            | v1.28.X            |
 | ----------------------------------------------------------------------------- | ----------| ------------------ | ------------------ | ------------------ |
 | [v1.31.0](https://github.com/sighupio/fury-distribution/releases/tag/v1.31.0) | :warning: |                    |                    |                    |
 | [v1.30.1](https://github.com/sighupio/fury-distribution/releases/tag/v1.30.1) |           | :white_check_mark: |                    |                    |
@@ -36,18 +36,18 @@ For a complete list of all KFD releases and their compatibility with Kubernetes 
 
 ## Warnings ⚠️
 
-- v1.31.0 (OnPremises): **use only with `furyctl >= 0.31.1`**. This KFD version used the version `1.31.4` of the On-premises installer that had an issue in the upgrade process to v1.31. This issue was patched in `v1.31.4-rev.1` of the installer and is automatically used when using furyctl >= 0.31.1.
+- v1.31.0 (OnPremises): **use only with `furyctl >= 0.31.1`**. This SKD version used the version `1.31.4` of the On-premises installer that had an issue in the upgrade process to v1.31. This issue was patched in `v1.31.4-rev.1` of the installer and is automatically used when using furyctl >= 0.31.1.
 
 
-### furyctl and KFD compatibility
+### furyctl and SKD compatibility
 
 Check [furyctl](https://github.com/sighupio/furyctl)'s repository for more information on compatibility between versions.
 
 ## Unmaintained releases 🗄️
 
-In the following table, you can check the compatibility of KFD releases that are not maintained anymore with older Kubernetes versions.
+In the following table, you can check the compatibility of SKD releases that are not maintained anymore with older Kubernetes versions.
 
-| KFD / Kubernetes Version                                                        | v1.27.X            | v1.26.X            | 1.25.X             | 1.24.X             |       1.23.X       |       1.22.X       |       1.21.X       |       1.20.X       |       1.19.X       |       1.18.X       |       1.17.X       |       1.16.X       |       1.15.X       |       1.14.X       |
+| SKD / Kubernetes Version                                                        | v1.27.X            | v1.26.X            | 1.25.X             | 1.24.X             |       1.23.X       |       1.22.X       |       1.21.X       |       1.20.X       |       1.19.X       |       1.18.X       |       1.17.X       |       1.16.X       |       1.15.X       |       1.14.X       |
 | ------------------------------------------------------------------------------- | ------------------ | ------------------ | ------------------ | ------------------ | :----------------: | :----------------: | :----------------: | :----------------: | :----------------: | :----------------: | :----------------: | :----------------: | :----------------: | :----------------: |
 | [v1.27.9](https://github.com/sighupio/fury-distribution/releases/tag/v1.27.9)   | :white_check_mark: |                    |                    |                    |                    |                    |                    |                    |                    |                    |                    |                    |                    |                    |
 | [v1.27.8](https://github.com/sighupio/fury-distribution/releases/tag/v1.27.8)   | :white_check_mark: |                    |                    |                    |                    |                    |                    |                    |                    |                    |                    |                    |                    |                    |

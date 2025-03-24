@@ -1,8 +1,8 @@
-# KFD Network Policies Overview
+# SKD Network Policies Overview
 
 ```mermaid
 graph TD
-    subgraph kfd[KFD Core Modules]
+    subgraph kfd[SKD Core Modules]
         ingress[Ingress<br/>Nginx + Cert-manager]
         auth[Auth<br/>Pomerium]
         mon[Monitoring<br/>Prometheus/Mimir]
