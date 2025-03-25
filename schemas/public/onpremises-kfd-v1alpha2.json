@@ -310,6 +310,10 @@
         "annotations": {
           "description": "Optional additional Kubernetes annotations that will be added to the control-plane nodes. Follows Kubernetes annotations format. **Existing annotations with the same key will be overwritten**.",
           "$ref": "#/$defs/Types.KubeAnnotations"
+        },
+        "kubeletConfiguration": {
+          "description": "Optional Kubelet configuration specific to control-plane nodes. If set, this will override the global `advanced.kubeletConfiguration`.",
+          "$ref": "#/$defs/Spec.Kubernetes.Advanced.KubeletConfiguration"
         }
       },
       "required": [
@@ -407,6 +411,10 @@
         "annotations": {
           "description": "Optional additional Kubernetes annotations that will be added to the nodes in this node group. Follows Kubernetes annotations format. **Existing annotations with the same key will be overwritten**.",
           "$ref": "#/$defs/Types.KubeAnnotations"
+        },
+        "kubeletConfiguration": {
+          "description": "Optional Kubelet configuration specific to worker nodes. If set, this will override the global `advanced.kubeletConfiguration`.",
+          "$ref": "#/$defs/Spec.Kubernetes.Advanced.KubeletConfiguration"
         }
       },
       "required": [
@@ -471,6 +479,16 @@
         "registry": {
           "type": "string",
           "description": "URL of the registry where to pull images from for the Kubernetes phase. (Default is registry.sighup.io/fury/on-premises)."
+        },
+        "apiServerCertSANs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Additional Subject Alternative Names for the API server certificates. These are used to secure connections to the API server from various clients."
+        },
+        "kubeletConfiguration": {
+          "$ref": "#/$defs/Spec.Kubernetes.Advanced.KubeletConfiguration"
         }
       }
     },
@@ -690,6 +708,11 @@
           }
         }
       }
+    },
+    "Spec.Kubernetes.Advanced.KubeletConfiguration": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Advanced configuration for Kubelet. This open field allows users to specify any parameter supported by the KubeletConfiguration. Examples of uses include controlling the maximum number of pods per core (`podsPerCore`), managing container logging (`containerLogMaxSize`), Topology Manager options (`topologyManagerPolicyOptions`). All values must follow the official Kubelet specification: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/."
     },
     "Spec.Distribution": {
       "type": "object",
