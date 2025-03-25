@@ -7,5 +7,77 @@ module "eks_addons" {
   cluster_name = "{{ .metadata.name }}"
   ebs_csi_driver = {
     service_account_role_arn = module.ebs_csi_driver_iam_role.ebs_csi_driver_iam_role_arn
+    configuration_values = jsonencode({
+      controller =  {
+          tolerations = [
+            {{- range $toleration := .spec.distribution.common.tolerations }}
+            {
+              {{- if $toleration.key }}
+              key = "{{ $toleration.key }}"
+              {{- end }}
+              {{- if $toleration.value }}
+              value = "{{ $toleration.value }}"
+              {{- end }}
+              {{- if $toleration.effect }}
+              effect = "{{ $toleration.effect }}"
+              {{- end }}
+            }
+          {{- end }}
+          ]
+          nodeSelector = {
+            {{- range $k,$v := .spec.distribution.common.nodeSelector }}
+              "{{ $k }}" = "{{ $v }}"
+            {{- end }}
+          }
+        }
+    })
+  }
+  coredns = {
+    configuration_values = jsonencode({
+      tolerations = [
+        {{- range $toleration := .spec.distribution.common.tolerations }}
+        {
+          {{- if $toleration.key }}
+          key = "{{ $toleration.key }}"
+          {{- end }}
+          {{- if $toleration.value }}
+          value = "{{ $toleration.value }}"
+          {{- end }}
+          {{- if $toleration.effect }}
+          effect = "{{ $toleration.effect }}"
+          {{- end }}
+        }
+      {{- end }}
+      ]
+      nodeSelector = {
+        {{- range $k,$v := .spec.distribution.common.nodeSelector }}
+          "{{ $k }}" = "{{ $v }}"
+        {{- end }}
+      }
+    })
+  }
+  snapshot_controller = {
+    configuration_values = jsonencode({
+      tolerations = [
+        {{- range $toleration := .spec.distribution.common.tolerations }}
+        {
+          {{- if $toleration.key }}
+          key = "{{ $toleration.key }}"
+          {{- end }}
+          {{- if $toleration.value }}
+          value = "{{ $toleration.value }}"
+          {{- end }}
+          {{- if $toleration.effect }}
+          effect = "{{ $toleration.effect }}"
+          {{- end }}
+        }
+      {{- end }}
+      ]
+      nodeSelector = {
+        {{- range $k,$v := .spec.distribution.common.nodeSelector }}
+          "{{ $k }}" = "{{ $v }}"
+        {{- end }}
+      }
+    })
   }
 }

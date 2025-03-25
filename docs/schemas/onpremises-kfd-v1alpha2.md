@@ -1,6 +1,6 @@
-# OnPremises - KFD On Premises Cluster Schema
+# OnPremises - SKD On Premises Cluster Schema
 
-This document explains the full schema for the `kind: OnPremises` for the `furyctl.yaml` file used by `furyctl`. This configuration file will be used to deploy the Kubernetes Fury Distribution modules and cluster on premises.
+This document explains the full schema for the `kind: OnPremises` for the `furyctl.yaml` file used by `furyctl`. This configuration file will be used to deploy the SIGHUP Distribution modules and cluster on premises.
 
 An example configuration file can be created by running the following command:
 
@@ -4518,15 +4518,17 @@ Defines the Kubernetes components configuration and the values needed for the ku
 
 ### Properties
 
-| Property                                        | Type     | Required |
-|:------------------------------------------------|:---------|:---------|
-| [airGap](#speckubernetesadvancedairgap)         | `object` | Optional |
-| [cloud](#speckubernetesadvancedcloud)           | `object` | Optional |
-| [containerd](#speckubernetesadvancedcontainerd) | `object` | Optional |
-| [encryption](#speckubernetesadvancedencryption) | `object` | Optional |
-| [oidc](#speckubernetesadvancedoidc)             | `object` | Optional |
-| [registry](#speckubernetesadvancedregistry)     | `string` | Optional |
-| [users](#speckubernetesadvancedusers)           | `object` | Optional |
+| Property                                                            | Type     | Required |
+|:--------------------------------------------------------------------|:---------|:---------|
+| [airGap](#speckubernetesadvancedairgap)                             | `object` | Optional |
+| [apiServerCertSANs](#speckubernetesadvancedapiservercertsans)       | `array`  | Optional |
+| [cloud](#speckubernetesadvancedcloud)                               | `object` | Optional |
+| [containerd](#speckubernetesadvancedcontainerd)                     | `object` | Optional |
+| [encryption](#speckubernetesadvancedencryption)                     | `object` | Optional |
+| [kubeletConfiguration](#speckubernetesadvancedkubeletconfiguration) | `object` | Optional |
+| [oidc](#speckubernetesadvancedoidc)                                 | `object` | Optional |
+| [registry](#speckubernetesadvancedregistry)                         | `string` | Optional |
+| [users](#speckubernetesadvancedusers)                               | `object` | Optional |
 
 ## .spec.kubernetes.advanced.airGap
 
@@ -4653,6 +4655,12 @@ Checksum for the runc binary.
 ### Description
 
 URL where to download the runc binary from.
+
+## .spec.kubernetes.advanced.apiServerCertSANs
+
+### Description
+
+Additional Subject Alternative Names for the API server certificates. These are used to secure connections to the API server from various clients.
 
 ## .spec.kubernetes.advanced.cloud
 
@@ -4781,6 +4789,12 @@ tlsCipherSuites:
   - "TLS_AES_256_GCM_SHA384"
   - "TLS_CHACHA20_POLY1305_SHA256"
 ```
+
+## .spec.kubernetes.advanced.kubeletConfiguration
+
+### Description
+
+Advanced configuration for Kubelet. This open field allows users to specify any parameter supported by the KubeletConfiguration. Examples of uses include controlling the maximum number of pods per core (`podsPerCore`), managing container logging (`containerLogMaxSize`), Topology Manager options (`topologyManagerPolicyOptions`). All values must follow the official Kubelet specification: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/.
 
 ## .spec.kubernetes.advanced.oidc
 
@@ -5063,11 +5077,12 @@ The basic-auth username for HAProxy's stats page
 
 ### Properties
 
-| Property                                         | Type     | Required |
-|:-------------------------------------------------|:---------|:---------|
-| [annotations](#speckubernetesmastersannotations) | `object` | Optional |
-| [hosts](#speckubernetesmastershosts)             | `array`  | Required |
-| [labels](#speckubernetesmasterslabels)           | `object` | Optional |
+| Property                                                           | Type     | Required |
+|:-------------------------------------------------------------------|:---------|:---------|
+| [annotations](#speckubernetesmastersannotations)                   | `object` | Optional |
+| [hosts](#speckubernetesmastershosts)                               | `array`  | Required |
+| [kubeletConfiguration](#speckubernetesmasterskubeletconfiguration) | `object` | Optional |
+| [labels](#speckubernetesmasterslabels)                             | `object` | Optional |
 
 ### Description
 
@@ -5100,6 +5115,12 @@ The IP address of the host
 
 A name to identify the host. This value will be concatenated to `.spec.kubernetes.dnsZone` to calculate the FQDN for the host as `<name>.<dnsZone>`.
 
+## .spec.kubernetes.masters.kubeletConfiguration
+
+### Description
+
+Advanced configuration for Kubelet. This open field allows users to specify any parameter supported by the KubeletConfiguration. Examples of uses include controlling the maximum number of pods per core (`podsPerCore`), managing container logging (`containerLogMaxSize`), Topology Manager options (`topologyManagerPolicyOptions`). All values must follow the official Kubelet specification: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/.
+
 ## .spec.kubernetes.masters.labels
 
 ### Description
@@ -5112,13 +5133,14 @@ Note: **Existing labels with the same key will be overwritten** and the label se
 
 ### Properties
 
-| Property                                       | Type     | Required |
-|:-----------------------------------------------|:---------|:---------|
-| [annotations](#speckubernetesnodesannotations) | `object` | Optional |
-| [hosts](#speckubernetesnodeshosts)             | `array`  | Required |
-| [labels](#speckubernetesnodeslabels)           | `object` | Optional |
-| [name](#speckubernetesnodesname)               | `string` | Required |
-| [taints](#speckubernetesnodestaints)           | `array`  | Optional |
+| Property                                                         | Type     | Required |
+|:-----------------------------------------------------------------|:---------|:---------|
+| [annotations](#speckubernetesnodesannotations)                   | `object` | Optional |
+| [hosts](#speckubernetesnodeshosts)                               | `array`  | Required |
+| [kubeletConfiguration](#speckubernetesnodeskubeletconfiguration) | `object` | Optional |
+| [labels](#speckubernetesnodeslabels)                             | `object` | Optional |
+| [name](#speckubernetesnodesname)                                 | `string` | Required |
+| [taints](#speckubernetesnodestaints)                             | `array`  | Optional |
 
 ### Description
 
@@ -5154,6 +5176,12 @@ The IP address of the host
 ### Description
 
 A name to identify the host. This value will be concatenated to `.spec.kubernetes.dnsZone` to calculate the FQDN for the host as `<name>.<dnsZone>`.
+
+## .spec.kubernetes.nodes.kubeletConfiguration
+
+### Description
+
+Advanced configuration for Kubelet. This open field allows users to specify any parameter supported by the KubeletConfiguration. Examples of uses include controlling the maximum number of pods per core (`podsPerCore`), managing container logging (`containerLogMaxSize`), Topology Manager options (`topologyManagerPolicyOptions`). All values must follow the official Kubelet specification: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/.
 
 ## .spec.kubernetes.nodes.labels
 
