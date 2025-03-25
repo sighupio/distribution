@@ -115,6 +115,10 @@ storage_config:
   bloom_shipper:
     working_directory: /var/loki/data/bloomshipper
   boltdb_shipper:
+    active_index_directory: /var/loki/index
+    cache_location: /var/loki/cache
+    cache_ttl: 24h
+    resync_interval: 5s
     index_gateway_client:
       server_address: dns+loki-distributed-index-gateway-headless.logging.svc.cluster.local:9095
   hedging:
@@ -122,6 +126,10 @@ storage_config:
     max_per_second: 20
     up_to: 3
   tsdb_shipper:
+    active_index_directory: /var/loki/index
+    cache_location: /var/loki/cache
+    cache_ttl: 24h
+    resync_interval: 5s
     index_gateway_client:
       server_address: dns+loki-distributed-index-gateway-headless.logging.svc.cluster.local:9095
 tracing:
