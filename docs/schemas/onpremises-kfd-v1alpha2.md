@@ -1105,15 +1105,175 @@ Default is `none`.
 
 ### Properties
 
-| Property                                         | Type     | Required |
-|:-------------------------------------------------|:---------|:---------|
-| [overrides](#specdistributionmodulesdroverrides) | `object` | Optional |
-| [type](#specdistributionmodulesdrtype)           | `string` | Required |
-| [velero](#specdistributionmodulesdrvelero)       | `object` | Optional |
+| Property                                           | Type     | Required |
+|:---------------------------------------------------|:---------|:---------|
+| [etcdBackup](#specdistributionmodulesdretcdbackup) | `object` | Optional |
+| [overrides](#specdistributionmodulesdroverrides)   | `object` | Optional |
+| [type](#specdistributionmodulesdrtype)             | `string` | Required |
+| [velero](#specdistributionmodulesdrvelero)         | `object` | Optional |
 
 ### Description
 
 Configuration for the Disaster Recovery module.
+
+## .spec.distribution.modules.dr.etcdBackup
+
+### Properties
+
+| Property                                                         | Type     | Required |
+|:-----------------------------------------------------------------|:---------|:---------|
+| [backupPrefix](#specdistributionmodulesdretcdbackupbackupprefix) | `string` | Optional |
+| [pvc](#specdistributionmodulesdretcdbackuppvc)                   | `object` | Optional |
+| [s3](#specdistributionmodulesdretcdbackups3)                     | `object` | Optional |
+| [type](#specdistributionmodulesdretcdbackuptype)                 | `string` | Optional |
+
+### Description
+
+Configuration for the ETCD backup package.
+
+## .spec.distribution.modules.dr.etcdBackup.backupPrefix
+
+### Description
+
+A prefix to be prepended to the backup filenames. If unset, the prefix defaults to the cluster's name.
+
+## .spec.distribution.modules.dr.etcdBackup.pvc
+
+### Properties
+
+| Property                                                              | Type     | Required |
+|:----------------------------------------------------------------------|:---------|:---------|
+| [accessModes](#specdistributionmodulesdretcdbackuppvcaccessmodes)     | `array`  | Optional |
+| [name](#specdistributionmodulesdretcdbackuppvcname)                   | `string` | Optional |
+| [retentionTime](#specdistributionmodulesdretcdbackuppvcretentiontime) | `string` | Optional |
+| [schedule](#specdistributionmodulesdretcdbackuppvcschedule)           | `string` | Optional |
+| [size](#specdistributionmodulesdretcdbackuppvcsize)                   | `string` | Optional |
+| [storageClass](#specdistributionmodulesdretcdbackuppvcstorageclass)   | `string` | Optional |
+
+### Description
+
+Configuration parameters for the `pvc` type of `etcdBackup`.
+
+## .spec.distribution.modules.dr.etcdBackup.pvc.accessModes
+
+### Description
+
+The accessModes that the `furyctl`-managed PersistentVolumeClaim will use. This has no effect and is ignored if `name` is set. Default is `["ReadOnlyOnce"]`
+
+## .spec.distribution.modules.dr.etcdBackup.pvc.name
+
+### Description
+
+The PersistentVolumeClaim name where the backups will be saved. If set, `size` and `storageClass` will be ignored and `etcd-backup` will use the PersistentVolumeClaim that matches the name set. Please note that the PersistentVolumeClaim must be created inside the `kube-system` namespace.
+
+If you leave `name` unset `furyctl` will create a PersistentVolumeClaim for you with an arbitrary name.
+
+## .spec.distribution.modules.dr.etcdBackup.pvc.retentionTime
+
+### Description
+
+The retention time of the backups inside the PersistentVolumeClaim. Follows rclone's `min-age` format. Example: '30d' for 30 days. Default is `10d` (ten days).
+
+## .spec.distribution.modules.dr.etcdBackup.pvc.schedule
+
+### Description
+
+The cron expression for the `etcd-backup-pvc` backup schedule. Default is `0 1 * * *` (everyday at 01:00).
+
+## .spec.distribution.modules.dr.etcdBackup.pvc.size
+
+### Description
+
+The size that the `furyctl`-managed PersistentVolumeClaim will use. This has no effect and is ignored if `name` is set. Default is `10G`.
+
+## .spec.distribution.modules.dr.etcdBackup.pvc.storageClass
+
+### Description
+
+The storage class that the `furyctl`-managed PersistentVolumeClaim will use. This has no effect and is ignored if `name` is set. Default is `default`.
+
+## .spec.distribution.modules.dr.etcdBackup.s3
+
+### Properties
+
+| Property                                                                 | Type      | Required |
+|:-------------------------------------------------------------------------|:----------|:---------|
+| [accessKeyId](#specdistributionmodulesdretcdbackups3accesskeyid)         | `string`  | Required |
+| [bucketName](#specdistributionmodulesdretcdbackups3bucketname)           | `string`  | Required |
+| [endpoint](#specdistributionmodulesdretcdbackups3endpoint)               | `string`  | Required |
+| [insecure](#specdistributionmodulesdretcdbackups3insecure)               | `boolean` | Optional |
+| [retentionTime](#specdistributionmodulesdretcdbackups3retentiontime)     | `string`  | Optional |
+| [schedule](#specdistributionmodulesdretcdbackups3schedule)               | `string`  | Optional |
+| [secretAccessKey](#specdistributionmodulesdretcdbackups3secretaccesskey) | `string`  | Required |
+
+### Description
+
+Configuration parameters for the `s3` type of `etcdBackup`.
+
+## .spec.distribution.modules.dr.etcdBackup.s3.accessKeyId
+
+### Description
+
+The access key ID (username) for the external S3-compatible bucket.
+
+## .spec.distribution.modules.dr.etcdBackup.s3.bucketName
+
+### Description
+
+The bucket name of the external S3-compatible object storage.
+
+## .spec.distribution.modules.dr.etcdBackup.s3.endpoint
+
+### Description
+
+External S3-compatible endpoint for etcd-backup-s3's storage.
+
+## .spec.distribution.modules.dr.etcdBackup.s3.insecure
+
+### Description
+
+If true, will use HTTP as protocol instead of HTTPS.
+
+## .spec.distribution.modules.dr.etcdBackup.s3.retentionTime
+
+### Description
+
+The retention time of the external S3-compatible object storage. Follows rclone's `min-age` format. Example: '30d' for 30 days. Default is `10d` (ten days).
+
+## .spec.distribution.modules.dr.etcdBackup.s3.schedule
+
+### Description
+
+The cron expression for the `etcd-backup-s3` backup schedule. Default is `0 1 * * *` (everyday at 01:00).
+
+## .spec.distribution.modules.dr.etcdBackup.s3.secretAccessKey
+
+### Description
+
+The secret access key (password) for the external S3-compatible bucket.
+
+## .spec.distribution.modules.dr.etcdBackup.type
+
+### Description
+
+The type of the etcd backup to enable, options are:
+- `none`: no etcd backup CronJob will be installed and no etcd backup will be performed.
+- `s3`: the etcd-backup-s3 package will be enabled. It will deploy a CronJob which continuously snapshots a healthy etcd node and will save the backups in a configured S3 bucket.
+- `pvc`: the etcd-backup-pvc package will be enabled. It will deploy a CronJob which continuously snapshots a healthy etcd node and will save the backups in a configured PersistentVolumeClaim.
+- `all`: both kinds of backups will be enabled.
+
+Default is `none`.
+
+### Constraints
+
+**enum**: the value of this property must be equal to one of the following string values:
+
+| Value  |
+|:-------|
+|`"s3"`  |
+|`"pvc"` |
+|`"none"`|
+|`"all"` |
 
 ## .spec.distribution.modules.dr.overrides
 
@@ -1191,7 +1351,7 @@ The value of the toleration
 
 ### Description
 
-The type of the Disaster Recovery, must be `none` or `on-premises`. `none` disables the module and `on-premises` will install Velero and an optional MinIO deployment.
+The type of the Disaster Recovery, must be `none` or `on-premises`. `none` disables the module and `on-premises` will install Velero, an optional MinIO deployment and optionally etcd-backup.
 
 Default is `none`.
 
