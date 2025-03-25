@@ -1,6 +1,6 @@
 # KFDDistribution - Distribution Only Cluster Schema
 
-This document explains the full schema for the `kind: KFDDistribution` for the `furyctl.yaml` file used by `furyctl`. This configuration file will be used to deploy the Kubernetes Fury Distribution modules on top of an existing Kubernetes cluster.
+This document explains the full schema for the `kind: KFDDistribution` for the `furyctl.yaml` file used by `furyctl`. This configuration file will be used to deploy the SIGHUP Distribution modules on top of an existing Kubernetes cluster.
 
 An example configuration file can be created by running the following command:
 
