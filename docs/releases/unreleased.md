@@ -1,6 +1,6 @@
 # SIGHUP Distribution Release vTBD
 
-Welcome to SKD release `vTBD`.
+Welcome to SD release `vTBD`.
 
 The distribution is maintained with ❤️ by the team [SIGHUP by ReeVo](https://sighup.io/).
 
