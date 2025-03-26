@@ -171,11 +171,16 @@ patches:
 {{- if or (eq $loggingType "opensearch") (eq $loggingType "loki") }}
 secretGenerator:
   {{- if eq $loggingType "loki" }}
-  - name: loki-distributed
+  - name: loki
     namespace: logging
     behavior: merge
     files:
       - config.yaml=patches/loki-config.yaml
+  - name: minio-credentials-loki
+    namespace: logging
+    behavior: replace
+    envs:
+      - patches/minio.credentials.loki.env
   {{- end }}
   - name: minio-logging
     namespace: logging
