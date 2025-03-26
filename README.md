@@ -8,7 +8,7 @@
   SIGHUP Distribution
 </h1>
 
-<p align="center">SIGHUP Distribution (SKD) is a certified battle-tested Kubernetes distribution based purely on upstream Kubernetes.</p>
+<p align="center">SIGHUP Distribution (SD) is a certified battle-tested Kubernetes distribution based purely on upstream Kubernetes.</p>
 <!-- markdownlint-enable MD033 MD045 -->
 
 [![Build Status](http://ci.sighup.io/api/badges/sighupio/fury-distribution/status.svg?ref=refs/tags/v1.31.0)](http://ci.sighup.io/sighupio/fury-distribution)
@@ -18,17 +18,17 @@
 
 ## Overview
 
-SIGHUP Distribution (SKD) is a [CNCF certified](https://landscape.cncf.io/?selected=fury-distribution) battle-tested Kubernetes distribution based purely on upstream Kubernetes.
+SIGHUP Distribution (SD) is a [CNCF certified](https://landscape.cncf.io/?selected=fury-distribution) battle-tested Kubernetes distribution based purely on upstream Kubernetes.
 
 It is developed and maintained by [SIGHUP by ReeVo][sighup-site] and the community, and it is fully open source.
 
-> 🎯 The goal of SKD is to turn any standard Kubernetes cluster into a fully-configured production-grade cluster.
+> 🎯 The goal of SD is to turn any standard Kubernetes cluster into a fully-configured production-grade cluster.
 <!-- separator -->
-> Previously known as SKD and then KFD (Kubernetes Fury Distribution), the project is now officially named SIGHUP Distribution. ReeVo has acquired SIGHUP, but the project will continue to be open-source and freely available without any changes to its functionality.
+> Previously known as KFD (Kubernetes Fury Distribution), the project is now officially named SIGHUP Distribution. ReeVo has acquired SIGHUP, but the project will continue to be open-source and freely available without any changes to its functionality.
 
 ## Un-distribution model 🧬
 
-SKD uses an **un-distribution model**. This means that we:
+SD uses an **un-distribution model**. This means that we:
 
 - Rely only on open source solutions.
 - Are free from vendor lock-in.
@@ -50,7 +50,7 @@ SIGHUP Distribution is structured on modules, and each module has a set of packa
 
 > All modules are open source, widely used, easily customizable, and pre-configured with sane defaults and tested to work well together.
 
-The standard way to deploy SKD is to:
+The standard way to deploy SD is to:
 
 - Deploy all the [Core Modules](#core-modules-) of the distribution using [furyctl][furyctl].
 - Deploy (if needed) any of the [Addon modules](#add-on-modules-) using [furyctl plugin][furyctl-plugins] feature.
@@ -59,12 +59,12 @@ See the getting started section below for more information.
 
 ### Recommended Hardware Requirements
 
-SKD is a modular and composable system, so hardware requirements ultimately depend on the modules and configuration chosen. Having said that, for a production-grade cluster a good starting point would be:
+SD is a modular and composable system, so hardware requirements ultimately depend on the modules and configuration chosen. Having said that, for a production-grade cluster a good starting point would be:
 
-A SKD production grade cluster will be composed of 3 node pools:
+A SD production grade cluster will be composed of 3 node pools:
 
 - Control Plane: 3 nodes in HA.
-- Infrastructure: 3 nodes dedicated to running the infrastructural components of SKD (monitoring, logging, policy enforcement, etc., i.e. the modules).
+- Infrastructure: 3 nodes dedicated to running the infrastructural components of SD (monitoring, logging, policy enforcement, etc., i.e. the modules).
 - Workers: where the application workload will run. This is up to you.
 - Load Balancers (optional): for on-premises installations, 2 load balancers in HA can be deployed to forward traffic to the control plane and the ingress controllers running in the infrastructure nodes.
 
@@ -106,19 +106,19 @@ Core modules provide essential functionality to the distribution for production-
 
 ### Add-on Modules 📦
 
-Add-on modules provide additional functionality to the distribution. Their release cycle is independent of SKD's.
+Add-on modules provide additional functionality to the distribution. Their release cycle is independent of SD's.
 
 | Module                              | Description                                                                  |
 | ----------------------------------- | ---------------------------------------------------------------------------- |
 | [Kong][kong-module]                 | Add Kong API Gateway for Kubernetes applications via Kong Ingress Controller |
-| [Service Mesh][service-mesh-module] | Deploy a service mesh on top of SKD                                          |
+| [Service Mesh][service-mesh-module] | Deploy a service mesh on top of SD                                          |
 | [Registry][registry-module]         | Integrate a Container Registry solution                                      |
 | [Storage][storage-module]           | Rook (Ceph Operator) based Storage solution on Kubernetes                    |
 | [Kafka][kafka-module]               | Apache Kafka event streaming for your Cluster                                |
 
-## Get started with SKD 🚀
+## Get started with SD 🚀
 
-To get started with SKD, please head to the [quickstart guides on the documentation site](https://docs.kubernetesfury.com/docs/distribution/#%EF%B8%8F-how-do-i-get-started).
+To get started with SD, please head to the [quickstart guides on the documentation site](https://docs.kubernetesfury.com/docs/distribution/#%EF%B8%8F-how-do-i-get-started).
 
 ## Issues 🐛
 
@@ -128,13 +128,13 @@ If the problem is related to a specific module, open the issue in the module rep
 
 ## Commercial Support 🛟
 
-If you are looking to run SKD in production and would like to learn more, SIGHUP (the company behind the Fury ecosystem) can help. Feel free to [email us](mailto:sales@sighup.io) or check out [our website](https://sighup.io).
+If you are looking to run SD in production and would like to learn more, SIGHUP (the company behind the Fury ecosystem) can help. Feel free to [email us](mailto:sales@sighup.io) or check out [our website](https://sighup.io).
 
 ## Support & Compatibility 🪢
 
-Current supported versions of SKD are:
+Current supported versions of SD are:
 
-|                                  SKD Version                                   | Kubernetes Version |
+|                                  SD Version                                   | Kubernetes Version |
 | :----------------------------------------------------------------------------: | :----------------: |
 | [`1.31.0`](https://github.com/sighupio/fury-distribution/releases/tag/v1.31.0) |      `1.31.x`      |
 | [`1.30.1`](https://github.com/sighupio/fury-distribution/releases/tag/v1.30.1) |      `1.30.x`      |
@@ -142,8 +142,8 @@ Current supported versions of SKD are:
 | [`1.28.6`](https://github.com/sighupio/fury-distribution/releases/tag/v1.28.6) |      `1.28.x`      |
 
 > [!NOTE]
-> Usually, SKD supports 3 versions simultaneously that are compatible with 3 different underlying Kubernetes versions. With SKD v1.31.0 the support for SKD v1.28.x will be extended for some time, effectively providing support for 4 versions (1.28, 1.29, 1.30 and 1.31).
-> See the [versioning](docs/VERSIONING.md) document for more details on SKD's version skew policy.
+> Usually, SD supports 3 versions simultaneously that are compatible with 3 different underlying Kubernetes versions. With SD v1.31.0 the support for SD v1.28.x will be extended for some time, effectively providing support for 4 versions (1.28, 1.29, 1.30 and 1.31).
+> See the [versioning](docs/VERSIONING.md) document for more details on SD's version skew policy.
 
 Check the [compatibility matrix][compatibility-matrix] for additional information about previous releases of the Distribution and the compatibility with `furyctl`.
 
@@ -153,12 +153,12 @@ Also, check the [versioning documentation file][versioning] to know more about t
 
 Each version of the SIGHUP Distribution that introduces compatibility with a new version of Kubernetes goes through a [conformance certification process with the CNCF][cncf-conformance]. Certified solutions are validated to ensure a set of guarantees such as consistency, timely updates and confirmability.
 
-SKD has been certified by the [CNCF] (Cloud Native Computing Foundation) as a _Certified Kubernetes Distribution_ for all Kubernetes versions since [Kubernetes 1.12](https://github.com/cncf/k8s-conformance/pull/619). Clicking on the badge below you can see the certification process for the latest version of SKD:
+SD has been certified by the [CNCF] (Cloud Native Computing Foundation) as a _Certified Kubernetes Distribution_ for all Kubernetes versions since [Kubernetes 1.12](https://github.com/cncf/k8s-conformance/pull/619). Clicking on the badge below you can see the certification process for the latest version of SD:
 
 <!-- markdownlint-disable MD033 -->
 <p align="center">
     <a href="https://github.com/cncf/k8s-conformance/pull/3528">
-        <img src="https://raw.githubusercontent.com/cncf/artwork/main/projects/kubernetes/certified-kubernetes/versionless/pantone/certified-kubernetes-pantone.svg" width="120" alt="SKD is CNCF Certified Kubernetes 1.31 - click to see the certification PR"/>
+        <img src="https://raw.githubusercontent.com/cncf/artwork/main/projects/kubernetes/certified-kubernetes/versionless/pantone/certified-kubernetes-pantone.svg" width="120" alt="SD is CNCF Certified Kubernetes 1.31 - click to see the certification PR"/>
     </a>
 </p>
 <!-- markdownlint-enable MD033 -->
@@ -173,7 +173,7 @@ If you wish to contribute please read the [Contributing Guidelines](docs/CONTRIB
 
 ## License
 
-SKD is open-source software and it's released under the following [LICENSE](LICENSE)
+SD is open-source software and it's released under the following [LICENSE](LICENSE)
 
 <!-- Core Modules -->
 
