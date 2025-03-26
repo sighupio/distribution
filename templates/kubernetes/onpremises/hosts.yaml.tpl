@@ -57,7 +57,23 @@ all:
           keyFile: "/etc/etcd/pki/apiserver-etcd-client.key"
           certFile: "/etc/etcd/pki/apiserver-etcd-client.crt"
         {{- end }}
-
+        {{- if index .spec.kubernetes.masters "kubeletConfiguration" }}
+          {{- range $key, $value := .spec.kubernetes.masters.kubeletConfiguration }}
+            {{- if kindIs "slice" $value }}
+        kubelet_config_{{ $key | snakecase }}:
+              {{- range $value }}
+          - {{ . }}
+              {{- end }}
+            {{- else if kindIs "map" $value }}
+        kubelet_config_{{ $key | snakecase }}:
+              {{- range $subKey, $subValue := $value }}
+          {{ $subKey }}: {{ $subValue }}
+              {{- end }}
+            {{- else }}
+        kubelet_config_{{ $key | snakecase }}: {{ $value | quote }}
+            {{- end }}
+          {{- end }}
+        {{- end }}
         {{- if and (index .spec.kubernetes "advanced") (index .spec.kubernetes.advanced "cloud") }}
         {{- if index .spec.kubernetes.advanced.cloud "provider" }}
         kubernetes_cloud_provider: "{{ .spec.kubernetes.advanced.cloud.provider }}"
@@ -107,6 +123,11 @@ all:
         kubernetes_image_registry: "{{ .spec.kubernetes.advanced.registry }}"
         {{- end }}
         {{- end }}
+
+        {{- if and (index .spec.kubernetes "advanced") (index .spec.kubernetes.advanced "apiServerCertSANs") }}
+        kubernetes_apiserver_certSANs:
+{{ .spec.kubernetes.advanced.apiServerCertSANs | toYaml | indent 10 }}
+        {{- end }}
     etcd:
       hosts:
         {{- if index $.spec.kubernetes "etcd" }}
@@ -155,6 +176,23 @@ all:
             kubernetes_node_annotations:
               {{ $n.annotations | toYaml | indent 14 | trim }}
             {{- end -}}
+            {{- if index $n "kubeletConfiguration" }}
+              {{- range $key, $value := $n.kubeletConfiguration }}
+                {{- if kindIs "slice" $value }}
+            kubelet_config_{{ $key | snakecase }}:
+                  {{- range $value }}
+              - {{ . }}
+                  {{- end }}
+                {{- else if kindIs "map" $value }}
+            kubelet_config_{{ $key | snakecase }}:
+                  {{- range $subKey, $subValue := $value }}
+              {{ $subKey }}: {{ $subValue }}
+                  {{- end }}
+                {{- else }}
+            kubelet_config_{{ $key | snakecase }}: {{ $value | quote }}
+                {{- end }}
+              {{- end }}
+            {{- end }}
       {{- end }}
     ungrouped: {}
   vars:
@@ -228,4 +266,20 @@ all:
     {{- end }}
     {{- end }}
 
+    {{- end }}
+    {{- range $key, $value := index .spec.kubernetes.advanced "kubeletConfiguration" }}
+      {{- $keyStr := toString $key }}
+      {{- if kindIs "slice" $value }}
+    kubelet_config_{{ $keyStr | snakecase }}:
+        {{- range $value }}
+      - {{ . }}
+        {{- end }}
+      {{- else if kindIs "map" $value }}
+    kubelet_config_{{ $keyStr | snakecase }}:
+        {{- range $subKey, $subValue := $value }}
+      {{ $subKey }}: {{ $subValue }}
+        {{- end }}
+      {{- else }}
+    kubelet_config_{{ $keyStr | snakecase }}: {{ $value | quote }}
+      {{- end }}
     {{- end }}
