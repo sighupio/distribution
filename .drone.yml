@@ -72,7 +72,7 @@ steps:
       - bats -t tests/schema.sh
 
   - name: render
-    image: quay.io/sighup/e2e-testing:1.1.0_1.31.1_3.10.0_4.33.3
+    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3
     pull: always
     depends_on:
       - license-check
