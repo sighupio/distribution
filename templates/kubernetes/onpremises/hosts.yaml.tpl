@@ -266,7 +266,6 @@ all:
     {{- end }}
     {{- end }}
 
-    {{- end }}
     {{- range $key, $value := index .spec.kubernetes.advanced "kubeletConfiguration" }}
       {{- $keyStr := toString $key }}
       {{- if kindIs "slice" $value }}
@@ -282,4 +281,6 @@ all:
       {{- else }}
     kubelet_config_{{ $keyStr | snakecase }}: {{ $value | quote }}
       {{- end }}
+    {{- end }}
+
     {{- end }}
