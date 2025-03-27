@@ -135,6 +135,19 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: loki-distributed-query-scheduler
+  namespace: logging
+spec:
+  template:
+    spec:
+      nodeSelector:
+        {{ template "nodeSelector" $lokiArgs }}
+      tolerations:
+        {{ template "tolerations" $lokiArgs }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
   name: loki-distributed-query-frontend
   namespace: logging
 spec:
