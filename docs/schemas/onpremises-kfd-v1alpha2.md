@@ -4956,7 +4956,9 @@ tlsCipherSuites:
 
 ### Description
 
-Advanced configuration for Kubelet. This open field allows users to specify any parameter supported by the KubeletConfiguration. Examples of uses include controlling the maximum number of pods per core (`podsPerCore`), managing container logging (`containerLogMaxSize`), Topology Manager options (`topologyManagerPolicyOptions`). All values must follow the official Kubelet specification: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/.
+Advanced configuration for Kubelet. This open field allows users to specify any parameter supported by the `KubeletConfiguration` object. Examples of uses include controlling the maximum number of pods per core (`podsPerCore`), managing container logging (`containerLogMaxSize`), Topology Manager options (`topologyManagerPolicyOptions`). All values must follow the official Kubelet specification: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/.
+
+NOTE: Content will **not** be validated by furyctl.
 
 ## .spec.kubernetes.advanced.oidc
 
@@ -5281,7 +5283,9 @@ A name to identify the host. This value will be concatenated to `.spec.kubernete
 
 ### Description
 
-Advanced configuration for Kubelet. This open field allows users to specify any parameter supported by the KubeletConfiguration. Examples of uses include controlling the maximum number of pods per core (`podsPerCore`), managing container logging (`containerLogMaxSize`), Topology Manager options (`topologyManagerPolicyOptions`). All values must follow the official Kubelet specification: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/.
+Advanced configuration for Kubelet. This open field allows users to specify any parameter supported by the `KubeletConfiguration` object. Examples of uses include controlling the maximum number of pods per core (`podsPerCore`), managing container logging (`containerLogMaxSize`), Topology Manager options (`topologyManagerPolicyOptions`). All values must follow the official Kubelet specification: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/.
+
+NOTE: Content will **not** be validated by furyctl.
 
 ## .spec.kubernetes.masters.labels
 
@@ -5343,7 +5347,9 @@ A name to identify the host. This value will be concatenated to `.spec.kubernete
 
 ### Description
 
-Advanced configuration for Kubelet. This open field allows users to specify any parameter supported by the KubeletConfiguration. Examples of uses include controlling the maximum number of pods per core (`podsPerCore`), managing container logging (`containerLogMaxSize`), Topology Manager options (`topologyManagerPolicyOptions`). All values must follow the official Kubelet specification: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/.
+Advanced configuration for Kubelet. This open field allows users to specify any parameter supported by the `KubeletConfiguration` object. Examples of uses include controlling the maximum number of pods per core (`podsPerCore`), managing container logging (`containerLogMaxSize`), Topology Manager options (`topologyManagerPolicyOptions`). All values must follow the official Kubelet specification: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/.
+
+NOTE: Content will **not** be validated by furyctl.
 
 ## .spec.kubernetes.nodes.labels
 

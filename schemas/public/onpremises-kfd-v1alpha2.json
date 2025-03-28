@@ -312,7 +312,7 @@
           "$ref": "#/$defs/Types.KubeAnnotations"
         },
         "kubeletConfiguration": {
-          "description": "Optional Kubelet configuration specific to control-plane nodes. If set, this will override the global `advanced.kubeletConfiguration`.",
+          "description": "Optional Kubelet configuration specific to control-plane nodes. If set, this will override the global `advanced.kubeletConfiguration`. See `advanced.KubeletConfiguration` for more details.",
           "$ref": "#/$defs/Spec.Kubernetes.Advanced.KubeletConfiguration"
         }
       },
@@ -413,7 +413,7 @@
           "$ref": "#/$defs/Types.KubeAnnotations"
         },
         "kubeletConfiguration": {
-          "description": "Optional Kubelet configuration specific to worker nodes. If set, this will override the global `advanced.kubeletConfiguration`.",
+          "description": "Optional Kubelet configuration specific to worker nodes. If set, this will override the global `advanced.kubeletConfiguration`. See `advanced.KubeletConfiguration` for more details.",
           "$ref": "#/$defs/Spec.Kubernetes.Advanced.KubeletConfiguration"
         }
       },
@@ -712,7 +712,7 @@
     "Spec.Kubernetes.Advanced.KubeletConfiguration": {
       "type": "object",
       "additionalProperties": true,
-      "description": "Advanced configuration for Kubelet. This open field allows users to specify any parameter supported by the KubeletConfiguration. Examples of uses include controlling the maximum number of pods per core (`podsPerCore`), managing container logging (`containerLogMaxSize`), Topology Manager options (`topologyManagerPolicyOptions`). All values must follow the official Kubelet specification: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/."
+      "description": "Advanced configuration for Kubelet. This open field allows users to specify any parameter supported by the `KubeletConfiguration` object. Examples of uses include controlling the maximum number of pods per core (`podsPerCore`), managing container logging (`containerLogMaxSize`), Topology Manager options (`topologyManagerPolicyOptions`). All values must follow the official Kubelet specification: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/.\n\nNOTE: Content will **not** be validated by furyctl."
     },
     "Spec.Distribution": {
       "type": "object",
