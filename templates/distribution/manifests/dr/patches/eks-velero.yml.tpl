@@ -42,4 +42,34 @@ spec:
       volumes:
       - name: cloud-credentials
         $patch: delete
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: node-agent
+  labels:
+    k8s-app: velero-node-agent
+  namespace: kube-system
+spec:
+  template:
+    spec:
+      containers:
+      - name: node-agent
+        volumeMounts:
+        - name: cloud-credentials
+          mountPath: /credentials
+          $patch: delete
+        env: 
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /credentials/cloud
+          $patch: delete
+        - name: AWS_SHARED_CREDENTIALS_FILE
+          value: /credentials/cloud
+          $patch: delete
+        - name: AZURE_CREDENTIALS_FILE
+          value: /credentials/cloud
+          $patch: delete
+      volumes:
+      - name: cloud-credentials
+        $patch: delete
 {{- end }}

@@ -2,6 +2,7 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
+{{- if eq .spec.distribution.common.provider.type "none" }}
 {{- if eq .spec.distribution.modules.dr.etcdBackup.type "all" "pvc" }}
 {{- if not (index .spec.distribution.modules.dr.etcdBackup.pvc "name") }}
 ---
@@ -20,5 +21,6 @@ spec:
   resources:
     requests:
       storage: {{ .spec.distribution.modules.dr.etcdBackup.pvc.size }}
+{{- end }}
 {{- end }}
 {{- end }}

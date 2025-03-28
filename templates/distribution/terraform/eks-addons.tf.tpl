@@ -9,6 +9,7 @@ module "eks_addons" {
     service_account_role_arn = module.ebs_csi_driver_iam_role.ebs_csi_driver_iam_role_arn
     configuration_values = jsonencode({
       controller =  {
+          {{- if index .spec.distribution.common "tolerations" }}
           tolerations = [
             {{- range $toleration := .spec.distribution.common.tolerations }}
             {
@@ -24,18 +25,22 @@ module "eks_addons" {
             }
           {{- end }}
           ]
+          {{- end }}
+          {{- if index .spec.distribution.common "nodeSelector" }}
           nodeSelector = {
             {{- range $k,$v := .spec.distribution.common.nodeSelector }}
               "{{ $k }}" = "{{ $v }}"
             {{- end }}
           }
+          {{- end }}
         }
     })
   }
   coredns = {
     configuration_values = jsonencode({
+      {{- if index .spec.distribution.common "tolerations" }}
       tolerations = [
-        {{- range $toleration := .spec.distribution.common.tolerations }}
+      {{- range $toleration := .spec.distribution.common.tolerations }}
         {
           {{- if $toleration.key }}
           key = "{{ $toleration.key }}"
@@ -49,15 +54,20 @@ module "eks_addons" {
         }
       {{- end }}
       ]
+      {{- end }}
+      {{- if index .spec.distribution.common "nodeSelector" }}
       nodeSelector = {
         {{- range $k,$v := .spec.distribution.common.nodeSelector }}
           "{{ $k }}" = "{{ $v }}"
         {{- end }}
       }
+      {{- end }}
     })
   }
   snapshot_controller = {
+    service_account_role_arn = module.ebs_csi_driver_iam_role.ebs_csi_driver_iam_role_arn
     configuration_values = jsonencode({
+      {{- if index .spec.distribution.common "tolerations" }}
       tolerations = [
         {{- range $toleration := .spec.distribution.common.tolerations }}
         {
@@ -73,11 +83,15 @@ module "eks_addons" {
         }
       {{- end }}
       ]
+      {{- end }}
+      {{- if index .spec.distribution.common "nodeSelector" }}
       nodeSelector = {
         {{- range $k,$v := .spec.distribution.common.nodeSelector }}
           "{{ $k }}" = "{{ $v }}"
         {{- end }}
       }
+      {{- end }}
     })
   }
 }
+
