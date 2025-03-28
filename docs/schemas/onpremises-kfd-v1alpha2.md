@@ -4950,7 +4950,7 @@ tlsCipherSuites:
   - "TLS_AES_128_GCM_SHA256"
   - "TLS_AES_256_GCM_SHA384"
   - "TLS_CHACHA20_POLY1305_SHA256"
-```
+```. NOTE: to customize the TLS cipher suites of the kubelet (as well as on control plane and etcd), set only this field - do not configure them under the `KubeletConfiguration`.
 
 ## .spec.kubernetes.advanced.kubeletConfiguration
 
@@ -4958,7 +4958,7 @@ tlsCipherSuites:
 
 Advanced configuration for Kubelet. This open field allows users to specify any parameter supported by the `KubeletConfiguration` object. Examples of uses include controlling the maximum number of pods per core (`podsPerCore`), managing container logging (`containerLogMaxSize`), Topology Manager options (`topologyManagerPolicyOptions`). All values must follow the official Kubelet specification: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/.
 
-NOTE: Content will **not** be validated by furyctl.
+NOTE: Content will **not** be validated by furyctl. To customize the TLS cipher suites of the Kubelet, set only the `Spec.Kubernetes.Advanced.Encryption.tlsCipherSuites` field - do not configure them under this field.
 
 ## .spec.kubernetes.advanced.oidc
 
@@ -5285,7 +5285,7 @@ A name to identify the host. This value will be concatenated to `.spec.kubernete
 
 Advanced configuration for Kubelet. This open field allows users to specify any parameter supported by the `KubeletConfiguration` object. Examples of uses include controlling the maximum number of pods per core (`podsPerCore`), managing container logging (`containerLogMaxSize`), Topology Manager options (`topologyManagerPolicyOptions`). All values must follow the official Kubelet specification: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/.
 
-NOTE: Content will **not** be validated by furyctl.
+NOTE: Content will **not** be validated by furyctl. To customize the TLS cipher suites of the Kubelet, set only the `Spec.Kubernetes.Advanced.Encryption.tlsCipherSuites` field - do not configure them under this field.
 
 ## .spec.kubernetes.masters.labels
 
@@ -5349,7 +5349,7 @@ A name to identify the host. This value will be concatenated to `.spec.kubernete
 
 Advanced configuration for Kubelet. This open field allows users to specify any parameter supported by the `KubeletConfiguration` object. Examples of uses include controlling the maximum number of pods per core (`podsPerCore`), managing container logging (`containerLogMaxSize`), Topology Manager options (`topologyManagerPolicyOptions`). All values must follow the official Kubelet specification: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/.
 
-NOTE: Content will **not** be validated by furyctl.
+NOTE: Content will **not** be validated by furyctl. To customize the TLS cipher suites of the Kubelet, set only the `Spec.Kubernetes.Advanced.Encryption.tlsCipherSuites` field - do not configure them under this field.
 
 ## .spec.kubernetes.nodes.labels
 

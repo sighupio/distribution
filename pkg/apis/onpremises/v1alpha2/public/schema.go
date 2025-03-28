@@ -1812,17 +1812,24 @@ type SpecKubernetesAdvancedEncryption struct {
 	//   - "TLS_AES_128_GCM_SHA256"
 	//   - "TLS_AES_256_GCM_SHA384"
 	//   - "TLS_CHACHA20_POLY1305_SHA256"
-	// ```
+	// ```. NOTE: to customize the TLS cipher suites of the kubelet (as well as on
+	// control plane and etcd), set only this field - do not configure them under the
+	// `KubeletConfiguration`.
 	TlsCipherSuites []string `json:"tlsCipherSuites,omitempty" yaml:"tlsCipherSuites,omitempty" mapstructure:"tlsCipherSuites,omitempty"`
 }
 
 // Advanced configuration for Kubelet. This open field allows users to specify any
-// parameter supported by the KubeletConfiguration. Examples of uses include
-// controlling the maximum number of pods per core (`podsPerCore`), managing
-// container logging (`containerLogMaxSize`), Topology Manager options
+// parameter supported by the `KubeletConfiguration` object. Examples of uses
+// include controlling the maximum number of pods per core (`podsPerCore`),
+// managing container logging (`containerLogMaxSize`), Topology Manager options
 // (`topologyManagerPolicyOptions`). All values must follow the official Kubelet
 // specification:
 // https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/.
+//
+// NOTE: Content will **not** be validated by furyctl. To customize the TLS cipher
+// suites of the Kubelet, set only the
+// `Spec.Kubernetes.Advanced.Encryption.tlsCipherSuites` field - do not configure
+// them under this field.
 type SpecKubernetesAdvancedKubeletConfiguration map[string]interface{}
 
 // OIDC configuration for the Kubernetes API server.
@@ -1949,7 +1956,8 @@ type SpecKubernetesMasters struct {
 	Hosts []SpecKubernetesMastersHost `json:"hosts" yaml:"hosts" mapstructure:"hosts"`
 
 	// Optional Kubelet configuration specific to control-plane nodes. If set, this
-	// will override the global `advanced.kubeletConfiguration`.
+	// will override the global `advanced.kubeletConfiguration`. See
+	// `advanced.KubeletConfiguration` for more details.
 	KubeletConfiguration SpecKubernetesAdvancedKubeletConfiguration `json:"kubeletConfiguration,omitempty" yaml:"kubeletConfiguration,omitempty" mapstructure:"kubeletConfiguration,omitempty"`
 
 	// Optional additional Kubernetes labels that will be added to the control-plane
@@ -1983,7 +1991,8 @@ type SpecKubernetesNodesNode struct {
 	Hosts []SpecKubernetesNodesNodeHost `json:"hosts" yaml:"hosts" mapstructure:"hosts"`
 
 	// Optional Kubelet configuration specific to worker nodes. If set, this will
-	// override the global `advanced.kubeletConfiguration`.
+	// override the global `advanced.kubeletConfiguration`. See
+	// `advanced.KubeletConfiguration` for more details.
 	KubeletConfiguration SpecKubernetesAdvancedKubeletConfiguration `json:"kubeletConfiguration,omitempty" yaml:"kubeletConfiguration,omitempty" mapstructure:"kubeletConfiguration,omitempty"`
 
 	// Optional additional Kubernetes labels that will be added to the nodes in this
