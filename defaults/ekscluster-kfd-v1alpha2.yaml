@@ -237,6 +237,8 @@ data:
       overrides:
         nodeSelector: null
         tolerations: null
+      etcdBackup:
+        type: "none"
       # the standard configuration for velero on the dr module
       velero:
         backend: minio
