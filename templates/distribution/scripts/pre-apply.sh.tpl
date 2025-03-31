@@ -189,7 +189,8 @@ deleteGatekeeper() {
 }
 
 deleteKyverno() {
-  $kustomizebin build $vendorPath/modules/opa/katalog/kyverno | $kubectlbin delete --ignore-not-found --wait --timeout=180s -f -
+  $kustomizebin build $vendorPath/modules/opa/katalog/kyverno/policies | $kubectlbin delete --ignore-not-found --wait --timeout=180s -f -
+  $kustomizebin build $vendorPath/modules/opa/katalog/kyverno/core | $kubectlbin delete --ignore-not-found --wait --timeout=180s -f -
   $kubectlbin delete --ignore-not-found --wait --timeout=180s validatingwebhookconfiguration -l webhook.kyverno.io/managed-by=kyverno
   $kubectlbin delete --ignore-not-found --wait --timeout=180s mutatingwebhookconfiguration -l webhook.kyverno.io/managed-by=kyverno
   $kubectlbin delete --ignore-not-found --wait --timeout=180s -A networkpolicy -l cluster.kfd.sighup.io/policy-type=kyverno
