@@ -104,6 +104,9 @@
         "masters": {
           "$ref": "#/$defs/Spec.Kubernetes.Masters"
         },
+        "etcd": {
+          "$ref": "#/$defs/Spec.Kubernetes.Etcd"
+        },
         "nodes": {
           "$ref": "#/$defs/Spec.Kubernetes.Nodes"
         },
@@ -243,11 +246,12 @@
         },
         "virtualRouterId": {
           "type": "string",
-          "description": "The virtual router ID of Keepalived, must be different from other Keepalived instances in the same network."
+          "description": "The virtual router ID of Keepalived, an arbitrary unique number from 1 to 255 used to differentiate multiple instances of vrrpd running on the same network interface and address family and multicast/unicast (and hence same socket)."
         },
         "passphrase": {
           "type": "string",
-          "description": "The passphrase for the Keepalived clustering."
+          "description": "Password for accessing vrrpd. Make it unique between Keepalived clusters.",
+          "maxLength": 8
         }
       },
       "required": [
@@ -306,6 +310,10 @@
         "annotations": {
           "description": "Optional additional Kubernetes annotations that will be added to the control-plane nodes. Follows Kubernetes annotations format. **Existing annotations with the same key will be overwritten**.",
           "$ref": "#/$defs/Types.KubeAnnotations"
+        },
+        "kubeletConfiguration": {
+          "description": "Optional Kubelet configuration specific to control-plane nodes. If set, this will override the global `advanced.kubeletConfiguration`. See `advanced.KubeletConfiguration` for more details.",
+          "$ref": "#/$defs/Spec.Kubernetes.Advanced.KubeletConfiguration"
         }
       },
       "required": [
@@ -323,6 +331,40 @@
         "ip": {
           "type": "string",
           "description": "The IP address of the host"
+        }
+      },
+      "required": [
+        "name",
+        "ip"
+      ]
+    },
+    "Spec.Kubernetes.Etcd": {
+      "type": "object",
+      "description": "Optional configuration for an etcd cluster on dedicated nodes. If omitted, etcd will run on control plane nodes.",
+      "additionalProperties": false,
+      "properties": {
+        "hosts": {
+          "type": "array",
+          "description": "List of nodes of the dedicated etcd cluster.",
+          "items": {
+            "$ref": "#/$defs/Spec.Kubernetes.Etcd.Host"
+          },
+          "minItems": 1
+        }
+      },
+      "required": ["hosts"]
+    },
+    "Spec.Kubernetes.Etcd.Host": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "A name to identify the etcd node. This value will be concatenated to `.spec.kubernetes.dnsZone` to calculate the FQDN for the host as `<name>.<dnsZone>`."
+        },
+        "ip": {
+          "type": "string",
+          "description": "The IP address of the etcd node."
         }
       },
       "required": [
@@ -369,6 +411,10 @@
         "annotations": {
           "description": "Optional additional Kubernetes annotations that will be added to the nodes in this node group. Follows Kubernetes annotations format. **Existing annotations with the same key will be overwritten**.",
           "$ref": "#/$defs/Types.KubeAnnotations"
+        },
+        "kubeletConfiguration": {
+          "description": "Optional Kubelet configuration specific to worker nodes. If set, this will override the global `advanced.kubeletConfiguration`. See `advanced.KubeletConfiguration` for more details.",
+          "$ref": "#/$defs/Spec.Kubernetes.Advanced.KubeletConfiguration"
         }
       },
       "required": [
@@ -433,6 +479,16 @@
         "registry": {
           "type": "string",
           "description": "URL of the registry where to pull images from for the Kubernetes phase. (Default is registry.sighup.io/fury/on-premises)."
+        },
+        "apiServerCertSANs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Additional Subject Alternative Names for the API server certificates. These are used to secure connections to the API server from various clients."
+        },
+        "kubeletConfiguration": {
+          "$ref": "#/$defs/Spec.Kubernetes.Advanced.KubeletConfiguration"
         }
       }
     },
@@ -555,7 +611,7 @@
           "items": {
             "type": "string"
           },
-          "description": "The TLS cipher suites to use for etcd, kubelet, and kubeadm static pods. Example:\n```yaml\ntlsCipherSuites:\n  - \"TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256\"\n  - \"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256\"\n  - \"TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384\"\n  - \"TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384\"\n  - \"TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256\"\n  - \"TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256\"\n  - \"TLS_AES_128_GCM_SHA256\"\n  - \"TLS_AES_256_GCM_SHA384\"\n  - \"TLS_CHACHA20_POLY1305_SHA256\"\n```"
+          "description": "The TLS cipher suites to use for etcd, kubelet, and kubeadm static pods. Example:\n```yaml\ntlsCipherSuites:\n  - \"TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256\"\n  - \"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256\"\n  - \"TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384\"\n  - \"TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384\"\n  - \"TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256\"\n  - \"TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256\"\n  - \"TLS_AES_128_GCM_SHA256\"\n  - \"TLS_AES_256_GCM_SHA384\"\n  - \"TLS_CHACHA20_POLY1305_SHA256\"\n```. NOTE: to customize the TLS cipher suites of the kubelet (as well as on control plane and etcd), set only this field - do not configure them under the `KubeletConfiguration`."
         },
         "configuration": {
           "type": "string",
@@ -652,6 +708,11 @@
           }
         }
       }
+    },
+    "Spec.Kubernetes.Advanced.KubeletConfiguration": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Advanced configuration for Kubelet. This open field allows users to specify any parameter supported by the `KubeletConfiguration` object. Examples of uses include controlling the maximum number of pods per core (`podsPerCore`), managing container logging (`containerLogMaxSize`), Topology Manager options (`topologyManagerPolicyOptions`). All values must follow the official Kubelet specification: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/.\n\nNOTE: Content will **not** be validated by furyctl. To customize the TLS cipher suites of the Kubelet, set only the `Spec.Kubernetes.Advanced.Encryption.tlsCipherSuites` field - do not configure them under this field."
     },
     "Spec.Distribution": {
       "type": "object",
@@ -1219,7 +1280,7 @@
         "tsdbStartDate": {
           "type": "string",
           "format": "date",
-          "description": "Starting from versions 1.28.4, 1.29.5 and 1.30.0 of KFD, Loki will change the time series database from BoltDB to TSDB and the schema from v11 to v13 that it uses to store the logs.\n\nThe value of this field will determine the date when Loki will start writing using the new TSDB and the schema v13, always at midnight UTC. The old BoltDB and schema will be kept until they expire for reading purposes.\n\nValue must be a string in `ISO 8601` date format (`yyyy-mm-dd`). Example: `2024-11-18`."
+          "description": "Starting from versions 1.28.4, 1.29.5 and 1.30.0 of KFD, Loki will change the time series database from BoltDB to TSDB and the schema from v11 to v13 that it uses to store the logs.\n\nThe value of this field will determine the date when Loki will start writing using the new TSDB and the schema v13, always at midnight UTC. The old BoltDB and schema will be kept until they expire for reading purposes.\n\nFrom versions 1.29.7, 1.30.3 and 1.31.1 of the distribution, this field will be unmutable once changed.\n\nValue must be a string in `ISO 8601` date format (`yyyy-mm-dd`). Example: `2024-11-18`."
         },
         "resources": {
           "$ref": "#/$defs/Types.KubeResources"
@@ -1788,7 +1849,7 @@
             "Audit",
             "Enforce"
           ],
-          "description": "The validation failure action to use for the policies, `Enforce` will block when a request does not comply with the policies and `Audit` will not block but log when a request does not comply with the policies."
+          "description": "The validation failure action to use for the included policies, `Enforce` will block when a request does not comply with the policies and `Audit` will not block but log when a request does not comply with the policies."
         },
         "installDefaultPolicies": {
           "type": "boolean",
@@ -1817,10 +1878,13 @@
             "none",
             "on-premises"
           ],
-          "description": "The type of the Disaster Recovery, must be `none` or `on-premises`. `none` disables the module and `on-premises` will install Velero and an optional MinIO deployment.\n\nDefault is `none`."
+          "description": "The type of the Disaster Recovery, must be `none` or `on-premises`. `none` disables the module and `on-premises` will install Velero, an optional MinIO deployment and optionally etcd-backup.\n\nDefault is `none`."
         },
         "velero": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Dr.Velero"
+        },
+        "etcdBackup": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Dr.EtcdBackup"
         }
       },
       "required": [
@@ -1839,6 +1903,133 @@
           "velero"
         ]
       }
+    },
+    "Spec.Distribution.Modules.Dr.EtcdBackup": {
+      "type": "object",
+      "description": "Configuration for the ETCD backup package.",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "s3",
+            "pvc",
+            "none",
+            "all"
+          ],
+          "description": "The type of the etcd backup to enable, options are:\n- `none`: no etcd backup CronJob will be installed and no etcd backup will be performed.\n- `s3`: the etcd-backup-s3 package will be enabled. It will deploy a CronJob which continuously snapshots a healthy etcd node and will save the backups in a configured S3 bucket.\n- `pvc`: the etcd-backup-pvc package will be enabled. It will deploy a CronJob which continuously snapshots a healthy etcd node and will save the backups in a configured PersistentVolumeClaim.\n- `all`: both kinds of backups will be enabled.\n\nDefault is `none`."
+        },
+        "backupPrefix": {
+          "type": "string",
+          "additionalProperties": false,
+          "description": "A prefix to be prepended to the backup filenames. If unset, the prefix defaults to the cluster's name."
+        },
+        "pvc": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Configuration parameters for the `pvc` type of `etcdBackup`.",
+          "properties": {
+            "schedule": {
+              "type": "string",
+              "description": "The cron expression for the `etcd-backup-pvc` backup schedule. Default is `0 1 * * *` (everyday at 01:00)."
+            },
+            "name": {
+              "type": "string",
+              "description": "The PersistentVolumeClaim name where the backups will be saved. If set, `size` and `storageClass` will be ignored and `etcd-backup` will use the PersistentVolumeClaim that matches the name set. Please note that the PersistentVolumeClaim must be created inside the `kube-system` namespace.\n\nIf you leave `name` unset `furyctl` will create a PersistentVolumeClaim for you with an arbitrary name."
+            },
+            "size": {
+              "type": "string",
+              "description": "The size that the `furyctl`-managed PersistentVolumeClaim will use. This has no effect and is ignored if `name` is set. Default is `10G`."
+            },
+            "accessModes": {
+              "type": "array",
+              "description": "The accessModes that the `furyctl`-managed PersistentVolumeClaim will use. This has no effect and is ignored if `name` is set. Default is `[\"ReadOnlyOnce\"]`"
+            },
+            "storageClass": {
+              "type": "string",
+              "description": "The storage class that the `furyctl`-managed PersistentVolumeClaim will use. This has no effect and is ignored if `name` is set. Default is `default`."
+            },
+            "retentionTime": {
+              "type": "string",
+              "description": "The retention time of the backups inside the PersistentVolumeClaim. Follows rclone's `min-age` format. Example: '30d' for 30 days. Default is `10d` (ten days)."
+            }
+          }
+        },
+        "s3": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Configuration parameters for the `s3` type of `etcdBackup`.",
+          "properties": {
+            "schedule": {
+              "type": "string",
+              "description": "The cron expression for the `etcd-backup-s3` backup schedule. Default is `0 1 * * *` (everyday at 01:00)."
+            },
+            "endpoint": {
+              "type": "string",
+              "description": "External S3-compatible endpoint for etcd-backup-s3's storage."
+            },
+            "insecure": {
+              "type": "boolean",
+              "description": "If true, will use HTTP as protocol instead of HTTPS."
+            },
+            "secretAccessKey": {
+              "type": "string",
+              "description": "The secret access key (password) for the external S3-compatible bucket."
+            },
+            "accessKeyId": {
+              "type": "string",
+              "description": "The access key ID (username) for the external S3-compatible bucket."
+            },
+            "bucketName": {
+              "type": "string",
+              "description": "The bucket name of the external S3-compatible object storage."
+            },
+            "retentionTime": {
+              "type": "string",
+              "description": "The retention time of the external S3-compatible object storage. Follows rclone's `min-age` format. Example: '30d' for 30 days. Default is `10d` (ten days)."
+            }
+          },
+          "required": [
+            "endpoint",
+            "accessKeyId",
+            "secretAccessKey",
+            "bucketName"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "required": ["type"]
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": ["s3", "all"]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "s3"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": ["pvc", "all"]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "pvc"
+            ]
+          }
+        }
+      ]
     },
     "Spec.Distribution.Modules.Dr.Velero": {
       "type": "object",
