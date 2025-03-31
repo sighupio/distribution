@@ -53,7 +53,32 @@ To make use of this new feature, you need to define the hosts where etcd will be
               ip: 192.168.66.49
   ...
   ```
+- [[#359](https://github.com/sighupio/distribution/pull/359)] **Add etcd backup over S3 and PVC**: we added two new solutions for snapshotting your etcd cluster. It allows a user to save the snapshot in a PersistentVolumeClaim or in a remote S3-bucket.
 
+To make use of this new feature, you need to define how etcdBackup will be deployed in your configuration file, using the `.spec.distribution.dr.etcdBackup` key, for example:
+
+```yaml
+spec:
+  distribution:
+    dr:
+      etcdBackup:
+        type: "all" # it can be: pvc, s3, all (pvc and s3), none
+        backupPrefix: "" # prefix for the filename of the snapshot
+        pvc:
+          schedule: "0 2 * * *"
+          # name: test-pvc (optional name of the pvc: if set it uses an existing one, if left unset it creates one for you)
+          size: 1G # size of the created PVC, ignored if name is set
+          # accessModes: [] # accessMode used for the created PVC, ignored if name is set
+          # storageClass: nome_storage # storage class to use for the created PVC, ignored if name is set
+          retentionTime: 10m # how long do you wanna keep your snapshots?
+        s3:
+          schedule: "0 0 * * *"
+          endpoint: play.min.io:9000 # s3 endpoint to upload your snapshots to
+          accessKeyId: test
+          secretAccessKey: test
+          retentionTime: 10m
+          bucketName: bucket-name
+```
 ## Fixes 🐞
 
 - [[#334](https://github.com/sighupio/fury-distribution/pull/334)] **Fix to policy module templates**: setting the policy module type to `gatekeeper` and the `additionalExcludedNamespaces` option for Kyverno at the same time resulted in an error do to an bug in the templates logic, this has been fixed.
