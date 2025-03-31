@@ -13,7 +13,7 @@ The files used by `furyctl`, in addition to the schema generated in `pkg/apis`, 
 
 - **Rules for `furyctl.yaml` changes**: The rules determine which changes are permitted in the `furyctl.yaml` file after initial deployment. These rules are critical for ensuring that modifications to the configuration are safe and consistent with the intended deployment workflow, particularly when managing state changes across environments.
 
-- **Basic models for KFD and `furyctl.yaml` kind and version**: These are contained in the `pkg/apis/config` folder. These Go structures are used to parse the `kfd.yaml` file and the initial information such as `Kind` and `APIVersion` from the `furyctl.yaml`.
+- **Basic models for SD and `furyctl.yaml` kind and version**: These are contained in the `pkg/apis/config` folder. These Go structures are used to parse the `kfd.yaml` file and the initial information such as `Kind` and `APIVersion` from the `furyctl.yaml`.
 </details>
 
 ---
