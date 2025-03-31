@@ -1,0 +1,16 @@
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  annotations:
+    kapp.k14s.io/change-group: "aws-load-balancer"
+    kapp.k14s.io/change-rule: "upsert after upserting cert-manager"
+  name: aws-load-balancer-webhook
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  annotations:
+    kapp.k14s.io/change-group: "aws-load-balancer"
+    kapp.k14s.io/change-rule: "upsert after upserting cert-manager"
+  name: aws-load-balancer-webhook
