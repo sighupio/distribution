@@ -101,7 +101,7 @@ Core modules provide essential functionality to the distribution for production-
 | [Monitoring][monitoring-module] | ![Version][monitoring-version] | Monitoring and alerting functionality based on Prometheus, AlertManager and Grafana                  |
 | [Tracing][tracing-module]       | ![Version][tracing-version]    | Tracing functionality based on Tempo                                                                 |
 | [Disaster Recovery][dr-module]  | ![Version][dr-version]         | Backup and disaster recovery solution using Velero                                                   |
-| [OPA][opa-module]               | ![Version][opa-version]        | Policy and Governance for your cluster using OPA Gatekeeper and Gatekeeper Policy Manager or Kyverno |
+| [Policy][policy-module]         | ![Version][policy-version]     | Policy and Governance for your cluster using Gatekeeper and Gatekeeper Policy Manager or Kyverno     |
 | [Auth][auth-module]             | ![Version][auth-version]       | Improved auth for your Kubernetes Cluster and its applications                                       |
 
 ### Add-on Modules 📦
@@ -183,7 +183,7 @@ SD is open-source software and it's released under the following [LICENSE](LICEN
 [monitoring-module]: https://github.com/sighupio/fury-kubernetes-monitoring
 [tracing-module]: https://github.com/sighupio/fury-kubernetes-tracing
 [dr-module]: https://github.com/sighupio/fury-kubernetes-dr
-[opa-module]: https://github.com/sighupio/fury-kubernetes-opa
+[policy-module]: https://github.com/sighupio/fury-kubernetes-opa
 [auth-module]: https://github.com/sighupio/fury-kubernetes-auth
 [networking-version]: https://img.shields.io/badge/release-v2.0.0-blue
 [ingress-version]: https://img.shields.io/badge/release-v3.0.1-blue
@@ -191,7 +191,7 @@ SD is open-source software and it's released under the following [LICENSE](LICEN
 [monitoring-version]: https://img.shields.io/badge/release-v3.3.0-blue
 [tracing-version]: https://img.shields.io/badge/release-v1.1.0-blue
 [dr-version]: https://img.shields.io/badge/release-v3.0.0-blue
-[opa-version]: https://img.shields.io/badge/release-v1.13.0-blue
+[policy-version]: https://img.shields.io/badge/release-v1.13.0-blue
 [auth-version]: https://img.shields.io/badge/release-v0.4.0-blue
 
 <!-- Addon Modules -->
