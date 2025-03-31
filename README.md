@@ -11,10 +11,10 @@
 <p align="center">SIGHUP Distribution (SD) is a certified battle-tested Kubernetes distribution based purely on upstream Kubernetes.</p>
 <!-- markdownlint-enable MD033 MD045 -->
 
-[![Build Status](http://ci.sighup.io/api/badges/sighupio/fury-distribution/status.svg?ref=refs/tags/v1.31.0)](http://ci.sighup.io/sighupio/fury-distribution)
-[![Release](https://img.shields.io/badge/release-v1.31.0-blue?label=DistributionRelease)](https://github.com/sighupio/fury-distribution/releases/latest)
+[![Build Status](http://ci.sighup.io/api/badges/sighupio/distribution/status.svg?ref=refs/tags/v1.31.0)](http://ci.sighup.io/sighupio/distribution)
+[![Release](https://img.shields.io/badge/release-v1.31.0-blue?label=DistributionRelease)](https://github.com/sighupio/distribution/releases/latest)
 [![Slack](https://img.shields.io/badge/slack-@kubernetes/fury-yellow.svg?logo=slack)](https://kubernetes.slack.com/archives/C0154HYTAQH)
-[![License](https://img.shields.io/github/license/sighupio/fury-distribution)](https://github.com/sighupio/fury-distribution/blob/main/LICENSE)
+[![License](https://img.shields.io/github/license/sighupio/distribution)](https://github.com/sighupio/distribution/blob/main/LICENSE)
 
 ## Overview
 
@@ -122,7 +122,7 @@ To get started with SD, please head to the [quickstart guides on the documentati
 
 ## Issues 🐛
 
-In case you experience any issues feel free to [open a new issue](https://github.com/sighupio/fury-distribution/issues/new/choose).
+In case you experience any issues feel free to [open a new issue](https://github.com/sighupio/distribution/issues/new/choose).
 
 If the problem is related to a specific module, open the issue in the module repository.
 
@@ -136,10 +136,10 @@ Current supported versions of SD are:
 
 |                                  SD Version                                   | Kubernetes Version |
 | :----------------------------------------------------------------------------: | :----------------: |
-| [`1.31.0`](https://github.com/sighupio/fury-distribution/releases/tag/v1.31.0) |      `1.31.x`      |
-| [`1.30.1`](https://github.com/sighupio/fury-distribution/releases/tag/v1.30.1) |      `1.30.x`      |
-| [`1.29.6`](https://github.com/sighupio/fury-distribution/releases/tag/v1.29.6) |      `1.29.x`      |
-| [`1.28.6`](https://github.com/sighupio/fury-distribution/releases/tag/v1.28.6) |      `1.28.x`      |
+| [`1.31.1`](https://github.com/sighupio/distribution/releases/tag/v1.31.1) |      `1.31.x`      |
+| [`1.30.1`](https://github.com/sighupio/distribution/releases/tag/v1.30.1) |      `1.30.x`      |
+| [`1.29.6`](https://github.com/sighupio/distribution/releases/tag/v1.29.6) |      `1.29.x`      |
+| [`1.28.6`](https://github.com/sighupio/distribution/releases/tag/v1.28.6) |      `1.28.x`      |
 
 > [!NOTE]
 > Usually, SD supports 3 versions simultaneously that are compatible with 3 different underlying Kubernetes versions. With SD v1.31.0 the support for SD v1.28.x will be extended for some time, effectively providing support for 4 versions (1.28, 1.29, 1.30 and 1.31).
@@ -177,14 +177,14 @@ SD is open-source software and it's released under the following [LICENSE](LICEN
 
 <!-- Core Modules -->
 
-[networking-module]: https://github.com/sighupio/fury-kubernetes-networking
-[ingress-module]: https://github.com/sighupio/fury-kubernetes-ingress
-[logging-module]: https://github.com/sighupio/fury-kubernetes-logging
-[monitoring-module]: https://github.com/sighupio/fury-kubernetes-monitoring
-[tracing-module]: https://github.com/sighupio/fury-kubernetes-tracing
-[dr-module]: https://github.com/sighupio/fury-kubernetes-dr
-[policy-module]: https://github.com/sighupio/fury-kubernetes-opa
-[auth-module]: https://github.com/sighupio/fury-kubernetes-auth
+[networking-module]: https://github.com/sighupio/module-networking
+[ingress-module]: https://github.com/sighupio/module-ingress
+[logging-module]: https://github.com/sighupio/module-logging
+[monitoring-module]: https://github.com/sighupio/module-monitoring
+[tracing-module]: https://github.com/sighupio/module-tracing
+[dr-module]: https://github.com/sighupio/module-dr
+[policy-module]: https://github.com/sighupio/module-opa
+[auth-module]: https://github.com/sighupio/module-auth
 [networking-version]: https://img.shields.io/badge/release-v2.0.0-blue
 [ingress-version]: https://img.shields.io/badge/release-v3.0.1-blue
 [logging-version]: https://img.shields.io/badge/release-v4.0.0-blue
@@ -196,18 +196,18 @@ SD is open-source software and it's released under the following [LICENSE](LICEN
 
 <!-- Addon Modules -->
 
-[kong-module]: https://github.com/sighupio/fury-kubernetes-kong
-[service-mesh-module]: https://github.com/sighupio/fury-kubernetes-service-mesh
-[registry-module]: https://github.com/sighupio/fury-kubernetes-registry
-[storage-module]: https://github.com/sighupio/fury-kubernetes-storage
-[kafka-module]: https://github.com/sighupio/fury-kubernetes-kafka
-[kong-version]: https://img.shields.io/github/v/release/sighupio/fury-kubernetes-kong
-[service-mesh-version]: https://img.shields.io/github/v/release/sighupio/fury-kubernetes-service-mesh
-[registry-version]: https://img.shields.io/github/v/release/sighupio/fury-kubernetes-registry
-[storage-version]: https://img.shields.io/github/v/release/sighupio/fury-kubernetes-storage
-[kafka-version]: https://img.shields.io/github/v/release/sighupio/fury-kubernetes-kafka
-[compatibility-matrix]: https://github.com/sighupio/fury-distribution/blob/main/docs/COMPATIBILITY_MATRIX.md
-[versioning]: https://github.com/sighupio/fury-distribution/blob/main/docs/VERSIONING.md
+[kong-module]: https://github.com/sighupio/add-on-kong
+[service-mesh-module]: https://github.com/sighupio/add-on-service-mesh
+[registry-module]: https://github.com/sighupio/add-on-registry
+[storage-module]: https://github.com/sighupio/add-on-storage
+[kafka-module]: https://github.com/sighupio/add-on-kafka
+[kong-version]: https://img.shields.io/github/v/release/sighupio/add-on-kong
+[service-mesh-version]: https://img.shields.io/github/v/release/sighupio/add-on-service-mesh
+[registry-version]: https://img.shields.io/github/v/release/sighupio/add-on-registry
+[storage-version]: https://img.shields.io/github/v/release/sighupio/add-on-storage
+[kafka-version]: https://img.shields.io/github/v/release/sighupio/add-on-kafka
+[compatibility-matrix]: https://github.com/sighupio/distribution/blob/main/docs/COMPATIBILITY_MATRIX.md
+[versioning]: https://github.com/sighupio/distribution/blob/main/docs/VERSIONING.md
 
 <!-- Misc -->
 
