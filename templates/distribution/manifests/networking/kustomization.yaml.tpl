@@ -14,6 +14,7 @@ resources:
 {{- if eq .spec.distribution.common.provider.type "none" }}{{/* none == on-prem */}}
     {{- if eq .spec.distribution.modules.networking.type "calico" }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/networking/katalog/tigera/on-prem" }}
+  - resources/calico-ns.yml
     {{- end }}
     {{- if eq .spec.distribution.modules.networking.type "cilium" }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/networking/katalog/cilium" }}
