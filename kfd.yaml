@@ -19,7 +19,7 @@ kubernetes:
     installer: v3.2.0
   onpremises:
     version: 1.31.7
-    installer: v1.32.3-rc.6
+    installer: fix/kubelet-reconfig-during-upgrade
 furyctlSchemas:
   eks:
     - apiVersion: kfd.sighup.io/v1alpha2
