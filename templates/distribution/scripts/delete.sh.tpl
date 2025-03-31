@@ -7,7 +7,7 @@ kubectlbin="{{ .paths.kubectl }}"
 yqbin="{{ .paths.yq }}"
 vendorPath="{{ .paths.vendorPath }}"
 
-$kustomizebin build --load_restrictor LoadRestrictionsNone . > out.yaml
+$kustomizebin build --load-restrictor LoadRestrictionsNone . > out.yaml
 
 {{- if eq .spec.distribution.modules.monitoring.type "none" }}
 if ! $kubectlbin get apiservice v1.monitoring.coreos.com; then
