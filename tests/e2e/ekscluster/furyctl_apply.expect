@@ -68,4 +68,5 @@ if {[catch {wait -i $furyctl_id} result]} {
 }
 
 puts "Script completed with exit code $exit_code."
+rm -rf .furyctl ~/.furyctl /tmp/furyctl-* || true
 exit $exit_code

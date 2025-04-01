@@ -6,8 +6,8 @@
 set -e
 
 echo "----------------------------------------------------------------------------"
-echo "Executing furyctl for the initial setup 1.31.0"
-FURYCTL_YAML=/drone/src/tests/e2e/ekscluster-upgrades/manifests/furyctl-init-cluster-1.31.0.yaml
+echo "Executing furyctl for the initial setup 1.30.1"
+FURYCTL_YAML=/drone/src/tests/e2e/ekscluster-upgrades/manifests/furyctl-init-cluster-1.30.1.yaml
 /drone/src/tests/e2e/ekscluster/replace_variables.sh --cluster-name "$CLUSTER_NAME" --furyctl-yaml "$FURYCTL_YAML"
 /drone/src/tests/e2e/ekscluster/furyctl_apply.expect $FURYCTL_YAML /tmp
 

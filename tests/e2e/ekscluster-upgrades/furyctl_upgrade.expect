@@ -39,9 +39,9 @@ if {[llength $argv] >= 3} {
 
 # Start furyctl apply.
 if {$distroLocation ne ""} {
-    spawn furyctl apply --upgrade --outdir $outdir -D --config $configFilePath --force upgrades --disable-analytics --distro-location $distroLocation
+    spawn furyctl apply --upgrade --outdir $outdir --config $configFilePath --force upgrades --disable-analytics --distro-location $distroLocation
 } else {
-    spawn furyctl apply --upgrade --outdir $outdir -D --config $configFilePath --force upgrades --disable-analytics
+    spawn furyctl apply --upgrade --outdir $outdir --config $configFilePath --force upgrades --disable-analytics
 }
 set furyctl_id $spawn_id
 
@@ -79,4 +79,5 @@ if {[catch {wait -i $furyctl_id} result]} {
 }
 
 puts "Script completed with exit code $exit_code."
+rm -rf .furyctl ~/.furyctl /tmp/furyctl-* || true
 exit $exit_code
