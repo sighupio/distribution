@@ -1857,6 +1857,9 @@ type SpecDistributionModulesLoggingLoki struct {
 	// using the new TSDB and the schema v13, always at midnight UTC. The old BoltDB
 	// and schema will be kept until they expire for reading purposes.
 	//
+	// From versions 1.29.7, 1.30.3 and 1.31.1 of the distribution, this field will be
+	// unmutable once changed.
+	//
 	// Value must be a string in `ISO 8601` date format (`yyyy-mm-dd`). Example:
 	// `2024-11-18`.
 	TsdbStartDate types.SerializableDate `json:"tsdbStartDate" yaml:"tsdbStartDate" mapstructure:"tsdbStartDate"`
@@ -2506,9 +2509,9 @@ type SpecDistributionModulesPolicyKyverno struct {
 	// Overrides corresponds to the JSON schema field "overrides".
 	Overrides *TypesFuryModuleComponentOverrides `json:"overrides,omitempty" yaml:"overrides,omitempty" mapstructure:"overrides,omitempty"`
 
-	// The validation failure action to use for the policies, `Enforce` will block
-	// when a request does not comply with the policies and `Audit` will not block but
-	// log when a request does not comply with the policies.
+	// The validation failure action to use for the included policies, `Enforce` will
+	// block when a request does not comply with the policies and `Audit` will not
+	// block but log when a request does not comply with the policies.
 	ValidationFailureAction SpecDistributionModulesPolicyKyvernoValidationFailureAction `json:"validationFailureAction" yaml:"validationFailureAction" mapstructure:"validationFailureAction"`
 }
 
@@ -3582,16 +3585,13 @@ func (j *SpecKubernetesNodePoolAdditionalFirewallRuleSourceSecurityGroupId) Unma
 
 // Optional additional firewall rules that will be attached to the nodes.
 type SpecKubernetesNodePoolAdditionalFirewallRules struct {
-	// The CIDR blocks objects definition for the Firewall rule. Even though it is a
-	// list, only one item is currently supported. See
-	// https://github.com/sighupio/fury-eks-installer/issues/46 for more details.
+	// The CIDR blocks objects definition for the Firewall rule.
 	CidrBlocks []SpecKubernetesNodePoolAdditionalFirewallRuleCidrBlock `json:"cidrBlocks,omitempty" yaml:"cidrBlocks,omitempty" mapstructure:"cidrBlocks,omitempty"`
 
-	// Self corresponds to the JSON schema field "self".
+	// The `self` objects definition for the Firewall rule.
 	Self []SpecKubernetesNodePoolAdditionalFirewallRuleSelf `json:"self,omitempty" yaml:"self,omitempty" mapstructure:"self,omitempty"`
 
-	// SourceSecurityGroupId corresponds to the JSON schema field
-	// "sourceSecurityGroupId".
+	// The Source Security Group ID objects definition for the Firewall rule.
 	SourceSecurityGroupId []SpecKubernetesNodePoolAdditionalFirewallRuleSourceSecurityGroupId `json:"sourceSecurityGroupId,omitempty" yaml:"sourceSecurityGroupId,omitempty" mapstructure:"sourceSecurityGroupId,omitempty"`
 }
 
@@ -3608,9 +3608,6 @@ func (j *SpecKubernetesNodePoolAdditionalFirewallRules) UnmarshalJSON(b []byte) 
 	}
 	if plain.CidrBlocks != nil && len(plain.CidrBlocks) < 1 {
 		return fmt.Errorf("field %s length: must be >= %d", "cidrBlocks", 1)
-	}
-	if len(plain.CidrBlocks) > 1 {
-		return fmt.Errorf("field %s length: must be <= %d", "cidrBlocks", 1)
 	}
 	if plain.Self != nil && len(plain.Self) < 1 {
 		return fmt.Errorf("field %s length: must be >= %d", "self", 1)

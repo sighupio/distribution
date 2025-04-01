@@ -1,6 +1,6 @@
-# OnPremises - KFD On Premises Cluster Schema
+# OnPremises - SD On Premises Cluster Schema
 
-This document explains the full schema for the `kind: OnPremises` for the `furyctl.yaml` file used by `furyctl`. This configuration file will be used to deploy the Kubernetes Fury Distribution modules and cluster on premises.
+This document explains the full schema for the `kind: OnPremises` for the `furyctl.yaml` file used by `furyctl`. This configuration file will be used to deploy the SIGHUP Distribution modules and cluster on premises.
 
 An example configuration file can be created by running the following command:
 
@@ -1105,15 +1105,175 @@ Default is `none`.
 
 ### Properties
 
-| Property                                         | Type     | Required |
-|:-------------------------------------------------|:---------|:---------|
-| [overrides](#specdistributionmodulesdroverrides) | `object` | Optional |
-| [type](#specdistributionmodulesdrtype)           | `string` | Required |
-| [velero](#specdistributionmodulesdrvelero)       | `object` | Optional |
+| Property                                           | Type     | Required |
+|:---------------------------------------------------|:---------|:---------|
+| [etcdBackup](#specdistributionmodulesdretcdbackup) | `object` | Optional |
+| [overrides](#specdistributionmodulesdroverrides)   | `object` | Optional |
+| [type](#specdistributionmodulesdrtype)             | `string` | Required |
+| [velero](#specdistributionmodulesdrvelero)         | `object` | Optional |
 
 ### Description
 
 Configuration for the Disaster Recovery module.
+
+## .spec.distribution.modules.dr.etcdBackup
+
+### Properties
+
+| Property                                                         | Type     | Required |
+|:-----------------------------------------------------------------|:---------|:---------|
+| [backupPrefix](#specdistributionmodulesdretcdbackupbackupprefix) | `string` | Optional |
+| [pvc](#specdistributionmodulesdretcdbackuppvc)                   | `object` | Optional |
+| [s3](#specdistributionmodulesdretcdbackups3)                     | `object` | Optional |
+| [type](#specdistributionmodulesdretcdbackuptype)                 | `string` | Optional |
+
+### Description
+
+Configuration for the ETCD backup package.
+
+## .spec.distribution.modules.dr.etcdBackup.backupPrefix
+
+### Description
+
+A prefix to be prepended to the backup filenames. If unset, the prefix defaults to the cluster's name.
+
+## .spec.distribution.modules.dr.etcdBackup.pvc
+
+### Properties
+
+| Property                                                              | Type     | Required |
+|:----------------------------------------------------------------------|:---------|:---------|
+| [accessModes](#specdistributionmodulesdretcdbackuppvcaccessmodes)     | `array`  | Optional |
+| [name](#specdistributionmodulesdretcdbackuppvcname)                   | `string` | Optional |
+| [retentionTime](#specdistributionmodulesdretcdbackuppvcretentiontime) | `string` | Optional |
+| [schedule](#specdistributionmodulesdretcdbackuppvcschedule)           | `string` | Optional |
+| [size](#specdistributionmodulesdretcdbackuppvcsize)                   | `string` | Optional |
+| [storageClass](#specdistributionmodulesdretcdbackuppvcstorageclass)   | `string` | Optional |
+
+### Description
+
+Configuration parameters for the `pvc` type of `etcdBackup`.
+
+## .spec.distribution.modules.dr.etcdBackup.pvc.accessModes
+
+### Description
+
+The accessModes that the `furyctl`-managed PersistentVolumeClaim will use. This has no effect and is ignored if `name` is set. Default is `["ReadOnlyOnce"]`
+
+## .spec.distribution.modules.dr.etcdBackup.pvc.name
+
+### Description
+
+The PersistentVolumeClaim name where the backups will be saved. If set, `size` and `storageClass` will be ignored and `etcd-backup` will use the PersistentVolumeClaim that matches the name set. Please note that the PersistentVolumeClaim must be created inside the `kube-system` namespace.
+
+If you leave `name` unset `furyctl` will create a PersistentVolumeClaim for you with an arbitrary name.
+
+## .spec.distribution.modules.dr.etcdBackup.pvc.retentionTime
+
+### Description
+
+The retention time of the backups inside the PersistentVolumeClaim. Follows rclone's `min-age` format. Example: '30d' for 30 days. Default is `10d` (ten days).
+
+## .spec.distribution.modules.dr.etcdBackup.pvc.schedule
+
+### Description
+
+The cron expression for the `etcd-backup-pvc` backup schedule. Default is `0 1 * * *` (everyday at 01:00).
+
+## .spec.distribution.modules.dr.etcdBackup.pvc.size
+
+### Description
+
+The size that the `furyctl`-managed PersistentVolumeClaim will use. This has no effect and is ignored if `name` is set. Default is `10G`.
+
+## .spec.distribution.modules.dr.etcdBackup.pvc.storageClass
+
+### Description
+
+The storage class that the `furyctl`-managed PersistentVolumeClaim will use. This has no effect and is ignored if `name` is set. Default is `default`.
+
+## .spec.distribution.modules.dr.etcdBackup.s3
+
+### Properties
+
+| Property                                                                 | Type      | Required |
+|:-------------------------------------------------------------------------|:----------|:---------|
+| [accessKeyId](#specdistributionmodulesdretcdbackups3accesskeyid)         | `string`  | Required |
+| [bucketName](#specdistributionmodulesdretcdbackups3bucketname)           | `string`  | Required |
+| [endpoint](#specdistributionmodulesdretcdbackups3endpoint)               | `string`  | Required |
+| [insecure](#specdistributionmodulesdretcdbackups3insecure)               | `boolean` | Optional |
+| [retentionTime](#specdistributionmodulesdretcdbackups3retentiontime)     | `string`  | Optional |
+| [schedule](#specdistributionmodulesdretcdbackups3schedule)               | `string`  | Optional |
+| [secretAccessKey](#specdistributionmodulesdretcdbackups3secretaccesskey) | `string`  | Required |
+
+### Description
+
+Configuration parameters for the `s3` type of `etcdBackup`.
+
+## .spec.distribution.modules.dr.etcdBackup.s3.accessKeyId
+
+### Description
+
+The access key ID (username) for the external S3-compatible bucket.
+
+## .spec.distribution.modules.dr.etcdBackup.s3.bucketName
+
+### Description
+
+The bucket name of the external S3-compatible object storage.
+
+## .spec.distribution.modules.dr.etcdBackup.s3.endpoint
+
+### Description
+
+External S3-compatible endpoint for etcd-backup-s3's storage.
+
+## .spec.distribution.modules.dr.etcdBackup.s3.insecure
+
+### Description
+
+If true, will use HTTP as protocol instead of HTTPS.
+
+## .spec.distribution.modules.dr.etcdBackup.s3.retentionTime
+
+### Description
+
+The retention time of the external S3-compatible object storage. Follows rclone's `min-age` format. Example: '30d' for 30 days. Default is `10d` (ten days).
+
+## .spec.distribution.modules.dr.etcdBackup.s3.schedule
+
+### Description
+
+The cron expression for the `etcd-backup-s3` backup schedule. Default is `0 1 * * *` (everyday at 01:00).
+
+## .spec.distribution.modules.dr.etcdBackup.s3.secretAccessKey
+
+### Description
+
+The secret access key (password) for the external S3-compatible bucket.
+
+## .spec.distribution.modules.dr.etcdBackup.type
+
+### Description
+
+The type of the etcd backup to enable, options are:
+- `none`: no etcd backup CronJob will be installed and no etcd backup will be performed.
+- `s3`: the etcd-backup-s3 package will be enabled. It will deploy a CronJob which continuously snapshots a healthy etcd node and will save the backups in a configured S3 bucket.
+- `pvc`: the etcd-backup-pvc package will be enabled. It will deploy a CronJob which continuously snapshots a healthy etcd node and will save the backups in a configured PersistentVolumeClaim.
+- `all`: both kinds of backups will be enabled.
+
+Default is `none`.
+
+### Constraints
+
+**enum**: the value of this property must be equal to one of the following string values:
+
+| Value  |
+|:-------|
+|`"s3"`  |
+|`"pvc"` |
+|`"none"`|
+|`"all"` |
 
 ## .spec.distribution.modules.dr.overrides
 
@@ -1191,7 +1351,7 @@ The value of the toleration
 
 ### Description
 
-The type of the Disaster Recovery, must be `none` or `on-premises`. `none` disables the module and `on-premises` will install Velero and an optional MinIO deployment.
+The type of the Disaster Recovery, must be `none` or `on-premises`. `none` disables the module and `on-premises` will install Velero, an optional MinIO deployment and optionally etcd-backup.
 
 Default is `none`.
 
@@ -2232,6 +2392,8 @@ The memory request for the Pod. Example: `500M`.
 Starting from versions 1.28.4, 1.29.5 and 1.30.0 of KFD, Loki will change the time series database from BoltDB to TSDB and the schema from v11 to v13 that it uses to store the logs.
 
 The value of this field will determine the date when Loki will start writing using the new TSDB and the schema v13, always at midnight UTC. The old BoltDB and schema will be kept until they expire for reading purposes.
+
+From versions 1.29.7, 1.30.3 and 1.31.1 of the distribution, this field will be unmutable once changed.
 
 Value must be a string in `ISO 8601` date format (`yyyy-mm-dd`). Example: `2024-11-18`.
 
@@ -4022,7 +4184,7 @@ The value of the toleration
 
 ### Description
 
-The validation failure action to use for the policies, `Enforce` will block when a request does not comply with the policies and `Audit` will not block but log when a request does not comply with the policies.
+The validation failure action to use for the included policies, `Enforce` will block when a request does not comply with the policies and `Audit` will not block but log when a request does not comply with the policies.
 
 ### Constraints
 
@@ -4500,6 +4662,7 @@ Defines which KFD version will be installed and, in consequence, the Kubernetes 
 | [advancedAnsible](#speckubernetesadvancedansible)         | `object` | Optional |
 | [controlPlaneAddress](#speckubernetescontrolplaneaddress) | `string` | Required |
 | [dnsZone](#speckubernetesdnszone)                         | `string` | Required |
+| [etcd](#speckubernetesetcd)                               | `object` | Optional |
 | [loadBalancers](#speckubernetesloadbalancers)             | `object` | Required |
 | [masters](#speckubernetesmasters)                         | `object` | Required |
 | [nodes](#speckubernetesnodes)                             | `array`  | Required |
@@ -4517,15 +4680,17 @@ Defines the Kubernetes components configuration and the values needed for the ku
 
 ### Properties
 
-| Property                                        | Type     | Required |
-|:------------------------------------------------|:---------|:---------|
-| [airGap](#speckubernetesadvancedairgap)         | `object` | Optional |
-| [cloud](#speckubernetesadvancedcloud)           | `object` | Optional |
-| [containerd](#speckubernetesadvancedcontainerd) | `object` | Optional |
-| [encryption](#speckubernetesadvancedencryption) | `object` | Optional |
-| [oidc](#speckubernetesadvancedoidc)             | `object` | Optional |
-| [registry](#speckubernetesadvancedregistry)     | `string` | Optional |
-| [users](#speckubernetesadvancedusers)           | `object` | Optional |
+| Property                                                            | Type     | Required |
+|:--------------------------------------------------------------------|:---------|:---------|
+| [airGap](#speckubernetesadvancedairgap)                             | `object` | Optional |
+| [apiServerCertSANs](#speckubernetesadvancedapiservercertsans)       | `array`  | Optional |
+| [cloud](#speckubernetesadvancedcloud)                               | `object` | Optional |
+| [containerd](#speckubernetesadvancedcontainerd)                     | `object` | Optional |
+| [encryption](#speckubernetesadvancedencryption)                     | `object` | Optional |
+| [kubeletConfiguration](#speckubernetesadvancedkubeletconfiguration) | `object` | Optional |
+| [oidc](#speckubernetesadvancedoidc)                                 | `object` | Optional |
+| [registry](#speckubernetesadvancedregistry)                         | `string` | Optional |
+| [users](#speckubernetesadvancedusers)                               | `object` | Optional |
 
 ## .spec.kubernetes.advanced.airGap
 
@@ -4653,6 +4818,12 @@ Checksum for the runc binary.
 
 URL where to download the runc binary from.
 
+## .spec.kubernetes.advanced.apiServerCertSANs
+
+### Description
+
+Additional Subject Alternative Names for the API server certificates. These are used to secure connections to the API server from various clients.
+
 ## .spec.kubernetes.advanced.cloud
 
 ### Properties
@@ -4779,7 +4950,15 @@ tlsCipherSuites:
   - "TLS_AES_128_GCM_SHA256"
   - "TLS_AES_256_GCM_SHA384"
   - "TLS_CHACHA20_POLY1305_SHA256"
-```
+```. NOTE: to customize the TLS cipher suites of the kubelet (as well as on control plane and etcd), set only this field - do not configure them under the `KubeletConfiguration`.
+
+## .spec.kubernetes.advanced.kubeletConfiguration
+
+### Description
+
+Advanced configuration for Kubelet. This open field allows users to specify any parameter supported by the `KubeletConfiguration` object. Examples of uses include controlling the maximum number of pods per core (`podsPerCore`), managing container logging (`containerLogMaxSize`), Topology Manager options (`topologyManagerPolicyOptions`). All values must follow the official Kubelet specification: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/.
+
+NOTE: Content will **not** be validated by furyctl. To customize the TLS cipher suites of the Kubelet, set only the `Spec.Kubernetes.Advanced.Encryption.tlsCipherSuites` field - do not configure them under this field.
 
 ## .spec.kubernetes.advanced.oidc
 
@@ -4901,6 +5080,47 @@ The address for the Kubernetes control plane. Usually a DNS entry pointing to a 
 
 The DNS zone of the machines. It will be appended to the name of each host to generate the `kubernetes_hostname` in the Ansible inventory file. It is also used to calculate etcd's initial cluster value.
 
+## .spec.kubernetes.etcd
+
+### Properties
+
+| Property                          | Type    | Required |
+|:----------------------------------|:--------|:---------|
+| [hosts](#speckubernetesetcdhosts) | `array` | Required |
+
+### Description
+
+Optional configuration for an etcd cluster on dedicated nodes. If omitted, etcd will run on control plane nodes.
+
+## .spec.kubernetes.etcd.hosts
+
+### Properties
+
+| Property                             | Type     | Required |
+|:-------------------------------------|:---------|:---------|
+| [ip](#speckubernetesetcdhostsip)     | `string` | Required |
+| [name](#speckubernetesetcdhostsname) | `string` | Required |
+
+### Description
+
+List of nodes of the dedicated etcd cluster.
+
+### Constraints
+
+**minimum number of items**: the minimum number of items for this array is: `1`
+
+## .spec.kubernetes.etcd.hosts.ip
+
+### Description
+
+The IP address of the etcd node.
+
+## .spec.kubernetes.etcd.hosts.name
+
+### Description
+
+A name to identify the etcd node. This value will be concatenated to `.spec.kubernetes.dnsZone` to calculate the FQDN for the host as `<name>.<dnsZone>`.
+
 ## .spec.kubernetes.loadBalancers
 
 ### Properties
@@ -4980,13 +5200,17 @@ The Virtual floating IP for Keepalived
 
 ### Description
 
-The passphrase for the Keepalived clustering.
+Password for accessing vrrpd. Make it unique between Keepalived clusters.
+
+### Constraints
+
+**maximum length**: the maximum number of characters for this string is: `8`
 
 ## .spec.kubernetes.loadBalancers.keepalived.virtualRouterId
 
 ### Description
 
-The virtual router ID of Keepalived, must be different from other Keepalived instances in the same network.
+The virtual router ID of Keepalived, an arbitrary unique number from 1 to 255 used to differentiate multiple instances of vrrpd running on the same network interface and address family and multicast/unicast (and hence same socket).
 
 ## .spec.kubernetes.loadBalancers.stats
 
@@ -5017,11 +5241,12 @@ The basic-auth username for HAProxy's stats page
 
 ### Properties
 
-| Property                                         | Type     | Required |
-|:-------------------------------------------------|:---------|:---------|
-| [annotations](#speckubernetesmastersannotations) | `object` | Optional |
-| [hosts](#speckubernetesmastershosts)             | `array`  | Required |
-| [labels](#speckubernetesmasterslabels)           | `object` | Optional |
+| Property                                                           | Type     | Required |
+|:-------------------------------------------------------------------|:---------|:---------|
+| [annotations](#speckubernetesmastersannotations)                   | `object` | Optional |
+| [hosts](#speckubernetesmastershosts)                               | `array`  | Required |
+| [kubeletConfiguration](#speckubernetesmasterskubeletconfiguration) | `object` | Optional |
+| [labels](#speckubernetesmasterslabels)                             | `object` | Optional |
 
 ### Description
 
@@ -5054,6 +5279,14 @@ The IP address of the host
 
 A name to identify the host. This value will be concatenated to `.spec.kubernetes.dnsZone` to calculate the FQDN for the host as `<name>.<dnsZone>`.
 
+## .spec.kubernetes.masters.kubeletConfiguration
+
+### Description
+
+Advanced configuration for Kubelet. This open field allows users to specify any parameter supported by the `KubeletConfiguration` object. Examples of uses include controlling the maximum number of pods per core (`podsPerCore`), managing container logging (`containerLogMaxSize`), Topology Manager options (`topologyManagerPolicyOptions`). All values must follow the official Kubelet specification: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/.
+
+NOTE: Content will **not** be validated by furyctl. To customize the TLS cipher suites of the Kubelet, set only the `Spec.Kubernetes.Advanced.Encryption.tlsCipherSuites` field - do not configure them under this field.
+
 ## .spec.kubernetes.masters.labels
 
 ### Description
@@ -5066,13 +5299,14 @@ Note: **Existing labels with the same key will be overwritten** and the label se
 
 ### Properties
 
-| Property                                       | Type     | Required |
-|:-----------------------------------------------|:---------|:---------|
-| [annotations](#speckubernetesnodesannotations) | `object` | Optional |
-| [hosts](#speckubernetesnodeshosts)             | `array`  | Required |
-| [labels](#speckubernetesnodeslabels)           | `object` | Optional |
-| [name](#speckubernetesnodesname)               | `string` | Required |
-| [taints](#speckubernetesnodestaints)           | `array`  | Optional |
+| Property                                                         | Type     | Required |
+|:-----------------------------------------------------------------|:---------|:---------|
+| [annotations](#speckubernetesnodesannotations)                   | `object` | Optional |
+| [hosts](#speckubernetesnodeshosts)                               | `array`  | Required |
+| [kubeletConfiguration](#speckubernetesnodeskubeletconfiguration) | `object` | Optional |
+| [labels](#speckubernetesnodeslabels)                             | `object` | Optional |
+| [name](#speckubernetesnodesname)                                 | `string` | Required |
+| [taints](#speckubernetesnodestaints)                             | `array`  | Optional |
 
 ### Description
 
@@ -5108,6 +5342,14 @@ The IP address of the host
 ### Description
 
 A name to identify the host. This value will be concatenated to `.spec.kubernetes.dnsZone` to calculate the FQDN for the host as `<name>.<dnsZone>`.
+
+## .spec.kubernetes.nodes.kubeletConfiguration
+
+### Description
+
+Advanced configuration for Kubelet. This open field allows users to specify any parameter supported by the `KubeletConfiguration` object. Examples of uses include controlling the maximum number of pods per core (`podsPerCore`), managing container logging (`containerLogMaxSize`), Topology Manager options (`topologyManagerPolicyOptions`). All values must follow the official Kubelet specification: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/.
+
+NOTE: Content will **not** be validated by furyctl. To customize the TLS cipher suites of the Kubelet, set only the `Spec.Kubernetes.Advanced.Encryption.tlsCipherSuites` field - do not configure them under this field.
 
 ## .spec.kubernetes.nodes.labels
 
