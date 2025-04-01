@@ -70,7 +70,7 @@ spec:
         kyverno:
           additionalExcludedNamespaces: ["local-path-storage"]
           installDefaultPolicies: true
-          validationFailureAction: Enforce
+          validationFailureAction: Audit
       dr:
         type: none
         velero:

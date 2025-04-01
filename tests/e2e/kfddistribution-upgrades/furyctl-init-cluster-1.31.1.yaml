@@ -54,7 +54,7 @@ spec:
         type: kyverno
         kyverno:
           additionalExcludedNamespaces: ["local-path-storage"]
-          validationFailureAction: Enforce
+          validationFailureAction: Audit
           installDefaultPolicies: true
       dr:
         type: on-premises

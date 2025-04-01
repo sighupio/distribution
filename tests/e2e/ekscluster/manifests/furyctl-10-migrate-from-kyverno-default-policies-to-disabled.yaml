@@ -145,7 +145,7 @@ spec:
           additionalExcludedNamespaces:
             - local-path-storage
           installDefaultPolicies: false
-          validationFailureAction: Enforce
+          validationFailureAction: Audit
       dr:
         type: eks
         velero:
