@@ -83,7 +83,7 @@ steps:
       FURYCTL_VERSION: v0.32.0-rc.2
       FURYCTL_CONFIG: tests/e2e/kfddistribution/furyctl-init-cluster.yaml
       FURYCTL_DISTRO_LOCATION: ./
-      FURYCTL_OUTDIR: ./out
+      FURYCTL_OUTDIR: ./
       FURYCTL_DISABLE_ANALYTICS: "true"
       KUBECONFIG: ./dummy
     commands:
