@@ -15,7 +15,7 @@ kind: EKSCluster
 metadata:
   name: e2e-eks-upgrades
 spec:
-  distributionVersion: v1.31.1-rc.1
+  distributionVersion: v1.31.1
   toolsConfiguration:
     terraform:
       state:
