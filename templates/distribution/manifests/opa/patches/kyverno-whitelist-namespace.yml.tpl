@@ -5,8 +5,7 @@
 {{- $defaultNamespaces := (list "kube-system" "kyverno" "logging" "monitoring" "ingress-nginx" "cert-manager" "tigera-operator" "calico-system" "calico-api" "vmware-system-csi" "pomerium" "tracing") }}
 {{- $newWebhook := dict "key" "kubernetes.io/metadata.name" "operator" "NotIn" "values" ((concat $defaultNamespaces .spec.distribution.modules.policy.kyverno.additionalExcludedNamespaces) | uniq) }}
 {{- $kwhitelist := dict "matchExpressions" (list $newWebhook) }}
-{{- $kwhitelist := dict "namespaceSelector" $kwhitelist | toJson }}
-{{- $kwhitelist := list $kwhitelist | quote }}
+{{- $kwhitelist := dict "namespaceSelector" $kwhitelist | toJson | quote }}
 
 ---
 apiVersion: v1
