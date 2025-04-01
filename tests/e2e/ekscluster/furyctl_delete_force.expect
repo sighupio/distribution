@@ -11,15 +11,6 @@ if {[llength $argv] == 0} {
     puts "Usage: furyctl_apply.expect /path/to/furyctl.yaml"
     exit 1
 }
-
-if {[llength $argv] >= 2} { 
-    set outdir [lindex $argv 1] 
-    puts "Using specified output directory: $outdir" 
-} else { 
-    set outdir $env(PWD) 
-    puts "Using current directory as output directory: $outdir" 
-}
-
 set configFilePath [lindex $argv 0]
 # Verify that necessary AWS environment variables exist.
 if { ![info exists env(AWS_ACCESS_KEY_ID)] || \
@@ -30,22 +21,32 @@ if { ![info exists env(AWS_ACCESS_KEY_ID)] || \
 }
 
 
-# Determine if --distro-location flag should be used
-set distroLocation ""
-if {[llength $argv] >= 3} {
-    set distroLocation [lindex $argv 2]
-}
-
-# Start furyctl apply.
-if {$distroLocation ne ""} {
-    spawn furyctl apply --outdir $outdir --config $configFilePath --disable-analytics --distro-location $distroLocation
-} else {
-    spawn furyctl apply --outdir $outdir --config $configFilePath --disable-analytics
-}
+# Start furyctl delete kubernetes.
+spawn furyctl delete cluster --outdir $env(PWD) --debug --disable-analytics --config $configFilePath --distro-location ./ --phase kubernetes
 set furyctl_id $spawn_id
 
 expect {
+     -re {.*Are you sure you want to continue\? Only 'yes' will be accepted to confirm.*} {
+        puts "Confirmation prompt detected, sending 'yes'"
+        send -i $furyctl_id "yes\r"
+        exp_continue
+    }
+    timeout {
+        puts "Timed out waiting for the interactive prompt."
+        catch {kill -s INT [exp_pid -i $furyctl_id]}
+        sleep 5
+        exit 1
+    }
+    eof {
+        puts "furyctl process ended."
+    }
+}
 
+# Start furyctl delete infrastructure.
+spawn furyctl delete cluster --outdir $env(PWD) --debug --disable-analytics --config $configFilePath --distro-location ./ --phase infrastructure
+set furyctl_id $spawn_id
+
+expect {
      -re {.*Are you sure you want to continue\? Only 'yes' will be accepted to confirm.*} {
         puts "Confirmation prompt detected, sending 'yes'"
         send -i $furyctl_id "yes\r"
@@ -78,5 +79,5 @@ if {[catch {wait -i $furyctl_id} result]} {
 }
 
 puts "Script completed with exit code $exit_code."
-rm -rf .furyctl ~/.furyctl /tmp/furyctl-* || true
 exit $exit_code
+
