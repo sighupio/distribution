@@ -140,7 +140,7 @@ spec:
         kyverno:
           additionalExcludedNamespaces:
             - local-path-storage
-          validationFailureAction: Audit
+          validationFailureAction: Enforce
           installDefaultPolicies: true
       dr:
         type: eks
