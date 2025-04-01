@@ -343,6 +343,7 @@ steps:
     AWS_REGION:
       from_secret: aws_region
   commands:
+    - apt update
     - apt-get install -y expect
     - echo "Installing the correct furyctl version..."
     - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-linux-amd64.tar.gz" | tar -xz
@@ -364,7 +365,7 @@ steps:
     AWS_REGION:
       from_secret: aws_region
   commands:
-    - apt-get install -y expect
+    - apt update
     - apt-get install -y expect
     - echo "Installing the correct furyctl version..."
     - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-linux-amd64.tar.gz" | tar -xz
@@ -403,6 +404,7 @@ steps:
     AWS_REGION:
       from_secret: aws_region
   commands:
+    - apt update
     - apt-get install -y expect
     - echo "Installing the correct furyctl version..."
     - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-linux-amd64.tar.gz" | tar -xz
@@ -424,6 +426,7 @@ steps:
     AWS_REGION:
       from_secret: aws_region
   commands:
+    - apt update
     - apt-get install -y expect
     - echo "Installing the correct furyctl version..."
     - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-linux-amd64.tar.gz" | tar -xz
