@@ -72,7 +72,7 @@ steps:
       - bats -t tests/schema.sh
 
   - name: render
-    image: quay.io/sighup/e2e-testing:1.1.0_1.30.5_3.10.0_4.33.3
+    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3
     pull: always
     depends_on:
       - license-check
@@ -83,7 +83,7 @@ steps:
       FURYCTL_VERSION: v0.32.0-rc.2
       FURYCTL_CONFIG: tests/e2e/kfddistribution/furyctl-init-cluster.yaml
       FURYCTL_DISTRO_LOCATION: ./
-      FURYCTL_OUTDIR: ./out/
+      FURYCTL_OUTDIR: ./
       FURYCTL_DISABLE_ANALYTICS: "true"
       KUBECONFIG: ./dummy
     commands:
@@ -92,7 +92,7 @@ steps:
       - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-$(uname -s)-amd64.tar.gz" | tar xz -C /usr/local/bin/
       - furyctl download dependencies && furyctl dump template
       # Move the folder with the manifests generated from the templates into the right path
-      - mv $${FURYTCL_OUTDIR}distribution $${FURYTCL_OUTDIR}.furyctl/$$(yq .metadata.name $FURYCTL_CONFIG)
+      - mv distribution $${FURYTCL_OUTDIR}.furyctl/$$(yq .metadata.name $FURYCTL_CONFIG)
       # Build the whole distribution
       - kustomize build $${FURYTCL_OUTDIR}.furyctl/$$(yq .metadata.name $FURYCTL_CONFIG)/distribution/manifests > distribution.yml
 
