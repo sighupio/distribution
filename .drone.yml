@@ -485,7 +485,7 @@ type: docker
 
 depends_on:
   - e2e-kubernetes-1.31
-  - e2e-kubernetes-1.30.0-to-1.31.0
+  - e2e-kubernetes-1.31.0-to-1.31.1
 
 platform:
   os: linux
