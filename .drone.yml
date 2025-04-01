@@ -59,7 +59,7 @@ steps:
   #     - schema-check
 
   - name: test-schema
-    image: quay.io/sighup/e2e-testing:1.1.0_1.30.5_3.10.0_4.33.3
+    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.29.1_5.6.0_4.33.3
     pull: always
     depends_on:
       - license-check
@@ -72,7 +72,7 @@ steps:
       - bats -t tests/schema.sh
 
   - name: render
-    image: quay.io/sighup/e2e-testing:1.1.0_1.30.5_3.10.0_4.33.3
+    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.29.1_5.6.0_4.33.3
     pull: always
     depends_on:
       - license-check
@@ -80,7 +80,7 @@ steps:
     environment:
       NETRC_FILE:
         from_secret: NETRC_FILE
-      FURYCTL_VERSION: v0.31.0
+      FURYCTL_VERSION: v0.32.0-rc.2
       FURYCTL_CONFIG: tests/e2e/kfddistribution/furyctl-init-cluster.yaml
       FURYCTL_DISTRO_LOCATION: ./
       FURYCTL_OUTDIR: ./
@@ -129,7 +129,7 @@ trigger:
 
 steps:
   - name: create Kind cluster
-    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.24.0_1.30.5_3.10.0
+    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.27.0_1.29.1_5.6.0
     pull: always
     volumes:
       - name: dockersock
@@ -162,7 +162,7 @@ steps:
       - kind get kubeconfig --name $${CLUSTER_NAME} > $${KUBECONFIG}
 
   - name: e2e-kfddistribution
-    image: quay.io/sighup/e2e-testing:1.1.0_1.30.5_3.10.0_4.33.3
+    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.29.1_5.6.0_4.33.3
     pull: always
     # we need to use host network to access Kind API port that is listening on the worker's loopback
     # beacuse we mount the host's Docker socket to run Kind.
@@ -170,7 +170,7 @@ steps:
     environment:
       CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}
       KUBECONFIG: /drone/src/kubeconfig
-      FURYCTL_VERSION: v0.31.0
+      FURYCTL_VERSION: v0.32.0-rc.2
     depends_on: [create Kind cluster]
     commands:
       - export KUBECONFIG=/drone/src/kubeconfig
@@ -188,7 +188,7 @@ steps:
       - tests/e2e-kfddistribution.sh
 
   - name: delete-kind-cluster
-    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.24.0_1.30.5_3.10.0
+    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.27.0_1.29.1_5.6.0
     volumes:
       - name: dockersock
         path: /var/run/docker.sock
@@ -209,7 +209,7 @@ volumes:
     host:
       path: /var/run/docker.sock
 ---
-name: e2e-kubernetes-1.29.5-to-1.29.6
+name: e2e-kubernetes-1.29.6-to-1.29.7
 kind: pipeline
 type: docker
 
@@ -233,7 +233,7 @@ trigger:
 
 steps:
   - name: create Kind cluster
-    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.24.0_1.30.5_3.10.0
+    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.27.0_1.29.1_5.6.0
     pull: always
     volumes:
       - name: dockersock
@@ -266,7 +266,7 @@ steps:
       - kind get kubeconfig --name $${CLUSTER_NAME} > $${KUBECONFIG}
 
   - name: e2e-kfddistribution
-    image: quay.io/sighup/e2e-testing:1.1.0_1.30.5_3.10.0_4.33.3
+    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.29.1_5.6.0_4.33.3
     pull: always
     # we need to use host network to access Kind API port that is listening on the worker's loopback
     # beacuse we mount the host's Docker socket to run Kind.
@@ -274,7 +274,7 @@ steps:
     environment:
       CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-upgrades
       KUBECONFIG: /drone/src/kubeconfig-upgrades
-      FURYCTL_VERSION: v0.31.0
+      FURYCTL_VERSION: v0.32.0-rc.2
     depends_on: [create Kind cluster]
     commands:
       - export KUBECONFIG=/drone/src/kubeconfig-upgrades
@@ -292,7 +292,7 @@ steps:
       - tests/e2e-kfddistribution-upgrades.sh
 
   - name: delete-kind-cluster
-    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.24.0_1.30.5_3.10.0
+    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.27.0_1.29.1_5.6.0
     volumes:
       - name: dockersock
         path: /var/run/docker.sock
@@ -319,7 +319,7 @@ type: docker
 
 depends_on:
   - e2e-kubernetes-1.29
-  - e2e-kubernetes-1.29.5-to-1.29.6
+  - e2e-kubernetes-1.29.6-to-1.29.7
 
 platform:
   os: linux
