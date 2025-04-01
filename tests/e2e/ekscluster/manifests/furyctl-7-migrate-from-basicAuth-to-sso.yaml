@@ -71,7 +71,7 @@ spec:
           max: 7
         instance:
           type: t3.xlarge
-          spot: true
+          spot: false
           volumeSize: 50
           volumeType: gp2
         labels:
