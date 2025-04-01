@@ -266,7 +266,7 @@ steps:
       - kind get kubeconfig --name $${CLUSTER_NAME} > $${KUBECONFIG}
 
   - name: e2e-kfddistribution
-    image: quay.io/sighup/e2e-testing:1.1.0_1.30.5_3.10.0_4.33.3
+    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3
     pull: always
     # we need to use host network to access Kind API port that is listening on the worker's loopback
     # beacuse we mount the host's Docker socket to run Kind.
