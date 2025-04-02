@@ -374,31 +374,6 @@ steps:
     - tests/e2e/ekscluster/furyctl_delete.expect $(cat ./last_furyctl_yaml.txt)
     - aws s3 rm s3://e2e-drone-eks/$CLUSTER_NAME --recursive
 
-- name: force-cleanup
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
-  environment:
-    FURYCTL_VERSION: "v0.32.0-rc.3"
-    CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}
-    DEBIAN_FRONTEND: noninteractive
-    DISTRIBUTION_VERSION: "v1.31.1"
-    AWS_ACCESS_KEY_ID:
-      from_secret: aws_access_key_id
-    AWS_SECRET_ACCESS_KEY:
-      from_secret: aws_secret_access_key
-    AWS_REGION:
-      from_secret: aws_region
-  commands:
-    - apt update
-    - apt-get install -y expect
-    - echo "Installing the correct furyctl version..."
-    - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-linux-amd64.tar.gz" | tar -xz
-    - mv furyctl /usr/local/bin
-    - chmod +x /usr/local/bin/furyctl
-    - tests/e2e/ekscluster/furyctl_delete_force.expect $(cat ./last_furyctl_yaml.txt)
-    - aws s3 rm s3://e2e-drone-eks/$CLUSTER_NAME --recursive
-  when:
-    status:
-      - failure
 ---
 name: e2e-ekscluster-upgrades-1.30.1-1.31.1
 kind: pipeline
@@ -460,32 +435,6 @@ steps:
     - chmod +x /usr/local/bin/furyctl
     - tests/e2e/ekscluster/furyctl_delete.expect tests/e2e/ekscluster-upgrades/manifests/furyctl-init-cluster-1.31.0.yaml
     - aws s3 rm s3://e2e-drone-eks/$CLUSTER_NAME --recursive
-
-- name: force-cleanup
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
-  environment:
-    FURYCTL_VERSION: "v0.32.0-rc.3"
-    CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-upgrades
-    DEBIAN_FRONTEND: noninteractive
-    DISTRIBUTION_VERSION: "v1.31.1"
-    AWS_ACCESS_KEY_ID:
-      from_secret: aws_access_key_id
-    AWS_SECRET_ACCESS_KEY:
-      from_secret: aws_secret_access_key
-    AWS_REGION:
-      from_secret: aws_region
-  commands:
-    - apt update
-    - apt-get install -y expect
-    - echo "Installing the correct furyctl version..."
-    - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-linux-amd64.tar.gz" | tar -xz
-    - mv furyctl /usr/local/bin
-    - chmod +x /usr/local/bin/furyctl
-    - tests/e2e/ekscluster/furyctl_delete_force.expect tests/e2e/ekscluster-upgrades/manifests/furyctl-init-cluster-1.31.0.yaml
-    - aws s3 rm s3://e2e-drone-eks/$CLUSTER_NAME --recursive
-  when:
-    status:
-      - failure
 
 ---
 kind: pipeline
