@@ -173,6 +173,7 @@ spec:
       tolerations:
         {{ template "tolerations" $mimirArgs }}
 {{- if eq .spec.distribution.modules.monitoring.mimir.backend "minio" }}
+{{- $minioArgs := dict "module" "monitoring" "package" "minio" "spec" .spec }}
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -183,9 +184,22 @@ spec:
   template:
     spec:
       nodeSelector:
-        {{ template "nodeSelector" $mimirArgs }}
+        {{ template "nodeSelector" $minioArgs }}
       tolerations:
-        {{ template "tolerations" $mimirArgs }}
+        {{ template "tolerations" $minioArgs }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: minio-monitoring-buckets-setup
+  namespace: monitoring
+spec:
+  template:
+    spec:
+      nodeSelector:
+        {{ template "nodeSelector" $minioArgs }}
+      tolerations:
+        {{ template "tolerations" $minioArgs }}
 {{- end }}
 ---
 apiVersion: apps/v1

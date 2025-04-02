@@ -52,6 +52,8 @@ patchesStrategicMerge:
   - patches/cert-manager.yml
 {{- end }}
 
+  - patches/cert-manager-kapp-group.yml
+
 {{ if or (ne .spec.distribution.modules.ingress.nginx.tls.provider "none") (ne .spec.distribution.modules.ingress.nginx.type "none") }}
   - patches/infra-nodes.yml
 {{- end }}

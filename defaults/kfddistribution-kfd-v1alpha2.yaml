@@ -229,6 +229,11 @@ data:
       overrides:
         nodeSelector: null
         tolerations: null
+      # etcdBackup isn't supported in the KFDDistribution provider.
+      # It is defined here only because otherwise the template engine
+      # breaks.
+      etcdBackup:
+        type: "none"
       # the standard configuration for velero on the dr module
       velero:
         backend: minio

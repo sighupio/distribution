@@ -1,6 +1,6 @@
 # KFDDistribution - Distribution Only Cluster Schema
 
-This document explains the full schema for the `kind: KFDDistribution` for the `furyctl.yaml` file used by `furyctl`. This configuration file will be used to deploy the Kubernetes Fury Distribution modules on top of an existing Kubernetes cluster.
+This document explains the full schema for the `kind: KFDDistribution` for the `furyctl.yaml` file used by `furyctl`. This configuration file will be used to deploy the SIGHUP Distribution modules on top of an existing Kubernetes cluster.
 
 An example configuration file can be created by running the following command:
 
@@ -2109,6 +2109,8 @@ Starting from versions 1.28.4, 1.29.5 and 1.30.0 of KFD, Loki will change the ti
 
 The value of this field will determine the date when Loki will start writing using the new TSDB and the schema v13, always at midnight UTC. The old BoltDB and schema will be kept until they expire for reading purposes.
 
+From versions 1.29.7, 1.30.2 and 1.31.1 of the distribution, this field will be unmutable once changed.
+
 Value must be a string in `ISO 8601` date format (`yyyy-mm-dd`). Example: `2024-11-18`.
 
 ## .spec.distribution.modules.logging.minio
@@ -3899,7 +3901,7 @@ The value of the toleration
 
 ### Description
 
-The validation failure action to use for the policies, `Enforce` will block when a request does not comply with the policies and `Audit` will not block but log when a request does not comply with the policies.
+The validation failure action to use for the included policies, `Enforce` will block when a request does not comply with the policies and `Audit` will not block but log when a request does not comply with the policies.
 
 ### Constraints
 

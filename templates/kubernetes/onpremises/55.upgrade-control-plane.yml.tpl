@@ -3,15 +3,6 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Upgrade etcd
-  hosts: master
-  serial: 1
-  become: true
-  roles:
-    - etcd
-  tags:
-    - kubeadm-upgrade
-
 - name: Control plane upgrade
   hosts: master
   serial: 1
