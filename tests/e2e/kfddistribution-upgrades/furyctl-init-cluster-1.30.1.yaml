@@ -33,7 +33,7 @@ spec:
       logging:
         type: loki
         loki:
-          tsdbStartDate: "2024-11-g28" # this should be a day in the future when upgrading
+          tsdbStartDate: "2024-11-28" # this should be a day in the future when upgrading
         minio:
           storageSize: 20Gi
           rootUser:
