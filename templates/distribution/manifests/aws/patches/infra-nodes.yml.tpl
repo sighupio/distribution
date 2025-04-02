@@ -33,16 +33,3 @@ spec:
         {{ template "nodeSelector" $clusterAutoscalerArgs }}
       tolerations:
         {{ template "tolerations" $clusterAutoscalerArgs }}
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: snapshot-controller
-  namespace: kube-system
-spec:
-  template:
-    spec:
-      nodeSelector:
-        {{ template "nodeSelector" $ebsSnapshotControllerArgs }}
-      tolerations:
-        {{ template "tolerations" $ebsSnapshotControllerArgs }}

@@ -11,6 +11,7 @@ metadata:
   namespace: kube-system
 spec:
   provider: velero.io/aws
+  default: true
   objectStorage:
     bucket: {{ .spec.distribution.modules.dr.velero.eks.bucketName }}
   config:

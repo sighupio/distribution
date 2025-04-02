@@ -3,11 +3,12 @@
 set -e
 
 kustomizebin="{{ .paths.kustomize }}"
+kappbin="{{ .paths.kapp }}"
 kubectlbin="{{ .paths.kubectl }}"
 yqbin="{{ .paths.yq }}"
 vendorPath="{{ .paths.vendorPath }}"
 
-$kustomizebin build --load_restrictor LoadRestrictionsNone . > out.yaml
+$kustomizebin build --load-restrictor LoadRestrictionsNone . > out.yaml
 
 {{- if and (index .spec.distribution.common "registry") (ne .spec.distribution.common.registry "") }}
 if [[ "$OSTYPE" == "darwin"* ]]; then
@@ -36,13 +37,6 @@ if [ "$dryrun" != "" ]; then
   exit 0
 fi
 
-{{- if eq .spec.distribution.modules.networking.type "calico" }}
-$kubectlbin create namespace calico-system --dry-run=client -o yaml | $kubectlbin apply -f - --server-side
-{{- end }}
-
-< out.yaml $yqbin 'select(.kind == "CustomResourceDefinition")' | $kubectlbin apply -f - --server-side
-< out.yaml $yqbin 'select(.kind == "CustomResourceDefinition")' | $kubectlbin wait --for condition=established --timeout=60s -f -
-
 echo "Clean up old init jobs..."
 
 $kubectlbin delete --ignore-not-found --wait --timeout=180s job minio-setup -n kube-system
@@ -50,43 +44,16 @@ $kubectlbin delete --ignore-not-found --wait --timeout=180s job minio-logging-bu
 $kubectlbin delete --ignore-not-found --wait --timeout=180s job minio-monitoring-buckets-setup -n monitoring
 $kubectlbin delete --ignore-not-found --wait --timeout=180s job minio-tracing-buckets-setup -n tracing
 
-< out.yaml \
-  $yqbin 'select(.kind != "Issuer" and .kind != "ClusterIssuer" and .kind != "Certificate" and .kind != "Ingress" and .kind != "K8sLivenessProbe" and .kind != "K8sReadinessProbe" and .kind != "K8sUniqueIngressHost" and .kind != "SecurityControls")' \
-  | $yqbin 'select(.metadata.name != "gatekeeper-mutating-webhook-configuration" and .metadata.name != "gatekeeper-validating-webhook-configuration")' \
-  | $kubectlbin apply -f - --server-side
-
-< out.yaml $yqbin 'select(.kind == "Deployment" and .metadata.namespace == "cert-manager")' | $kubectlbin wait --for condition=available --timeout=360s -f -
-
-< out.yaml \
-  $yqbin 'select(.kind == "Issuer" or .kind == "ClusterIssuer" or .kind == "Certificate")' \
-  | $kubectlbin apply -f - --server-side
-
-{{- if eq .spec.distribution.modules.ingress.nginx.type "dual" }}
-$kubectlbin rollout status daemonset ingress-nginx-controller-external -n ingress-nginx --timeout=180s
-
-$kubectlbin rollout status daemonset ingress-nginx-controller-internal -n ingress-nginx --timeout=180s
-
-{{- end }}
-
-{{- if eq .spec.distribution.modules.ingress.nginx.type "single" }}
-$kubectlbin rollout status daemonset ingress-nginx-controller -n ingress-nginx --timeout=180s
-
-{{- end }}
+additionalKappArgs=""
 
 {{- if eq .spec.distribution.modules.policy.type "gatekeeper" }}
-$kubectlbin rollout status deployment gatekeeper-audit -n gatekeeper-system --timeout=180s
-$kubectlbin rollout status deployment gatekeeper-controller-manager -n gatekeeper-system --timeout=180s
-$kubectlbin rollout status deployment gatekeeper-policy-manager -n gatekeeper-system --timeout=180s
+    {{- if .spec.distribution.modules.policy.gatekeeper.installDefaultPolicies }}
+    # We need this to tell Kapp that the CRDs will be created later by Gatekeeper
+additionalKappArgs+="-f ../../vendor/modules/opa/katalog/tests/kapp/exists.yaml"
+    {{- end }}
 {{- end }}
 
-{{- if eq .spec.distribution.modules.policy.type "kyverno" }}
-$kubectlbin rollout status deployment kyverno-admission-controller -n kyverno --timeout=180s
-$kubectlbin rollout status deployment kyverno-background-controller  -n kyverno --timeout=180s
-$kubectlbin rollout status deployment kyverno-cleanup-controller -n kyverno --timeout=180s
-$kubectlbin rollout status deployment kyverno-reports-controller  -n kyverno --timeout=180s
-{{- end }}
-
-< out.yaml $kubectlbin apply -f - --server-side
+$kappbin deploy -a kfd -n kube-system -f out.yaml $additionalKappArgs --allow-all-ns -y --default-label-scoping-rules=false --apply-default-update-strategy=fallback-on-replace -c --wait-timeout 30m0s --apply-timeout 30m0s --apply-concurrency 20
 
 echo "Executing cleanup migrations on values that can be nil..."
 

@@ -10,7 +10,6 @@ kind: Kustomization
 
 resources:
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/aws/katalog/cluster-autoscaler/v" $version.Major "." $version.Minor ".x" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/aws/katalog/snapshot-controller" }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/aws/katalog/load-balancer-controller" }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/aws/katalog/node-termination-handler" }}
   - resources/storageclasses.yml
@@ -20,3 +19,4 @@ patchesStrategicMerge:
   - patches/cluster-autoscaler.yml
   - patches/infra-nodes.yml
   - patches/load-balancer-controller.yml
+  - patches/load-balancer-controller-kapp-wait.yml

@@ -1,6 +1,6 @@
 # EKSCluster - EKS Cluster Schema
 
-This document explains the full schema for the `kind: EKSCluster` for the `furyctl.yaml` file used by `furyctl`. This configuration file will be used to deploy a Kubernetes Fury Cluster deployed through AWS's Elastic Kubernetes Service.
+This document explains the full schema for the `kind: EKSCluster` for the `furyctl.yaml` file used by `furyctl`. This configuration file will be used to deploy a SIGHUP Distribution cluster deployed through AWS's Elastic Kubernetes Service.
 
 An example configuration file can be created by running the following command:
 
@@ -2622,6 +2622,8 @@ Starting from versions 1.28.4, 1.29.5 and 1.30.0 of KFD, Loki will change the ti
 
 The value of this field will determine the date when Loki will start writing using the new TSDB and the schema v13, always at midnight UTC. The old BoltDB and schema will be kept until they expire for reading purposes.
 
+From versions 1.29.7, 1.30.2 and 1.31.1 of the distribution, this field will be unmutable once changed.
+
 Value must be a string in `ISO 8601` date format (`yyyy-mm-dd`). Example: `2024-11-18`.
 
 ## .spec.distribution.modules.logging.minio
@@ -4297,7 +4299,7 @@ The value of the toleration
 
 ### Description
 
-The validation failure action to use for the policies, `Enforce` will block when a request does not comply with the policies and `Audit` will not block but log when a request does not comply with the policies.
+The validation failure action to use for the included policies, `Enforce` will block when a request does not comply with the policies and `Audit` will not block but log when a request does not comply with the policies.
 
 ### Constraints
 
@@ -5314,11 +5316,9 @@ Optional additional firewall rules that will be attached to the nodes.
 
 ### Description
 
-The CIDR blocks objects definition for the Firewall rule. Even though it is a list, only one item is currently supported. See https://github.com/sighupio/fury-eks-installer/issues/46 for more details.
+The CIDR blocks objects definition for the Firewall rule.
 
 ### Constraints
-
-**maximum number of items**: the maximum number of items for this array is: `1`
 
 **minimum number of items**: the minimum number of items for this array is: `1`
 
@@ -5400,6 +5400,10 @@ The type of the Firewall rule, can be `ingress` for incoming traffic or `egress`
 | [self](#speckubernetesnodepoolsadditionalfirewallrulesselfself)         | `boolean` | Required |
 | [tags](#speckubernetesnodepoolsadditionalfirewallrulesselftags)         | `object`  | Optional |
 | [type](#speckubernetesnodepoolsadditionalfirewallrulesselftype)         | `string`  | Required |
+
+### Description
+
+The `self` objects definition for the Firewall rule.
 
 ### Constraints
 
@@ -5483,6 +5487,10 @@ The type of the Firewall rule, can be `ingress` for incoming traffic or `egress`
 | [sourceSecurityGroupId](#speckubernetesnodepoolsadditionalfirewallrulessourcesecuritygroupidsourcesecuritygroupid) | `string` | Required |
 | [tags](#speckubernetesnodepoolsadditionalfirewallrulessourcesecuritygroupidtags)                                   | `object` | Optional |
 | [type](#speckubernetesnodepoolsadditionalfirewallrulessourcesecuritygroupidtype)                                   | `string` | Required |
+
+### Description
+
+The Source Security Group ID objects definition for the Firewall rule.
 
 ### Constraints
 

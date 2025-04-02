@@ -38,9 +38,11 @@
   roles:
     - kube-node-common
     - containerd
+    - kube-worker
   tags:
     - kube-node-common
     - containerd
+    - kube-worker
 
 - name: Kubernetes uncordon node
   hosts: nodes

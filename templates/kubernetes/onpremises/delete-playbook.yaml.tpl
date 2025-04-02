@@ -19,14 +19,15 @@
   tags:
     - reset-k8s
 
-- name: Reset etcd master nodes
-  hosts: master
+- name: Reset etcd nodes
+  hosts: master,etcd
   become: true
   tasks:
     - name: Stop etcd
       systemd:
         name: etcd
         state: stopped
+      when: inventory_hostname in groups['etcd']
     - name: Clean etcd datadir
       file:
         path: /var/lib/etcd
@@ -40,10 +41,10 @@
         path: /etc/kubernetes/pki
         state: absent
   tags:
-    - reset-etcd-master
+    - reset-etcd-nodes
 
 - name: Reboot
-  hosts: master,nodes
+  hosts: master,nodes,etcd
   become: true
   tasks:   
     - name: Reboot
