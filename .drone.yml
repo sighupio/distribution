@@ -325,6 +325,7 @@ clone:
 
 trigger:
   ref:
+    - refs/tags/e2e-eks-**
     - refs/tags/e2e-full-**
     - refs/tags/v**
 
@@ -387,6 +388,7 @@ clone:
 
 trigger:
   ref:
+    - refs/tags/e2e-eks-**
     - refs/tags/e2e-full-**
     - refs/tags/v**
 
