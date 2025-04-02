@@ -15,7 +15,7 @@ kind: EKSCluster
 metadata:
   name: e2e-eks-upgrades
 spec:
-  distributionVersion: v1.31.1-rc.1
+  distributionVersion: v1.31.1
   toolsConfiguration:
     terraform:
       state:
@@ -67,8 +67,8 @@ spec:
       - name: infra
         type: eks-managed
         size:
-          min: 5
-          max: 7
+          min: 6
+          max: 9
         instance:
           type: t3.xlarge
           spot: false

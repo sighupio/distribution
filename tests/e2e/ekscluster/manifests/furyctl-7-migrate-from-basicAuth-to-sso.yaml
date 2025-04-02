@@ -13,19 +13,19 @@
 apiVersion: kfd.sighup.io/v1alpha2
 kind: EKSCluster
 metadata:
-  name: e2e-eks-0
+  name: e2e-test-eks
 spec:
-  distributionVersion: v1.31.1-rc.1
+  distributionVersion: v1.31.1
   toolsConfiguration:
     terraform:
       state:
         s3:
           bucketName: e2e-drone-eks
-          keyPrefix: e2e-eks-0
+          keyPrefix: e2e-test-eks
           region: eu-west-1
   region: eu-west-1
   tags:
-    env: e2e-eks-0
+    env: e2e-test-eks
   infrastructure:
     vpc:
       network:

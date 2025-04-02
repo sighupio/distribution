@@ -22,7 +22,7 @@ if { ![info exists env(AWS_ACCESS_KEY_ID)] || \
 
 
 # Start furyctl apply.
-spawn furyctl delete cluster --outdir $env(PWD) --debug --disable-analytics --config $configFilePath
+spawn furyctl delete cluster --outdir $env(PWD) --debug --disable-analytics --config $configFilePath --distro-location ./
 set furyctl_id $spawn_id
 
 expect {

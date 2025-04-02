@@ -31,8 +31,18 @@ if { ![info exists env(AWS_ACCESS_KEY_ID)] || \
 }
 
 
+# Determine if --distro-location flag should be used
+set distroLocation ""
+if {[llength $argv] >= 3} {
+    set distroLocation [lindex $argv 2]
+}
+
 # Start furyctl apply.
-spawn furyctl apply --upgrade --outdir $outdir -D --config $configFilePath --force upgrades --distro-location $env(PWD) --disable-analytics
+if {$distroLocation ne ""} {
+    spawn furyctl apply --upgrade --outdir $outdir --config $configFilePath --force upgrades --disable-analytics --distro-location $distroLocation
+} else {
+    spawn furyctl apply --upgrade --outdir $outdir --config $configFilePath --force upgrades --disable-analytics
+}
 set furyctl_id $spawn_id
 
 expect {
