@@ -4950,7 +4950,8 @@ tlsCipherSuites:
   - "TLS_AES_128_GCM_SHA256"
   - "TLS_AES_256_GCM_SHA384"
   - "TLS_CHACHA20_POLY1305_SHA256"
-```. NOTE: to customize the TLS cipher suites of the kubelet (as well as on control plane and etcd), set only this field - do not configure them under the `KubeletConfiguration`.
+```
+. NOTE: to customize the TLS cipher suites of the kubelet (as well as on control plane and etcd), set only this field - do not configure them under the `KubeletConfiguration`.
 
 ## .spec.kubernetes.advanced.kubeletConfiguration
 
