@@ -8,35 +8,39 @@ For a complete list of all SD releases and their compatibility with Kubernetes v
 
 ℹ️ **Use the latest patch release for your desired version whenever it's possible**. See [the versioning file](VERSIONING.md) for more information.
 
-| SD / Kubernetes Version                                                  | v1.32.X            | v1.31.X            | v1.30.X            | v1.29.X            | v1.28.X            |
-| ------------------------------------------------------------------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ |
-| [v1.32.0](https://github.com/sighupio/distribution/releases/tag/v1.32.0) | :white_check_mark: |                    |                    |                    |                    |
-| [v1.31.1](https://github.com/sighupio/distribution/releases/tag/v1.31.1) |                    | :white_check_mark: |                    |                    |                    |
-| [v1.31.0](https://github.com/sighupio/distribution/releases/tag/v1.31.0) |                    | :white_check_mark: |                    |                    |                    |
-| [v1.30.2](https://github.com/sighupio/distribution/releases/tag/v1.30.2) |                    |                    | :white_check_mark: |                    |                    |
-| [v1.30.1](https://github.com/sighupio/distribution/releases/tag/v1.30.1) |                    |                    | :white_check_mark: |                    |                    |
-| [v1.30.0](https://github.com/sighupio/distribution/releases/tag/v1.30.0) |                    |                    | :white_check_mark: |                    |                    |
-| [v1.29.7](https://github.com/sighupio/distribution/releases/tag/v1.29.7) |                    |                    |                    | :white_check_mark: |                    |
-| [v1.29.6](https://github.com/sighupio/distribution/releases/tag/v1.29.6) |                    |                    |                    | :white_check_mark: |                    |
-| [v1.29.5](https://github.com/sighupio/distribution/releases/tag/v1.29.5) |                    |                    |                    | :white_check_mark: |                    |
-| [v1.29.4](https://github.com/sighupio/distribution/releases/tag/v1.29.4) |                    |                    |                    | :white_check_mark: |                    |
-| [v1.29.3](https://github.com/sighupio/distribution/releases/tag/v1.29.3) |                    |                    |                    | :white_check_mark: |                    |
-| [v1.29.2](https://github.com/sighupio/distribution/releases/tag/v1.29.2) |                    |                    |                    | :white_check_mark: |                    |
-| [v1.29.1](https://github.com/sighupio/distribution/releases/tag/v1.29.1) |                    |                    |                    | :white_check_mark: |                    |
-| [v1.29.0](https://github.com/sighupio/distribution/releases/tag/v1.29.0) |                    |                    |                    | :white_check_mark: |                    |
-| [v1.28.6](https://github.com/sighupio/distribution/releases/tag/v1.28.6) |                    |                    |                    |                    | :white_check_mark: |
-| [v1.28.5](https://github.com/sighupio/distribution/releases/tag/v1.28.5) |                    |                    |                    |                    | :white_check_mark: |
-| [v1.28.4](https://github.com/sighupio/distribution/releases/tag/v1.28.4) |                    |                    |                    |                    | :white_check_mark: |
-| [v1.28.3](https://github.com/sighupio/distribution/releases/tag/v1.28.3) |                    |                    |                    |                    | :white_check_mark: |
-| [v1.28.2](https://github.com/sighupio/distribution/releases/tag/v1.28.2) |                    |                    |                    |                    | :white_check_mark: |
-| [v1.28.1](https://github.com/sighupio/distribution/releases/tag/v1.28.1) |                    |                    |                    |                    | :white_check_mark: |
-| [v1.28.0](https://github.com/sighupio/distribution/releases/tag/v1.28.0) |                    |                    |                    |                    | :white_check_mark: |
+| SD / Kubernetes Version                                                      | v1.31.X   | v1.30.X            | v1.29.X            | v1.28.X            |
+| ----------------------------------------------------------------------------- | ----------| ------------------ | ------------------ | ------------------ |
+| [v1.31.1](https://github.com/sighupio/distribution/releases/tag/v1.31.1) | :white_check_mark: |                    |                    |                    |
+| [v1.31.0](https://github.com/sighupio/distribution/releases/tag/v1.31.0) | :warning: |                    |                    |
+| [v1.30.2](https://github.com/sighupio/distribution/releases/tag/v1.30.2) |           | :white_check_mark: |                    |                    |
+| [v1.30.1](https://github.com/sighupio/distribution/releases/tag/v1.30.1) |           | :white_check_mark: |                    |                    |
+| [v1.30.0](https://github.com/sighupio/distribution/releases/tag/v1.30.0) |           | :white_check_mark: |                    |                    |
+| [v1.29.7](https://github.com/sighupio/distribution/releases/tag/v1.29.7) |           |                    | :white_check_mark: |                    |
+| [v1.29.6](https://github.com/sighupio/distribution/releases/tag/v1.29.6) |           |                    | :white_check_mark: |                    |
+| [v1.29.5](https://github.com/sighupio/distribution/releases/tag/v1.29.5) |           |                    | :white_check_mark: |                    |
+| [v1.29.4](https://github.com/sighupio/distribution/releases/tag/v1.29.4) |           |                    | :white_check_mark: |                    |
+| [v1.29.3](https://github.com/sighupio/distribution/releases/tag/v1.29.3) |           |                    | :white_check_mark: |                    |
+| [v1.29.2](https://github.com/sighupio/distribution/releases/tag/v1.29.2) |           |                    | :white_check_mark: |                    |
+| [v1.29.1](https://github.com/sighupio/distribution/releases/tag/v1.29.1) |           |                    | :white_check_mark: |                    |
+| [v1.29.0](https://github.com/sighupio/distribution/releases/tag/v1.29.0) |           |                    | :white_check_mark: |                    |
+| [v1.28.6](https://github.com/sighupio/distribution/releases/tag/v1.28.6) |           |                    |                    | :white_check_mark: |
+| [v1.28.5](https://github.com/sighupio/distribution/releases/tag/v1.28.5) |           |                    |                    | :white_check_mark: |
+| [v1.28.4](https://github.com/sighupio/distribution/releases/tag/v1.28.4) |           |                    |                    | :white_check_mark: |
+| [v1.28.3](https://github.com/sighupio/distribution/releases/tag/v1.28.3) |           |                    |                    | :white_check_mark: |
+| [v1.28.2](https://github.com/sighupio/distribution/releases/tag/v1.28.2) |           |                    |                    | :white_check_mark: |
+| [v1.28.1](https://github.com/sighupio/distribution/releases/tag/v1.28.1) |           |                    |                    | :white_check_mark: |
+| [v1.28.0](https://github.com/sighupio/distribution/releases/tag/v1.28.0) |           |                    |                    | :white_check_mark: |
 
 |       Legend       | Meaning          |
 | :----------------: | ---------------- |
 | :white_check_mark: | Compatible       |
 |     :warning:      | Has known issues |
 |        :x:         | Incompatible     |
+
+## Warnings ⚠️
+
+- v1.31.0 (OnPremises): **use only with `furyctl >= 0.31.1`**. This SD version used the version `1.31.4` of the On-premises installer that had an issue in the upgrade process to v1.31. This issue was patched in `v1.31.4-rev.1` of the installer and is automatically used when using furyctl >= 0.31.1.
+
 
 ### furyctl and SD compatibility
 
