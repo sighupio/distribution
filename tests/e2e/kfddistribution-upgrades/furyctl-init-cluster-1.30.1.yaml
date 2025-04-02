@@ -8,7 +8,7 @@ kind: KFDDistribution
 metadata:
   name: sighup
 spec:
-  distributionVersion: v1.29.4
+  distributionVersion: v1.30.1
   # This section describes how the KFD distribution will be installed
   distribution:
     kubeconfig: "{env://KUBECONFIG}"
