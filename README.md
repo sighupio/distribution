@@ -111,7 +111,7 @@ Add-on modules provide additional functionality to the distribution. Their relea
 | Module                              | Description                                                                  |
 | ----------------------------------- | ---------------------------------------------------------------------------- |
 | [Kong][kong-module]                 | Add Kong API Gateway for Kubernetes applications via Kong Ingress Controller |
-| [Service Mesh][service-mesh-module] | Deploy a service mesh on top of SD                                          |
+| [Service Mesh][service-mesh-module] | Deploy a service mesh on top of SD                                           |
 | [Registry][registry-module]         | Integrate a Container Registry solution                                      |
 | [Storage][storage-module]           | Rook (Ceph Operator) based Storage solution on Kubernetes                    |
 | [Kafka][kafka-module]               | Apache Kafka event streaming for your Cluster                                |
@@ -134,11 +134,11 @@ If you are looking to run SD in production and would like to learn more, SIGHUP 
 
 Current supported versions of SD are:
 
-|                                  SD Version                                   | Kubernetes Version |
-| :----------------------------------------------------------------------------: | :----------------: |
+|                                  SD Version                               | Kubernetes Version |
+| :-----------------------------------------------------------------------: | :----------------: |
 | [`1.31.1`](https://github.com/sighupio/distribution/releases/tag/v1.31.1) |      `1.31.x`      |
-| [`1.30.1`](https://github.com/sighupio/distribution/releases/tag/v1.30.1) |      `1.30.x`      |
-| [`1.29.6`](https://github.com/sighupio/distribution/releases/tag/v1.29.6) |      `1.29.x`      |
+| [`1.30.2`](https://github.com/sighupio/distribution/releases/tag/v1.30.2) |      `1.30.x`      |
+| [`1.29.7`](https://github.com/sighupio/distribution/releases/tag/v1.29.7) |      `1.29.x`      |
 | [`1.28.6`](https://github.com/sighupio/distribution/releases/tag/v1.28.6) |      `1.28.x`      |
 
 > [!NOTE]
