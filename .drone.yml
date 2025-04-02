@@ -327,7 +327,7 @@ trigger:
   ref:
     - refs/tags/e2e-eks-**
     # - refs/tags/e2e-full-**
-    - refs/tags/v**
+    # - refs/tags/v**
 
 steps:
 - name: run-tests
@@ -390,7 +390,7 @@ trigger:
   ref:
     - refs/tags/e2e-eks-**
     # - refs/tags/e2e-full-**
-    - refs/tags/v**
+    # - refs/tags/v**
 
 steps:
 - name: run-tests
