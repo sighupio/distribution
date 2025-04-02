@@ -7,6 +7,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
+  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/dr/katalog/velero/velero-node-agent" }}
 {{- if eq .spec.distribution.common.provider.type "eks" }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/dr/katalog/velero/velero-aws" }}
 {{- else if eq .spec.distribution.common.provider.type "none" }}
@@ -18,7 +19,6 @@ resources:
   - resources/storageLocation.yaml
   - resources/volumeSnapshotLocation.yaml
 {{- end }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/dr/katalog/velero/velero-node-agent" }}
 {{- if .spec.distribution.modules.dr.velero.snapshotController.install }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/dr/katalog/velero/snapshot-controller" }}
 {{- end }}

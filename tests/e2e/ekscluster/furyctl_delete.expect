@@ -22,13 +22,18 @@ if { ![info exists env(AWS_ACCESS_KEY_ID)] || \
 
 
 # Start furyctl apply.
-spawn furyctl delete cluster --outdir $env(PWD) --debug --disable-analytics --config $configFilePath
+spawn furyctl delete cluster --outdir $env(PWD) --debug --disable-analytics --config $configFilePath --distro-location ./
 set furyctl_id $spawn_id
 
 expect {
      -re {.*Are you sure you want to continue\? Only 'yes' will be accepted to confirm.*} {
         puts "Confirmation prompt detected, sending 'yes'"
         send -i $furyctl_id "yes\r"
+        exp_continue
+    }
+    -re {.*Press ENTER when you are ready to continue.*} {
+        puts "Ready prompt detected, sending ENTER"
+        send -i $furyctl_id "\r"
         exp_continue
     }
     timeout {

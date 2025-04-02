@@ -59,7 +59,7 @@ steps:
   #     - schema-check
 
   - name: test-schema
-    image: quay.io/sighup/e2e-testing:1.1.0_1.31.1_3.10.0_4.33.3
+    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
     pull: always
     depends_on:
       - license-check
@@ -72,7 +72,7 @@ steps:
       - bats -t tests/schema.sh
 
   - name: render
-    image: quay.io/sighup/e2e-testing:1.1.0_1.31.1_3.10.0_4.33.3
+    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
     pull: always
     depends_on:
       - license-check
@@ -80,7 +80,7 @@ steps:
     environment:
       NETRC_FILE:
         from_secret: NETRC_FILE
-      FURYCTL_VERSION: v0.31.0
+      FURYCTL_VERSION: v0.32.0-rc.3
       FURYCTL_CONFIG: tests/e2e/kfddistribution/furyctl-init-cluster.yaml
       FURYCTL_DISTRO_LOCATION: ./
       FURYCTL_OUTDIR: ./
@@ -129,7 +129,7 @@ trigger:
 
 steps:
   - name: create Kind cluster
-    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.24.0_1.31.1_3.10.0
+    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.24.0_1.31.1_5.6.0
     pull: always
     volumes:
       - name: dockersock
@@ -162,7 +162,7 @@ steps:
       - kind get kubeconfig --name $${CLUSTER_NAME} > $${KUBECONFIG}
 
   - name: e2e-kfddistribution
-    image: quay.io/sighup/e2e-testing:1.1.0_1.31.1_3.10.0_4.33.3
+    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
     pull: always
     # we need to use host network to access Kind API port that is listening on the worker's loopback
     # beacuse we mount the host's Docker socket to run Kind.
@@ -170,7 +170,7 @@ steps:
     environment:
       CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}
       KUBECONFIG: /drone/src/kubeconfig
-      FURYCTL_VERSION: v0.31.0
+      FURYCTL_VERSION: v0.32.0-rc.3
     depends_on: [create Kind cluster]
     commands:
       - export KUBECONFIG=/drone/src/kubeconfig
@@ -188,7 +188,7 @@ steps:
       - tests/e2e-kfddistribution.sh
 
   - name: delete-kind-cluster
-    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.24.0_1.31.1_3.10.0
+    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.24.0_1.31.1_5.6.0
     volumes:
       - name: dockersock
         path: /var/run/docker.sock
@@ -209,7 +209,7 @@ volumes:
     host:
       path: /var/run/docker.sock
 ---
-name: e2e-kubernetes-1.30.0-to-1.31.0
+name: e2e-kubernetes-1.31.0-to-1.31.1
 kind: pipeline
 type: docker
 
@@ -233,7 +233,7 @@ trigger:
 
 steps:
   - name: create Kind cluster
-    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.24.0_1.31.1_3.10.0
+    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.24.0_1.31.1_5.6.0
     pull: always
     volumes:
       - name: dockersock
@@ -266,7 +266,7 @@ steps:
       - kind get kubeconfig --name $${CLUSTER_NAME} > $${KUBECONFIG}
 
   - name: e2e-kfddistribution
-    image: quay.io/sighup/e2e-testing:1.1.0_1.31.1_3.10.0_4.33.3
+    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
     pull: always
     # we need to use host network to access Kind API port that is listening on the worker's loopback
     # beacuse we mount the host's Docker socket to run Kind.
@@ -274,7 +274,7 @@ steps:
     environment:
       CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-upgrades
       KUBECONFIG: /drone/src/kubeconfig-upgrades
-      FURYCTL_VERSION: v0.31.0
+      FURYCTL_VERSION: v0.32.0-rc.3
     depends_on: [create Kind cluster]
     commands:
       - export KUBECONFIG=/drone/src/kubeconfig-upgrades
@@ -292,7 +292,7 @@ steps:
       - tests/e2e-kfddistribution-upgrades.sh
 
   - name: delete-kind-cluster
-    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.24.0_1.31.1_3.10.0
+    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.24.0_1.31.1_5.6.0
     volumes:
       - name: dockersock
         path: /var/run/docker.sock
@@ -313,7 +313,7 @@ volumes:
     host:
       path: /var/run/docker.sock
 ---
-name: e2e-ekscluster
+name: e2e-ekscluster-1.31.1
 kind: pipeline
 type: docker
 
@@ -325,15 +325,16 @@ clone:
 
 trigger:
   ref:
-    - refs/tags/e2e-full-**
-    - refs/tags/v**
+    - refs/tags/e2e-eks-**
+    # - refs/tags/e2e-full-**
+    # - refs/tags/v**
 
 steps:
 - name: run-tests
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3
+  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
   environment:
-    FURYCTL_VERSION: "v0.31.1"
-    DISTRIBUTION_VERSION: "v1.31.0"
+    FURYCTL_VERSION: "v0.32.0-rc.3"
+    DISTRIBUTION_VERSION: "v1.31.1"
     DEBIAN_FRONTEND: noninteractive
     CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}
     AWS_ACCESS_KEY_ID:
@@ -343,6 +344,7 @@ steps:
     AWS_REGION:
       from_secret: aws_region
   commands:
+    - apt update
     - apt-get install -y expect
     - echo "Installing the correct furyctl version..."
     - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-linux-amd64.tar.gz" | tar -xz
@@ -350,13 +352,13 @@ steps:
     - chmod +x /usr/local/bin/furyctl
     - ./tests/e2e/ekscluster/e2e-ekscluster.sh
 
-- name: cleanup
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3
+- name: furyctl-delete
+  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
   environment:
-    FURYCTL_VERSION: "v0.31.1"
+    FURYCTL_VERSION: "v0.32.0-rc.3"
     CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}
     DEBIAN_FRONTEND: noninteractive
-    DISTRIBUTION_VERSION: "v1.31.0"
+    DISTRIBUTION_VERSION: "v1.31.1"
     AWS_ACCESS_KEY_ID:
       from_secret: aws_access_key_id
     AWS_SECRET_ACCESS_KEY:
@@ -364,7 +366,7 @@ steps:
     AWS_REGION:
       from_secret: aws_region
   commands:
-    - apt-get install -y expect
+    - apt update
     - apt-get install -y expect
     - echo "Installing the correct furyctl version..."
     - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-linux-amd64.tar.gz" | tar -xz
@@ -372,8 +374,9 @@ steps:
     - chmod +x /usr/local/bin/furyctl
     - tests/e2e/ekscluster/furyctl_delete.expect $(cat ./last_furyctl_yaml.txt)
     - aws s3 rm s3://e2e-drone-eks/$CLUSTER_NAME --recursive
+
 ---
-name: e2e-ekscluster-upgrades
+name: e2e-ekscluster-upgrades-1.30.1-1.31.1
 kind: pipeline
 type: docker
 
@@ -385,15 +388,16 @@ clone:
 
 trigger:
   ref:
-    - refs/tags/e2e-full-**
-    - refs/tags/v**
+    - refs/tags/e2e-eks-**
+    # - refs/tags/e2e-full-**
+    # - refs/tags/v**
 
 steps:
 - name: run-tests
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3
+  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
   environment:
-    FURYCTL_VERSION: "v0.31.1"
-    DISTRIBUTION_VERSION: "v1.31.0"
+    FURYCTL_VERSION: "v0.32.0-rc.3"
+    DISTRIBUTION_VERSION: "v1.31.1"
     CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-upgrades
     DEBIAN_FRONTEND: noninteractive
     AWS_ACCESS_KEY_ID:
@@ -403,6 +407,7 @@ steps:
     AWS_REGION:
       from_secret: aws_region
   commands:
+    - apt update
     - apt-get install -y expect
     - echo "Installing the correct furyctl version..."
     - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-linux-amd64.tar.gz" | tar -xz
@@ -410,13 +415,13 @@ steps:
     - chmod +x /usr/local/bin/furyctl
     - ./tests/e2e/ekscluster-upgrades/e2e-ekscluster-upgrades.sh
 
-- name: cleanup
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3
+- name: furyctl-delete
+  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
   environment:
-    FURYCTL_VERSION: "v0.31.1"
+    FURYCTL_VERSION: "v0.32.0-rc.3"
     CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-upgrades
     DEBIAN_FRONTEND: noninteractive
-    DISTRIBUTION_VERSION: "v1.31.0"
+    DISTRIBUTION_VERSION: "v1.31.1"
     AWS_ACCESS_KEY_ID:
       from_secret: aws_access_key_id
     AWS_SECRET_ACCESS_KEY:
@@ -424,12 +429,13 @@ steps:
     AWS_REGION:
       from_secret: aws_region
   commands:
+    - apt update
     - apt-get install -y expect
     - echo "Installing the correct furyctl version..."
     - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-linux-amd64.tar.gz" | tar -xz
     - mv furyctl /usr/local/bin
     - chmod +x /usr/local/bin/furyctl
-    - tests/e2e/ekscluster/furyctl_delete.expect tests/e2e/ekscluster-upgrades/manifests/furyctl-init-cluster-1.31.0.yaml
+    - tests/e2e/ekscluster/furyctl_delete.expect tests/e2e/ekscluster-upgrades/manifests/furyctl-init-cluster-1.31.1.yaml
     - aws s3 rm s3://e2e-drone-eks/$CLUSTER_NAME --recursive
 
 ---
@@ -475,7 +481,7 @@ steps:
       - sed "s/ACCOUNT_ID_PLACEHOLDER/$ACCOUNT_ID/" tests/e2e/ekscluster/awsnuke/config.yml > ./aws-nuke-config.yml
       - sed -i "s/ACCOUNT_ID_PROD_PLACEHOLDER/$ACCOUNT_ID_PROD/" ./aws-nuke-config.yml
       # Run AWS Nuke
-      - aws-nuke -c ./aws-nuke-config.yml --force --no-dry-run
+      - aws-nuke nuke -c ./aws-nuke-config.yml --force --no-dry-run
       - aws s3 rm s3://e2e-drone-eks --recursive
 
 ---
@@ -485,7 +491,7 @@ type: docker
 
 depends_on:
   - e2e-kubernetes-1.31
-  - e2e-kubernetes-1.30.0-to-1.31.0
+  - e2e-kubernetes-1.31.0-to-1.31.1
 
 platform:
   os: linux

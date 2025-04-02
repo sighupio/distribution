@@ -312,7 +312,7 @@
           "$ref": "#/$defs/Types.KubeAnnotations"
         },
         "kubeletConfiguration": {
-          "description": "Optional Kubelet configuration specific to control-plane nodes. If set, this will override the global `advanced.kubeletConfiguration`.",
+          "description": "Optional Kubelet configuration specific to control-plane nodes. If set, this will override the global `advanced.kubeletConfiguration`. See `advanced.KubeletConfiguration` for more details.",
           "$ref": "#/$defs/Spec.Kubernetes.Advanced.KubeletConfiguration"
         }
       },
@@ -413,7 +413,7 @@
           "$ref": "#/$defs/Types.KubeAnnotations"
         },
         "kubeletConfiguration": {
-          "description": "Optional Kubelet configuration specific to worker nodes. If set, this will override the global `advanced.kubeletConfiguration`.",
+          "description": "Optional Kubelet configuration specific to worker nodes. If set, this will override the global `advanced.kubeletConfiguration`. See `advanced.KubeletConfiguration` for more details.",
           "$ref": "#/$defs/Spec.Kubernetes.Advanced.KubeletConfiguration"
         }
       },
@@ -611,7 +611,7 @@
           "items": {
             "type": "string"
           },
-          "description": "The TLS cipher suites to use for etcd, kubelet, and kubeadm static pods. Example:\n```yaml\ntlsCipherSuites:\n  - \"TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256\"\n  - \"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256\"\n  - \"TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384\"\n  - \"TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384\"\n  - \"TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256\"\n  - \"TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256\"\n  - \"TLS_AES_128_GCM_SHA256\"\n  - \"TLS_AES_256_GCM_SHA384\"\n  - \"TLS_CHACHA20_POLY1305_SHA256\"\n```"
+          "description": "The TLS cipher suites to use for etcd, kubelet, and kubeadm static pods. Example:\n```yaml\ntlsCipherSuites:\n  - \"TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256\"\n  - \"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256\"\n  - \"TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384\"\n  - \"TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384\"\n  - \"TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256\"\n  - \"TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256\"\n  - \"TLS_AES_128_GCM_SHA256\"\n  - \"TLS_AES_256_GCM_SHA384\"\n  - \"TLS_CHACHA20_POLY1305_SHA256\"\n```\n. NOTE: to customize the TLS cipher suites of the kubelet (as well as on control plane and etcd), set only this field - do not configure them under the `KubeletConfiguration`."
         },
         "configuration": {
           "type": "string",
@@ -712,7 +712,7 @@
     "Spec.Kubernetes.Advanced.KubeletConfiguration": {
       "type": "object",
       "additionalProperties": true,
-      "description": "Advanced configuration for Kubelet. This open field allows users to specify any parameter supported by the KubeletConfiguration. Examples of uses include controlling the maximum number of pods per core (`podsPerCore`), managing container logging (`containerLogMaxSize`), Topology Manager options (`topologyManagerPolicyOptions`). All values must follow the official Kubelet specification: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/."
+      "description": "Advanced configuration for Kubelet. This open field allows users to specify any parameter supported by the `KubeletConfiguration` object. Examples of uses include controlling the maximum number of pods per core (`podsPerCore`), managing container logging (`containerLogMaxSize`), Topology Manager options (`topologyManagerPolicyOptions`). All values must follow the official Kubelet specification: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/.\n\nNOTE: Content will **not** be validated by furyctl. To customize the TLS cipher suites of the Kubelet, set only the `Spec.Kubernetes.Advanced.Encryption.tlsCipherSuites` field - do not configure them under this field."
     },
     "Spec.Distribution": {
       "type": "object",
@@ -1280,7 +1280,7 @@
         "tsdbStartDate": {
           "type": "string",
           "format": "date",
-          "description": "Starting from versions 1.28.4, 1.29.5 and 1.30.0 of KFD, Loki will change the time series database from BoltDB to TSDB and the schema from v11 to v13 that it uses to store the logs.\n\nThe value of this field will determine the date when Loki will start writing using the new TSDB and the schema v13, always at midnight UTC. The old BoltDB and schema will be kept until they expire for reading purposes.\n\nValue must be a string in `ISO 8601` date format (`yyyy-mm-dd`). Example: `2024-11-18`."
+          "description": "Starting from versions 1.28.4, 1.29.5 and 1.30.0 of KFD, Loki will change the time series database from BoltDB to TSDB and the schema from v11 to v13 that it uses to store the logs.\n\nThe value of this field will determine the date when Loki will start writing using the new TSDB and the schema v13, always at midnight UTC. The old BoltDB and schema will be kept until they expire for reading purposes.\n\nFrom versions 1.29.7, 1.30.3 and 1.31.1 of the distribution, this field will be unmutable once changed.\n\nValue must be a string in `ISO 8601` date format (`yyyy-mm-dd`). Example: `2024-11-18`."
         },
         "resources": {
           "$ref": "#/$defs/Types.KubeResources"

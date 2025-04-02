@@ -972,6 +972,9 @@ type SpecDistributionModulesLoggingLoki struct {
 	// using the new TSDB and the schema v13, always at midnight UTC. The old BoltDB
 	// and schema will be kept until they expire for reading purposes.
 	//
+	// From versions 1.29.7, 1.30.2 and 1.31.1 of the distribution, this field will be
+	// unmutable once changed.
+	//
 	// Value must be a string in `ISO 8601` date format (`yyyy-mm-dd`). Example:
 	// `2024-11-18`.
 	TsdbStartDate types.SerializableDate `json:"tsdbStartDate" yaml:"tsdbStartDate" mapstructure:"tsdbStartDate"`
