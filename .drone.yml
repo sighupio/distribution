@@ -351,7 +351,7 @@ steps:
     - chmod +x /usr/local/bin/furyctl
     - ./tests/e2e/ekscluster/e2e-ekscluster.sh
 
-- name: cleanup
+- name: furyctl-delete
   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
   environment:
     FURYCTL_VERSION: "v0.32.0-rc.3"
@@ -413,7 +413,7 @@ steps:
     - chmod +x /usr/local/bin/furyctl
     - ./tests/e2e/ekscluster-upgrades/e2e-ekscluster-upgrades.sh
 
-- name: cleanup
+- name: furyctl-delete
   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
   environment:
     FURYCTL_VERSION: "v0.32.0-rc.3"
