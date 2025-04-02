@@ -138,7 +138,7 @@ Current supported versions of SD are:
 | :----------------------------------------------------------------------------: | :----------------: |
 | [`1.31.1`](https://github.com/sighupio/distribution/releases/tag/v1.31.1) |      `1.31.x`      |
 | [`1.30.2`](https://github.com/sighupio/distribution/releases/tag/v1.30.2) |      `1.30.x`      |
-| [`1.29.6`](https://github.com/sighupio/distribution/releases/tag/v1.29.6) |      `1.29.x`      |
+| [`1.29.7`](https://github.com/sighupio/distribution/releases/tag/v1.29.7) |      `1.29.x`      |
 | [`1.28.6`](https://github.com/sighupio/distribution/releases/tag/v1.28.6) |      `1.28.x`      |
 
 > [!NOTE]
