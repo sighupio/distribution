@@ -20,7 +20,7 @@ spec:
     terraform:
       state:
         s3:
-          bucketName: e2e-drone-eks
+          bucketName: e2e-drone-eks-upgrades
           keyPrefix: e2e-eks-upgrades
           region: eu-west-1
   region: eu-west-1
