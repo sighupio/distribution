@@ -183,7 +183,7 @@ SD is open-source software and it's released under the following [LICENSE](LICEN
 [monitoring-module]: https://github.com/sighupio/module-monitoring
 [tracing-module]: https://github.com/sighupio/module-tracing
 [dr-module]: https://github.com/sighupio/module-dr
-[policy-module]: https://github.com/sighupio/module-opa
+[policy-module]: https://github.com/sighupio/module-policy
 [auth-module]: https://github.com/sighupio/module-auth
 [networking-version]: https://img.shields.io/badge/release-v2.1.0-blue
 [ingress-version]: https://img.shields.io/badge/release-v4.0.0-blue
