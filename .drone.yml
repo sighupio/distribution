@@ -215,7 +215,6 @@ type: docker
 
 depends_on:
   - qa
-  - e2e-kubernetes-1.30
 
 clone:
   depth: 1
