@@ -11,6 +11,4 @@ echo "Executing furyctl for the initial setup 1.29.6"
 
 echo "----------------------------------------------------------------------------"
 echo "Executing upgrade to 1.29.7"
-# we set the switch date for Loki to "tomorrow". Notice that `-d flag` does not work on Darwin, you need to use `-v +1d` instead.
-# this is needed only when upgrading from 1.29.6 to 1.29.7 (and equivalent versions)
 /tmp/furyctl apply --upgrade --config tests/e2e/kfddistribution-upgrades/furyctl-init-cluster-1.29.7.yaml --outdir "$PWD" --distro-location ./ --force upgrades --disable-analytics
