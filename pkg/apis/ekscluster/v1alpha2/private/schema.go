@@ -1849,16 +1849,18 @@ type SpecDistributionModulesLoggingLoki struct {
 	// Resources corresponds to the JSON schema field "resources".
 	Resources *TypesKubeResources `json:"resources,omitempty" yaml:"resources,omitempty" mapstructure:"resources,omitempty"`
 
-	// Starting from versions 1.28.4, 1.29.5 and 1.30.0 of KFD, Loki will change the
-	// time series database from BoltDB to TSDB and the schema from v11 to v13 that it
-	// uses to store the logs.
+	// Starting from versions 1.28.4, 1.29.5 and 1.30.0 of SIGHUP Distribution, Loki
+	// changed the time series database from BoltDB to TSDB and the schema that it
+	// uses to store the logs from v11 to v13.
 	//
 	// The value of this field will determine the date when Loki will start writing
 	// using the new TSDB and the schema v13, always at midnight UTC. The old BoltDB
-	// and schema will be kept until they expire for reading purposes.
+	// and schema will be kept until all the logs expire for reading purposes.
 	//
-	// From versions 1.29.7, 1.30.2 and 1.31.1 of the distribution, this field will be
-	// unmutable once changed.
+	// From versions 1.29.7, 1.30.2 and 1.31.1 of the Distribution, this field will be
+	// immutable once set and its value should be a date before upgrading to one of
+	// these versions or creating the cluster, Loki does not support writing BoltDB
+	// and schema v11 anymore.
 	//
 	// Value must be a string in `ISO 8601` date format (`yyyy-mm-dd`). Example:
 	// `2024-11-18`.
