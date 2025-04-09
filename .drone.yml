@@ -324,8 +324,10 @@ clone:
   depth: 1
 
 trigger:
-  ref:
-    - refs/tags/e2e-eks-**
+  branch:
+    - feat/e2e-eks-**
+    # ref:
+    # - refs/tags/e2e-eks-**
     # - refs/tags/e2e-full-**
     # - refs/tags/v**
 
@@ -333,7 +335,7 @@ steps:
 - name: run-tests
   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
   environment:
-    FURYCTL_VERSION: "v0.32.0-rc.3"
+    FURYCTL_VERSION: "v0.32.0"
     DISTRIBUTION_VERSION: "v1.31.1"
     DEBIAN_FRONTEND: noninteractive
     CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}
@@ -355,7 +357,7 @@ steps:
 - name: furyctl-delete
   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
   environment:
-    FURYCTL_VERSION: "v0.32.0-rc.3"
+    FURYCTL_VERSION: "v0.32.0"
     CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}
     DEBIAN_FRONTEND: noninteractive
     DISTRIBUTION_VERSION: "v1.31.1"
@@ -387,8 +389,11 @@ clone:
   depth: 1
 
 trigger:
-  ref:
-    - refs/tags/e2e-eks-**
+  branch:
+    - feat/e2e-eks-**
+# trigger:
+#   ref:
+#     - refs/tags/e2e-eks-**
     # - refs/tags/e2e-full-**
     # - refs/tags/v**
 
