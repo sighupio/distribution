@@ -9,8 +9,28 @@
     - name: Check that the /etc/kubernetes/admin.conf exists
       stat:
         path: /etc/kubernetes/admin.conf
-    - name: Getting admin.conf kubeconfig
-      fetch:
-        src: /etc/kubernetes/admin.conf
-        dest: "{{ "{{ kubernetes_kubeconfig_path }}/admin.conf" }}"
-        flat: yes
+      register: admin_conf_stat
+
+    - name: Set fact if admin.conf exists
+      set_fact:
+        admin_conf_exists: "{{"{{ admin_conf_stat.stat.exists }}"}}"
+      when: admin_conf_stat.stat.exists
+
+- name: Aggregate results and fetch admin.conf
+  hosts: master
+  tasks:
+    - name: Initialize any_master_has_conf
+      set_fact:
+        any_master_has_conf: false
+
+    - name: Check if any master has admin.conf
+      set_fact:
+        any_master_has_conf: "{{"{{ any_master_has_conf or hostvars[item].admin_conf_exists }}"}}"
+      loop: "{{"{{ groups['master'] }}"}}"
+      when: hostvars[item].admin_conf_exists is defined
+
+    - name: Fail if no master has admin.conf
+      fail:
+        msg: "No master node has /etc/kubernetes/admin.conf"
+      when: not any_master_has_conf
+ 
