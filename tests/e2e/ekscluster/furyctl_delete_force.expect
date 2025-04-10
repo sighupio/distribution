@@ -20,9 +20,12 @@ if { ![info exists env(AWS_ACCESS_KEY_ID)] || \
     exit 1
 }
 
+# Create temporary outdir for furyctl.
+set env(FURYCTL_OUTDIR) [exec mktemp -d]
+puts "Temporary furyctl outdir location: $env(FURYCTL_OUTDIR)"
 
 # Start furyctl delete kubernetes.
-spawn furyctl delete cluster --outdir $env(PWD) --debug --disable-analytics --config $configFilePath --distro-location ./ --phase kubernetes
+spawn furyctl delete cluster --debug --disable-analytics --config $configFilePath --distro-location ./ --phase kubernetes
 set furyctl_id $spawn_id
 
 expect {
@@ -48,7 +51,7 @@ expect {
 }
 
 # Start furyctl delete infrastructure.
-spawn furyctl delete cluster --outdir $env(PWD) --debug --disable-analytics --config $configFilePath --distro-location ./ --phase infrastructure
+spawn furyctl delete cluster --debug --disable-analytics --config $configFilePath --distro-location ./ --phase infrastructure
 set furyctl_id $spawn_id
 
 expect {
