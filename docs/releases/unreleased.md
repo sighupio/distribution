@@ -15,7 +15,7 @@ The distribution is maintained with ❤️ by the team [SIGHUP by ReeVo](https:/
 ## New features 🌟
 
 ## Fixes 🐞
-- [[#387](https://github.com/sighupio/distribution/pull/387)]: fixed an issue that prevented the control planes nodes array to be marked as immutable under the OnPremises provider.
+- [[#387](https://github.com/sighupio/distribution/pull/387)]: fixed an issue that prevented the control planes nodes array to be marked as immutable under the OnPremises provider. The number of control plane nodes was set as immutable in the 1.31.1 release cycle because we don't have any support to scale the etcd cluster with the number of control plane nodes yet. Moreover, the etcd cluster can be placed either on control plane nodes or set-up on separate machines, adding further cases to the etcd scaling support, which at the moment we don't have.
 
 ### Security fixes
 
