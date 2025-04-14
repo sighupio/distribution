@@ -80,7 +80,7 @@ steps:
     environment:
       NETRC_FILE:
         from_secret: NETRC_FILE
-      FURYCTL_VERSION: v0.32.1-rc.0
+      FURYCTL_VERSION: v0.32.1
       FURYCTL_CONFIG: tests/e2e/kfddistribution/furyctl-init-cluster.yaml
       FURYCTL_DISTRO_LOCATION: ./
       FURYCTL_OUTDIR: ./
@@ -170,7 +170,7 @@ steps:
     environment:
       CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}
       KUBECONFIG: /drone/src/kubeconfig
-      FURYCTL_VERSION: v0.32.1-rc.0
+      FURYCTL_VERSION: v0.32.1
     depends_on: [create Kind cluster]
     commands:
       - export KUBECONFIG=/drone/src/kubeconfig
@@ -274,7 +274,7 @@ steps:
     environment:
       CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-upgrades
       KUBECONFIG: /drone/src/kubeconfig-upgrades
-      FURYCTL_VERSION: v0.32.1-rc.0
+      FURYCTL_VERSION: v0.32.1
     depends_on: [create Kind cluster]
     commands:
       - export KUBECONFIG=/drone/src/kubeconfig-upgrades
@@ -324,18 +324,16 @@ clone:
   depth: 1
 
 trigger:
-  branch:
-    - feat/e2e-eks-**
-    # ref:
-    # - refs/tags/e2e-eks-**
-    # - refs/tags/e2e-full-**
-    # - refs/tags/v**
+  ref:
+    - refs/tags/e2e-eks-**
+    - refs/tags/e2e-full-**
+    - refs/tags/v**
 
 steps:
 - name: run-tests
   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
   environment:
-    FURYCTL_VERSION: "v0.32.1-rc.0"
+    FURYCTL_VERSION: "v0.32.1"
     DISTRIBUTION_VERSION: "v1.31.1"
     DEBIAN_FRONTEND: noninteractive
     CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}
@@ -357,7 +355,7 @@ steps:
 - name: furyctl-delete
   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
   environment:
-    FURYCTL_VERSION: "v0.32.1-rc.0"
+    FURYCTL_VERSION: "v0.32.1"
     CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}
     DEBIAN_FRONTEND: noninteractive
     DISTRIBUTION_VERSION: "v1.31.1"
@@ -380,7 +378,7 @@ steps:
 - name: furyctl-delete-force
   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
   environment:
-    FURYCTL_VERSION: "v0.32.1-rc.0"
+    FURYCTL_VERSION: "v0.32.1"
     CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-upgrades
     DEBIAN_FRONTEND: noninteractive
     DISTRIBUTION_VERSION: "v1.31.1"
@@ -414,19 +412,16 @@ clone:
   depth: 1
 
 trigger:
-  branch:
-    - feat/e2e-eks-**
-# trigger:
-#   ref:
-#     - refs/tags/e2e-eks-**
-    # - refs/tags/e2e-full-**
-    # - refs/tags/v**
+  ref:
+    - refs/tags/e2e-eks-**
+    - refs/tags/e2e-full-**
+    - refs/tags/v**
 
 steps:
 - name: run-tests
   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
   environment:
-    FURYCTL_VERSION: "v0.32.1-rc.0"
+    FURYCTL_VERSION: "v0.32.1"
     DISTRIBUTION_VERSION: "v1.31.1"
     CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-upgrades
     DEBIAN_FRONTEND: noninteractive
@@ -448,7 +443,7 @@ steps:
 - name: furyctl-delete
   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
   environment:
-    FURYCTL_VERSION: "v0.32.1-rc.0"
+    FURYCTL_VERSION: "v0.32.1"
     CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-upgrades
     DEBIAN_FRONTEND: noninteractive
     DISTRIBUTION_VERSION: "v1.31.1"
@@ -471,7 +466,7 @@ steps:
 - name: furyctl-delete-force
   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
   environment:
-    FURYCTL_VERSION: "v0.32.1-rc.0"
+    FURYCTL_VERSION: "v0.32.1"
     CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-upgrades
     DEBIAN_FRONTEND: noninteractive
     DISTRIBUTION_VERSION: "v1.31.1"
