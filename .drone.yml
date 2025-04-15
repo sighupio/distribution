@@ -498,7 +498,7 @@ trigger:
     - cron
     - tag
   cron:
-    - "0 23 * * *" # Run at 11 PM every day
+    - "nightly-aws-wipe"
   ref:
     include:
       - refs/tags/aws-nuke-ci-**
