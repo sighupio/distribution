@@ -75,4 +75,3 @@ echo "--------------------------------------------------------------------------
 echo "Executing furyctl testing alertmanagerconfigs uninstall (SAFE)"
 /tmp/furyctl create cluster --config tests/e2e/kfddistribution/manifests/furyctl-12-migrate-from-alertmanagerconfigs-to-disabled.yaml --outdir "$PWD" --distro-location ./ --skip-deps-download --disable-analytics
 bats -t tests/e2e/kfddistribution/e2e-kfddistribution-12-migrate-from-alertmanagerconfigs-to-disabled.sh
-
