@@ -498,7 +498,7 @@ trigger:
     - cron
     - tag
   cron:
-    - "nightly-aws-wipe"
+    - "scheduled-test"
   ref:
     include:
       - refs/tags/aws-nuke-ci-**
