@@ -493,9 +493,9 @@ kind: pipeline
 type: docker
 name: scheduled-aws-nuke
 
-# trigger:
-#   cron:
-#     - "scheduled-test"
+trigger:
+  cron:
+    - "scheduled-test"
 
 clone:
   depth: 1
