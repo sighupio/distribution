@@ -493,9 +493,9 @@ kind: pipeline
 type: docker
 name: scheduled-aws-nuke
 
-trigger:
-  cron:
-    - "scheduled-test"
+# trigger:
+#   cron:
+#     - "scheduled-test"
 
 clone:
   depth: 1
@@ -511,15 +511,15 @@ steps:
       AWS_DEFAULT_REGION: eu-west-1
       ACCOUNT_ID_PROD:
         from_secret: aws_account_id_prod
+      AWS_NUKE_VERSION: "v3.51.1"
     commands:
       # Install required tools
       - yum update -y
       - yum install -y wget tar gzip jq
-      
       # Install AWS Nuke
-      - wget https://github.com/rebuy-de/aws-nuke/releases/download/v2.25.0/aws-nuke-v2.25.0-linux-amd64.tar.gz
-      - tar -xvf aws-nuke-v2.25.0-linux-amd64.tar.gz
-      - mv aws-nuke-v2.25.0-linux-amd64 /usr/local/bin/aws-nuke
+      - wget https://github.com/ekristen/aws-nuke/releases/download/$${AWS_NUKE_VERSION}/aws-nuke-$${AWS_NUKE_VERSION}-linux-amd64.tar.gz
+      - tar -xvf aws-nuke-$${AWS_NUKE_VERSION}-linux-amd64.tar.gz
+      - mv aws-nuke /usr/local/bin/aws-nuke
       - chmod +x /usr/local/bin/aws-nuke
       - export ACCOUNT_ID=$(aws sts get-caller-identity | jq -r ".Account")
       - sed "s/ACCOUNT_ID_PLACEHOLDER/$ACCOUNT_ID/" tests/e2e/ekscluster/awsnuke/config.yml > ./aws-nuke-config.yml
