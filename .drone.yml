@@ -69,7 +69,7 @@ steps:
     commands:
       # we need to download `jv` for running the JSON Schemas tests.
       - curl -L https://github.com/santhosh-tekuri/jsonschema/releases/download/v$${JV_VERSION}/jv-v$${JV_VERSION}-linux-amd64.tar.gz | tar zx --directory /usr/local/bin/
-      - bats -t tests/schema.sh
+      - bats -t tests/e2e/kfddistribution/schema.sh
 
   - name: render
     image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
@@ -81,7 +81,7 @@ steps:
       NETRC_FILE:
         from_secret: NETRC_FILE
       FURYCTL_VERSION: v0.32.1
-      FURYCTL_CONFIG: tests/e2e/kfddistribution/furyctl-init-cluster.yaml
+      FURYCTL_CONFIG: tests/e2e/kfddistribution/manifests/furyctl-init-cluster.yaml
       FURYCTL_DISTRO_LOCATION: ./
       FURYCTL_OUTDIR: ./
       FURYCTL_DISABLE_ANALYTICS: "true"
@@ -185,7 +185,7 @@ steps:
       # - kubectl wait --timeout=180s --for=condition=ready pod --all -n kube-system
       - until kubectl get serviceaccount default > /dev/null 2>&1; do echo "waiting for control-plane" && sleep 1; done
       # finally, run the e2e tests
-      - tests/e2e-kfddistribution.sh
+      - tests/e2e/kfddistribution/e2e-kfddistribution.sh
 
   - name: delete-kind-cluster
     image: quay.io/sighup/dind-kind-kubectl-kustomize:0.24.0_1.31.1_5.6.0
@@ -289,7 +289,7 @@ steps:
       # - kubectl wait --timeout=180s --for=condition=ready pod --all -n kube-system
       - until kubectl get serviceaccount default > /dev/null 2>&1; do echo "waiting for control-plane" && sleep 1; done
       # finally, run the e2e tests
-      - tests/e2e-kfddistribution-upgrades.sh
+      - tests/e2e/kfddistribution/e2e-kfddistribution-upgrades.sh
 
   - name: delete-kind-cluster
     image: quay.io/sighup/dind-kind-kubectl-kustomize:0.24.0_1.31.1_5.6.0
