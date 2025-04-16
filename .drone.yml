@@ -495,7 +495,7 @@ name: scheduled-aws-nuke
 
 trigger:
   cron:
-    - "scheduled-test"
+    - "scheduled-aws-nuke"
 
 clone:
   depth: 1
