@@ -503,6 +503,10 @@ trigger:
     include:
       - refs/tags/aws-nuke-ci-**
 
+platform:
+  os: linux
+  arch: amd64
+
 clone:
   depth: 1
 
