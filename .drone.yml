@@ -69,7 +69,7 @@ steps:
     commands:
       # we need to download `jv` for running the JSON Schemas tests.
       - curl -L https://github.com/santhosh-tekuri/jsonschema/releases/download/v$${JV_VERSION}/jv-v$${JV_VERSION}-linux-amd64.tar.gz | tar zx --directory /usr/local/bin/
-      - bats -t tests/schema.sh
+      - bats -t tests/e2e/kfddistribution/schema.sh
 
   - name: render
     image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
@@ -80,8 +80,8 @@ steps:
     environment:
       NETRC_FILE:
         from_secret: NETRC_FILE
-      FURYCTL_VERSION: v0.32.0-rc.3
-      FURYCTL_CONFIG: tests/e2e/kfddistribution/furyctl-init-cluster.yaml
+      FURYCTL_VERSION: v0.32.1
+      FURYCTL_CONFIG: tests/e2e/kfddistribution/manifests/furyctl-init-cluster.yaml
       FURYCTL_DISTRO_LOCATION: ./
       FURYCTL_OUTDIR: ./
       FURYCTL_DISABLE_ANALYTICS: "true"
@@ -170,7 +170,7 @@ steps:
     environment:
       CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}
       KUBECONFIG: /drone/src/kubeconfig
-      FURYCTL_VERSION: v0.32.0-rc.3
+      FURYCTL_VERSION: v0.32.1
     depends_on: [create Kind cluster]
     commands:
       - export KUBECONFIG=/drone/src/kubeconfig
@@ -185,7 +185,7 @@ steps:
       # - kubectl wait --timeout=180s --for=condition=ready pod --all -n kube-system
       - until kubectl get serviceaccount default > /dev/null 2>&1; do echo "waiting for control-plane" && sleep 1; done
       # finally, run the e2e tests
-      - tests/e2e-kfddistribution.sh
+      - tests/e2e/kfddistribution/e2e-kfddistribution.sh
 
   - name: delete-kind-cluster
     image: quay.io/sighup/dind-kind-kubectl-kustomize:0.24.0_1.31.1_5.6.0
@@ -274,7 +274,7 @@ steps:
     environment:
       CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-upgrades
       KUBECONFIG: /drone/src/kubeconfig-upgrades
-      FURYCTL_VERSION: v0.32.0-rc.3
+      FURYCTL_VERSION: v0.32.1
     depends_on: [create Kind cluster]
     commands:
       - export KUBECONFIG=/drone/src/kubeconfig-upgrades
@@ -289,7 +289,7 @@ steps:
       # - kubectl wait --timeout=180s --for=condition=ready pod --all -n kube-system
       - until kubectl get serviceaccount default > /dev/null 2>&1; do echo "waiting for control-plane" && sleep 1; done
       # finally, run the e2e tests
-      - tests/e2e-kfddistribution-upgrades.sh
+      - tests/e2e/kfddistribution/e2e-kfddistribution-upgrades.sh
 
   - name: delete-kind-cluster
     image: quay.io/sighup/dind-kind-kubectl-kustomize:0.24.0_1.31.1_5.6.0
@@ -326,14 +326,14 @@ clone:
 trigger:
   ref:
     - refs/tags/e2e-eks-**
-    # - refs/tags/e2e-full-**
-    # - refs/tags/v**
+    - refs/tags/e2e-full-**
+    - refs/tags/v**
 
 steps:
 - name: run-tests
   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
   environment:
-    FURYCTL_VERSION: "v0.32.0-rc.3"
+    FURYCTL_VERSION: "v0.32.1"
     DISTRIBUTION_VERSION: "v1.31.1"
     DEBIAN_FRONTEND: noninteractive
     CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}
@@ -355,7 +355,7 @@ steps:
 - name: furyctl-delete
   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
   environment:
-    FURYCTL_VERSION: "v0.32.0-rc.3"
+    FURYCTL_VERSION: "v0.32.1"
     CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}
     DEBIAN_FRONTEND: noninteractive
     DISTRIBUTION_VERSION: "v1.31.1"
@@ -375,6 +375,31 @@ steps:
     - tests/e2e/ekscluster/furyctl_delete.expect $(cat ./last_furyctl_yaml.txt)
     - aws s3 rm s3://e2e-drone-eks/$CLUSTER_NAME --recursive
 
+- name: furyctl-delete-force
+  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
+  environment:
+    FURYCTL_VERSION: "v0.32.1"
+    CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-upgrades
+    DEBIAN_FRONTEND: noninteractive
+    DISTRIBUTION_VERSION: "v1.31.1"
+    AWS_ACCESS_KEY_ID:
+      from_secret: aws_access_key_id
+    AWS_SECRET_ACCESS_KEY:
+      from_secret: aws_secret_access_key
+    AWS_REGION:
+      from_secret: aws_region
+  commands:
+    - apt update
+    - apt-get install -y expect
+    - echo "Installing the correct furyctl version..."
+    - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-linux-amd64.tar.gz" | tar -xz
+    - mv furyctl /usr/local/bin
+    - chmod +x /usr/local/bin/furyctl
+    - tests/e2e/ekscluster/furyctl_delete_force.expect tests/e2e/ekscluster-upgrades/manifests/furyctl-init-cluster-1.31.1.yaml
+    - aws s3 rm s3://e2e-drone-eks/$CLUSTER_NAME --recursive
+  when:
+    status:
+    - failure
 ---
 name: e2e-ekscluster-upgrades-1.30.1-1.31.1
 kind: pipeline
@@ -389,14 +414,14 @@ clone:
 trigger:
   ref:
     - refs/tags/e2e-eks-**
-    # - refs/tags/e2e-full-**
-    # - refs/tags/v**
+    - refs/tags/e2e-full-**
+    - refs/tags/v**
 
 steps:
 - name: run-tests
   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
   environment:
-    FURYCTL_VERSION: "v0.32.0-rc.3"
+    FURYCTL_VERSION: "v0.32.1"
     DISTRIBUTION_VERSION: "v1.31.1"
     CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-upgrades
     DEBIAN_FRONTEND: noninteractive
@@ -418,7 +443,7 @@ steps:
 - name: furyctl-delete
   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
   environment:
-    FURYCTL_VERSION: "v0.32.0-rc.3"
+    FURYCTL_VERSION: "v0.32.1"
     CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-upgrades
     DEBIAN_FRONTEND: noninteractive
     DISTRIBUTION_VERSION: "v1.31.1"
@@ -438,20 +463,39 @@ steps:
     - tests/e2e/ekscluster/furyctl_delete.expect tests/e2e/ekscluster-upgrades/manifests/furyctl-init-cluster-1.31.1.yaml
     - aws s3 rm s3://e2e-drone-eks/$CLUSTER_NAME --recursive
 
+- name: furyctl-delete-force
+  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
+  environment:
+    FURYCTL_VERSION: "v0.32.1"
+    CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-upgrades
+    DEBIAN_FRONTEND: noninteractive
+    DISTRIBUTION_VERSION: "v1.31.1"
+    AWS_ACCESS_KEY_ID:
+      from_secret: aws_access_key_id
+    AWS_SECRET_ACCESS_KEY:
+      from_secret: aws_secret_access_key
+    AWS_REGION:
+      from_secret: aws_region
+  commands:
+    - apt update
+    - apt-get install -y expect
+    - echo "Installing the correct furyctl version..."
+    - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-linux-amd64.tar.gz" | tar -xz
+    - mv furyctl /usr/local/bin
+    - chmod +x /usr/local/bin/furyctl
+    - tests/e2e/ekscluster/furyctl_delete_force.expect tests/e2e/ekscluster-upgrades/manifests/furyctl-init-cluster-1.31.1.yaml
+    - aws s3 rm s3://e2e-drone-eks/$CLUSTER_NAME --recursive
+  when:
+    status:
+    - failure
 ---
 kind: pipeline
 type: docker
 name: scheduled-aws-nuke
 
 trigger:
-  event:
-    - cron
-    - tag
   cron:
-    - "0 23 * * *" # Run at 11 PM every day
-  ref:
-    include:
-      - refs/tags/aws-nuke-ci-**
+    - "scheduled-aws-nuke"
 
 clone:
   depth: 1
@@ -467,15 +511,15 @@ steps:
       AWS_DEFAULT_REGION: eu-west-1
       ACCOUNT_ID_PROD:
         from_secret: aws_account_id_prod
+      AWS_NUKE_VERSION: "v3.51.1"
     commands:
       # Install required tools
       - yum update -y
       - yum install -y wget tar gzip jq
-      
       # Install AWS Nuke
-      - wget https://github.com/rebuy-de/aws-nuke/releases/download/v2.25.0/aws-nuke-v2.25.0-linux-amd64.tar.gz
-      - tar -xvf aws-nuke-v2.25.0-linux-amd64.tar.gz
-      - mv aws-nuke-v2.25.0-linux-amd64 /usr/local/bin/aws-nuke
+      - wget https://github.com/ekristen/aws-nuke/releases/download/$${AWS_NUKE_VERSION}/aws-nuke-$${AWS_NUKE_VERSION}-linux-amd64.tar.gz
+      - tar -xvf aws-nuke-$${AWS_NUKE_VERSION}-linux-amd64.tar.gz
+      - mv aws-nuke /usr/local/bin/aws-nuke
       - chmod +x /usr/local/bin/aws-nuke
       - export ACCOUNT_ID=$(aws sts get-caller-identity | jq -r ".Account")
       - sed "s/ACCOUNT_ID_PLACEHOLDER/$ACCOUNT_ID/" tests/e2e/ekscluster/awsnuke/config.yml > ./aws-nuke-config.yml

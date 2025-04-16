@@ -6,11 +6,11 @@
 regions:
   - "eu-west-1"
 
-account-blocklist:
+blocklist:
 - ACCOUNT_ID_PROD_PLACEHOLDER # production
 
 resource-types:
-  targets:
+  includes:
     - EC2Subnet
     - EC2SecurityGroup
     - EC2InternetGateway
