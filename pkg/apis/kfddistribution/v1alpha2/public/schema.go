@@ -64,6 +64,10 @@ type SpecDistribution struct {
 
 // Common configuration for all the distribution modules.
 type SpecDistributionCommon struct {
+	// EXPERIMENTAL FEATURE. This field defines whether Network Policies are provided
+	// for core modules.
+	NetworkPoliciesEnabled *bool `json:"networkPoliciesEnabled,omitempty" yaml:"networkPoliciesEnabled,omitempty" mapstructure:"networkPoliciesEnabled,omitempty"`
+
 	// The node selector to use to place the pods for all the KFD modules. Follows
 	// Kubernetes selector format. Example: `node.kubernetes.io/role: infra`.
 	NodeSelector TypesKubeNodeSelector `json:"nodeSelector,omitempty" yaml:"nodeSelector,omitempty" mapstructure:"nodeSelector,omitempty"`
