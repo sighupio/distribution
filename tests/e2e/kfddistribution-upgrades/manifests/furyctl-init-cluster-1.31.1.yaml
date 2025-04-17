@@ -13,7 +13,8 @@ spec:
   distribution:
     kubeconfig: "{env://KUBECONFIG}"
     # This common configuration will be applied to all the packages that will be installed in the cluster
-    common: {}
+    common:
+      networkPoliciesEnabled: true
     # This section contains all the configurations for all the KFD core modules
     modules:
       networking:
