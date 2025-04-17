@@ -23,6 +23,23 @@ echo "Testing that the components are running"
 bats -t tests/e2e/kfddistribution/e2e-kfddistribution-init-cluster.sh
 
 echo "----------------------------------------------------------------------------"
+echo "Executing furyctl for the secured setup"
+/tmp/furyctl create cluster --config tests/e2e/kfddistribution/manifests/furyctl-init-cluster-secured.yaml --outdir "$PWD" --distro-location ./ --force all --disable-analytics
+echo "Testing that the components are running"
+bats -t tests/e2e/kfddistribution/e2e-kfddistribution-init-cluster.sh
+
+echo "----------------------------------------------------------------------------"
+echo "Executing furyctl cleanup all modules and configurations for the secured setup"
+/tmp/furyctl create cluster --config tests/e2e/kfddistribution/manifests/furyctl-cleanup-all-secured.yaml --outdir "$PWD" --distro-location ./ --skip-deps-download --force all --disable-analytics
+bats -t tests/e2e/kfddistribution/e2e-kfddistribution-cleanup-all.sh
+
+echo "----------------------------------------------------------------------------"
+echo "Resetting furyctl with the initial setup"
+/tmp/furyctl create cluster --config tests/e2e/kfddistribution/manifests/furyctl-init-cluster.yaml --outdir "$PWD" --distro-location ./ --force all --disable-analytics
+echo "Testing that the components are running"
+bats -t tests/e2e/kfddistribution/e2e-kfddistribution-init-cluster.sh
+
+echo "----------------------------------------------------------------------------"
 echo "Executing furyctl with the tempo migration to none"
 /tmp/furyctl create cluster --config tests/e2e/kfddistribution/manifests/furyctl-2-migrate-from-tempo-to-none.yaml --outdir "$PWD" --distro-location ./ --force all --skip-deps-download --disable-analytics
 bats -t tests/e2e/kfddistribution/e2e-kfddistribution-2-migrate-from-tempo-to-none.sh
