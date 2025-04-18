@@ -90,17 +90,24 @@ The name of the cluster. It will also be used as a prefix for all the other reso
 
 ### Properties
 
-| Property                                                        | Type     | Required |
-|:----------------------------------------------------------------|:---------|:---------|
-| [nodeSelector](#specdistributioncommonnodeselector)             | `object` | Optional |
-| [provider](#specdistributioncommonprovider)                     | `object` | Optional |
-| [registry](#specdistributioncommonregistry)                     | `string` | Optional |
-| [relativeVendorPath](#specdistributioncommonrelativevendorpath) | `string` | Optional |
-| [tolerations](#specdistributioncommontolerations)               | `array`  | Optional |
+| Property                                                                | Type      | Required |
+|:------------------------------------------------------------------------|:----------|:---------|
+| [networkPoliciesEnabled](#specdistributioncommonnetworkpoliciesenabled) | `boolean` | Optional |
+| [nodeSelector](#specdistributioncommonnodeselector)                     | `object`  | Optional |
+| [provider](#specdistributioncommonprovider)                             | `object`  | Optional |
+| [registry](#specdistributioncommonregistry)                             | `string`  | Optional |
+| [relativeVendorPath](#specdistributioncommonrelativevendorpath)         | `string`  | Optional |
+| [tolerations](#specdistributioncommontolerations)                       | `array`   | Optional |
 
 ### Description
 
 Common configuration for all the distribution modules.
+
+## .spec.distribution.common.networkPoliciesEnabled
+
+### Description
+
+EXPERIMENTAL FEATURE. This field defines whether Network Policies are provided for core modules.
 
 ## .spec.distribution.common.nodeSelector
 
