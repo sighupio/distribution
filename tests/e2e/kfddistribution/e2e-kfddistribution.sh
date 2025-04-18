@@ -17,20 +17,15 @@ echo "Executing furyctl cleanup all modules and configurations"
 bats -t tests/e2e/kfddistribution/e2e-kfddistribution-cleanup-all.sh
 
 echo "----------------------------------------------------------------------------"
-echo "Resetting furyctl with the initial setup"
-/tmp/furyctl create cluster --config tests/e2e/kfddistribution/manifests/furyctl-init-cluster.yaml --outdir "$PWD" --distro-location ./ --force all --disable-analytics
-echo "Testing that the components are running"
-bats -t tests/e2e/kfddistribution/e2e-kfddistribution-init-cluster.sh
-
-echo "----------------------------------------------------------------------------"
-echo "Executing furyctl for the secured setup"
+echo "Executing furyctl with the secured registry"
 /tmp/furyctl create cluster --config tests/e2e/kfddistribution/manifests/furyctl-init-cluster-secured.yaml --outdir "$PWD" --distro-location ./ --force all --disable-analytics
 echo "Testing that the components are running"
+# We re-use the init-cluster bats test, since the components deployed are the same.
 bats -t tests/e2e/kfddistribution/e2e-kfddistribution-init-cluster.sh
 
 echo "----------------------------------------------------------------------------"
-echo "Executing furyctl cleanup all modules and configurations for the secured setup"
-/tmp/furyctl create cluster --config tests/e2e/kfddistribution/manifests/furyctl-cleanup-all-secured.yaml --outdir "$PWD" --distro-location ./ --skip-deps-download --force all --disable-analytics
+echo "Executing furyctl cleanup all modules and configurations without the secured registry"
+/tmp/furyctl create cluster --config tests/e2e/kfddistribution/manifests/furyctl-cleanup-all.yaml --outdir "$PWD" --distro-location ./ --skip-deps-download --force all --disable-analytics
 bats -t tests/e2e/kfddistribution/e2e-kfddistribution-cleanup-all.sh
 
 echo "----------------------------------------------------------------------------"
