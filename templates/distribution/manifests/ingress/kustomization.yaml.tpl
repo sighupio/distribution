@@ -24,7 +24,7 @@ resources:
 
 {{- end }}
 
-{{ if eq .spec.distribution.common.networkPoliciesEnabled true }}
+{{- if and (eq .spec.distribution.common.networkPoliciesEnabled true) (or (eq .spec.distribution.modules.ingress.nginx.tls.provider "certManager") (ne .spec.distribution.modules.ingress.nginx.type "none")) }}
   - policies
 {{- end }}
 
