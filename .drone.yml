@@ -507,7 +507,7 @@ trigger:
     #- refs/tags/v**
 
 steps:
-- name: run-tests
+- name: create-cluster
   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
   environment:
     FURYCTL_VERSION: "v0.32.1"
@@ -523,7 +523,6 @@ steps:
     TF_VAR_hcloud_token:
       from_secret: hcloud_token
   commands:
-    - apt update
     - cd tests/e2e/onpremises/
     - ssh-keygen -N '' -t rsa -b 4096 -C "sighup" -f /cache/ci-ssh-key
     - export TF_VAR_public_key=$(cat /cache/ci-ssh-key.pub)
@@ -534,6 +533,16 @@ steps:
     - name: cache
       path: /cache
     
+- name: create-cluster
+  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
+  environment:
+    KUBECONFIG: /cache/kubeconfig
+  commands:
+    - ./tests/e2e/onpremises/e2e-onpremises.sh
+  volumes:
+    - name: cache
+      path: /cache
+
 - name: delete
   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
   environment:
@@ -550,7 +559,6 @@ steps:
     TF_VAR_hcloud_token:
       from_secret: hcloud_token
   commands:
-    - apt update
     - cd tests/e2e/onpremises/
     - export TF_VAR_public_key=$(cat /cache/ci-ssh-key.pub)
     - export TF_VAR_private_key=$(cat /cache/ci-ssh-key)
@@ -575,7 +583,6 @@ steps:
     TF_VAR_hcloud_token:
       from_secret: hcloud_token
   commands:
-    - apt update
     - cd tests/e2e/onpremises/
     - export TF_VAR_public_key=$(cat /cache/ci-ssh-key.pub)
     - export TF_VAR_private_key=$(cat /cache/ci-ssh-key)
