@@ -21,24 +21,24 @@
         dest: "/root/"
         owner: root
         group: root
-        mode: 0755 # Assicura che i file siano eseguibili se necessario
+        mode: 0755
 
     - name: Install furyctl
       shell: |
         curl -L "https://github.com/sighupio/furyctl/releases/download/v0.32.1/furyctl-$(uname -s)-amd64.tar.gz" | tar xz -C /usr/local/bin/
       args:
-        creates: /usr/local/bin/furyctl # Evita di reinstallare se già presente
+        creates: /usr/local/bin/furyctl
 
     - name: Create furyctl pki
       shell: furyctl create pki -p ./pki
       args:
-        chdir: /root  # Esegui nella directory /root, dove i file sono stati copiati
+        chdir: /root
       ignore_errors: yes
 
     - name: Run create_ingress_certs.sh
       shell: ./create_ingress_certs.sh
       args:
-        chdir: /root # Esegui nella directory /root
+        chdir: /root
 
     - name: Create cluster with furyctl - Kubernetes phase
       shell: furyctl apply cluster -o $PWD -D --phase kubernetes

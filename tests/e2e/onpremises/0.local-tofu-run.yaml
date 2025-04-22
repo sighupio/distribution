@@ -6,7 +6,7 @@
 - name: Local Setup - Generate Terraform Files and Furyctl Configuration
   hosts: localhost
   connection: local
-  gather_facts: false # Non serve raccogliere facts in questo caso
+  gather_facts: false
 
   tasks:
     - name: Run tofu init
