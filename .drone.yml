@@ -529,7 +529,7 @@ steps:
     - export TF_VAR_public_key=$(cat /cache/ci-ssh-key.pub)
     - export TF_VAR_private_key=$(cat /cache/ci-ssh-key)
     - ansible-playbook 0.local-tofu-run.yaml
-    #- ansible-playbook 1.remote-furyctl-exec.yaml
+    - ansible-playbook 1.remote-furyctl-exec.yaml
   volumes:
     - name: cache
       path: /cache
