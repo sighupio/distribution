@@ -501,7 +501,7 @@ clone:
 
 trigger:
   ref:
-    - refs/tags/d2d-test-**
+    - refs/tags/d2d-**
     #- refs/tags/e2e-onpremises-**
     #- refs/tags/e2e-full-**
     #- refs/tags/v**
