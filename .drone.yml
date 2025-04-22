@@ -43,6 +43,8 @@ steps:
       VALIDATE_NATURAL_LANGUAGE: "false"
       # Disable go linting, we use the one included in the go image
       VALIDATE_GO: "false"
+      # Disable terraform/tofu linting, not relevant for the relased software
+      VALIDATE_TERRAFORM: "false"
       # Exclude template files from linting. The linter does not understand Go template.
       FILTER_REGEX_EXCLUDE: (templates/|\.github)
     depends_on:
