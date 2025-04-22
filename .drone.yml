@@ -533,7 +533,7 @@ steps:
     - name: cache
       path: /cache
     
-- name: create-cluster
+- name: bats-tests
   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
   environment:
     KUBECONFIG: /cache/kubeconfig
