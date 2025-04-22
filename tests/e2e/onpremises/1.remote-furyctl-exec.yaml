@@ -1,0 +1,77 @@
+---
+- name: Remote Setup - Configure and Deploy on Target Host
+  hosts: haproxy
+  gather_facts: false # Non serve raccogliere facts in questo caso
+
+  tasks:
+    - name: Install required packages
+      apt:
+        name:
+          - ansible
+        state: present
+        update_cache: yes
+
+    - name: Copy files to remote host
+      copy:
+        src: "./to_copy/"
+        dest: "/root/"
+        owner: root
+        group: root
+        mode: 0755 # Assicura che i file siano eseguibili se necessario
+
+    - name: Install furyctl
+      shell: |
+        curl -L "https://github.com/sighupio/furyctl/releases/download/v0.32.1/furyctl-$(uname -s)-amd64.tar.gz" | tar xz -C /usr/local/bin/
+      args:
+        creates: /usr/local/bin/furyctl # Evita di reinstallare se già presente
+
+    - name: Create furyctl pki
+      shell: furyctl create pki -p ./pki
+      args:
+        chdir: /root  # Esegui nella directory /root, dove i file sono stati copiati
+      ignore_errors: yes
+
+    - name: Run create_ingress_certs.sh
+      shell: ./create_ingress_certs.sh
+      args:
+        chdir: /root # Esegui nella directory /root
+
+    - name: Create cluster with furyctl - Kubernetes phase
+      shell: furyctl apply cluster -o $PWD -D --phase kubernetes
+      args:
+        chdir: /root
+
+    - name: Copy prepare playbook on .furyctl ansible directory
+      shell: cp 00.prepare-hosts.yaml /root/.furyctl/reevo/kubernetes
+      args:
+        chdir: /root
+    
+    - name: Run ansible prepare (prerequisites for storage)
+      shell: ansible-playbook 00.prepare-hosts.yaml
+      args:
+        chdir: /root/.furyctl/reevo/kubernetes
+
+    - name: Complete furyctl installation , all phases + post apply phase
+      shell: furyctl apply cluster -o $PWD -D --post-apply-phases distribution
+      args:
+        chdir: /root
+
+    - name: Apply distribution again, in the case storage class is not yet available
+      shell: sleep 60 && furyctl apply cluster -o $PWD -D --phase distribution
+      args:
+        chdir: /root
+
+    - name: Slurp kubeconfig file
+      slurp:
+        src: "/root/kubeconfig"
+      register: kubeconfig_file
+
+    - name: Decode kubeconfig content
+      set_fact:
+        kubeconfig_decoded: "{{ kubeconfig_file.content | b64decode }}"
+
+    - name: Save kubeconfig to local machine
+      copy:
+        content: "{{ kubeconfig_decoded }}"
+        dest: "kubeconfig"
+      delegate_to: localhost

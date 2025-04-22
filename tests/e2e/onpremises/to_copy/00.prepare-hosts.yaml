@@ -1,0 +1,15 @@
+- hosts: all  # Applica a tutti gli host nell'inventario
+  gather_facts: false # Non raccogliere facts, per velocizzare l'esecuzione
+
+  tasks:
+    - name: Install required packages using package module
+      apt:
+        name:
+          - net-tools
+          - open-iscsi
+          - cryptsetup
+        state: present
+        update_cache: yes # Assicura che il cache sia aggiornato
+
+    - name: Load dm_crypt module
+      command: modprobe dm_crypt

@@ -1,0 +1,11 @@
+---
+- name: Local Setup - Destroy infrastructure
+  hosts: localhost
+  connection: local
+  gather_facts: false # Non serve raccogliere facts in questo caso
+
+  tasks:
+    - name: Run tofu destroy force
+      command: tofu apply -destroy -auto-approve
+      args:
+        chdir: "." 

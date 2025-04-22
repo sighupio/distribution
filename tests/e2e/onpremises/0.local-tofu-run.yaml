@@ -1,0 +1,50 @@
+---
+- name: Local Setup - Generate Terraform Files and Furyctl Configuration
+  hosts: localhost
+  connection: local
+  gather_facts: false # Non serve raccogliere facts in questo caso
+
+  tasks:
+    - name: Run tofu init
+      command: tofu init
+      args:
+        chdir: "."
+
+    - name: Run tofu plan
+      command: tofu plan -out=terraform.plan
+      args:
+        chdir: "."
+
+    - name: Run tofu apply
+      command: tofu apply terraform.plan
+      args:
+        chdir: "."
+
+    - name: Extract furyctl_yaml output
+      shell: tofu output --raw furyctl_yaml > to_copy/furyctl.yaml
+      args:
+        chdir: "."
+
+    - name: Extract req_dns output
+      shell: tofu output --raw req_dns > to_copy/req-dns.cnf
+      args:
+        chdir: "."
+
+    - name: Get haproxy IP from Tofu Output
+      shell: tofu output -raw haproxy_ip
+      register: haproxy_ip_output
+
+    - name: Update hosts.yaml with haproxy IP
+      copy:
+        dest: "hosts.yaml"
+        content: |
+          all:
+            children:
+              haproxy:
+                hosts:
+                  haproxy:
+                    ansible_host: "{{ haproxy_ip_output.stdout }}"
+            vars:
+              ansible_python_interpreter: python3
+              ansible_ssh_private_key_file: "/Users/samuelechiocca/.ssh/id_ed25519"
+              ansible_user: "root"
