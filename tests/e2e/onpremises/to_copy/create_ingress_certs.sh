@@ -1,4 +1,7 @@
 #!/bin/bash
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
 
 openssl genrsa -out ca-key.pem 2048
 openssl req -x509 -new -days 365 -nodes -key ca-key.pem -out ca.crt -subj "/CN=ingress-ca"
