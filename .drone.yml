@@ -6,6 +6,9 @@ name: qa
 kind: pipeline
 type: docker
 
+node:
+   performance: low
+
 platform:
   os: linux
   arch: amd64
@@ -317,6 +320,9 @@ name: e2e-ekscluster-1.31.1
 kind: pipeline
 type: docker
 
+node:
+   performance: low
+
 depends_on:
   - qa
 
@@ -404,6 +410,9 @@ steps:
 name: e2e-ekscluster-upgrades-1.30.1-1.31.1
 kind: pipeline
 type: docker
+
+node:
+   performance: low
 
 depends_on:
   - qa
@@ -493,6 +502,9 @@ name: e2e-onpremises-1.31.1
 kind: pipeline
 type: docker
 
+node:
+   performance: low
+
 depends_on:
   - qa
 
@@ -501,13 +513,12 @@ clone:
 
 trigger:
   ref:
-    - refs/tags/d2d-**
-    #- refs/tags/e2e-onpremises-**
-    #- refs/tags/e2e-full-**
-    #- refs/tags/v**
+    - refs/tags/e2e-onpremises-**
+    - refs/tags/e2e-full-**
+    - refs/tags/v**
 
 steps:
-- name: create-cluster
+- name: create-hetzner-infrastructure
   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
   environment:
     FURYCTL_VERSION: "v0.32.1"
@@ -528,6 +539,27 @@ steps:
     - export TF_VAR_public_key=$(cat /cache/ci-ssh-key.pub)
     - export TF_VAR_private_key=$(cat /cache/ci-ssh-key)
     - ansible-playbook 0.local-tofu-run.yaml
+  volumes:
+    - name: cache
+      path: /cache
+
+- name: install-cluster-with-furyctl
+  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
+  environment:
+    FURYCTL_VERSION: "v0.32.1"
+    DISTRIBUTION_VERSION: "v1.31.1"
+    DEBIAN_FRONTEND: noninteractive
+    AWS_ACCESS_KEY_ID:
+      from_secret: aws_access_key_id
+    AWS_SECRET_ACCESS_KEY:
+      from_secret: aws_secret_access_key
+    AWS_REGION:
+      from_secret: aws_region
+    TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
+    TF_VAR_hcloud_token:
+      from_secret: hcloud_token
+  commands:
+    - cd tests/e2e/onpremises/
     - ansible-playbook 1.remote-furyctl-exec.yaml
   volumes:
     - name: cache
