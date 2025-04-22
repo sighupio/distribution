@@ -5,7 +5,7 @@
 ---
 - name: Remote Setup - Configure and Deploy on Target Host
   hosts: haproxy
-  gather_facts: false # Non serve raccogliere facts in questo caso
+  gather_facts: false
 
   tasks:
     - name: Install required packages
