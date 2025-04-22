@@ -34,6 +34,11 @@
       args:
         chdir: /root
       ignore_errors: yes
+      register: furyctl_pki
+
+    - name: Debug furyctl pki creation
+      debug:
+        msg: "{{ furyctl_pki.stdout }}"
 
     - name: Run create_ingress_certs.sh
       shell: ./create_ingress_certs.sh
@@ -44,6 +49,11 @@
       shell: furyctl apply cluster -o $PWD -D --phase kubernetes
       args:
         chdir: /root
+      register: furyctl_kubernetes
+
+    - name: Debug furyctl kubernetes phase
+      debug:
+        msg: "{{ furyctl_kubernetes.stdout }}"
 
     - name: Copy prepare playbook on .furyctl ansible directory
       shell: cp 00.prepare-hosts.yaml /root/.furyctl/reevo/kubernetes
@@ -59,11 +69,21 @@
       shell: furyctl apply cluster -o $PWD -D --post-apply-phases distribution
       args:
         chdir: /root
+      register: furyctl_post_apply
+
+    - name: Debug furyctl with post apply phase
+      debug:
+        msg: "{{ furyctl_post_apply.stdout }}"
 
     - name: Apply distribution again, in the case storage class is not yet available
       shell: sleep 60 && furyctl apply cluster -o $PWD -D --phase distribution
       args:
         chdir: /root
+      register: furyctl_distribution
+
+    - name: Debug furyctl final apply
+      debug:
+        msg: "{{ furyctl_distribution.stdout }}"
 
     - name: Slurp kubeconfig file
       slurp:
