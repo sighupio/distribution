@@ -3,7 +3,7 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Local Setup - Generate Terraform Files and Furyctl Configuration
+- name: Local Setup - Generate Terraform Files and furyctl Configuration
   hosts: localhost
   connection: local
   gather_facts: false
