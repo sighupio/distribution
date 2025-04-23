@@ -31,7 +31,7 @@ spec:
     loadBalancers:
       enabled: true
       hosts:
-        - name: haproxy1-10-10-1-2
+        - name: haproxy-10-10-1-2
           ip: 10.10.1.2
       keepalived:
         enabled: false
@@ -45,11 +45,11 @@ spec:
       additionalConfig: "{file://./haproxy-additional.cfg}"
     masters:
       hosts:
-        - name: master0-10-10-1-3
+        - name: controlplane0-10-10-1-3
           ip: 10.10.1.3
-        - name: master1-10-10-1-4
+        - name: controlplane1-10-10-1-4
           ip: 10.10.1.4
-        - name: master2-10-10-1-5
+        - name: controlplane2-10-10-1-5
           ip: 10.10.1.5
     nodes:
       - name: infra
@@ -67,12 +67,6 @@ spec:
             ip: 10.10.1.9
           - name: worker1-10-10-1-10
             ip: 10.10.1.10
-          #- name: worker2-10-10-1-11
-          #  ip: 10.10.1.11
-          #- name: worker3-10-10-1-12
-          #  ip: 10.10.1.12
-          #- name: worker4-10-10-1-13
-          #  ip: 10.10.1.13
         taints: []
     #advancedAnsible:
       #config: |

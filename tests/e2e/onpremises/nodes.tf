@@ -38,9 +38,9 @@ resource "null_resource" "init_haproxy" {
 
 }
 
-resource "hcloud_server" "master" {
+resource "hcloud_server" "controlplane" {
   count       = 3
-  name        = "master-${count.index}-${var.ci_number}"
+  name        = "controlplane-${count.index}-${var.ci_number}"
   image       = "ubuntu-24.04"
   server_type = "cpx31"
   location    = "nbg1"
