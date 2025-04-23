@@ -35,6 +35,9 @@ resources:
 {{- if and (eq .spec.distribution.modules.tracing.type "tempo") (.checks.storageClassAvailable) }}
   - tracing
 {{- end }}
+{{- if .spec.distribution.modules.docs.enabled }}
+  - docs
+{{- end }}
 
 {{- if .spec.distribution.customPatches.patchesStrategicMerge }}
 patchesStrategicMerge:
