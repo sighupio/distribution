@@ -14,6 +14,16 @@ The distribution is maintained with ❤️ by the team [SIGHUP by ReeVo](https:/
 
 ## New features 🌟
 
+- [[#XXX](https://github.com/sighupio/distribution/pull/XXX)] **Embedded Docs site**: the distribution now includes an embedded version of the docs site with the documentation for the SD version. The docs will be deployed by default and an (unprotected) ingress will be automatically created. You can disable and / or override some values with the new configuration key, for example:
+
+```yaml
+spec:
+  distribution:
+    modules:
+      docs:
+        enabled: false # disable embedded Docs
+```
+
 ## Fixes 🐞
 - [[#387](https://github.com/sighupio/distribution/pull/387)]: This PR fixed an issue that prevented the control planes nodes array to be treated as immutable under the OnPremises provider. The number of control plane nodes was originally set as immutable in the 1.31.1 release cycle because there isn't any support to scale the etcd cluster with the number of control plane nodes in the SIGHUP Distribution yet. The issue allowed users to change the number of the control plane, even if it was explicitly marked as immutable.
 
