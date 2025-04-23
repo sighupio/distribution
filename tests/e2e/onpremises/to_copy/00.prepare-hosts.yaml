@@ -2,8 +2,8 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-- hosts: all  # Applica a tutti gli host nell'inventario
-  gather_facts: false # Non raccogliere facts, per velocizzare l'esecuzione
+- hosts: all
+  gather_facts: false
 
   tasks:
     - name: Install required packages using package module
@@ -13,7 +13,7 @@
           - open-iscsi
           - cryptsetup
         state: present
-        update_cache: yes # Assicura che il cache sia aggiornato
+        update_cache: yes #
 
     - name: Load dm_crypt module
       command: modprobe dm_crypt
