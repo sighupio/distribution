@@ -10,6 +10,5 @@
 
   tasks:
     - name: Run tofu destroy force
-      command: tofu apply -destroy -auto-approve
-      args:
-        chdir: "." 
+      ansible.builtin.command: tofu apply -destroy -auto-approve
+

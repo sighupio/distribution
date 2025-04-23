@@ -16,7 +16,7 @@
         update_cache: yes
 
     - name: Copy files to remote host
-      copy:
+      ansible.builtin.copy:
         src: "./to_copy/"
         dest: "/root/"
         owner: root
@@ -24,13 +24,13 @@
         mode: 0755
 
     - name: Install furyctl
-      shell: |
+      ansible.builtin.shell: |
         curl -L "https://github.com/sighupio/furyctl/releases/download/v0.32.1/furyctl-$(uname -s)-amd64.tar.gz" | tar xz -C /usr/local/bin/
       args:
         creates: /usr/local/bin/furyctl
 
     - name: Create furyctl pki
-      shell: furyctl create pki -p ./pki
+      ansible.builtin.shell: furyctl create pki -p ./pki
       args:
         chdir: /root
       ignore_errors: yes
@@ -41,12 +41,12 @@
         msg: "{{ furyctl_pki.stdout }}"
 
     - name: Run create_ingress_certs.sh
-      shell: ./create_ingress_certs.sh
+      ansible.builtin.shell: ./create_ingress_certs.sh
       args:
         chdir: /root
 
     - name: Create cluster with furyctl - Kubernetes phase
-      shell: furyctl apply cluster -o $PWD -D --phase kubernetes
+      ansible.builtin.shell: furyctl apply cluster -o $PWD -D --phase kubernetes
       args:
         chdir: /root
       register: furyctl_kubernetes
@@ -56,37 +56,37 @@
         msg: "{{ furyctl_kubernetes.stdout }}"
 
     - name: Copy prepare playbook on .furyctl ansible directory
-      shell: cp 00.prepare-hosts.yaml /root/.furyctl/reevo/kubernetes
+      ansible.builtin.shell: cp 00.prepare-hosts.yaml /root/.furyctl/reevo/kubernetes
       args:
         chdir: /root
-    
+
     - name: Run ansible prepare (prerequisites for storage)
-      shell: ansible-playbook 00.prepare-hosts.yaml
+      ansible.builtin.shell: ansible-playbook 00.prepare-hosts.yaml
       args:
         chdir: /root/.furyctl/reevo/kubernetes
 
     - name: Complete furyctl installation , all phases + post apply phase
-      shell: furyctl apply cluster -o $PWD -D --post-apply-phases distribution
+      ansible.builtin.shell: furyctl apply cluster -o $PWD -D --post-apply-phases distribution
       args:
         chdir: /root
       register: furyctl_post_apply
 
     - name: Debug furyctl with post apply phase
-      debug:
+      ansible.builtin.debug:
         msg: "{{ furyctl_post_apply.stdout }}"
 
     - name: Apply distribution again, in the case storage class is not yet available
-      shell: sleep 60 && furyctl apply cluster -o $PWD -D --phase distribution
+      ansible.builtin.shell: sleep 60 && furyctl apply cluster -o $PWD -D --phase distribution
       args:
         chdir: /root
       register: furyctl_distribution
 
     - name: Debug furyctl final apply
-      debug:
+      ansible.builtin.debug:
         msg: "{{ furyctl_distribution.stdout }}"
 
     - name: Slurp kubeconfig file
-      slurp:
+      ansible.builtin.slurp:
         src: "/root/kubeconfig"
       register: kubeconfig_file
 
@@ -95,7 +95,7 @@
         kubeconfig_decoded: "{{ kubeconfig_file.content | b64decode }}"
 
     - name: Save kubeconfig to local machine
-      copy:
+      ansible.builtin.copy:
         content: "{{ kubeconfig_decoded }}"
         dest: "/cache/kubeconfig"
       delegate_to: localhost

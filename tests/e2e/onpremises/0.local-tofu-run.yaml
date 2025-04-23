@@ -10,32 +10,22 @@
 
   tasks:
     - name: Run tofu init
-      command: tofu init
-      args:
-        chdir: "."
+      ansible.builtin.command: tofu init
 
     - name: Run tofu plan
-      command: tofu plan -out=terraform.plan
-      args:
-        chdir: "."
+      ansible.builtin.command: tofu plan -out=terraform.plan
 
     - name: Run tofu apply
-      command: tofu apply terraform.plan
-      args:
-        chdir: "."
+      ansible.builtin.command: tofu apply terraform.plan
 
     - name: Extract furyctl_yaml output
-      shell: tofu output --raw furyctl_yaml > to_copy/furyctl.yaml
-      args:
-        chdir: "."
+      ansible.builtin.shell: tofu output --raw furyctl_yaml > to_copy/furyctl.yaml
 
     - name: Extract req_dns output
-      shell: tofu output --raw req_dns > to_copy/req-dns.cnf
-      args:
-        chdir: "."
+      ansible.builtin.shell: tofu output --raw req_dns > to_copy/req-dns.cnf
 
     - name: Get haproxy IP from Tofu Output
-      shell: tofu output -raw haproxy_ip
+      ansible.builtin.shell: tofu output -raw haproxy_ip
       register: haproxy_ip_output
 
     - name: Update hosts.yaml with haproxy IP
