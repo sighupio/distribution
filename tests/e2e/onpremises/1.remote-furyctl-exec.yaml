@@ -25,9 +25,11 @@
 
     - name: Install furyctl
       ansible.builtin.shell: |
-        curl -L "https://github.com/sighupio/furyctl/releases/download/v0.32.1/furyctl-$(uname -s)-amd64.tar.gz" | tar xz -C /usr/local/bin/
+        curl -L "https://github.com/sighupio/furyctl/releases/download/{{ furyctl_version }}/furyctl-$(uname -s)-amd64.tar.gz" | tar xz -C /usr/local/bin/
       args:
         creates: /usr/local/bin/furyctl
+      vars:
+        furyctl_version: "{{ lookup('env', 'FURYCTL_VERSION') | default('v0.32.1') }}"
 
     - name: Create furyctl pki
       ansible.builtin.shell: furyctl create pki -p ./pki
