@@ -637,6 +637,10 @@
           "format": "date",
           "description": "Starting from versions 1.28.4, 1.29.5 and 1.30.0 of SIGHUP Distribution, Loki changed the time series database from BoltDB to TSDB and the schema that it uses to store the logs from v11 to v13.\n\nThe value of this field will determine the date when Loki will start writing using the new TSDB and the schema v13, always at midnight UTC. The old BoltDB and schema will be kept until all the logs expire for reading purposes.\n\nFrom versions 1.29.7, 1.30.2 and 1.31.1 of the Distribution, this field will be immutable once set and its value should be a date before upgrading to one of these versions or creating the cluster, Loki does not support writing BoltDB and schema v11 anymore.\n\nValue must be a string in `ISO 8601` date format (`yyyy-mm-dd`). Example: `2024-11-18`."
         },
+        "retentionPeriod": {
+          "type": "string",
+          "description": "Optional retention period for logs stored in Loki (default `720h`, 30 days). Setting it to `0s` disables retention. Format must match: `[0-9]+(s|m|h|d|w|y)`."
+        },
         "resources": {
           "$ref": "#/$defs/Types.KubeResources"
         }

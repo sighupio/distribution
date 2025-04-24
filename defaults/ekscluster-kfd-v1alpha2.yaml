@@ -113,6 +113,8 @@ data:
           secretAccessKey: example
           accessKeyId: example
           bucketName: lokibucket
+        # retentionPeriod can be set to 0s to disable retention
+        retentionPeriod: 720h # 30 days
       customOutputs: {}
     # monitoring module configuration
     monitoring:
