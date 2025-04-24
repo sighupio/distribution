@@ -6,6 +6,9 @@ name: qa
 kind: pipeline
 type: docker
 
+node:
+   performance: low
+
 platform:
   os: linux
   arch: amd64
@@ -43,8 +46,8 @@ steps:
       VALIDATE_NATURAL_LANGUAGE: "false"
       # Disable go linting, we use the one included in the go image
       VALIDATE_GO: "false"
-      # Exclude template files from linting. The linter does not understand Go template.
-      FILTER_REGEX_EXCLUDE: (templates/|\.github)
+      # Exclude template files from linting. The linter does not understand Go template. Exclude also tests
+      FILTER_REGEX_EXCLUDE: (templates/|\.github|tests/)
     depends_on:
       - license-check
       - schema-check
@@ -106,7 +109,7 @@ steps:
       - /pluto detect distribution.yml --ignore-deprecations --target-versions=k8s=v1.31.0
 
 ---
-name: e2e-kubernetes-1.31
+name: e2e-kfddistribution-1.31
 kind: pipeline
 type: docker
 
@@ -209,13 +212,12 @@ volumes:
     host:
       path: /var/run/docker.sock
 ---
-name: e2e-kubernetes-1.31.0-to-1.31.1
+name: e2e-kfddistribution-1.31.0-to-1.31.1
 kind: pipeline
 type: docker
 
 depends_on:
   - qa
-  - e2e-kubernetes-1.31
 
 clone:
   depth: 1
@@ -317,6 +319,9 @@ name: e2e-ekscluster-1.31.1
 kind: pipeline
 type: docker
 
+node:
+   performance: low
+
 depends_on:
   - qa
 
@@ -405,6 +410,9 @@ name: e2e-ekscluster-upgrades-1.30.1-1.31.1
 kind: pipeline
 type: docker
 
+node:
+   performance: low
+
 depends_on:
   - qa
 
@@ -489,6 +497,115 @@ steps:
     status:
     - failure
 ---
+name: e2e-onpremises-1.31.1
+kind: pipeline
+type: docker
+
+node:
+   performance: low
+
+depends_on:
+  - qa
+
+clone:
+  depth: 1
+
+trigger:
+  ref:
+    - refs/tags/e2e-onpremises-**
+    - refs/tags/e2e-full-**
+    - refs/tags/v**
+
+steps:
+- name: create-hetzner-infrastructure
+  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
+  environment:
+    FURYCTL_VERSION: "v0.32.1"
+    DISTRIBUTION_VERSION: "v1.31.1"
+    DEBIAN_FRONTEND: noninteractive
+    AWS_ACCESS_KEY_ID:
+      from_secret: aws_access_key_id
+    AWS_SECRET_ACCESS_KEY:
+      from_secret: aws_secret_access_key
+    AWS_REGION:
+      from_secret: aws_region
+    TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
+    TF_VAR_hcloud_token:
+      from_secret: hcloud_token
+  commands:
+    - cd tests/e2e/onpremises/
+    - ssh-keygen -N '' -t rsa -b 4096 -C "sighup" -f /cache/ci-ssh-key
+    - export TF_VAR_public_key=$(cat /cache/ci-ssh-key.pub)
+    - export TF_VAR_private_key=$(cat /cache/ci-ssh-key)
+    - ansible-playbook 0.local-tofu-run.yaml
+  volumes:
+    - name: cache
+      path: /cache
+
+- name: install-cluster-with-furyctl
+  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
+  environment:
+    FURYCTL_VERSION: "v0.32.1"
+    DISTRIBUTION_VERSION: "v1.31.1"
+    DEBIAN_FRONTEND: noninteractive
+    AWS_ACCESS_KEY_ID:
+      from_secret: aws_access_key_id
+    AWS_SECRET_ACCESS_KEY:
+      from_secret: aws_secret_access_key
+    AWS_REGION:
+      from_secret: aws_region
+    TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
+    TF_VAR_hcloud_token:
+      from_secret: hcloud_token
+  commands:
+    - cd tests/e2e/onpremises/
+    - ansible-playbook 1.remote-furyctl-exec.yaml
+  volumes:
+    - name: cache
+      path: /cache
+    
+- name: bats-tests
+  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
+  environment:
+    KUBECONFIG: /cache/kubeconfig
+  commands:
+    - ./tests/e2e/onpremises/e2e-onpremises.sh
+  volumes:
+    - name: cache
+      path: /cache
+
+- name: delete
+  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
+  environment:
+    FURYCTL_VERSION: "v0.32.1"
+    DEBIAN_FRONTEND: noninteractive
+    DISTRIBUTION_VERSION: "v1.31.1"
+    AWS_ACCESS_KEY_ID:
+      from_secret: aws_access_key_id
+    AWS_SECRET_ACCESS_KEY:
+      from_secret: aws_secret_access_key
+    AWS_REGION:
+      from_secret: aws_region
+    TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
+    TF_VAR_hcloud_token:
+      from_secret: hcloud_token
+  commands:
+    - cd tests/e2e/onpremises/
+    - export TF_VAR_public_key=$(cat /cache/ci-ssh-key.pub)
+    - export TF_VAR_private_key=$(cat /cache/ci-ssh-key)
+    - ansible-playbook 2.local-tofu-destroy.yaml
+  when:
+    status:
+    - success
+    - failure
+  volumes:
+    - name: cache
+      path: /cache
+
+volumes:
+- name: cache
+  temp: {}
+---
 kind: pipeline
 type: docker
 name: scheduled-aws-nuke
@@ -534,8 +651,8 @@ kind: pipeline
 type: docker
 
 depends_on:
-  - e2e-kubernetes-1.31
-  - e2e-kubernetes-1.31.0-to-1.31.1
+  - e2e-kfddistribution-1.31
+  - e2e-kfddistribution-1.31.0-to-1.31.1
 
 platform:
   os: linux
