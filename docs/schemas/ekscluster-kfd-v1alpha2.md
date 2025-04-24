@@ -2619,7 +2619,7 @@ The memory request for the Pod. Example: `500M`.
 
 ### Description
 
-Optional retention period for logs stored in Loki (default `720h`, 30 days). Setting it to `0s` disables retention.
+Optional retention period for logs stored in Loki (default `720h`, 30 days). Setting it to `0s` disables retention. Format must match: `[0-9]+(s|m|h|d|w|y)`.
 
 ## .spec.distribution.modules.logging.loki.tsdbStartDate
 
