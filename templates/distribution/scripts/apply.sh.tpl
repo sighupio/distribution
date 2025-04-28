@@ -48,8 +48,8 @@ additionalKappArgs=""
 
 {{- if eq .spec.distribution.modules.policy.type "gatekeeper" }}
     {{- if .spec.distribution.modules.policy.gatekeeper.installDefaultPolicies }}
-    # We need this to tell Kapp that the CRDs will be created later by Gatekeeper
-additionalKappArgs+="-f ../../vendor/modules/opa/katalog/tests/kapp/exists.yaml"
+# We need this to tell Kapp that the CRDs will be created later by Gatekeeper
+additionalKappArgs="-f ../../vendor/modules/opa/katalog/tests/kapp/exists.yaml"
     {{- end }}
 {{- end }}
 
