@@ -1852,7 +1852,7 @@ type SpecDistributionModulesLoggingLoki struct {
 	// Optional retention period for logs stored in Loki (default `720h`, 30 days).
 	// Setting it to `0s` disables retention. Format must match:
 	// `[0-9]+(s|m|h|d|w|y)`.
-	RetentionPeriod *string `json:"retentionPeriod,omitempty" yaml:"retentionPeriod,omitempty" mapstructure:"retentionPeriod,omitempty"`
+	RetentionTime *string `json:"retentionTime,omitempty" yaml:"retentionTime,omitempty" mapstructure:"retentionTime,omitempty"`
 
 	// Starting from versions 1.28.4, 1.29.5 and 1.30.0 of SIGHUP Distribution, Loki
 	// changed the time series database from BoltDB to TSDB and the schema that it
