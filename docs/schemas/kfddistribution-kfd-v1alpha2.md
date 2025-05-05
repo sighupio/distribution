@@ -1990,7 +1990,7 @@ This value defines where the output from the `systemdEtcd` Flow will be sent. Th
 | [backend](#specdistributionmoduleslogginglokibackend)                   | `string` | Optional |
 | [externalEndpoint](#specdistributionmoduleslogginglokiexternalendpoint) | `object` | Optional |
 | [resources](#specdistributionmoduleslogginglokiresources)               | `object` | Optional |
-| [retentionPeriod](#specdistributionmoduleslogginglokiretentionperiod)   | `string` | Optional |
+| [retentionTime](#specdistributionmoduleslogginglokiretentiontime)       | `string` | Optional |
 | [tsdbStartDate](#specdistributionmoduleslogginglokitsdbstartdate)       | `string` | Required |
 
 ### Description
@@ -2109,7 +2109,7 @@ The CPU request for the Pod, in cores. Example: `500m`.
 
 The memory request for the Pod. Example: `500M`.
 
-## .spec.distribution.modules.logging.loki.retentionPeriod
+## .spec.distribution.modules.logging.loki.retentionTime
 
 ### Description
 
