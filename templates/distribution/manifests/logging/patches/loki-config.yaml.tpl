@@ -71,7 +71,7 @@ limits_config:
   split_queries_by_interval: 15m
   volume_enabled: true
   max_label_names_per_series: 30
-  retention_period: {{ .spec.distribution.modules.logging.loki.retentionPeriod }}
+  retention_period: {{ .spec.distribution.modules.logging.loki.retentionTime }}
 memberlist:
   join_members:
   - loki-distributed-memberlist
@@ -135,7 +135,7 @@ storage_config:
       server_address: dns+loki-distributed-index-gateway-headless.logging.svc.cluster.local:9095
 compactor:
   working_directory: /var/loki/compactor
-  retention_enabled: {{ ne .spec.distribution.modules.logging.loki.retentionPeriod "0s" }}
+  retention_enabled: {{ ne .spec.distribution.modules.logging.loki.retentionTime "0s" }}
   retention_delete_delay: 2h
   retention_delete_worker_count: 150
   delete_request_store: s3
