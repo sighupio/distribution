@@ -41,9 +41,9 @@ spec:
               tolerations:
                 {{ template "tolerations" ( merge (dict "indent" 16 "returnEmptyInsteadOfNull" true) $certManagerArgs ) }}
 {{- end -}}
-{{- else if .spec.distribution.modules.ingress.certManager.clusterIssuer.solvers }}
+{{- else if index .spec.distribution.modules.ingress.certManager.clusterIssuer "solvers" }}
     solvers:
-      {{ .spec.distribution.modules.ingress.certManager.clusterIssuer.solvers | toYaml | nindent 6 }}
+      {{- .spec.distribution.modules.ingress.certManager.clusterIssuer.solvers | toYaml | nindent 6 }}
 {{- end }}
 
 {{- end -}}
