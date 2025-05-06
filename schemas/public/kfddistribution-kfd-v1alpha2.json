@@ -732,6 +732,9 @@
         "prometheusAgent": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Monitoring.PrometheusAgent"
         },
+        "prometheusAdapter": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Monitoring.PrometheusAdapter"
+        },
         "alertmanager": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Monitoring.AlertManager"
         },
@@ -786,6 +789,19 @@
         }
       }
     },
+    "Spec.Distribution.Modules.Monitoring.PrometheusAdapter": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "resources": {
+          "$ref": "#/$defs/Types.KubeResources"
+        },
+        "retentionTime": {
+          "type": "string",
+          "description": "The retention time for the `k8s` Prometheus instance."
+        }
+      }
+    },
     "Spec.Distribution.Modules.Monitoring.PrometheusAgent": {
       "type": "object",
       "additionalProperties": false,
@@ -793,12 +809,9 @@
         "resources": {
           "$ref": "#/$defs/Types.KubeResources"
         },
-        "remoteWrite": {
-          "description": "Set this option to ship the collected metrics to a remote Prometheus receiver.\n\n`remoteWrite` is an array of objects that allows configuring the [remoteWrite](https://prometheus.io/docs/specs/remote_write_spec/) options for Prometheus. The objects in the array follow [the same schema as in the prometheus operator](https://prometheus-operator.dev/docs/operator/api/#monitoring.coreos.com/v1.RemoteWriteSpec).",
-          "type": "array",
-          "items": {
-            "type": "object"
-          }
+        "installEnhancedHPAMetrics": {
+          "type": "boolean",
+          "description": "Configures whether to enable advanced HPA metric collection in the Prometheus Agent. When set to `true`, the Prometheus Adapter component will query Prometheus instances directly to retrieve additional metrics related to the Horizontal Pod Autoscaler (HPA). These metrics provide deeper visibility into HPA behavior and performance. **Caution:** Enabling this feature results in a significant increase in RAM consumption within the Prometheus Agent, as it requires managing an additional dataset. Default value: true."
         }
       }
     },
