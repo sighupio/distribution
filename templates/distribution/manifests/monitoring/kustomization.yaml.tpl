@@ -124,7 +124,7 @@ configMapGenerator:
     namespace: monitoring
     behavior: replace
     files:
-      - patches/adapter-config.yml
+      - config.yaml=patches/adapter-config.yml
   {{- end }}
 {{- end }}
 
