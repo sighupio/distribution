@@ -3,6 +3,7 @@
 # license that can be found in the LICENSE file.
 
 {{- $monitoringType := .spec.distribution.modules.monitoring.type }}
+{{- $installEnhancedHPAMetrics := .spec.distribution.modules.monitoring.prometheusAdapter.installEnhancedHPAMetrics }}
 # rendering Kustomization file for monitoring type {{ $monitoringType }}
 
 ---
@@ -107,10 +108,9 @@ patchesStrategicMerge:
 {{- end }}
 {{- end }}
 
-
+configMapGenerator:
 {{- if .checks.storageClassAvailable }}
   {{- if eq $monitoringType "mimir" }}
-configMapGenerator:
   - name: mimir-distributed-config
     namespace: monitoring
     behavior: replace
@@ -118,7 +118,15 @@ configMapGenerator:
       - patches/mimir.yaml
   {{- end }}
 {{- end }}
-
+{{- if or (eq $monitoringType "prometheus") (eq $monitoringType "mimir") }}
+  {{- if not $installEnhancedHPAMetrics }}
+  - name: adapter-config
+    namespace: monitoring
+    behavior: replace
+    files:
+      - patches/adapter-config.yml
+  {{- end }}
+{{- end }}
 
 secretGenerator:
 {{- if .checks.storageClassAvailable }}
