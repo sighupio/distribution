@@ -224,3 +224,7 @@ cert-manager.io/cluster-issuer: {{ .spec.distribution.modules.ingress.certManage
 {{ define "hubbleUrl" }}
   {{- template "ingressHost" (dict "module" "networking" "package" "hubble" "prefix" "hubble." "spec" .) -}}
 {{ end }}
+
+{{ define "docsUrl" }}
+  {{- template "ingressHost" (dict "module" "docs" "package" "docs" "prefix" "docs." "spec" .) -}}
+{{ end }}

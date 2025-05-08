@@ -834,6 +834,9 @@
         "dr": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Dr"
         },
+        "docs": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Docs"
+        },
         "ingress": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Ingress"
         },
@@ -859,6 +862,46 @@
         "logging",
         "policy"
       ]
+    },
+    "Spec.Distribution.Modules.Docs": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "overrides": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Docs.Overrides"
+        },
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "When enabled, the docs site will be included in the distribution and available at `docs.<baseDomain>`."
+        }
+      }
+    },
+    "Spec.Distribution.Modules.Docs.Overrides": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Override the common configuration with a particular configuration for the Docs module.",
+      "properties": {
+        "ingresses": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "docs": {
+              "$ref": "#/$defs/Types.FuryModuleOverridesIngress"
+            }
+          }        },
+        "nodeSelector": {
+          "$ref": "#/$defs/Types.KubeNodeSelector",
+          "description": "Set to override the node selector used to place the pods of the Ingress module."
+        },
+        "tolerations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Types.KubeToleration"
+          },
+          "description": "Set to override the tolerations that will be added to the pods of the Ingress module."
+        }
+      }
     },
     "Spec.Distribution.Modules.Ingress": {
       "type": "object",

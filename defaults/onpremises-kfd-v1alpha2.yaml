@@ -18,6 +18,13 @@ data:
     networkPoliciesEnabled: false
   # the module section will be used to fine tune each module behaviour and configuration
   modules:
+    docs:
+      enabled: true
+      overrides:
+        ingresses:
+          docs:
+            host: ""
+            ingressClass: ""
     # ingress module configuration
     ingress:
       overrides:
