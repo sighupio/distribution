@@ -23,7 +23,7 @@ The distribution is maintained with ❤️ by the team [SIGHUP by ReeVo](https:/
 - [[#393](https://github.com/sighupio/distribution/pull/393)]: This PR fixes an issue present when users start the cluster with ingress type none, TLS provider secret, and network policies disabled and try to enable them afterwards.
 - [[#401](https://github.com/sighupio/distribution/pull/401)]: Fixed an error in uninstalling the logging module that prevented switching from any logging type to `none` when the monitoring module was not installed.
 - [[#403](https://github.com/sighupio/distribution/pull/403)]: Fixed an error that prevented the generation of manifests when `ingress.nginx.type: none` and `ingress.certManager` configuration was not set.
-- [[#406](https://github.com/sighupio/distribution/pull/406)]: Gangplank, the SD tool to generate kubeconfigs with SSO now shows up the Ingress directory (Forecastle).
+- [[#406](https://github.com/sighupio/distribution/pull/406)]: Gangplank, the SD tool to generate kubeconfigs with SSO, now shows up the Ingress directory (Forecastle).
 
 ### Security fixes
 
