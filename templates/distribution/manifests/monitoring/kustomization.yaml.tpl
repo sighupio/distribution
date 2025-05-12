@@ -107,6 +107,22 @@ patchesStrategicMerge:
       name: k8s-slack-webhook
 {{- end }}
 {{- end }}
+{{- if or (eq $monitoringType "prometheus") (eq $monitoringType "mimir") }}
+  {{- if not $installEnhancedHPAMetrics }}
+  - |-
+    $patch: delete
+    apiVersion: apiregistration.k8s.io/v1
+    kind: APIService
+    metadata:
+      name: v1beta1.custom.metrics.k8s.io
+  - |-
+    $patch: delete
+    apiVersion: apiregistration.k8s.io/v1
+    kind: APIService
+    metadata:
+      name: v1beta1.external.metrics.k8s.io
+  {{- end }}
+{{- end }}
 
 configMapGenerator:
 {{- if .checks.storageClassAvailable }}
