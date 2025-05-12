@@ -15,6 +15,13 @@ The distribution is maintained with ❤️ by the team [SIGHUP by ReeVo](https:/
 ## New features 🌟
 - [[#396](https://github.com/sighupio/distribution/pull/396)]: This PR adds the retention configurations to Loki in logging module. This is an optional field to define retention period for logs stored in Loki. If not set, the default value is 30 days. Users can set it to `0s` to disable retention.
 - [[#391](https://github.com/sighupio/distribution/pull/391)]: With this PR users can enable the installation of network policies that will restrict the traffic across all the infrastructural namespaces of SD (SIGHUP Distribution) to just the access needed for its proper functioning and denying the rest of it. This experimental feature is now available also in the KFDDistribution provider.
+- [[#407](https://github.com/sighupio/distribution/pull/407)]: Adds the option to disable the default custom and external metrics provided by prometheus adapter. This change is needed when in the cluster there are no needs for advanced HPA capabilities. This also drastically reduce the memory used by prometheus adapter.
+How to use it:
+    ```yaml
+            monitoring:
+                prometheusAdapter:
+                    installEnhancedHPAMetrics: false # default is true
+    ```
 
 ## Fixes 🐞
 - [[#387](https://github.com/sighupio/distribution/pull/387)]: This PR fixed an issue that prevented the control planes nodes array to be treated as immutable under the OnPremises provider. The number of control plane nodes was originally set as immutable in the 1.31.1 release cycle because there isn't any support to scale the etcd cluster with the number of control plane nodes in the SIGHUP Distribution yet. The issue allowed users to change the number of the control plane, even if it was explicitly marked as immutable.
