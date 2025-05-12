@@ -40,7 +40,7 @@ metadata:
     cluster.kfd.sighup.io/useful-link.url: https://{{ template "gangplankUrl" .spec }}
     cluster.kfd.sighup.io/useful-link.name: "Gangplank"
     forecastle.stakater.com/expose: "true"
-    forecastle.stakater.com/appName: "Gangkplank - SSO Kubeconfig"
+    forecastle.stakater.com/appName: "Gangplank - SSO Kubeconfig"
     forecastle.stakater.com/icon: "https://raw.githubusercontent.com/sighupio/distribution/refs/heads/main/docs/assets/black-logo.png"
   {{- if eq .spec.distribution.modules.ingress.nginx.tls.provider "certManager" }}
     {{ template "certManagerClusterIssuer" . }}
