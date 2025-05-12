@@ -38,7 +38,7 @@ metadata:
     cluster.kfd.sighup.io/useful-link.enable: "true"
   annotations:
     cluster.kfd.sighup.io/useful-link.url: https://{{ template "gangplankUrl" .spec }}
-    cluster.kfd.sighup.io/useful-link.name: "Gangplak"
+    cluster.kfd.sighup.io/useful-link.name: "Gangplank"
     forecastle.stakater.com/expose: "true"
     forecastle.stakater.com/appName: "Gankplank - SSO Kubeconfig"
     forecastle.stakater.com/icon: "https://raw.githubusercontent.com/sighupio/distribution/refs/heads/main/docs/assets/black-logo.png"
