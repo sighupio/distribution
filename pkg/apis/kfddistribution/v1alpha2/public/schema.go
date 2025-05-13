@@ -1205,11 +1205,11 @@ type SpecDistributionModulesMonitoringPrometheus struct {
 
 type SpecDistributionModulesMonitoringPrometheusAdapter struct {
 	// Configures whether to enable advanced HPA metric collection in the Prometheus
-	// Agent. When set to `true`, the Prometheus Adapter component will query
+	// Adapter. When set to `true`, the Prometheus Adapter component will query
 	// Prometheus instances directly to retrieve additional metrics related to the
 	// Horizontal Pod Autoscaler (HPA). These metrics provide deeper visibility into
-	// HPA behavior and performance. **Caution:** Enabling this feature results in a
-	// significant increase in RAM consumption within the Prometheus Agent, as it
+	// HPA behaviour and performance. **Caution:** Enabling this feature results in a
+	// significant increase in RAM consumption of the Prometheus Adapter, as it
 	// requires managing an additional dataset. Default value: true.
 	InstallEnhancedHPAMetrics *bool `json:"installEnhancedHPAMetrics,omitempty" yaml:"installEnhancedHPAMetrics,omitempty" mapstructure:"installEnhancedHPAMetrics,omitempty"`
 
