@@ -142,6 +142,8 @@ data:
         retentionSize: 120GB
         storageSize: 150Gi
       prometheusAgent: {}
+      prometheusAdapter:
+        installEnhancedHPAMetrics: true
       alertmanager:
         installDefaultRules: true
         deadManSwitchWebhookUrl: ""

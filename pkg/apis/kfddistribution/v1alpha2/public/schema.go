@@ -1010,669 +1010,62 @@ const (
 	SpecDistributionModulesLoggingTypeCustomOutputs SpecDistributionModulesLoggingType = "customOutputs"
 	SpecDistributionModulesLoggingTypeLoki          SpecDistributionModulesLoggingType = "loki"
 	SpecDistributionModulesLoggingTypeNone          SpecDistributionModulesLoggingType = "none"
+	SpecDistributionModulesLoggingTypeOpensearch    SpecDistributionModulesLoggingType = "opensearch"
 )
 
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionModulesPolicyKyvernoValidationFailureAction) UnmarshalJSON(b []byte) error {
-	var v string
-	if err := json.Unmarshal(b, &v); err != nil {
-		return err
-	}
-	var ok bool
-	for _, expected := range enumValues_SpecDistributionModulesPolicyKyvernoValidationFailureAction {
-		if reflect.DeepEqual(v, expected) {
-			ok = true
-			break
-		}
-	}
-	if !ok {
-		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_SpecDistributionModulesPolicyKyvernoValidationFailureAction, v)
-	}
-	*j = SpecDistributionModulesPolicyKyvernoValidationFailureAction(v)
-	return nil
-}
+// Configuration for the Monitoring module.
+type SpecDistributionModulesMonitoring struct {
+	// Alertmanager corresponds to the JSON schema field "alertmanager".
+	Alertmanager *SpecDistributionModulesMonitoringAlertManager `json:"alertmanager,omitempty" yaml:"alertmanager,omitempty" mapstructure:"alertmanager,omitempty"`
 
-var enumValues_SpecDistributionModulesIngressNginxType = []interface{}{
-	"none",
-	"single",
-	"dual",
-}
+	// BlackboxExporter corresponds to the JSON schema field "blackboxExporter".
+	BlackboxExporter *SpecDistributionModulesMonitoringBlackboxExporter `json:"blackboxExporter,omitempty" yaml:"blackboxExporter,omitempty" mapstructure:"blackboxExporter,omitempty"`
 
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionModulesIngressNginxType) UnmarshalJSON(b []byte) error {
-	var v string
-	if err := json.Unmarshal(b, &v); err != nil {
-		return err
-	}
-	var ok bool
-	for _, expected := range enumValues_SpecDistributionModulesIngressNginxType {
-		if reflect.DeepEqual(v, expected) {
-			ok = true
-			break
-		}
-	}
-	if !ok {
-		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_SpecDistributionModulesIngressNginxType, v)
-	}
-	*j = SpecDistributionModulesIngressNginxType(v)
-	return nil
-}
+	// Grafana corresponds to the JSON schema field "grafana".
+	Grafana *SpecDistributionModulesMonitoringGrafana `json:"grafana,omitempty" yaml:"grafana,omitempty" mapstructure:"grafana,omitempty"`
 
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionModulesIngressNginxTLSSecret) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if v, ok := raw["ca"]; !ok || v == nil {
-		return fmt.Errorf("field ca in SpecDistributionModulesIngressNginxTLSSecret: required")
-	}
-	if v, ok := raw["cert"]; !ok || v == nil {
-		return fmt.Errorf("field cert in SpecDistributionModulesIngressNginxTLSSecret: required")
-	}
-	if v, ok := raw["key"]; !ok || v == nil {
-		return fmt.Errorf("field key in SpecDistributionModulesIngressNginxTLSSecret: required")
-	}
-	type Plain SpecDistributionModulesIngressNginxTLSSecret
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = SpecDistributionModulesIngressNginxTLSSecret(plain)
-	return nil
-}
+	// KubeStateMetrics corresponds to the JSON schema field "kubeStateMetrics".
+	KubeStateMetrics *SpecDistributionModulesMonitoringKubeStateMetrics `json:"kubeStateMetrics,omitempty" yaml:"kubeStateMetrics,omitempty" mapstructure:"kubeStateMetrics,omitempty"`
 
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionModulesIngressNginxTLSProvider) UnmarshalJSON(b []byte) error {
-	var v string
-	if err := json.Unmarshal(b, &v); err != nil {
-		return err
-	}
-	var ok bool
-	for _, expected := range enumValues_SpecDistributionModulesIngressNginxTLSProvider {
-		if reflect.DeepEqual(v, expected) {
-			ok = true
-			break
-		}
-	}
-	if !ok {
-		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_SpecDistributionModulesIngressNginxTLSProvider, v)
-	}
-	*j = SpecDistributionModulesIngressNginxTLSProvider(v)
-	return nil
-}
+	// Mimir corresponds to the JSON schema field "mimir".
+	Mimir *SpecDistributionModulesMonitoringMimir `json:"mimir,omitempty" yaml:"mimir,omitempty" mapstructure:"mimir,omitempty"`
 
-var enumValues_SpecDistributionModulesIngressNginxTLSProvider = []interface{}{
-	"certManager",
-	"secret",
-	"none",
-}
+	// Minio corresponds to the JSON schema field "minio".
+	Minio *SpecDistributionModulesMonitoringMinio `json:"minio,omitempty" yaml:"minio,omitempty" mapstructure:"minio,omitempty"`
 
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionModulesIngressCertManager) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if v, ok := raw["clusterIssuer"]; !ok || v == nil {
-		return fmt.Errorf("field clusterIssuer in SpecDistributionModulesIngressCertManager: required")
-	}
-	type Plain SpecDistributionModulesIngressCertManager
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = SpecDistributionModulesIngressCertManager(plain)
-	return nil
-}
+	// Overrides corresponds to the JSON schema field "overrides".
+	Overrides *TypesFuryModuleOverrides `json:"overrides,omitempty" yaml:"overrides,omitempty" mapstructure:"overrides,omitempty"`
 
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionModulesIngressNginx) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if v, ok := raw["type"]; !ok || v == nil {
-		return fmt.Errorf("field type in SpecDistributionModulesIngressNginx: required")
-	}
-	type Plain SpecDistributionModulesIngressNginx
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = SpecDistributionModulesIngressNginx(plain)
-	return nil
-}
+	// Prometheus corresponds to the JSON schema field "prometheus".
+	Prometheus *SpecDistributionModulesMonitoringPrometheus `json:"prometheus,omitempty" yaml:"prometheus,omitempty" mapstructure:"prometheus,omitempty"`
 
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionModulesIngressCertManagerClusterIssuer) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if v, ok := raw["email"]; !ok || v == nil {
-		return fmt.Errorf("field email in SpecDistributionModulesIngressCertManagerClusterIssuer: required")
-	}
-	if v, ok := raw["name"]; !ok || v == nil {
-		return fmt.Errorf("field name in SpecDistributionModulesIngressCertManagerClusterIssuer: required")
-	}
-	type Plain SpecDistributionModulesIngressCertManagerClusterIssuer
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = SpecDistributionModulesIngressCertManagerClusterIssuer(plain)
-	return nil
-}
+	// PrometheusAdapter corresponds to the JSON schema field "prometheusAdapter".
+	PrometheusAdapter *SpecDistributionModulesMonitoringPrometheusAdapter `json:"prometheusAdapter,omitempty" yaml:"prometheusAdapter,omitempty" mapstructure:"prometheusAdapter,omitempty"`
 
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionModulesIngressCertManagerClusterIssuerType) UnmarshalJSON(b []byte) error {
-	var v string
-	if err := json.Unmarshal(b, &v); err != nil {
-		return err
-	}
-	var ok bool
-	for _, expected := range enumValues_SpecDistributionModulesIngressCertManagerClusterIssuerType {
-		if reflect.DeepEqual(v, expected) {
-			ok = true
-			break
-		}
-	}
-	if !ok {
-		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_SpecDistributionModulesIngressCertManagerClusterIssuerType, v)
-	}
-	*j = SpecDistributionModulesIngressCertManagerClusterIssuerType(v)
-	return nil
-}
+	// PrometheusAgent corresponds to the JSON schema field "prometheusAgent".
+	PrometheusAgent *SpecDistributionModulesMonitoringPrometheusAgent `json:"prometheusAgent,omitempty" yaml:"prometheusAgent,omitempty" mapstructure:"prometheusAgent,omitempty"`
 
-var enumValues_SpecDistributionModulesIngressCertManagerClusterIssuerType = []interface{}{
-	"http01",
-}
+	// The type of the monitoring, must be `none`, `prometheus`, `prometheusAgent` or
+	// `mimir`.
+	//
+	// - `none`: will disable the whole monitoring stack.
+	// - `prometheus`: will install Prometheus Operator and a preconfigured Prometheus
+	// instance, Alertmanager, a set of alert rules, exporters needed to monitor all
+	// the components of the cluster, Grafana and a series of dashboards to view the
+	// collected metrics, and more.
+	// - `prometheusAgent`: will install Prometheus operator, an instance of
+	// Prometheus in Agent mode (no alerting, no queries, no storage), and all the
+	// exporters needed to get metrics for the status of the cluster and the
+	// workloads. Useful when having a centralized (remote) Prometheus where to ship
+	// the metrics and not storing them locally in the cluster.
+	// - `mimir`: will install the same as the `prometheus` option, plus Grafana Mimir
+	// that allows for longer retention of metrics and the usage of Object Storage.
+	//
+	// Default is `prometheus`.
+	Type SpecDistributionModulesMonitoringType `json:"type" yaml:"type" mapstructure:"type"`
 
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionModulesIngress) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if v, ok := raw["baseDomain"]; !ok || v == nil {
-		return fmt.Errorf("field baseDomain in SpecDistributionModulesIngress: required")
-	}
-	if v, ok := raw["nginx"]; !ok || v == nil {
-		return fmt.Errorf("field nginx in SpecDistributionModulesIngress: required")
-	}
-	type Plain SpecDistributionModulesIngress
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = SpecDistributionModulesIngress(plain)
-	return nil
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionModulesDr) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if v, ok := raw["type"]; !ok || v == nil {
-		return fmt.Errorf("field type in SpecDistributionModulesDr: required")
-	}
-	type Plain SpecDistributionModulesDr
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = SpecDistributionModulesDr(plain)
-	return nil
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionModulesDrVeleroBackend) UnmarshalJSON(b []byte) error {
-	var v string
-	if err := json.Unmarshal(b, &v); err != nil {
-		return err
-	}
-	var ok bool
-	for _, expected := range enumValues_SpecDistributionModulesDrVeleroBackend {
-		if reflect.DeepEqual(v, expected) {
-			ok = true
-			break
-		}
-	}
-	if !ok {
-		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_SpecDistributionModulesDrVeleroBackend, v)
-	}
-	*j = SpecDistributionModulesDrVeleroBackend(v)
-	return nil
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionModulesLoggingCustomOutputs) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if v, ok := raw["audit"]; !ok || v == nil {
-		return fmt.Errorf("field audit in SpecDistributionModulesLoggingCustomOutputs: required")
-	}
-	if v, ok := raw["errors"]; !ok || v == nil {
-		return fmt.Errorf("field errors in SpecDistributionModulesLoggingCustomOutputs: required")
-	}
-	if v, ok := raw["events"]; !ok || v == nil {
-		return fmt.Errorf("field events in SpecDistributionModulesLoggingCustomOutputs: required")
-	}
-	if v, ok := raw["infra"]; !ok || v == nil {
-		return fmt.Errorf("field infra in SpecDistributionModulesLoggingCustomOutputs: required")
-	}
-	if v, ok := raw["ingressNginx"]; !ok || v == nil {
-		return fmt.Errorf("field ingressNginx in SpecDistributionModulesLoggingCustomOutputs: required")
-	}
-	if v, ok := raw["kubernetes"]; !ok || v == nil {
-		return fmt.Errorf("field kubernetes in SpecDistributionModulesLoggingCustomOutputs: required")
-	}
-	if v, ok := raw["systemdCommon"]; !ok || v == nil {
-		return fmt.Errorf("field systemdCommon in SpecDistributionModulesLoggingCustomOutputs: required")
-	}
-	if v, ok := raw["systemdEtcd"]; !ok || v == nil {
-		return fmt.Errorf("field systemdEtcd in SpecDistributionModulesLoggingCustomOutputs: required")
-	}
-	type Plain SpecDistributionModulesLoggingCustomOutputs
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = SpecDistributionModulesLoggingCustomOutputs(plain)
-	return nil
-}
-
-var enumValues_SpecDistributionModulesDrVeleroBackend = []interface{}{
-	"minio",
-	"externalEndpoint",
-}
-
-var enumValues_SpecDistributionModulesLoggingLokiBackend = []interface{}{
-	"minio",
-	"externalEndpoint",
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionModulesLoggingLokiBackend) UnmarshalJSON(b []byte) error {
-	var v string
-	if err := json.Unmarshal(b, &v); err != nil {
-		return err
-	}
-	var ok bool
-	for _, expected := range enumValues_SpecDistributionModulesLoggingLokiBackend {
-		if reflect.DeepEqual(v, expected) {
-			ok = true
-			break
-		}
-	}
-	if !ok {
-		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_SpecDistributionModulesLoggingLokiBackend, v)
-	}
-	*j = SpecDistributionModulesLoggingLokiBackend(v)
-	return nil
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionModulesDrType) UnmarshalJSON(b []byte) error {
-	var v string
-	if err := json.Unmarshal(b, &v); err != nil {
-		return err
-	}
-	var ok bool
-	for _, expected := range enumValues_SpecDistributionModulesDrType {
-		if reflect.DeepEqual(v, expected) {
-			ok = true
-			break
-		}
-	}
-	if !ok {
-		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_SpecDistributionModulesDrType, v)
-	}
-	*j = SpecDistributionModulesDrType(v)
-	return nil
-}
-
-var enumValues_SpecDistributionModulesDrType = []interface{}{
-	"none",
-	"on-premises",
-}
-
-// Override the common configuration with a particular configuration for the
-// module.
-type TypesFuryModuleOverrides struct {
-	// Ingresses corresponds to the JSON schema field "ingresses".
-	Ingresses TypesFuryModuleOverridesIngresses `json:"ingresses,omitempty" yaml:"ingresses,omitempty" mapstructure:"ingresses,omitempty"`
-
-	// Set to override the node selector used to place the pods of the module.
-	NodeSelector TypesKubeNodeSelector `json:"nodeSelector,omitempty" yaml:"nodeSelector,omitempty" mapstructure:"nodeSelector,omitempty"`
-
-	// Set to override the tolerations that will be added to the pods of the module.
-	Tolerations []TypesKubeToleration `json:"tolerations,omitempty" yaml:"tolerations,omitempty" mapstructure:"tolerations,omitempty"`
-}
-
-type TypesKubeResourcesLimits struct {
-	// The CPU limit for the Pod. Example: `1000m`.
-	Cpu *string `json:"cpu,omitempty" yaml:"cpu,omitempty" mapstructure:"cpu,omitempty"`
-
-	// The memory limit for the Pod. Example: `1G`.
-	Memory *string `json:"memory,omitempty" yaml:"memory,omitempty" mapstructure:"memory,omitempty"`
-}
-
-type TypesKubeResourcesRequests struct {
-	// The CPU request for the Pod, in cores. Example: `500m`.
-	Cpu *string `json:"cpu,omitempty" yaml:"cpu,omitempty" mapstructure:"cpu,omitempty"`
-
-	// The memory request for the Pod. Example: `500M`.
-	Memory *string `json:"memory,omitempty" yaml:"memory,omitempty" mapstructure:"memory,omitempty"`
-}
-
-type TypesKubeResources struct {
-	// Limits corresponds to the JSON schema field "limits".
-	Limits *TypesKubeResourcesLimits `json:"limits,omitempty" yaml:"limits,omitempty" mapstructure:"limits,omitempty"`
-
-	// Requests corresponds to the JSON schema field "requests".
-	Requests *TypesKubeResourcesRequests `json:"requests,omitempty" yaml:"requests,omitempty" mapstructure:"requests,omitempty"`
-}
-
-type TypesFuryModuleOverridesIngresses map[string]TypesFuryModuleOverridesIngress
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionModulesLoggingLoki) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if v, ok := raw["tsdbStartDate"]; !ok || v == nil {
-		return fmt.Errorf("field tsdbStartDate in SpecDistributionModulesLoggingLoki: required")
-	}
-	type Plain SpecDistributionModulesLoggingLoki
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = SpecDistributionModulesLoggingLoki(plain)
-	return nil
-}
-
-type TypesFuryModuleOverridesIngress struct {
-	// If true, the ingress will not have authentication even if
-	// `.spec.modules.auth.provider.type` is SSO or Basic Auth.
-	DisableAuth *bool `json:"disableAuth,omitempty" yaml:"disableAuth,omitempty" mapstructure:"disableAuth,omitempty"`
-
-	// Use this host for the ingress instead of the default one.
-	Host *string `json:"host,omitempty" yaml:"host,omitempty" mapstructure:"host,omitempty"`
-
-	// Use this ingress class for the ingress instead of the default one.
-	IngressClass *string `json:"ingressClass,omitempty" yaml:"ingressClass,omitempty" mapstructure:"ingressClass,omitempty"`
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionModulesAuth) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if v, ok := raw["provider"]; !ok || v == nil {
-		return fmt.Errorf("field provider in SpecDistributionModulesAuth: required")
-	}
-	type Plain SpecDistributionModulesAuth
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = SpecDistributionModulesAuth(plain)
-	return nil
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionModulesAuthProvider) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if v, ok := raw["type"]; !ok || v == nil {
-		return fmt.Errorf("field type in SpecDistributionModulesAuthProvider: required")
-	}
-	type Plain SpecDistributionModulesAuthProvider
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = SpecDistributionModulesAuthProvider(plain)
-	return nil
-}
-
-var enumValues_SpecDistributionModulesLoggingOpensearchType = []interface{}{
-	"single",
-	"triple",
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionModulesLoggingOpensearchType) UnmarshalJSON(b []byte) error {
-	var v string
-	if err := json.Unmarshal(b, &v); err != nil {
-		return err
-	}
-	var ok bool
-	for _, expected := range enumValues_SpecDistributionModulesLoggingOpensearchType {
-		if reflect.DeepEqual(v, expected) {
-			ok = true
-			break
-		}
-	}
-	if !ok {
-		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_SpecDistributionModulesLoggingOpensearchType, v)
-	}
-	*j = SpecDistributionModulesLoggingOpensearchType(v)
-	return nil
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionModulesAuthProviderType) UnmarshalJSON(b []byte) error {
-	var v string
-	if err := json.Unmarshal(b, &v); err != nil {
-		return err
-	}
-	var ok bool
-	for _, expected := range enumValues_SpecDistributionModulesAuthProviderType {
-		if reflect.DeepEqual(v, expected) {
-			ok = true
-			break
-		}
-	}
-	if !ok {
-		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_SpecDistributionModulesAuthProviderType, v)
-	}
-	*j = SpecDistributionModulesAuthProviderType(v)
-	return nil
-}
-
-var enumValues_SpecDistributionModulesAuthProviderType = []interface{}{
-	"none",
-	"basicAuth",
-	"sso",
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionModulesAuthProviderBasicAuth) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if v, ok := raw["password"]; !ok || v == nil {
-		return fmt.Errorf("field password in SpecDistributionModulesAuthProviderBasicAuth: required")
-	}
-	if v, ok := raw["username"]; !ok || v == nil {
-		return fmt.Errorf("field username in SpecDistributionModulesAuthProviderBasicAuth: required")
-	}
-	type Plain SpecDistributionModulesAuthProviderBasicAuth
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = SpecDistributionModulesAuthProviderBasicAuth(plain)
-	return nil
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionModulesLoggingOpensearch) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if v, ok := raw["type"]; !ok || v == nil {
-		return fmt.Errorf("field type in SpecDistributionModulesLoggingOpensearch: required")
-	}
-	type Plain SpecDistributionModulesLoggingOpensearch
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = SpecDistributionModulesLoggingOpensearch(plain)
-	return nil
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionModulesAuthOverridesIngress) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if v, ok := raw["host"]; !ok || v == nil {
-		return fmt.Errorf("field host in SpecDistributionModulesAuthOverridesIngress: required")
-	}
-	if v, ok := raw["ingressClass"]; !ok || v == nil {
-		return fmt.Errorf("field ingressClass in SpecDistributionModulesAuthOverridesIngress: required")
-	}
-	type Plain SpecDistributionModulesAuthOverridesIngress
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = SpecDistributionModulesAuthOverridesIngress(plain)
-	return nil
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionModulesAuthDex) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if v, ok := raw["connectors"]; !ok || v == nil {
-		return fmt.Errorf("field connectors in SpecDistributionModulesAuthDex: required")
-	}
-	type Plain SpecDistributionModulesAuthDex
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = SpecDistributionModulesAuthDex(plain)
-	return nil
-}
-
-var enumValues_SpecDistributionModulesLoggingType = []interface{}{
-	"none",
-	"opensearch",
-	"loki",
-	"customOutputs",
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionModulesLoggingType) UnmarshalJSON(b []byte) error {
-	var v string
-	if err := json.Unmarshal(b, &v); err != nil {
-		return err
-	}
-	var ok bool
-	for _, expected := range enumValues_SpecDistributionModulesLoggingType {
-		if reflect.DeepEqual(v, expected) {
-			ok = true
-			break
-		}
-	}
-	if !ok {
-		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_SpecDistributionModulesLoggingType, v)
-	}
-	*j = SpecDistributionModulesLoggingType(v)
-	return nil
-}
-
-type TypesFuryModuleComponentOverrides struct {
-	// Set to override the node selector used to place the pods of the package.
-	NodeSelector TypesKubeNodeSelector `json:"nodeSelector,omitempty" yaml:"nodeSelector,omitempty" mapstructure:"nodeSelector,omitempty"`
-
-	// Set to override the tolerations that will be added to the pods of the package.
-	Tolerations []TypesKubeToleration `json:"tolerations,omitempty" yaml:"tolerations,omitempty" mapstructure:"tolerations,omitempty"`
-}
-
-const SpecDistributionModulesLoggingTypeOpensearch SpecDistributionModulesLoggingType = "opensearch"
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionCustomPatchesSecretGeneratorResource) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if v, ok := raw["name"]; !ok || v == nil {
-		return fmt.Errorf("field name in SpecDistributionCustomPatchesSecretGeneratorResource: required")
-	}
-	type Plain SpecDistributionCustomPatchesSecretGeneratorResource
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = SpecDistributionCustomPatchesSecretGeneratorResource(plain)
-	return nil
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionCustomPatchesSecretGeneratorResourceBehavior) UnmarshalJSON(b []byte) error {
-	var v string
-	if err := json.Unmarshal(b, &v); err != nil {
-		return err
-	}
-	var ok bool
-	for _, expected := range enumValues_SpecDistributionCustomPatchesSecretGeneratorResourceBehavior {
-		if reflect.DeepEqual(v, expected) {
-			ok = true
-			break
-		}
-	}
-	if !ok {
-		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_SpecDistributionCustomPatchesSecretGeneratorResourceBehavior, v)
-	}
-	*j = SpecDistributionCustomPatchesSecretGeneratorResourceBehavior(v)
-	return nil
-}
-
-var enumValues_SpecDistributionCustomPatchesSecretGeneratorResourceBehavior = []interface{}{
-	"create",
-	"replace",
-	"merge",
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionModulesLogging) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if v, ok := raw["type"]; !ok || v == nil {
-		return fmt.Errorf("field type in SpecDistributionModulesLogging: required")
-	}
-	type Plain SpecDistributionModulesLogging
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = SpecDistributionModulesLogging(plain)
-	return nil
+	// X509Exporter corresponds to the JSON schema field "x509Exporter".
+	X509Exporter *SpecDistributionModulesMonitoringX509Exporter `json:"x509Exporter,omitempty" yaml:"x509Exporter,omitempty" mapstructure:"x509Exporter,omitempty"`
 }
 
 type SpecDistributionModulesMonitoringAlertManager struct {
@@ -1723,36 +1116,30 @@ type SpecDistributionModulesMonitoringKubeStateMetrics struct {
 	Overrides *TypesFuryModuleComponentOverrides `json:"overrides,omitempty" yaml:"overrides,omitempty" mapstructure:"overrides,omitempty"`
 }
 
+// Configuration for the Mimir package.
+type SpecDistributionModulesMonitoringMimir struct {
+	// The storage backend type for Mimir. `minio` will use an in-cluster MinIO
+	// deployment for object storage, `externalEndpoint` can be used to point to an
+	// external S3-compatible object storage instead of deploying an in-cluster MinIO.
+	Backend *SpecDistributionModulesMonitoringMimirBackend `json:"backend,omitempty" yaml:"backend,omitempty" mapstructure:"backend,omitempty"`
+
+	// Configuration for Mimir's external storage backend.
+	ExternalEndpoint *SpecDistributionModulesMonitoringMimirExternalEndpoint `json:"externalEndpoint,omitempty" yaml:"externalEndpoint,omitempty" mapstructure:"externalEndpoint,omitempty"`
+
+	// Overrides corresponds to the JSON schema field "overrides".
+	Overrides *TypesFuryModuleComponentOverrides `json:"overrides,omitempty" yaml:"overrides,omitempty" mapstructure:"overrides,omitempty"`
+
+	// The retention time for the logs stored in Mimir. Default is `30d`. Value must
+	// match the regular expression `[0-9]+(ns|us|µs|ms|s|m|h|d|w|y)` where y = 365
+	// days.
+	RetentionTime *string `json:"retentionTime,omitempty" yaml:"retentionTime,omitempty" mapstructure:"retentionTime,omitempty"`
+}
+
 type SpecDistributionModulesMonitoringMimirBackend string
 
-var enumValues_SpecDistributionModulesMonitoringMimirBackend = []interface{}{
-	"minio",
-	"externalEndpoint",
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionModulesMonitoringMimirBackend) UnmarshalJSON(b []byte) error {
-	var v string
-	if err := json.Unmarshal(b, &v); err != nil {
-		return err
-	}
-	var ok bool
-	for _, expected := range enumValues_SpecDistributionModulesMonitoringMimirBackend {
-		if reflect.DeepEqual(v, expected) {
-			ok = true
-			break
-		}
-	}
-	if !ok {
-		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_SpecDistributionModulesMonitoringMimirBackend, v)
-	}
-	*j = SpecDistributionModulesMonitoringMimirBackend(v)
-	return nil
-}
-
 const (
-	SpecDistributionModulesMonitoringMimirBackendMinio            SpecDistributionModulesMonitoringMimirBackend = "minio"
 	SpecDistributionModulesMonitoringMimirBackendExternalEndpoint SpecDistributionModulesMonitoringMimirBackend = "externalEndpoint"
+	SpecDistributionModulesMonitoringMimirBackendMinio            SpecDistributionModulesMonitoringMimirBackend = "minio"
 )
 
 // Configuration for Mimir's external storage backend.
@@ -1773,33 +1160,6 @@ type SpecDistributionModulesMonitoringMimirExternalEndpoint struct {
 	SecretAccessKey *string `json:"secretAccessKey,omitempty" yaml:"secretAccessKey,omitempty" mapstructure:"secretAccessKey,omitempty"`
 }
 
-// Configuration for the Mimir package.
-type SpecDistributionModulesMonitoringMimir struct {
-	// The storage backend type for Mimir. `minio` will use an in-cluster MinIO
-	// deployment for object storage, `externalEndpoint` can be used to point to an
-	// external S3-compatible object storage instead of deploying an in-cluster MinIO.
-	Backend *SpecDistributionModulesMonitoringMimirBackend `json:"backend,omitempty" yaml:"backend,omitempty" mapstructure:"backend,omitempty"`
-
-	// Configuration for Mimir's external storage backend.
-	ExternalEndpoint *SpecDistributionModulesMonitoringMimirExternalEndpoint `json:"externalEndpoint,omitempty" yaml:"externalEndpoint,omitempty" mapstructure:"externalEndpoint,omitempty"`
-
-	// Overrides corresponds to the JSON schema field "overrides".
-	Overrides *TypesFuryModuleComponentOverrides `json:"overrides,omitempty" yaml:"overrides,omitempty" mapstructure:"overrides,omitempty"`
-
-	// The retention time for the logs stored in Mimir. Default is `30d`. Value must
-	// match the regular expression `[0-9]+(ns|us|µs|ms|s|m|h|d|w|y)` where y = 365
-	// days.
-	RetentionTime *string `json:"retentionTime,omitempty" yaml:"retentionTime,omitempty" mapstructure:"retentionTime,omitempty"`
-}
-
-type SpecDistributionModulesMonitoringMinioRootUser struct {
-	// The password for the default MinIO root user.
-	Password *string `json:"password,omitempty" yaml:"password,omitempty" mapstructure:"password,omitempty"`
-
-	// The username for the default MinIO root user.
-	Username *string `json:"username,omitempty" yaml:"username,omitempty" mapstructure:"username,omitempty"`
-}
-
 // Configuration for Monitoring's MinIO deployment.
 type SpecDistributionModulesMonitoringMinio struct {
 	// Overrides corresponds to the JSON schema field "overrides".
@@ -1812,7 +1172,13 @@ type SpecDistributionModulesMonitoringMinio struct {
 	StorageSize *string `json:"storageSize,omitempty" yaml:"storageSize,omitempty" mapstructure:"storageSize,omitempty"`
 }
 
-type SpecDistributionModulesMonitoringPrometheusRemoteWriteElem map[string]interface{}
+type SpecDistributionModulesMonitoringMinioRootUser struct {
+	// The password for the default MinIO root user.
+	Password *string `json:"password,omitempty" yaml:"password,omitempty" mapstructure:"password,omitempty"`
+
+	// The username for the default MinIO root user.
+	Username *string `json:"username,omitempty" yaml:"username,omitempty" mapstructure:"username,omitempty"`
+}
 
 type SpecDistributionModulesMonitoringPrometheus struct {
 	// Set this option to ship the collected metrics to a remote Prometheus receiver.
@@ -1837,7 +1203,19 @@ type SpecDistributionModulesMonitoringPrometheus struct {
 	StorageSize *string `json:"storageSize,omitempty" yaml:"storageSize,omitempty" mapstructure:"storageSize,omitempty"`
 }
 
-type SpecDistributionModulesMonitoringPrometheusAgentRemoteWriteElem map[string]interface{}
+type SpecDistributionModulesMonitoringPrometheusAdapter struct {
+	// Configures whether to enable advanced HPA metric collection in the Prometheus
+	// Adapter. When set to `true`, the Prometheus Adapter component will query
+	// Prometheus instances directly to retrieve additional metrics related to the
+	// Horizontal Pod Autoscaler (HPA). These metrics provide deeper visibility into
+	// HPA behaviour and performance. **Caution:** Enabling this feature results in a
+	// significant increase in RAM consumption of the Prometheus Adapter, as it
+	// requires managing an additional dataset. Default value: true.
+	InstallEnhancedHPAMetrics *bool `json:"installEnhancedHPAMetrics,omitempty" yaml:"installEnhancedHPAMetrics,omitempty" mapstructure:"installEnhancedHPAMetrics,omitempty"`
+
+	// Resources corresponds to the JSON schema field "resources".
+	Resources *TypesKubeResources `json:"resources,omitempty" yaml:"resources,omitempty" mapstructure:"resources,omitempty"`
+}
 
 type SpecDistributionModulesMonitoringPrometheusAgent struct {
 	// Set this option to ship the collected metrics to a remote Prometheus receiver.
@@ -1853,191 +1231,23 @@ type SpecDistributionModulesMonitoringPrometheusAgent struct {
 	Resources *TypesKubeResources `json:"resources,omitempty" yaml:"resources,omitempty" mapstructure:"resources,omitempty"`
 }
 
+type SpecDistributionModulesMonitoringPrometheusAgentRemoteWriteElem map[string]interface{}
+
+type SpecDistributionModulesMonitoringPrometheusRemoteWriteElem map[string]interface{}
+
 type SpecDistributionModulesMonitoringType string
 
-var enumValues_SpecDistributionModulesMonitoringType = []interface{}{
-	"none",
-	"prometheus",
-	"prometheusAgent",
-	"mimir",
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionModulesMonitoringType) UnmarshalJSON(b []byte) error {
-	var v string
-	if err := json.Unmarshal(b, &v); err != nil {
-		return err
-	}
-	var ok bool
-	for _, expected := range enumValues_SpecDistributionModulesMonitoringType {
-		if reflect.DeepEqual(v, expected) {
-			ok = true
-			break
-		}
-	}
-	if !ok {
-		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_SpecDistributionModulesMonitoringType, v)
-	}
-	*j = SpecDistributionModulesMonitoringType(v)
-	return nil
-}
-
 const (
+	SpecDistributionModulesMonitoringTypeMimir           SpecDistributionModulesMonitoringType = "mimir"
 	SpecDistributionModulesMonitoringTypeNone            SpecDistributionModulesMonitoringType = "none"
 	SpecDistributionModulesMonitoringTypePrometheus      SpecDistributionModulesMonitoringType = "prometheus"
 	SpecDistributionModulesMonitoringTypePrometheusAgent SpecDistributionModulesMonitoringType = "prometheusAgent"
-	SpecDistributionModulesMonitoringTypeMimir           SpecDistributionModulesMonitoringType = "mimir"
 )
 
 type SpecDistributionModulesMonitoringX509Exporter struct {
 	// Overrides corresponds to the JSON schema field "overrides".
 	Overrides *TypesFuryModuleComponentOverrides `json:"overrides,omitempty" yaml:"overrides,omitempty" mapstructure:"overrides,omitempty"`
 }
-
-// Configuration for the Monitoring module.
-type SpecDistributionModulesMonitoring struct {
-	// Alertmanager corresponds to the JSON schema field "alertmanager".
-	Alertmanager *SpecDistributionModulesMonitoringAlertManager `json:"alertmanager,omitempty" yaml:"alertmanager,omitempty" mapstructure:"alertmanager,omitempty"`
-
-	// BlackboxExporter corresponds to the JSON schema field "blackboxExporter".
-	BlackboxExporter *SpecDistributionModulesMonitoringBlackboxExporter `json:"blackboxExporter,omitempty" yaml:"blackboxExporter,omitempty" mapstructure:"blackboxExporter,omitempty"`
-
-	// Grafana corresponds to the JSON schema field "grafana".
-	Grafana *SpecDistributionModulesMonitoringGrafana `json:"grafana,omitempty" yaml:"grafana,omitempty" mapstructure:"grafana,omitempty"`
-
-	// KubeStateMetrics corresponds to the JSON schema field "kubeStateMetrics".
-	KubeStateMetrics *SpecDistributionModulesMonitoringKubeStateMetrics `json:"kubeStateMetrics,omitempty" yaml:"kubeStateMetrics,omitempty" mapstructure:"kubeStateMetrics,omitempty"`
-
-	// Mimir corresponds to the JSON schema field "mimir".
-	Mimir *SpecDistributionModulesMonitoringMimir `json:"mimir,omitempty" yaml:"mimir,omitempty" mapstructure:"mimir,omitempty"`
-
-	// Minio corresponds to the JSON schema field "minio".
-	Minio *SpecDistributionModulesMonitoringMinio `json:"minio,omitempty" yaml:"minio,omitempty" mapstructure:"minio,omitempty"`
-
-	// Overrides corresponds to the JSON schema field "overrides".
-	Overrides *TypesFuryModuleOverrides `json:"overrides,omitempty" yaml:"overrides,omitempty" mapstructure:"overrides,omitempty"`
-
-	// Prometheus corresponds to the JSON schema field "prometheus".
-	Prometheus *SpecDistributionModulesMonitoringPrometheus `json:"prometheus,omitempty" yaml:"prometheus,omitempty" mapstructure:"prometheus,omitempty"`
-
-	// PrometheusAgent corresponds to the JSON schema field "prometheusAgent".
-	PrometheusAgent *SpecDistributionModulesMonitoringPrometheusAgent `json:"prometheusAgent,omitempty" yaml:"prometheusAgent,omitempty" mapstructure:"prometheusAgent,omitempty"`
-
-	// The type of the monitoring, must be `none`, `prometheus`, `prometheusAgent` or
-	// `mimir`.
-	//
-	// - `none`: will disable the whole monitoring stack.
-	// - `prometheus`: will install Prometheus Operator and a preconfigured Prometheus
-	// instance, Alertmanager, a set of alert rules, exporters needed to monitor all
-	// the components of the cluster, Grafana and a series of dashboards to view the
-	// collected metrics, and more.
-	// - `prometheusAgent`: will install Prometheus operator, an instance of
-	// Prometheus in Agent mode (no alerting, no queries, no storage), and all the
-	// exporters needed to get metrics for the status of the cluster and the
-	// workloads. Useful when having a centralized (remote) Prometheus where to ship
-	// the metrics and not storing them locally in the cluster.
-	// - `mimir`: will install the same as the `prometheus` option, plus Grafana Mimir
-	// that allows for longer retention of metrics and the usage of Object Storage.
-	//
-	// Default is `prometheus`.
-	Type SpecDistributionModulesMonitoringType `json:"type" yaml:"type" mapstructure:"type"`
-
-	// X509Exporter corresponds to the JSON schema field "x509Exporter".
-	X509Exporter *SpecDistributionModulesMonitoringX509Exporter `json:"x509Exporter,omitempty" yaml:"x509Exporter,omitempty" mapstructure:"x509Exporter,omitempty"`
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionModulesMonitoring) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if v, ok := raw["type"]; !ok || v == nil {
-		return fmt.Errorf("field type in SpecDistributionModulesMonitoring: required")
-	}
-	type Plain SpecDistributionModulesMonitoring
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = SpecDistributionModulesMonitoring(plain)
-	return nil
-}
-
-type TypesCidr string
-
-type SpecDistributionModulesNetworkingCilium struct {
-	// The mask size to use for the Pods network on each node.
-	MaskSize string `json:"maskSize" yaml:"maskSize" mapstructure:"maskSize"`
-
-	// Overrides corresponds to the JSON schema field "overrides".
-	Overrides *TypesFuryModuleComponentOverrides `json:"overrides,omitempty" yaml:"overrides,omitempty" mapstructure:"overrides,omitempty"`
-
-	// Allows specifing a CIDR for the Pods network different from
-	// `.spec.kubernetes.podCidr`. If not set the default is to use
-	// `.spec.kubernetes.podCidr`.
-	PodCidr TypesCidr `json:"podCidr" yaml:"podCidr" mapstructure:"podCidr"`
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionModulesNetworkingCilium) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if v, ok := raw["maskSize"]; !ok || v == nil {
-		return fmt.Errorf("field maskSize in SpecDistributionModulesNetworkingCilium: required")
-	}
-	if v, ok := raw["podCidr"]; !ok || v == nil {
-		return fmt.Errorf("field podCidr in SpecDistributionModulesNetworkingCilium: required")
-	}
-	type Plain SpecDistributionModulesNetworkingCilium
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = SpecDistributionModulesNetworkingCilium(plain)
-	return nil
-}
-
-type SpecDistributionModulesNetworkingTigeraOperator struct {
-	// Overrides corresponds to the JSON schema field "overrides".
-	Overrides *TypesFuryModuleComponentOverrides `json:"overrides,omitempty" yaml:"overrides,omitempty" mapstructure:"overrides,omitempty"`
-}
-
-type SpecDistributionModulesNetworkingType string
-
-var enumValues_SpecDistributionModulesNetworkingType = []interface{}{
-	"none",
-	"calico",
-	"cilium",
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionModulesNetworkingType) UnmarshalJSON(b []byte) error {
-	var v string
-	if err := json.Unmarshal(b, &v); err != nil {
-		return err
-	}
-	var ok bool
-	for _, expected := range enumValues_SpecDistributionModulesNetworkingType {
-		if reflect.DeepEqual(v, expected) {
-			ok = true
-			break
-		}
-	}
-	if !ok {
-		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_SpecDistributionModulesNetworkingType, v)
-	}
-	*j = SpecDistributionModulesNetworkingType(v)
-	return nil
-}
-
-const (
-	SpecDistributionModulesNetworkingTypeNone   SpecDistributionModulesNetworkingType = "none"
-	SpecDistributionModulesNetworkingTypeCalico SpecDistributionModulesNetworkingType = "calico"
-	SpecDistributionModulesNetworkingTypeCilium SpecDistributionModulesNetworkingType = "cilium"
-)
 
 // Configuration for the Networking module.
 type SpecDistributionModulesNetworking struct {
@@ -2055,57 +1265,49 @@ type SpecDistributionModulesNetworking struct {
 	Type SpecDistributionModulesNetworkingType `json:"type" yaml:"type" mapstructure:"type"`
 }
 
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionModulesNetworking) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if v, ok := raw["type"]; !ok || v == nil {
-		return fmt.Errorf("field type in SpecDistributionModulesNetworking: required")
-	}
-	type Plain SpecDistributionModulesNetworking
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = SpecDistributionModulesNetworking(plain)
-	return nil
+type SpecDistributionModulesNetworkingCilium struct {
+	// The mask size to use for the Pods network on each node.
+	MaskSize string `json:"maskSize" yaml:"maskSize" mapstructure:"maskSize"`
+
+	// Overrides corresponds to the JSON schema field "overrides".
+	Overrides *TypesFuryModuleComponentOverrides `json:"overrides,omitempty" yaml:"overrides,omitempty" mapstructure:"overrides,omitempty"`
+
+	// Allows specifing a CIDR for the Pods network different from
+	// `.spec.kubernetes.podCidr`. If not set the default is to use
+	// `.spec.kubernetes.podCidr`.
+	PodCidr TypesCidr `json:"podCidr" yaml:"podCidr" mapstructure:"podCidr"`
 }
 
-type SpecDistributionModulesPolicyGatekeeperEnforcementAction string
-
-var enumValues_SpecDistributionModulesPolicyGatekeeperEnforcementAction = []interface{}{
-	"deny",
-	"dryrun",
-	"warn",
+type SpecDistributionModulesNetworkingTigeraOperator struct {
+	// Overrides corresponds to the JSON schema field "overrides".
+	Overrides *TypesFuryModuleComponentOverrides `json:"overrides,omitempty" yaml:"overrides,omitempty" mapstructure:"overrides,omitempty"`
 }
 
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionModulesPolicyGatekeeperEnforcementAction) UnmarshalJSON(b []byte) error {
-	var v string
-	if err := json.Unmarshal(b, &v); err != nil {
-		return err
-	}
-	var ok bool
-	for _, expected := range enumValues_SpecDistributionModulesPolicyGatekeeperEnforcementAction {
-		if reflect.DeepEqual(v, expected) {
-			ok = true
-			break
-		}
-	}
-	if !ok {
-		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_SpecDistributionModulesPolicyGatekeeperEnforcementAction, v)
-	}
-	*j = SpecDistributionModulesPolicyGatekeeperEnforcementAction(v)
-	return nil
-}
+type SpecDistributionModulesNetworkingType string
 
 const (
-	SpecDistributionModulesPolicyGatekeeperEnforcementActionDeny   SpecDistributionModulesPolicyGatekeeperEnforcementAction = "deny"
-	SpecDistributionModulesPolicyGatekeeperEnforcementActionDryrun SpecDistributionModulesPolicyGatekeeperEnforcementAction = "dryrun"
-	SpecDistributionModulesPolicyGatekeeperEnforcementActionWarn   SpecDistributionModulesPolicyGatekeeperEnforcementAction = "warn"
+	SpecDistributionModulesNetworkingTypeCalico SpecDistributionModulesNetworkingType = "calico"
+	SpecDistributionModulesNetworkingTypeCilium SpecDistributionModulesNetworkingType = "cilium"
+	SpecDistributionModulesNetworkingTypeNone   SpecDistributionModulesNetworkingType = "none"
 )
+
+// Configuration for the Policy module.
+type SpecDistributionModulesPolicy struct {
+	// Gatekeeper corresponds to the JSON schema field "gatekeeper".
+	Gatekeeper *SpecDistributionModulesPolicyGatekeeper `json:"gatekeeper,omitempty" yaml:"gatekeeper,omitempty" mapstructure:"gatekeeper,omitempty"`
+
+	// Kyverno corresponds to the JSON schema field "kyverno".
+	Kyverno *SpecDistributionModulesPolicyKyverno `json:"kyverno,omitempty" yaml:"kyverno,omitempty" mapstructure:"kyverno,omitempty"`
+
+	// Overrides corresponds to the JSON schema field "overrides".
+	Overrides *TypesFuryModuleOverrides `json:"overrides,omitempty" yaml:"overrides,omitempty" mapstructure:"overrides,omitempty"`
+
+	// The type of policy enforcement to use, either `none`, `gatekeeper` or
+	// `kyverno`.
+	//
+	// Default is `none`.
+	Type SpecDistributionModulesPolicyType `json:"type" yaml:"type" mapstructure:"type"`
+}
 
 // Configuration for the Gatekeeper package.
 type SpecDistributionModulesPolicyGatekeeper struct {
@@ -2125,6 +1327,361 @@ type SpecDistributionModulesPolicyGatekeeper struct {
 
 	// Overrides corresponds to the JSON schema field "overrides".
 	Overrides *TypesFuryModuleComponentOverrides `json:"overrides,omitempty" yaml:"overrides,omitempty" mapstructure:"overrides,omitempty"`
+}
+
+type SpecDistributionModulesPolicyGatekeeperEnforcementAction string
+
+const (
+	SpecDistributionModulesPolicyGatekeeperEnforcementActionDeny   SpecDistributionModulesPolicyGatekeeperEnforcementAction = "deny"
+	SpecDistributionModulesPolicyGatekeeperEnforcementActionDryrun SpecDistributionModulesPolicyGatekeeperEnforcementAction = "dryrun"
+	SpecDistributionModulesPolicyGatekeeperEnforcementActionWarn   SpecDistributionModulesPolicyGatekeeperEnforcementAction = "warn"
+)
+
+// Configuration for the Kyverno package.
+type SpecDistributionModulesPolicyKyverno struct {
+	// This parameter adds namespaces to Kyverno's exemption list, so it will not
+	// enforce the policies on them.
+	AdditionalExcludedNamespaces []string `json:"additionalExcludedNamespaces,omitempty" yaml:"additionalExcludedNamespaces,omitempty" mapstructure:"additionalExcludedNamespaces,omitempty"`
+
+	// Set to `false` to avoid installing the default Kyverno policies included with
+	// distribution.
+	InstallDefaultPolicies bool `json:"installDefaultPolicies" yaml:"installDefaultPolicies" mapstructure:"installDefaultPolicies"`
+
+	// Overrides corresponds to the JSON schema field "overrides".
+	Overrides *TypesFuryModuleComponentOverrides `json:"overrides,omitempty" yaml:"overrides,omitempty" mapstructure:"overrides,omitempty"`
+
+	// The validation failure action to use for the included policies, `Enforce` will
+	// block when a request does not comply with the policies and `Audit` will not
+	// block but log when a request does not comply with the policies.
+	ValidationFailureAction SpecDistributionModulesPolicyKyvernoValidationFailureAction `json:"validationFailureAction" yaml:"validationFailureAction" mapstructure:"validationFailureAction"`
+}
+
+type SpecDistributionModulesPolicyKyvernoValidationFailureAction string
+
+const (
+	SpecDistributionModulesPolicyKyvernoValidationFailureActionAudit   SpecDistributionModulesPolicyKyvernoValidationFailureAction = "Audit"
+	SpecDistributionModulesPolicyKyvernoValidationFailureActionEnforce SpecDistributionModulesPolicyKyvernoValidationFailureAction = "Enforce"
+)
+
+type SpecDistributionModulesPolicyType string
+
+const (
+	SpecDistributionModulesPolicyTypeGatekeeper SpecDistributionModulesPolicyType = "gatekeeper"
+	SpecDistributionModulesPolicyTypeKyverno    SpecDistributionModulesPolicyType = "kyverno"
+	SpecDistributionModulesPolicyTypeNone       SpecDistributionModulesPolicyType = "none"
+)
+
+// Configuration for the Tracing module.
+type SpecDistributionModulesTracing struct {
+	// Minio corresponds to the JSON schema field "minio".
+	Minio *SpecDistributionModulesTracingMinio `json:"minio,omitempty" yaml:"minio,omitempty" mapstructure:"minio,omitempty"`
+
+	// Overrides corresponds to the JSON schema field "overrides".
+	Overrides *TypesFuryModuleOverrides `json:"overrides,omitempty" yaml:"overrides,omitempty" mapstructure:"overrides,omitempty"`
+
+	// Tempo corresponds to the JSON schema field "tempo".
+	Tempo *SpecDistributionModulesTracingTempo `json:"tempo,omitempty" yaml:"tempo,omitempty" mapstructure:"tempo,omitempty"`
+
+	// The type of tracing to use, either `none` or `tempo`. `none` will disable the
+	// Tracing module and `tempo` will install a Grafana Tempo deployment.
+	//
+	// Default is `tempo`.
+	Type SpecDistributionModulesTracingType `json:"type" yaml:"type" mapstructure:"type"`
+}
+
+// Configuration for Tracing's MinIO deployment.
+type SpecDistributionModulesTracingMinio struct {
+	// Overrides corresponds to the JSON schema field "overrides".
+	Overrides *TypesFuryModuleComponentOverrides `json:"overrides,omitempty" yaml:"overrides,omitempty" mapstructure:"overrides,omitempty"`
+
+	// RootUser corresponds to the JSON schema field "rootUser".
+	RootUser *SpecDistributionModulesTracingMinioRootUser `json:"rootUser,omitempty" yaml:"rootUser,omitempty" mapstructure:"rootUser,omitempty"`
+
+	// The PVC size for each MinIO disk, 6 disks total.
+	StorageSize *string `json:"storageSize,omitempty" yaml:"storageSize,omitempty" mapstructure:"storageSize,omitempty"`
+}
+
+type SpecDistributionModulesTracingMinioRootUser struct {
+	// The password for the default MinIO root user.
+	Password *string `json:"password,omitempty" yaml:"password,omitempty" mapstructure:"password,omitempty"`
+
+	// The username for the default MinIO root user.
+	Username *string `json:"username,omitempty" yaml:"username,omitempty" mapstructure:"username,omitempty"`
+}
+
+// Configuration for the Tempo package.
+type SpecDistributionModulesTracingTempo struct {
+	// The storage backend type for Tempo. `minio` will use an in-cluster MinIO
+	// deployment for object storage, `externalEndpoint` can be used to point to an
+	// external S3-compatible object storage instead of deploying an in-cluster MinIO.
+	Backend *SpecDistributionModulesTracingTempoBackend `json:"backend,omitempty" yaml:"backend,omitempty" mapstructure:"backend,omitempty"`
+
+	// Configuration for Tempo's external storage backend.
+	ExternalEndpoint *SpecDistributionModulesTracingTempoExternalEndpoint `json:"externalEndpoint,omitempty" yaml:"externalEndpoint,omitempty" mapstructure:"externalEndpoint,omitempty"`
+
+	// Overrides corresponds to the JSON schema field "overrides".
+	Overrides *TypesFuryModuleComponentOverrides `json:"overrides,omitempty" yaml:"overrides,omitempty" mapstructure:"overrides,omitempty"`
+
+	// The retention time for the traces stored in Tempo.
+	RetentionTime *string `json:"retentionTime,omitempty" yaml:"retentionTime,omitempty" mapstructure:"retentionTime,omitempty"`
+}
+
+type SpecDistributionModulesTracingTempoBackend string
+
+const (
+	SpecDistributionModulesTracingTempoBackendExternalEndpoint SpecDistributionModulesTracingTempoBackend = "externalEndpoint"
+	SpecDistributionModulesTracingTempoBackendMinio            SpecDistributionModulesTracingTempoBackend = "minio"
+)
+
+// Configuration for Tempo's external storage backend.
+type SpecDistributionModulesTracingTempoExternalEndpoint struct {
+	// The access key ID (username) for the external S3-compatible bucket.
+	AccessKeyId *string `json:"accessKeyId,omitempty" yaml:"accessKeyId,omitempty" mapstructure:"accessKeyId,omitempty"`
+
+	// The bucket name of the external S3-compatible object storage.
+	BucketName *string `json:"bucketName,omitempty" yaml:"bucketName,omitempty" mapstructure:"bucketName,omitempty"`
+
+	// The external S3-compatible endpoint for Tempo's storage.
+	Endpoint *string `json:"endpoint,omitempty" yaml:"endpoint,omitempty" mapstructure:"endpoint,omitempty"`
+
+	// If true, will use HTTP as protocol instead of HTTPS.
+	Insecure *bool `json:"insecure,omitempty" yaml:"insecure,omitempty" mapstructure:"insecure,omitempty"`
+
+	// The secret access key (password) for the external S3-compatible bucket.
+	SecretAccessKey *string `json:"secretAccessKey,omitempty" yaml:"secretAccessKey,omitempty" mapstructure:"secretAccessKey,omitempty"`
+}
+
+type SpecDistributionModulesTracingType string
+
+const (
+	SpecDistributionModulesTracingTypeNone  SpecDistributionModulesTracingType = "none"
+	SpecDistributionModulesTracingTypeTempo SpecDistributionModulesTracingType = "tempo"
+)
+
+type SpecPlugins struct {
+	// Helm corresponds to the JSON schema field "helm".
+	Helm *SpecPluginsHelm `json:"helm,omitempty" yaml:"helm,omitempty" mapstructure:"helm,omitempty"`
+
+	// Kustomize corresponds to the JSON schema field "kustomize".
+	Kustomize SpecPluginsKustomize `json:"kustomize,omitempty" yaml:"kustomize,omitempty" mapstructure:"kustomize,omitempty"`
+}
+
+type SpecPluginsHelm struct {
+	// Releases corresponds to the JSON schema field "releases".
+	Releases SpecPluginsHelmReleases `json:"releases,omitempty" yaml:"releases,omitempty" mapstructure:"releases,omitempty"`
+
+	// Repositories corresponds to the JSON schema field "repositories".
+	Repositories SpecPluginsHelmRepositories `json:"repositories,omitempty" yaml:"repositories,omitempty" mapstructure:"repositories,omitempty"`
+}
+
+type SpecPluginsHelmReleases []struct {
+	// The chart of the release
+	Chart string `json:"chart" yaml:"chart" mapstructure:"chart"`
+
+	// Disable running `helm diff` validation when installing the plugin, it will
+	// still be done when upgrading.
+	DisableValidationOnInstall *bool `json:"disableValidationOnInstall,omitempty" yaml:"disableValidationOnInstall,omitempty" mapstructure:"disableValidationOnInstall,omitempty"`
+
+	// The name of the release
+	Name string `json:"name" yaml:"name" mapstructure:"name"`
+
+	// The namespace of the release
+	Namespace string `json:"namespace" yaml:"namespace" mapstructure:"namespace"`
+
+	// Set corresponds to the JSON schema field "set".
+	Set []SpecPluginsHelmReleasesElemSetElem `json:"set,omitempty" yaml:"set,omitempty" mapstructure:"set,omitempty"`
+
+	// The values of the release
+	Values []string `json:"values,omitempty" yaml:"values,omitempty" mapstructure:"values,omitempty"`
+
+	// The version of the release
+	Version *string `json:"version,omitempty" yaml:"version,omitempty" mapstructure:"version,omitempty"`
+}
+
+type SpecPluginsHelmReleasesElemSetElem struct {
+	// The name of the set
+	Name string `json:"name" yaml:"name" mapstructure:"name"`
+
+	// The value of the set
+	Value string `json:"value" yaml:"value" mapstructure:"value"`
+}
+
+type SpecPluginsHelmRepositories []struct {
+	// The name of the repository
+	Name string `json:"name" yaml:"name" mapstructure:"name"`
+
+	// The url of the repository
+	Url string `json:"url" yaml:"url" mapstructure:"url"`
+}
+
+type SpecPluginsKustomize []struct {
+	// The folder of the kustomize plugin
+	Folder string `json:"folder" yaml:"folder" mapstructure:"folder"`
+
+	// The name of the kustomize plugin
+	Name string `json:"name" yaml:"name" mapstructure:"name"`
+}
+
+type TypesCidr string
+
+type TypesEnvRef string
+
+type TypesFileRef string
+
+type TypesFuryModuleComponentOverrides struct {
+	// Set to override the node selector used to place the pods of the package.
+	NodeSelector TypesKubeNodeSelector `json:"nodeSelector,omitempty" yaml:"nodeSelector,omitempty" mapstructure:"nodeSelector,omitempty"`
+
+	// Set to override the tolerations that will be added to the pods of the package.
+	Tolerations []TypesKubeToleration `json:"tolerations,omitempty" yaml:"tolerations,omitempty" mapstructure:"tolerations,omitempty"`
+}
+
+type TypesFuryModuleComponentOverrides_1 struct {
+	// NodeSelector corresponds to the JSON schema field "nodeSelector".
+	NodeSelector TypesKubeNodeSelector_1 `json:"nodeSelector,omitempty" yaml:"nodeSelector,omitempty" mapstructure:"nodeSelector,omitempty"`
+
+	// Tolerations corresponds to the JSON schema field "tolerations".
+	Tolerations []TypesKubeToleration_1 `json:"tolerations,omitempty" yaml:"tolerations,omitempty" mapstructure:"tolerations,omitempty"`
+}
+
+// Override the common configuration with a particular configuration for the
+// module.
+type TypesFuryModuleOverrides struct {
+	// Ingresses corresponds to the JSON schema field "ingresses".
+	Ingresses TypesFuryModuleOverridesIngresses `json:"ingresses,omitempty" yaml:"ingresses,omitempty" mapstructure:"ingresses,omitempty"`
+
+	// Set to override the node selector used to place the pods of the module.
+	NodeSelector TypesKubeNodeSelector `json:"nodeSelector,omitempty" yaml:"nodeSelector,omitempty" mapstructure:"nodeSelector,omitempty"`
+
+	// Set to override the tolerations that will be added to the pods of the module.
+	Tolerations []TypesKubeToleration `json:"tolerations,omitempty" yaml:"tolerations,omitempty" mapstructure:"tolerations,omitempty"`
+}
+
+type TypesFuryModuleOverridesIngress struct {
+	// If true, the ingress will not have authentication even if
+	// `.spec.modules.auth.provider.type` is SSO or Basic Auth.
+	DisableAuth *bool `json:"disableAuth,omitempty" yaml:"disableAuth,omitempty" mapstructure:"disableAuth,omitempty"`
+
+	// Use this host for the ingress instead of the default one.
+	Host *string `json:"host,omitempty" yaml:"host,omitempty" mapstructure:"host,omitempty"`
+
+	// Use this ingress class for the ingress instead of the default one.
+	IngressClass *string `json:"ingressClass,omitempty" yaml:"ingressClass,omitempty" mapstructure:"ingressClass,omitempty"`
+}
+
+type TypesFuryModuleOverridesIngresses map[string]TypesFuryModuleOverridesIngress
+
+type TypesIpAddress string
+
+type TypesKubeLabels map[string]string
+
+type TypesKubeLabels_1 map[string]string
+
+type TypesKubeNodeSelector map[string]string
+
+type TypesKubeNodeSelector_1 map[string]string
+
+type TypesKubeResources struct {
+	// Limits corresponds to the JSON schema field "limits".
+	Limits *TypesKubeResourcesLimits `json:"limits,omitempty" yaml:"limits,omitempty" mapstructure:"limits,omitempty"`
+
+	// Requests corresponds to the JSON schema field "requests".
+	Requests *TypesKubeResourcesRequests `json:"requests,omitempty" yaml:"requests,omitempty" mapstructure:"requests,omitempty"`
+}
+
+type TypesKubeResourcesLimits struct {
+	// The CPU limit for the Pod. Example: `1000m`.
+	Cpu *string `json:"cpu,omitempty" yaml:"cpu,omitempty" mapstructure:"cpu,omitempty"`
+
+	// The memory limit for the Pod. Example: `1G`.
+	Memory *string `json:"memory,omitempty" yaml:"memory,omitempty" mapstructure:"memory,omitempty"`
+}
+
+type TypesKubeResourcesRequests struct {
+	// The CPU request for the Pod, in cores. Example: `500m`.
+	Cpu *string `json:"cpu,omitempty" yaml:"cpu,omitempty" mapstructure:"cpu,omitempty"`
+
+	// The memory request for the Pod. Example: `500M`.
+	Memory *string `json:"memory,omitempty" yaml:"memory,omitempty" mapstructure:"memory,omitempty"`
+}
+
+type TypesKubeTaints struct {
+	// Effect corresponds to the JSON schema field "effect".
+	Effect TypesKubeTaintsEffect `json:"effect" yaml:"effect" mapstructure:"effect"`
+
+	// Key corresponds to the JSON schema field "key".
+	Key string `json:"key" yaml:"key" mapstructure:"key"`
+
+	// Value corresponds to the JSON schema field "value".
+	Value string `json:"value" yaml:"value" mapstructure:"value"`
+}
+
+type TypesKubeTaintsEffect string
+
+const (
+	TypesKubeTaintsEffectNoExecute        TypesKubeTaintsEffect = "NoExecute"
+	TypesKubeTaintsEffectNoSchedule       TypesKubeTaintsEffect = "NoSchedule"
+	TypesKubeTaintsEffectPreferNoSchedule TypesKubeTaintsEffect = "PreferNoSchedule"
+)
+
+type TypesKubeToleration struct {
+	// Effect corresponds to the JSON schema field "effect".
+	Effect TypesKubeTolerationEffect `json:"effect" yaml:"effect" mapstructure:"effect"`
+
+	// The key of the toleration
+	Key string `json:"key" yaml:"key" mapstructure:"key"`
+
+	// Operator corresponds to the JSON schema field "operator".
+	Operator *TypesKubeTolerationOperator `json:"operator,omitempty" yaml:"operator,omitempty" mapstructure:"operator,omitempty"`
+
+	// The value of the toleration
+	Value *string `json:"value,omitempty" yaml:"value,omitempty" mapstructure:"value,omitempty"`
+}
+
+type TypesKubeTolerationEffect string
+
+const (
+	TypesKubeTolerationEffectNoExecute        TypesKubeTolerationEffect = "NoExecute"
+	TypesKubeTolerationEffectNoSchedule       TypesKubeTolerationEffect = "NoSchedule"
+	TypesKubeTolerationEffectPreferNoSchedule TypesKubeTolerationEffect = "PreferNoSchedule"
+)
+
+type TypesKubeTolerationEffect_1 string
+
+const (
+	TypesKubeTolerationEffect_1_NoExecute        TypesKubeTolerationEffect_1 = "NoExecute"
+	TypesKubeTolerationEffect_1_NoSchedule       TypesKubeTolerationEffect_1 = "NoSchedule"
+	TypesKubeTolerationEffect_1_PreferNoSchedule TypesKubeTolerationEffect_1 = "PreferNoSchedule"
+)
+
+type TypesKubeTolerationOperator string
+
+const (
+	TypesKubeTolerationOperatorEqual  TypesKubeTolerationOperator = "Equal"
+	TypesKubeTolerationOperatorExists TypesKubeTolerationOperator = "Exists"
+)
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecDistributionModulesIngressNginxTLS) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	if v, ok := raw["provider"]; !ok || v == nil {
+		return fmt.Errorf("field provider in SpecDistributionModulesIngressNginxTLS: required")
+	}
+	type Plain SpecDistributionModulesIngressNginxTLS
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	*j = SpecDistributionModulesIngressNginxTLS(plain)
+	return nil
+}
+
+var enumValues_SpecDistributionModulesPolicyKyvernoValidationFailureAction = []interface{}{
+	"Audit",
+	"Enforce",
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
@@ -2148,53 +1705,24 @@ func (j *SpecDistributionModulesPolicyGatekeeper) UnmarshalJSON(b []byte) error 
 	return nil
 }
 
-type SpecDistributionModulesPolicyKyvernoValidationFailureAction string
-
-var enumValues_SpecDistributionModulesPolicyKyvernoValidationFailureAction = []interface{}{
-	"Audit",
-	"Enforce",
-}
-
 // UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionModulesIngressNginxTLS) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
+func (j *SpecDistributionModulesPolicyGatekeeperEnforcementAction) UnmarshalJSON(b []byte) error {
+	var v string
+	if err := json.Unmarshal(b, &v); err != nil {
 		return err
 	}
-	if v, ok := raw["provider"]; !ok || v == nil {
-		return fmt.Errorf("field provider in SpecDistributionModulesIngressNginxTLS: required")
+	var ok bool
+	for _, expected := range enumValues_SpecDistributionModulesPolicyGatekeeperEnforcementAction {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
 	}
-	type Plain SpecDistributionModulesIngressNginxTLS
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_SpecDistributionModulesPolicyGatekeeperEnforcementAction, v)
 	}
-	*j = SpecDistributionModulesIngressNginxTLS(plain)
+	*j = SpecDistributionModulesPolicyGatekeeperEnforcementAction(v)
 	return nil
-}
-
-const (
-	SpecDistributionModulesPolicyKyvernoValidationFailureActionAudit   SpecDistributionModulesPolicyKyvernoValidationFailureAction = "Audit"
-	SpecDistributionModulesPolicyKyvernoValidationFailureActionEnforce SpecDistributionModulesPolicyKyvernoValidationFailureAction = "Enforce"
-)
-
-// Configuration for the Kyverno package.
-type SpecDistributionModulesPolicyKyverno struct {
-	// This parameter adds namespaces to Kyverno's exemption list, so it will not
-	// enforce the policies on them.
-	AdditionalExcludedNamespaces []string `json:"additionalExcludedNamespaces,omitempty" yaml:"additionalExcludedNamespaces,omitempty" mapstructure:"additionalExcludedNamespaces,omitempty"`
-
-	// Set to `false` to avoid installing the default Kyverno policies included with
-	// distribution.
-	InstallDefaultPolicies bool `json:"installDefaultPolicies" yaml:"installDefaultPolicies" mapstructure:"installDefaultPolicies"`
-
-	// Overrides corresponds to the JSON schema field "overrides".
-	Overrides *TypesFuryModuleComponentOverrides `json:"overrides,omitempty" yaml:"overrides,omitempty" mapstructure:"overrides,omitempty"`
-
-	// The validation failure action to use for the included policies, `Enforce` will
-	// block when a request does not comply with the policies and `Audit` will not
-	// block but log when a request does not comply with the policies.
-	ValidationFailureAction SpecDistributionModulesPolicyKyvernoValidationFailureAction `json:"validationFailureAction" yaml:"validationFailureAction" mapstructure:"validationFailureAction"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
@@ -2218,7 +1746,11 @@ func (j *SpecDistributionModulesPolicyKyverno) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-type SpecDistributionModulesPolicyType string
+var enumValues_SpecDistributionModulesPolicyGatekeeperEnforcementAction = []interface{}{
+	"deny",
+	"dryrun",
+	"warn",
+}
 
 var enumValues_SpecDistributionModulesPolicyType = []interface{}{
 	"none",
@@ -2246,28 +1778,69 @@ func (j *SpecDistributionModulesPolicyType) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-const (
-	SpecDistributionModulesPolicyTypeNone       SpecDistributionModulesPolicyType = "none"
-	SpecDistributionModulesPolicyTypeGatekeeper SpecDistributionModulesPolicyType = "gatekeeper"
-	SpecDistributionModulesPolicyTypeKyverno    SpecDistributionModulesPolicyType = "kyverno"
-)
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecDistributionModulesNetworking) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	if v, ok := raw["type"]; !ok || v == nil {
+		return fmt.Errorf("field type in SpecDistributionModulesNetworking: required")
+	}
+	type Plain SpecDistributionModulesNetworking
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	*j = SpecDistributionModulesNetworking(plain)
+	return nil
+}
 
-// Configuration for the Policy module.
-type SpecDistributionModulesPolicy struct {
-	// Gatekeeper corresponds to the JSON schema field "gatekeeper".
-	Gatekeeper *SpecDistributionModulesPolicyGatekeeper `json:"gatekeeper,omitempty" yaml:"gatekeeper,omitempty" mapstructure:"gatekeeper,omitempty"`
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecDistributionModulesNetworkingType) UnmarshalJSON(b []byte) error {
+	var v string
+	if err := json.Unmarshal(b, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_SpecDistributionModulesNetworkingType {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_SpecDistributionModulesNetworkingType, v)
+	}
+	*j = SpecDistributionModulesNetworkingType(v)
+	return nil
+}
 
-	// Kyverno corresponds to the JSON schema field "kyverno".
-	Kyverno *SpecDistributionModulesPolicyKyverno `json:"kyverno,omitempty" yaml:"kyverno,omitempty" mapstructure:"kyverno,omitempty"`
+var enumValues_SpecDistributionModulesNetworkingType = []interface{}{
+	"none",
+	"calico",
+	"cilium",
+}
 
-	// Overrides corresponds to the JSON schema field "overrides".
-	Overrides *TypesFuryModuleOverrides `json:"overrides,omitempty" yaml:"overrides,omitempty" mapstructure:"overrides,omitempty"`
-
-	// The type of policy enforcement to use, either `none`, `gatekeeper` or
-	// `kyverno`.
-	//
-	// Default is `none`.
-	Type SpecDistributionModulesPolicyType `json:"type" yaml:"type" mapstructure:"type"`
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecDistributionModulesNetworkingCilium) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	if v, ok := raw["maskSize"]; !ok || v == nil {
+		return fmt.Errorf("field maskSize in SpecDistributionModulesNetworkingCilium: required")
+	}
+	if v, ok := raw["podCidr"]; !ok || v == nil {
+		return fmt.Errorf("field podCidr in SpecDistributionModulesNetworkingCilium: required")
+	}
+	type Plain SpecDistributionModulesNetworkingCilium
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	*j = SpecDistributionModulesNetworkingCilium(plain)
+	return nil
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
@@ -2288,27 +1861,50 @@ func (j *SpecDistributionModulesPolicy) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-type SpecDistributionModulesTracingMinioRootUser struct {
-	// The password for the default MinIO root user.
-	Password *string `json:"password,omitempty" yaml:"password,omitempty" mapstructure:"password,omitempty"`
-
-	// The username for the default MinIO root user.
-	Username *string `json:"username,omitempty" yaml:"username,omitempty" mapstructure:"username,omitempty"`
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecDistributionModulesMonitoring) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	if v, ok := raw["type"]; !ok || v == nil {
+		return fmt.Errorf("field type in SpecDistributionModulesMonitoring: required")
+	}
+	type Plain SpecDistributionModulesMonitoring
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	*j = SpecDistributionModulesMonitoring(plain)
+	return nil
 }
 
-// Configuration for Tracing's MinIO deployment.
-type SpecDistributionModulesTracingMinio struct {
-	// Overrides corresponds to the JSON schema field "overrides".
-	Overrides *TypesFuryModuleComponentOverrides `json:"overrides,omitempty" yaml:"overrides,omitempty" mapstructure:"overrides,omitempty"`
-
-	// RootUser corresponds to the JSON schema field "rootUser".
-	RootUser *SpecDistributionModulesTracingMinioRootUser `json:"rootUser,omitempty" yaml:"rootUser,omitempty" mapstructure:"rootUser,omitempty"`
-
-	// The PVC size for each MinIO disk, 6 disks total.
-	StorageSize *string `json:"storageSize,omitempty" yaml:"storageSize,omitempty" mapstructure:"storageSize,omitempty"`
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecDistributionModulesMonitoringType) UnmarshalJSON(b []byte) error {
+	var v string
+	if err := json.Unmarshal(b, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_SpecDistributionModulesMonitoringType {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_SpecDistributionModulesMonitoringType, v)
+	}
+	*j = SpecDistributionModulesMonitoringType(v)
+	return nil
 }
 
-type SpecDistributionModulesTracingTempoBackend string
+var enumValues_SpecDistributionModulesMonitoringType = []interface{}{
+	"none",
+	"prometheus",
+	"prometheusAgent",
+	"mimir",
+}
 
 var enumValues_SpecDistributionModulesTracingTempoBackend = []interface{}{
 	"minio",
@@ -2335,47 +1931,74 @@ func (j *SpecDistributionModulesTracingTempoBackend) UnmarshalJSON(b []byte) err
 	return nil
 }
 
-const (
-	SpecDistributionModulesTracingTempoBackendMinio            SpecDistributionModulesTracingTempoBackend = "minio"
-	SpecDistributionModulesTracingTempoBackendExternalEndpoint SpecDistributionModulesTracingTempoBackend = "externalEndpoint"
-)
-
-// Configuration for Tempo's external storage backend.
-type SpecDistributionModulesTracingTempoExternalEndpoint struct {
-	// The access key ID (username) for the external S3-compatible bucket.
-	AccessKeyId *string `json:"accessKeyId,omitempty" yaml:"accessKeyId,omitempty" mapstructure:"accessKeyId,omitempty"`
-
-	// The bucket name of the external S3-compatible object storage.
-	BucketName *string `json:"bucketName,omitempty" yaml:"bucketName,omitempty" mapstructure:"bucketName,omitempty"`
-
-	// The external S3-compatible endpoint for Tempo's storage.
-	Endpoint *string `json:"endpoint,omitempty" yaml:"endpoint,omitempty" mapstructure:"endpoint,omitempty"`
-
-	// If true, will use HTTP as protocol instead of HTTPS.
-	Insecure *bool `json:"insecure,omitempty" yaml:"insecure,omitempty" mapstructure:"insecure,omitempty"`
-
-	// The secret access key (password) for the external S3-compatible bucket.
-	SecretAccessKey *string `json:"secretAccessKey,omitempty" yaml:"secretAccessKey,omitempty" mapstructure:"secretAccessKey,omitempty"`
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecDistributionModulesMonitoringMimirBackend) UnmarshalJSON(b []byte) error {
+	var v string
+	if err := json.Unmarshal(b, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_SpecDistributionModulesMonitoringMimirBackend {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_SpecDistributionModulesMonitoringMimirBackend, v)
+	}
+	*j = SpecDistributionModulesMonitoringMimirBackend(v)
+	return nil
 }
 
-// Configuration for the Tempo package.
-type SpecDistributionModulesTracingTempo struct {
-	// The storage backend type for Tempo. `minio` will use an in-cluster MinIO
-	// deployment for object storage, `externalEndpoint` can be used to point to an
-	// external S3-compatible object storage instead of deploying an in-cluster MinIO.
-	Backend *SpecDistributionModulesTracingTempoBackend `json:"backend,omitempty" yaml:"backend,omitempty" mapstructure:"backend,omitempty"`
-
-	// Configuration for Tempo's external storage backend.
-	ExternalEndpoint *SpecDistributionModulesTracingTempoExternalEndpoint `json:"externalEndpoint,omitempty" yaml:"externalEndpoint,omitempty" mapstructure:"externalEndpoint,omitempty"`
-
-	// Overrides corresponds to the JSON schema field "overrides".
-	Overrides *TypesFuryModuleComponentOverrides `json:"overrides,omitempty" yaml:"overrides,omitempty" mapstructure:"overrides,omitempty"`
-
-	// The retention time for the traces stored in Tempo.
-	RetentionTime *string `json:"retentionTime,omitempty" yaml:"retentionTime,omitempty" mapstructure:"retentionTime,omitempty"`
+var enumValues_SpecDistributionModulesMonitoringMimirBackend = []interface{}{
+	"minio",
+	"externalEndpoint",
 }
 
-type SpecDistributionModulesTracingType string
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecDistributionModulesLogging) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	if v, ok := raw["type"]; !ok || v == nil {
+		return fmt.Errorf("field type in SpecDistributionModulesLogging: required")
+	}
+	type Plain SpecDistributionModulesLogging
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	*j = SpecDistributionModulesLogging(plain)
+	return nil
+}
+
+var enumValues_SpecDistributionCustomPatchesSecretGeneratorResourceBehavior = []interface{}{
+	"create",
+	"replace",
+	"merge",
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecDistributionCustomPatchesSecretGeneratorResourceBehavior) UnmarshalJSON(b []byte) error {
+	var v string
+	if err := json.Unmarshal(b, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_SpecDistributionCustomPatchesSecretGeneratorResourceBehavior {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_SpecDistributionCustomPatchesSecretGeneratorResourceBehavior, v)
+	}
+	*j = SpecDistributionCustomPatchesSecretGeneratorResourceBehavior(v)
+	return nil
+}
 
 var enumValues_SpecDistributionModulesTracingType = []interface{}{
 	"none",
@@ -2402,27 +2025,49 @@ func (j *SpecDistributionModulesTracingType) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-const (
-	SpecDistributionModulesTracingTypeNone  SpecDistributionModulesTracingType = "none"
-	SpecDistributionModulesTracingTypeTempo SpecDistributionModulesTracingType = "tempo"
-)
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecDistributionCustomPatchesSecretGeneratorResource) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	if v, ok := raw["name"]; !ok || v == nil {
+		return fmt.Errorf("field name in SpecDistributionCustomPatchesSecretGeneratorResource: required")
+	}
+	type Plain SpecDistributionCustomPatchesSecretGeneratorResource
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	*j = SpecDistributionCustomPatchesSecretGeneratorResource(plain)
+	return nil
+}
 
-// Configuration for the Tracing module.
-type SpecDistributionModulesTracing struct {
-	// Minio corresponds to the JSON schema field "minio".
-	Minio *SpecDistributionModulesTracingMinio `json:"minio,omitempty" yaml:"minio,omitempty" mapstructure:"minio,omitempty"`
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecDistributionModulesLoggingType) UnmarshalJSON(b []byte) error {
+	var v string
+	if err := json.Unmarshal(b, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_SpecDistributionModulesLoggingType {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_SpecDistributionModulesLoggingType, v)
+	}
+	*j = SpecDistributionModulesLoggingType(v)
+	return nil
+}
 
-	// Overrides corresponds to the JSON schema field "overrides".
-	Overrides *TypesFuryModuleOverrides `json:"overrides,omitempty" yaml:"overrides,omitempty" mapstructure:"overrides,omitempty"`
-
-	// Tempo corresponds to the JSON schema field "tempo".
-	Tempo *SpecDistributionModulesTracingTempo `json:"tempo,omitempty" yaml:"tempo,omitempty" mapstructure:"tempo,omitempty"`
-
-	// The type of tracing to use, either `none` or `tempo`. `none` will disable the
-	// Tracing module and `tempo` will install a Grafana Tempo deployment.
-	//
-	// Default is `tempo`.
-	Type SpecDistributionModulesTracingType `json:"type" yaml:"type" mapstructure:"type"`
+var enumValues_SpecDistributionModulesLoggingType = []interface{}{
+	"none",
+	"opensearch",
+	"loki",
+	"customOutputs",
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
@@ -2488,7 +2133,23 @@ func (j *SpecDistributionModules) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-type TypesKubeLabels map[string]string
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecDistributionModulesAuthDex) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	if v, ok := raw["connectors"]; !ok || v == nil {
+		return fmt.Errorf("field connectors in SpecDistributionModulesAuthDex: required")
+	}
+	type Plain SpecDistributionModulesAuthDex
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	*j = SpecDistributionModulesAuthDex(plain)
+	return nil
+}
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *SpecDistribution) UnmarshalJSON(b []byte) error {
@@ -2511,12 +2172,25 @@ func (j *SpecDistribution) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-type SpecPluginsHelmReleasesElemSetElem struct {
-	// The name of the set
-	Name string `json:"name" yaml:"name" mapstructure:"name"`
-
-	// The value of the set
-	Value string `json:"value" yaml:"value" mapstructure:"value"`
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecDistributionModulesAuthOverridesIngress) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	if v, ok := raw["host"]; !ok || v == nil {
+		return fmt.Errorf("field host in SpecDistributionModulesAuthOverridesIngress: required")
+	}
+	if v, ok := raw["ingressClass"]; !ok || v == nil {
+		return fmt.Errorf("field ingressClass in SpecDistributionModulesAuthOverridesIngress: required")
+	}
+	type Plain SpecDistributionModulesAuthOverridesIngress
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	*j = SpecDistributionModulesAuthOverridesIngress(plain)
+	return nil
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
@@ -2540,60 +2214,89 @@ func (j *SpecPluginsHelmReleasesElemSetElem) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-type SpecPluginsHelmReleases []struct {
-	// The chart of the release
-	Chart string `json:"chart" yaml:"chart" mapstructure:"chart"`
-
-	// Disable running `helm diff` validation when installing the plugin, it will
-	// still be done when upgrading.
-	DisableValidationOnInstall *bool `json:"disableValidationOnInstall,omitempty" yaml:"disableValidationOnInstall,omitempty" mapstructure:"disableValidationOnInstall,omitempty"`
-
-	// The name of the release
-	Name string `json:"name" yaml:"name" mapstructure:"name"`
-
-	// The namespace of the release
-	Namespace string `json:"namespace" yaml:"namespace" mapstructure:"namespace"`
-
-	// Set corresponds to the JSON schema field "set".
-	Set []SpecPluginsHelmReleasesElemSetElem `json:"set,omitempty" yaml:"set,omitempty" mapstructure:"set,omitempty"`
-
-	// The values of the release
-	Values []string `json:"values,omitempty" yaml:"values,omitempty" mapstructure:"values,omitempty"`
-
-	// The version of the release
-	Version *string `json:"version,omitempty" yaml:"version,omitempty" mapstructure:"version,omitempty"`
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecDistributionModulesLoggingOpensearch) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	if v, ok := raw["type"]; !ok || v == nil {
+		return fmt.Errorf("field type in SpecDistributionModulesLoggingOpensearch: required")
+	}
+	type Plain SpecDistributionModulesLoggingOpensearch
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	*j = SpecDistributionModulesLoggingOpensearch(plain)
+	return nil
 }
 
-type SpecPluginsHelmRepositories []struct {
-	// The name of the repository
-	Name string `json:"name" yaml:"name" mapstructure:"name"`
-
-	// The url of the repository
-	Url string `json:"url" yaml:"url" mapstructure:"url"`
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecDistributionModulesAuthProviderBasicAuth) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	if v, ok := raw["password"]; !ok || v == nil {
+		return fmt.Errorf("field password in SpecDistributionModulesAuthProviderBasicAuth: required")
+	}
+	if v, ok := raw["username"]; !ok || v == nil {
+		return fmt.Errorf("field username in SpecDistributionModulesAuthProviderBasicAuth: required")
+	}
+	type Plain SpecDistributionModulesAuthProviderBasicAuth
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	*j = SpecDistributionModulesAuthProviderBasicAuth(plain)
+	return nil
 }
 
-type SpecPluginsHelm struct {
-	// Releases corresponds to the JSON schema field "releases".
-	Releases SpecPluginsHelmReleases `json:"releases,omitempty" yaml:"releases,omitempty" mapstructure:"releases,omitempty"`
-
-	// Repositories corresponds to the JSON schema field "repositories".
-	Repositories SpecPluginsHelmRepositories `json:"repositories,omitempty" yaml:"repositories,omitempty" mapstructure:"repositories,omitempty"`
+var enumValues_SpecDistributionModulesAuthProviderType = []interface{}{
+	"none",
+	"basicAuth",
+	"sso",
 }
 
-type SpecPluginsKustomize []struct {
-	// The folder of the kustomize plugin
-	Folder string `json:"folder" yaml:"folder" mapstructure:"folder"`
-
-	// The name of the kustomize plugin
-	Name string `json:"name" yaml:"name" mapstructure:"name"`
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecDistributionModulesAuthProviderType) UnmarshalJSON(b []byte) error {
+	var v string
+	if err := json.Unmarshal(b, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_SpecDistributionModulesAuthProviderType {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_SpecDistributionModulesAuthProviderType, v)
+	}
+	*j = SpecDistributionModulesAuthProviderType(v)
+	return nil
 }
 
-type SpecPlugins struct {
-	// Helm corresponds to the JSON schema field "helm".
-	Helm *SpecPluginsHelm `json:"helm,omitempty" yaml:"helm,omitempty" mapstructure:"helm,omitempty"`
-
-	// Kustomize corresponds to the JSON schema field "kustomize".
-	Kustomize SpecPluginsKustomize `json:"kustomize,omitempty" yaml:"kustomize,omitempty" mapstructure:"kustomize,omitempty"`
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecDistributionModulesLoggingOpensearchType) UnmarshalJSON(b []byte) error {
+	var v string
+	if err := json.Unmarshal(b, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_SpecDistributionModulesLoggingOpensearchType {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_SpecDistributionModulesLoggingOpensearchType, v)
+	}
+	*j = SpecDistributionModulesLoggingOpensearchType(v)
+	return nil
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
@@ -2667,24 +2370,48 @@ func (j *TypesKubeToleration) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-type TypesKubeToleration struct {
-	// Effect corresponds to the JSON schema field "effect".
-	Effect TypesKubeTolerationEffect `json:"effect" yaml:"effect" mapstructure:"effect"`
-
-	// The key of the toleration
-	Key string `json:"key" yaml:"key" mapstructure:"key"`
-
-	// Operator corresponds to the JSON schema field "operator".
-	Operator *TypesKubeTolerationOperator `json:"operator,omitempty" yaml:"operator,omitempty" mapstructure:"operator,omitempty"`
-
-	// The value of the toleration
-	Value *string `json:"value,omitempty" yaml:"value,omitempty" mapstructure:"value,omitempty"`
+var enumValues_SpecDistributionModulesLoggingOpensearchType = []interface{}{
+	"single",
+	"triple",
 }
 
-const (
-	TypesKubeTolerationOperatorEqual  TypesKubeTolerationOperator = "Equal"
-	TypesKubeTolerationOperatorExists TypesKubeTolerationOperator = "Exists"
-)
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecDistributionModulesAuthProvider) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	if v, ok := raw["type"]; !ok || v == nil {
+		return fmt.Errorf("field type in SpecDistributionModulesAuthProvider: required")
+	}
+	type Plain SpecDistributionModulesAuthProvider
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	*j = SpecDistributionModulesAuthProvider(plain)
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecDistributionModulesPolicyKyvernoValidationFailureAction) UnmarshalJSON(b []byte) error {
+	var v string
+	if err := json.Unmarshal(b, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_SpecDistributionModulesPolicyKyvernoValidationFailureAction {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_SpecDistributionModulesPolicyKyvernoValidationFailureAction, v)
+	}
+	*j = SpecDistributionModulesPolicyKyvernoValidationFailureAction(v)
+	return nil
+}
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *TypesKubeTolerationOperator) UnmarshalJSON(b []byte) error {
@@ -2711,13 +2438,66 @@ var enumValues_TypesKubeTolerationOperator = []interface{}{
 	"Equal",
 }
 
-type TypesKubeTolerationOperator string
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecDistributionModulesAuth) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	if v, ok := raw["provider"]; !ok || v == nil {
+		return fmt.Errorf("field provider in SpecDistributionModulesAuth: required")
+	}
+	type Plain SpecDistributionModulesAuth
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	*j = SpecDistributionModulesAuth(plain)
+	return nil
+}
 
-const (
-	TypesKubeTolerationEffectNoExecute        TypesKubeTolerationEffect = "NoExecute"
-	TypesKubeTolerationEffectPreferNoSchedule TypesKubeTolerationEffect = "PreferNoSchedule"
-	TypesKubeTolerationEffectNoSchedule       TypesKubeTolerationEffect = "NoSchedule"
-)
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecDistributionModulesLoggingLoki) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	if v, ok := raw["tsdbStartDate"]; !ok || v == nil {
+		return fmt.Errorf("field tsdbStartDate in SpecDistributionModulesLoggingLoki: required")
+	}
+	type Plain SpecDistributionModulesLoggingLoki
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	*j = SpecDistributionModulesLoggingLoki(plain)
+	return nil
+}
+
+var enumValues_SpecDistributionModulesDrType = []interface{}{
+	"none",
+	"on-premises",
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecDistributionModulesDrType) UnmarshalJSON(b []byte) error {
+	var v string
+	if err := json.Unmarshal(b, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_SpecDistributionModulesDrType {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_SpecDistributionModulesDrType, v)
+	}
+	*j = SpecDistributionModulesDrType(v)
+	return nil
+}
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *TypesKubeTolerationEffect) UnmarshalJSON(b []byte) error {
@@ -2766,9 +2546,30 @@ func (j *SpecDistributionModulesAuthPomeriumSecrets) UnmarshalJSON(b []byte) err
 	return nil
 }
 
-type TypesKubeNodeSelector_1 map[string]string
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecDistributionModulesLoggingLokiBackend) UnmarshalJSON(b []byte) error {
+	var v string
+	if err := json.Unmarshal(b, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_SpecDistributionModulesLoggingLokiBackend {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_SpecDistributionModulesLoggingLokiBackend, v)
+	}
+	*j = SpecDistributionModulesLoggingLokiBackend(v)
+	return nil
+}
 
-type TypesKubeTolerationEffect_1 string
+var enumValues_SpecDistributionModulesLoggingLokiBackend = []interface{}{
+	"minio",
+	"externalEndpoint",
+}
 
 var enumValues_TypesKubeTolerationEffect_1 = []interface{}{
 	"NoSchedule",
@@ -2796,11 +2597,69 @@ func (j *TypesKubeTolerationEffect_1) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-const (
-	TypesKubeTolerationEffect_1_NoSchedule       TypesKubeTolerationEffect_1 = "NoSchedule"
-	TypesKubeTolerationEffect_1_PreferNoSchedule TypesKubeTolerationEffect_1 = "PreferNoSchedule"
-	TypesKubeTolerationEffect_1_NoExecute        TypesKubeTolerationEffect_1 = "NoExecute"
-)
+var enumValues_SpecDistributionModulesDrVeleroBackend = []interface{}{
+	"minio",
+	"externalEndpoint",
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecDistributionModulesLoggingCustomOutputs) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	if v, ok := raw["audit"]; !ok || v == nil {
+		return fmt.Errorf("field audit in SpecDistributionModulesLoggingCustomOutputs: required")
+	}
+	if v, ok := raw["errors"]; !ok || v == nil {
+		return fmt.Errorf("field errors in SpecDistributionModulesLoggingCustomOutputs: required")
+	}
+	if v, ok := raw["events"]; !ok || v == nil {
+		return fmt.Errorf("field events in SpecDistributionModulesLoggingCustomOutputs: required")
+	}
+	if v, ok := raw["infra"]; !ok || v == nil {
+		return fmt.Errorf("field infra in SpecDistributionModulesLoggingCustomOutputs: required")
+	}
+	if v, ok := raw["ingressNginx"]; !ok || v == nil {
+		return fmt.Errorf("field ingressNginx in SpecDistributionModulesLoggingCustomOutputs: required")
+	}
+	if v, ok := raw["kubernetes"]; !ok || v == nil {
+		return fmt.Errorf("field kubernetes in SpecDistributionModulesLoggingCustomOutputs: required")
+	}
+	if v, ok := raw["systemdCommon"]; !ok || v == nil {
+		return fmt.Errorf("field systemdCommon in SpecDistributionModulesLoggingCustomOutputs: required")
+	}
+	if v, ok := raw["systemdEtcd"]; !ok || v == nil {
+		return fmt.Errorf("field systemdEtcd in SpecDistributionModulesLoggingCustomOutputs: required")
+	}
+	type Plain SpecDistributionModulesLoggingCustomOutputs
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	*j = SpecDistributionModulesLoggingCustomOutputs(plain)
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecDistributionModulesDrVeleroBackend) UnmarshalJSON(b []byte) error {
+	var v string
+	if err := json.Unmarshal(b, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_SpecDistributionModulesDrVeleroBackend {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_SpecDistributionModulesDrVeleroBackend, v)
+	}
+	*j = SpecDistributionModulesDrVeleroBackend(v)
+	return nil
+}
 
 type TypesKubeTolerationOperator_1 string
 
@@ -2872,12 +2731,22 @@ func (j *TypesKubeToleration_1) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-type TypesFuryModuleComponentOverrides_1 struct {
-	// NodeSelector corresponds to the JSON schema field "nodeSelector".
-	NodeSelector TypesKubeNodeSelector_1 `json:"nodeSelector,omitempty" yaml:"nodeSelector,omitempty" mapstructure:"nodeSelector,omitempty"`
-
-	// Tolerations corresponds to the JSON schema field "tolerations".
-	Tolerations []TypesKubeToleration_1 `json:"tolerations,omitempty" yaml:"tolerations,omitempty" mapstructure:"tolerations,omitempty"`
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecDistributionModulesDr) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	if v, ok := raw["type"]; !ok || v == nil {
+		return fmt.Errorf("field type in SpecDistributionModulesDr: required")
+	}
+	type Plain SpecDistributionModulesDr
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	*j = SpecDistributionModulesDr(plain)
+	return nil
 }
 
 var enumValues_TypesKubeTolerationEffect = []interface{}{
@@ -2886,7 +2755,26 @@ var enumValues_TypesKubeTolerationEffect = []interface{}{
 	"NoExecute",
 }
 
-type TypesKubeTolerationEffect string
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecDistributionModulesIngress) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	if v, ok := raw["baseDomain"]; !ok || v == nil {
+		return fmt.Errorf("field baseDomain in SpecDistributionModulesIngress: required")
+	}
+	if v, ok := raw["nginx"]; !ok || v == nil {
+		return fmt.Errorf("field nginx in SpecDistributionModulesIngress: required")
+	}
+	type Plain SpecDistributionModulesIngress
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	*j = SpecDistributionModulesIngress(plain)
+	return nil
+}
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *SpecDistributionModulesAuthPomerium_2) UnmarshalJSON(b []byte) error {
@@ -2906,15 +2794,86 @@ func (j *SpecDistributionModulesAuthPomerium_2) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-type TypesEnvRef string
+var enumValues_SpecDistributionModulesIngressCertManagerClusterIssuerType = []interface{}{
+	"http01",
+}
 
-type TypesFileRef string
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecDistributionModulesIngressCertManagerClusterIssuerType) UnmarshalJSON(b []byte) error {
+	var v string
+	if err := json.Unmarshal(b, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_SpecDistributionModulesIngressCertManagerClusterIssuerType {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_SpecDistributionModulesIngressCertManagerClusterIssuerType, v)
+	}
+	*j = SpecDistributionModulesIngressCertManagerClusterIssuerType(v)
+	return nil
+}
 
-type TypesIpAddress string
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecDistributionModulesIngressCertManagerClusterIssuer) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	if v, ok := raw["email"]; !ok || v == nil {
+		return fmt.Errorf("field email in SpecDistributionModulesIngressCertManagerClusterIssuer: required")
+	}
+	if v, ok := raw["name"]; !ok || v == nil {
+		return fmt.Errorf("field name in SpecDistributionModulesIngressCertManagerClusterIssuer: required")
+	}
+	type Plain SpecDistributionModulesIngressCertManagerClusterIssuer
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	*j = SpecDistributionModulesIngressCertManagerClusterIssuer(plain)
+	return nil
+}
 
-type TypesKubeLabels_1 map[string]string
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecDistributionModulesIngressNginx) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	if v, ok := raw["type"]; !ok || v == nil {
+		return fmt.Errorf("field type in SpecDistributionModulesIngressNginx: required")
+	}
+	type Plain SpecDistributionModulesIngressNginx
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	*j = SpecDistributionModulesIngressNginx(plain)
+	return nil
+}
 
-type TypesKubeTaintsEffect string
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecDistributionModulesIngressCertManager) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	if v, ok := raw["clusterIssuer"]; !ok || v == nil {
+		return fmt.Errorf("field clusterIssuer in SpecDistributionModulesIngressCertManager: required")
+	}
+	type Plain SpecDistributionModulesIngressCertManager
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	*j = SpecDistributionModulesIngressCertManager(plain)
+	return nil
+}
 
 var enumValues_TypesKubeTaintsEffect = []interface{}{
 	"NoSchedule",
@@ -2942,21 +2901,74 @@ func (j *TypesKubeTaintsEffect) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-const (
-	TypesKubeTaintsEffectNoSchedule       TypesKubeTaintsEffect = "NoSchedule"
-	TypesKubeTaintsEffectPreferNoSchedule TypesKubeTaintsEffect = "PreferNoSchedule"
-	TypesKubeTaintsEffectNoExecute        TypesKubeTaintsEffect = "NoExecute"
-)
+var enumValues_SpecDistributionModulesIngressNginxTLSProvider = []interface{}{
+	"certManager",
+	"secret",
+	"none",
+}
 
-type TypesKubeTaints struct {
-	// Effect corresponds to the JSON schema field "effect".
-	Effect TypesKubeTaintsEffect `json:"effect" yaml:"effect" mapstructure:"effect"`
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecDistributionModulesIngressNginxTLSProvider) UnmarshalJSON(b []byte) error {
+	var v string
+	if err := json.Unmarshal(b, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_SpecDistributionModulesIngressNginxTLSProvider {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_SpecDistributionModulesIngressNginxTLSProvider, v)
+	}
+	*j = SpecDistributionModulesIngressNginxTLSProvider(v)
+	return nil
+}
 
-	// Key corresponds to the JSON schema field "key".
-	Key string `json:"key" yaml:"key" mapstructure:"key"`
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecDistributionModulesIngressNginxTLSSecret) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	if v, ok := raw["ca"]; !ok || v == nil {
+		return fmt.Errorf("field ca in SpecDistributionModulesIngressNginxTLSSecret: required")
+	}
+	if v, ok := raw["cert"]; !ok || v == nil {
+		return fmt.Errorf("field cert in SpecDistributionModulesIngressNginxTLSSecret: required")
+	}
+	if v, ok := raw["key"]; !ok || v == nil {
+		return fmt.Errorf("field key in SpecDistributionModulesIngressNginxTLSSecret: required")
+	}
+	type Plain SpecDistributionModulesIngressNginxTLSSecret
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	*j = SpecDistributionModulesIngressNginxTLSSecret(plain)
+	return nil
+}
 
-	// Value corresponds to the JSON schema field "value".
-	Value string `json:"value" yaml:"value" mapstructure:"value"`
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecDistributionModulesIngressNginxType) UnmarshalJSON(b []byte) error {
+	var v string
+	if err := json.Unmarshal(b, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_SpecDistributionModulesIngressNginxType {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_SpecDistributionModulesIngressNginxType, v)
+	}
+	*j = SpecDistributionModulesIngressNginxType(v)
+	return nil
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
@@ -3033,7 +3045,11 @@ func (j *KfddistributionKfdV1Alpha2Kind) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-type TypesKubeNodeSelector map[string]string
+var enumValues_SpecDistributionModulesIngressNginxType = []interface{}{
+	"none",
+	"single",
+	"dual",
+}
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *Metadata) UnmarshalJSON(b []byte) error {
