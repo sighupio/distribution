@@ -15,7 +15,7 @@ modules:
   tracing: v1.2.0
 kubernetes:
   eks:
-    version: 1.31
+    version: 1.32
     installer: v3.2.0
   onpremises:
     version: 1.32.4
