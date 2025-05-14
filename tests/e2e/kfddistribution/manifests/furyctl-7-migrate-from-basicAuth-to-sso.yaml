@@ -8,7 +8,7 @@ kind: KFDDistribution
 metadata:
   name: sighup
 spec:
-  distributionVersion: v1.31.1
+  distributionVersion: v1.32.0
   # This section describes how the KFD distribution will be installed
   distribution:
     kubeconfig: "{env://KUBECONFIG}"
@@ -84,7 +84,6 @@ spec:
             SHARED_SECRET: "LEjtmaKtiCB2qA5rtFSHWiWAzkdFftADf/q2xWT64dg="
             SIGNING_KEY: "LS0tLS1CRUdJTiBFQyBQUklWQVRFIEtFWS0tLS0tCk1IY0NBUUVFSU9DMHBBQmx4ZS84bjRQcHBBVUE1QnRxam96Z3dDZVpvRDI2c056TGRiS1hvQW9HQ0NxR1NNNDkKQXdFSG9VUURRZ0FFRUpDc253MHlXODRLZXhVSjQ5M21MMG9tNFN5dzJBeGtWOGFpRkxDZFdKaVBYamtUMDE1QwowclJsV2tqNVdlQUhqYmVncmRNL2QyejZTbzY3MWs3TVpRPT0KLS0tLS1FTkQgRUMgUFJJVkFURSBLRVktLS0tLQo="
         baseDomain: fury.sighup.cc
-
         dex:
           connectors:
             - type: ldap
@@ -111,74 +110,73 @@ spec:
                   nameAttr: cn
     # patches for kind compatibility and resource setting
     customPatches:
-      patchesStrategicMerge:
-        []
-        #- |
-        #  apiVersion: apps/v1
-        #  kind: StatefulSet
-        #  metadata:
-        #    name: minio-logging
-        #    namespace: logging
-        #  spec:
-        #    template:
-        #      spec:
-        #        containers:
-        #        - name: minio
-        #          resources:
-        #            requests:
-        #              cpu: 10m
-        #              memory: 50Mi
-        #- |
-        #  apiVersion: apps/v1
-        #  kind: StatefulSet
-        #  metadata:
-        #    name: minio-monitoring
-        #    namespace: monitoring
-        #  spec:
-        #    template:
-        #      spec:
-        #        containers:
-        #        - name: minio
-        #          resources:
-        #            requests:
-        #              cpu: 10m
-        #              memory: 50Mi
-        #- |
-        #  apiVersion: apps/v1
-        #  kind: StatefulSet
-        #  metadata:
-        #    name: minio-tracing
-        #    namespace: tracing
-        #  spec:
-        #    template:
-        #      spec:
-        #        containers:
-        #        - name: minio
-        #          resources:
-        #            requests:
-        #              cpu: 10m
-        #              memory: 50Mi
-        #- |
-        #  $patch: delete
-        #  apiVersion: logging-extensions.banzaicloud.io/v1alpha1
-        #  kind: HostTailer
-        #  metadata:
-        #    name: systemd-common
-        #    namespace: logging
-        #- |
-        #  $patch: delete
-        #  apiVersion: logging-extensions.banzaicloud.io/v1alpha1
-        #  kind: HostTailer
-        #  metadata:
-        #    name: systemd-etcd
-        #    namespace: logging
-        #- |
-        #  $patch: delete
-        #  apiVersion: apps/v1
-        #  kind: DaemonSet
-        #  metadata:
-        #    name: x509-certificate-exporter-control-plane
-        #    namespace: monitoring
+      patchesStrategicMerge: []
+      #- |
+      #  apiVersion: apps/v1
+      #  kind: StatefulSet
+      #  metadata:
+      #    name: minio-logging
+      #    namespace: logging
+      #  spec:
+      #    template:
+      #      spec:
+      #        containers:
+      #        - name: minio
+      #          resources:
+      #            requests:
+      #              cpu: 10m
+      #              memory: 50Mi
+      #- |
+      #  apiVersion: apps/v1
+      #  kind: StatefulSet
+      #  metadata:
+      #    name: minio-monitoring
+      #    namespace: monitoring
+      #  spec:
+      #    template:
+      #      spec:
+      #        containers:
+      #        - name: minio
+      #          resources:
+      #            requests:
+      #              cpu: 10m
+      #              memory: 50Mi
+      #- |
+      #  apiVersion: apps/v1
+      #  kind: StatefulSet
+      #  metadata:
+      #    name: minio-tracing
+      #    namespace: tracing
+      #  spec:
+      #    template:
+      #      spec:
+      #        containers:
+      #        - name: minio
+      #          resources:
+      #            requests:
+      #              cpu: 10m
+      #              memory: 50Mi
+      #- |
+      #  $patch: delete
+      #  apiVersion: logging-extensions.banzaicloud.io/v1alpha1
+      #  kind: HostTailer
+      #  metadata:
+      #    name: systemd-common
+      #    namespace: logging
+      #- |
+      #  $patch: delete
+      #  apiVersion: logging-extensions.banzaicloud.io/v1alpha1
+      #  kind: HostTailer
+      #  metadata:
+      #    name: systemd-etcd
+      #    namespace: logging
+      #- |
+      #  $patch: delete
+      #  apiVersion: apps/v1
+      #  kind: DaemonSet
+      #  metadata:
+      #    name: x509-certificate-exporter-control-plane
+      #    namespace: monitoring
   plugins:
     kustomize:
       - name: ldap-server
