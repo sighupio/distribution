@@ -732,7 +732,7 @@ steps:
     TF_VAR_hcloud_token:
       from_secret: hcloud_token
   commands:
-    - cd tests/e2e/onpremises/
+    - cd tests/e2e/onpremises-upgrades/
     - export TF_VAR_public_key=$(cat /cache/ci-ssh-key.pub)
     - export TF_VAR_private_key=$(cat /cache/ci-ssh-key)
     - ansible-playbook 3.local-tofu-destroy.yaml
