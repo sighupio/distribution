@@ -1146,20 +1146,6 @@
           "if": {
             "properties": {
               "type": {
-                "const": "loki"
-              }
-            }
-          },
-          "then": {
-            "required": [
-              "loki"
-            ]
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "type": {
                 "const": "customOutputs"
               }
             }
