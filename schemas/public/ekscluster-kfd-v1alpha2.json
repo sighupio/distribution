@@ -1754,10 +1754,7 @@
         "resources": {
           "$ref": "#/$defs/Types.KubeResources"
         }
-      },
-      "required": [
-        "tsdbStartDate"
-      ]
+      }
     },
     "Spec.Distribution.Modules.Logging.Operator": {
       "type": "object",
