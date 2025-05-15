@@ -652,11 +652,11 @@ steps:
     - name: cache-upgrades
       path: /cache
 
-- name: install-cluster-with-furyctl-1.31.1
+- name: install-cluster-1.31.1-with-furyctl
   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
   environment:
     FURYCTL_VERSION: "v0.32.2"
-    DISTRIBUTION_VERSION: "v1.31.1"
+    DISTRIBUTION_VERSION: "v1.31.1" # distribution version is hardcoded in the tofu outputs
     DEBIAN_FRONTEND: noninteractive
     AWS_ACCESS_KEY_ID:
       from_secret: aws_access_key_id
@@ -684,11 +684,11 @@ steps:
     - name: cache-upgrades
       path: /cache
 
-- name: install-cluster-with-furyctl-1.31.1
+- name: upgrade-cluster-to-1.32.0-with-furyctl
   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
   environment:
     FURYCTL_VERSION: "v0.32.3-rc.0"
-    DISTRIBUTION_VERSION: "v1.32.0"
+    DISTRIBUTION_VERSION: "v1.32.0" # distribution version is hardcoded in the tofu outputs
     DEBIAN_FRONTEND: noninteractive
     AWS_ACCESS_KEY_ID:
       from_secret: aws_access_key_id
