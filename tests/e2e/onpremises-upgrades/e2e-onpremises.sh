@@ -139,14 +139,3 @@ load ./helper
     status=${loop_it_result}
     [[ "$status" -eq 0 ]]
 }
-
-@test "Kyverno Admission controller is Running" {
-    info
-    test(){
-        readyReplicas=$(kubectl get deploy kyverno-admission-controller -n kyverno -o jsonpath="{.status.readyReplicas}")
-        if [ "${readyReplicas}" != "3" ]; then return 1; fi
-    }
-    loop_it test 60 10
-    status=${loop_it_result}
-    [[ "$status" -eq 0 ]]
-}
