@@ -47,20 +47,8 @@
       args:
         chdir: /root
 
-    - name: Clone current commit distribution
-      ansible.builtin.shell: git clone https://github.com/sighupio/distribution.git /tmp/fury-distribution
-      args:
-        chdir: /root
-
-    - name: Clone current commit distribution
-      ansible.builtin.shell: git checkout {{ commit_sha }}
-      args:
-        chdir: /tmp/fury-distribution
-      vars:
-        commit_sha: "{{ lookup('env', 'DRONE_COMMIT_SHA') | default('main') }}"
-
     - name: Create cluster with furyctl - Kubernetes phase
-      ansible.builtin.shell: furyctl apply cluster -o $PWD -D --phase kubernetes --distro-location /tmp/fury-distribution
+      ansible.builtin.shell: furyctl apply cluster -o $PWD -D --phase kubernetes
       args:
         chdir: /root
       register: furyctl_kubernetes
@@ -80,7 +68,7 @@
         chdir: /root/.furyctl/reevo/kubernetes
 
     - name: Complete furyctl installation , all phases + post apply phase
-      ansible.builtin.shell: furyctl apply cluster -o $PWD -D --post-apply-phases distribution --distro-location /tmp/fury-distribution
+      ansible.builtin.shell: furyctl apply cluster -o $PWD -D --post-apply-phases distribution
       args:
         chdir: /root
       register: furyctl_post_apply
@@ -90,7 +78,7 @@
         msg: "{{ furyctl_post_apply.stdout }}"
 
     - name: Apply distribution again, in the case storage class is not yet available
-      ansible.builtin.shell: sleep 60 && furyctl apply cluster -o $PWD -D --phase distribution --distro-location /tmp/fury-distribution
+      ansible.builtin.shell: sleep 60 && furyctl apply cluster -o $PWD -D --phase distribution
       args:
         chdir: /root
       register: furyctl_distribution

@@ -607,6 +607,147 @@ volumes:
 - name: cache
   temp: {}
 ---
+name: e2e-onpremises-upgrades-1.31.1-1.32.0
+kind: pipeline
+type: docker
+
+node:
+   performance: low
+
+depends_on:
+  - qa
+
+clone:
+  depth: 1
+
+trigger:
+  ref:
+    - refs/tags/e2e-onpremises-**
+    - refs/tags/e2e-full-**
+    - refs/tags/v**
+
+steps:
+- name: create-hetzner-infrastructure
+  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
+  environment:
+    FURYCTL_VERSION: "v0.32.2"
+    DISTRIBUTION_VERSION: "v1.31.1"
+    DEBIAN_FRONTEND: noninteractive
+    AWS_ACCESS_KEY_ID:
+      from_secret: aws_access_key_id
+    AWS_SECRET_ACCESS_KEY:
+      from_secret: aws_secret_access_key
+    AWS_REGION:
+      from_secret: aws_region
+    TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
+    TF_VAR_hcloud_token:
+      from_secret: hcloud_token
+  commands:
+    - cd tests/e2e/onpremises-upgrades/
+    - ssh-keygen -N '' -t rsa -b 4096 -C "sighup" -f /cache/ci-ssh-key
+    - export TF_VAR_public_key=$(cat /cache/ci-ssh-key.pub)
+    - export TF_VAR_private_key=$(cat /cache/ci-ssh-key)
+    - ansible-playbook 0.local-tofu-run.yaml
+  volumes:
+    - name: cache-upgrades
+      path: /cache
+
+- name: install-cluster-1.31.1-with-furyctl
+  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
+  environment:
+    FURYCTL_VERSION: "v0.32.2"
+    DISTRIBUTION_VERSION: "v1.31.1" # distribution version is hardcoded in the tofu outputs
+    DEBIAN_FRONTEND: noninteractive
+    AWS_ACCESS_KEY_ID:
+      from_secret: aws_access_key_id
+    AWS_SECRET_ACCESS_KEY:
+      from_secret: aws_secret_access_key
+    AWS_REGION:
+      from_secret: aws_region
+    TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
+    TF_VAR_hcloud_token:
+      from_secret: hcloud_token
+  commands:
+    - cd tests/e2e/onpremises-upgrades/
+    - ansible-playbook 1.remote-furyctl-exec.yaml
+  volumes:
+    - name: cache-upgrades
+      path: /cache
+    
+- name: bats-tests
+  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
+  environment:
+    KUBECONFIG: /cache/kubeconfig
+  commands:
+    - ./tests/e2e/onpremises-upgrades/e2e-onpremises.sh
+  volumes:
+    - name: cache-upgrades
+      path: /cache
+
+- name: upgrade-cluster-to-1.32.0-with-furyctl
+  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
+  environment:
+    FURYCTL_VERSION: "v0.32.3-rc.0"
+    DISTRIBUTION_VERSION: "v1.32.0" # distribution version is hardcoded in the tofu outputs
+    DEBIAN_FRONTEND: noninteractive
+    AWS_ACCESS_KEY_ID:
+      from_secret: aws_access_key_id
+    AWS_SECRET_ACCESS_KEY:
+      from_secret: aws_secret_access_key
+    AWS_REGION:
+      from_secret: aws_region
+    TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
+    TF_VAR_hcloud_token:
+      from_secret: hcloud_token
+  commands:
+    - cd tests/e2e/onpremises-upgrades/
+    - ansible-playbook 2.remote-furyctl-exec-upgrade.yaml
+  volumes:
+    - name: cache-upgrades
+      path: /cache
+    
+- name: bats-tests-upgrades
+  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
+  environment:
+    KUBECONFIG: /cache/kubeconfig
+  commands:
+    - ./tests/e2e/onpremises-upgrades/e2e-onpremises.sh
+  volumes:
+    - name: cache-upgrades
+      path: /cache
+
+- name: delete
+  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
+  environment:
+    FURYCTL_VERSION: "v0.32.3-rc.0"
+    DEBIAN_FRONTEND: noninteractive
+    DISTRIBUTION_VERSION: "v1.32.0"
+    AWS_ACCESS_KEY_ID:
+      from_secret: aws_access_key_id
+    AWS_SECRET_ACCESS_KEY:
+      from_secret: aws_secret_access_key
+    AWS_REGION:
+      from_secret: aws_region
+    TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
+    TF_VAR_hcloud_token:
+      from_secret: hcloud_token
+  commands:
+    - cd tests/e2e/onpremises-upgrades/
+    - export TF_VAR_public_key=$(cat /cache/ci-ssh-key.pub)
+    - export TF_VAR_private_key=$(cat /cache/ci-ssh-key)
+    - ansible-playbook 3.local-tofu-destroy.yaml
+  when:
+    status:
+    - success
+    - failure
+  volumes:
+    - name: cache-upgrades
+      path: /cache
+
+volumes:
+- name: cache-upgrades
+  temp: {}
+---
 kind: pipeline
 type: docker
 name: scheduled-aws-nuke
