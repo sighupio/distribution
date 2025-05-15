@@ -9,7 +9,7 @@ modules:
   dr: v3.1.0
   ingress: v4.0.0
   logging: v5.0.0
-  monitoring: v3.5.0-rc.2
+  monitoring: v3.5.0-rc.3
   opa: v1.14.0
   networking: v2.2.0-rc.1
   tracing: v1.2.0
