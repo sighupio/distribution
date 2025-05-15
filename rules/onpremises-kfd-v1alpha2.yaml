@@ -34,6 +34,13 @@ distribution:
     description: "changes to the logging module type have been detected. This will cause the reconfiguration or deletion of the current logging stack."
     safe:
       - from: none
+    unsupported:
+      - to: opensearch
+        from: loki
+        reason: "currently, switching from opensearch to loki is not supported. You need to first remove the current stack with type: none."
+      - to: loki
+        from: opensearch
+        reason: "currently, switching from loki to opensearch is not supported. You need to first remove the current stack with type: none."
     reducers:
       - key: distributionModulesLoggingType
         lifecycle: pre-apply
@@ -43,7 +50,17 @@ distribution:
     safe:
       - fromNodes:
         - path: ".spec.distribution.modules.logging.type"
-          value: "none"
+          from: "none"
+        - path: ".spec.distribution.modules.logging.type"
+          to: "none"
+        - path: ".spec.distribution.modules.logging.type"
+          from: "opensearch"
+        - path: ".spec.distribution.modules.logging.type"
+          to: "opensearch"
+    unsupported:
+      - to: opensearch
+        from: loki
+        reason: "currently, switching Logging from loki to opensearch is not supported. You need to first remove the current stack with type: none."
   - path: .spec.distribution.modules.monitoring.alertmanager.installDefaultRules
     immutable: false
     description: "changes to the monitoring alertmanager configs have been detected. This will cause the reconfiguration, creation or deletion of the default alertmanager configs."
