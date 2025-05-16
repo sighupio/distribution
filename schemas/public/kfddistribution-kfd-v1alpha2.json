@@ -501,20 +501,6 @@
           "if": {
             "properties": {
               "type": {
-                "const": "loki"
-              }
-            }
-          },
-          "then": {
-            "required": [
-              "loki"
-            ]
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "type": {
                 "const": "customOutputs"
               }
             }
@@ -644,10 +630,7 @@
         "resources": {
           "$ref": "#/$defs/Types.KubeResources"
         }
-      },
-      "required": [
-        "tsdbStartDate"
-      ]
+      }
     },
     "Spec.Distribution.Modules.Logging.Operator": {
       "type": "object",

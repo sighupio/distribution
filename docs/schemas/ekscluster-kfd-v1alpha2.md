@@ -2497,7 +2497,7 @@ This value defines where the output from the `systemdEtcd` Flow will be sent. Th
 | [externalEndpoint](#specdistributionmoduleslogginglokiexternalendpoint) | `object` | Optional |
 | [resources](#specdistributionmoduleslogginglokiresources)               | `object` | Optional |
 | [retentionTime](#specdistributionmoduleslogginglokiretentiontime)       | `string` | Optional |
-| [tsdbStartDate](#specdistributionmoduleslogginglokitsdbstartdate)       | `string` | Required |
+| [tsdbStartDate](#specdistributionmoduleslogginglokitsdbstartdate)       | `string` | Optional |
 
 ### Description
 
