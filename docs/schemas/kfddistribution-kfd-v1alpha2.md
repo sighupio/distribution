@@ -1991,7 +1991,7 @@ This value defines where the output from the `systemdEtcd` Flow will be sent. Th
 | [externalEndpoint](#specdistributionmoduleslogginglokiexternalendpoint) | `object` | Optional |
 | [resources](#specdistributionmoduleslogginglokiresources)               | `object` | Optional |
 | [retentionTime](#specdistributionmoduleslogginglokiretentiontime)       | `string` | Optional |
-| [tsdbStartDate](#specdistributionmoduleslogginglokitsdbstartdate)       | `string` | Required |
+| [tsdbStartDate](#specdistributionmoduleslogginglokitsdbstartdate)       | `string` | Optional |
 
 ### Description
 
@@ -2557,19 +2557,20 @@ Default is `opensearch`.
 
 ### Properties
 
-| Property                                                               | Type     | Required |
-|:-----------------------------------------------------------------------|:---------|:---------|
-| [alertmanager](#specdistributionmodulesmonitoringalertmanager)         | `object` | Optional |
-| [blackboxExporter](#specdistributionmodulesmonitoringblackboxexporter) | `object` | Optional |
-| [grafana](#specdistributionmodulesmonitoringgrafana)                   | `object` | Optional |
-| [kubeStateMetrics](#specdistributionmodulesmonitoringkubestatemetrics) | `object` | Optional |
-| [mimir](#specdistributionmodulesmonitoringmimir)                       | `object` | Optional |
-| [minio](#specdistributionmodulesmonitoringminio)                       | `object` | Optional |
-| [overrides](#specdistributionmodulesmonitoringoverrides)               | `object` | Optional |
-| [prometheus](#specdistributionmodulesmonitoringprometheus)             | `object` | Optional |
-| [prometheusAgent](#specdistributionmodulesmonitoringprometheusagent)   | `object` | Optional |
-| [type](#specdistributionmodulesmonitoringtype)                         | `string` | Required |
-| [x509Exporter](#specdistributionmodulesmonitoringx509exporter)         | `object` | Optional |
+| Property                                                                 | Type     | Required |
+|:-------------------------------------------------------------------------|:---------|:---------|
+| [alertmanager](#specdistributionmodulesmonitoringalertmanager)           | `object` | Optional |
+| [blackboxExporter](#specdistributionmodulesmonitoringblackboxexporter)   | `object` | Optional |
+| [grafana](#specdistributionmodulesmonitoringgrafana)                     | `object` | Optional |
+| [kubeStateMetrics](#specdistributionmodulesmonitoringkubestatemetrics)   | `object` | Optional |
+| [mimir](#specdistributionmodulesmonitoringmimir)                         | `object` | Optional |
+| [minio](#specdistributionmodulesmonitoringminio)                         | `object` | Optional |
+| [overrides](#specdistributionmodulesmonitoringoverrides)                 | `object` | Optional |
+| [prometheus](#specdistributionmodulesmonitoringprometheus)               | `object` | Optional |
+| [prometheusAdapter](#specdistributionmodulesmonitoringprometheusadapter) | `object` | Optional |
+| [prometheusAgent](#specdistributionmodulesmonitoringprometheusagent)     | `object` | Optional |
+| [type](#specdistributionmodulesmonitoringtype)                           | `string` | Required |
+| [x509Exporter](#specdistributionmodulesmonitoringx509exporter)           | `object` | Optional |
 
 ### Description
 
@@ -3257,6 +3258,72 @@ The retention time for the `k8s` Prometheus instance.
 ### Description
 
 The storage size for the `k8s` Prometheus instance.
+
+## .spec.distribution.modules.monitoring.prometheusAdapter
+
+### Properties
+
+| Property                                                                                                  | Type      | Required |
+|:----------------------------------------------------------------------------------------------------------|:----------|:---------|
+| [installEnhancedHPAMetrics](#specdistributionmodulesmonitoringprometheusadapterinstallenhancedhpametrics) | `boolean` | Optional |
+| [resources](#specdistributionmodulesmonitoringprometheusadapterresources)                                 | `object`  | Optional |
+
+## .spec.distribution.modules.monitoring.prometheusAdapter.installEnhancedHPAMetrics
+
+### Description
+
+Configures whether to enable advanced HPA metric collection in the Prometheus Adapter. When set to `true`, the Prometheus Adapter component will query Prometheus instances directly to retrieve additional metrics related to the Horizontal Pod Autoscaler (HPA). These metrics provide deeper visibility into HPA behaviour and performance. **Caution:** Enabling this feature results in a significant increase in RAM consumption of the Prometheus Adapter, as it requires managing an additional dataset. Default value: true.
+
+## .spec.distribution.modules.monitoring.prometheusAdapter.resources
+
+### Properties
+
+| Property                                                                         | Type     | Required |
+|:---------------------------------------------------------------------------------|:---------|:---------|
+| [limits](#specdistributionmodulesmonitoringprometheusadapterresourceslimits)     | `object` | Optional |
+| [requests](#specdistributionmodulesmonitoringprometheusadapterresourcesrequests) | `object` | Optional |
+
+## .spec.distribution.modules.monitoring.prometheusAdapter.resources.limits
+
+### Properties
+
+| Property                                                                           | Type     | Required |
+|:-----------------------------------------------------------------------------------|:---------|:---------|
+| [cpu](#specdistributionmodulesmonitoringprometheusadapterresourceslimitscpu)       | `string` | Optional |
+| [memory](#specdistributionmodulesmonitoringprometheusadapterresourceslimitsmemory) | `string` | Optional |
+
+## .spec.distribution.modules.monitoring.prometheusAdapter.resources.limits.cpu
+
+### Description
+
+The CPU limit for the Pod. Example: `1000m`.
+
+## .spec.distribution.modules.monitoring.prometheusAdapter.resources.limits.memory
+
+### Description
+
+The memory limit for the Pod. Example: `1G`.
+
+## .spec.distribution.modules.monitoring.prometheusAdapter.resources.requests
+
+### Properties
+
+| Property                                                                             | Type     | Required |
+|:-------------------------------------------------------------------------------------|:---------|:---------|
+| [cpu](#specdistributionmodulesmonitoringprometheusadapterresourcesrequestscpu)       | `string` | Optional |
+| [memory](#specdistributionmodulesmonitoringprometheusadapterresourcesrequestsmemory) | `string` | Optional |
+
+## .spec.distribution.modules.monitoring.prometheusAdapter.resources.requests.cpu
+
+### Description
+
+The CPU request for the Pod, in cores. Example: `500m`.
+
+## .spec.distribution.modules.monitoring.prometheusAdapter.resources.requests.memory
+
+### Description
+
+The memory request for the Pod. Example: `500M`.
 
 ## .spec.distribution.modules.monitoring.prometheusAgent
 

@@ -48,6 +48,12 @@ spec:
         {{ template "nodeSelector" $prometheusArgs }}
       tolerations:
         {{ template "tolerations" $prometheusArgs }}
+{{- if index .spec.distribution.modules.monitoring.prometheusAdapter "resources" }}
+      containers:
+        - name: prometheus-adapter
+          resources:
+            {{ .spec.distribution.modules.monitoring.prometheusAdapter.resources | toYaml | indent 12 | trim }}
+{{- end }}
 {{- if .checks.storageClassAvailable }}
 ---
 apiVersion: monitoring.coreos.com/v1

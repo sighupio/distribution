@@ -40,6 +40,20 @@ distribution:
   - path: .spec.distribution.modules.logging.loki.tsdbStartDate
     immutable: true
     description: "changes to Loki's TSDB start date have been detected. This parameter cannot be changed once set."
+    safe:
+      - fromNodes:
+        - path: ".spec.distribution.modules.logging.type"
+          from: "none"
+        - path: ".spec.distribution.modules.logging.type"
+          to: "none"
+        - path: ".spec.distribution.modules.logging.type"
+          from: "opensearch"
+        - path: ".spec.distribution.modules.logging.type"
+          to: "opensearch"
+    unsupported:
+      - to: opensearch
+        from: loki
+        reason: "currently, switching Logging from loki to opensearch is not supported. You need to first remove the current stack with type: none."
   - path: .spec.distribution.modules.monitoring.alertmanager.installDefaultRules
     immutable: false
     description: "changes to the monitoring alertmanager configs have been detected. This will cause the reconfiguration, creation or deletion of the default alertmanager configs."

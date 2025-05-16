@@ -106,6 +106,7 @@ data:
           username: minio
           password: minio123
       loki:
+        tsdbStartDate: "2025-05-15" # we needed this field when migrating from BoltDB to TSDB. Now TSDB is the default.
         backend: minio
         externalEndpoint:
           endpoint: s3.eu-west-1.amazonaws.com
@@ -149,6 +150,8 @@ data:
         retentionSize: 120GB
         storageSize: 150Gi
       prometheusAgent: {}
+      prometheusAdapter:
+        installEnhancedHPAMetrics: true
       alertmanager:
         installDefaultRules: true
         deadManSwitchWebhookUrl: ""

@@ -1,0 +1,103 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Remote Setup - Configure and Deploy on Target Host
+  hosts: haproxy
+  gather_facts: false
+
+  tasks:
+    - name: Install required packages
+      apt:
+        name:
+          - ansible
+        state: present
+        update_cache: yes
+
+    - name: Copy files to remote host
+      ansible.builtin.copy:
+        src: "./to_copy/"
+        dest: "/root/"
+        owner: root
+        group: root
+        mode: 0755
+
+    - name: Install furyctl
+      ansible.builtin.shell: |
+        curl -L "https://github.com/sighupio/furyctl/releases/download/{{ furyctl_version }}/furyctl-$(uname -s)-amd64.tar.gz" | tar xz -C /usr/local/bin/
+      args:
+        creates: /usr/local/bin/furyctl
+      vars:
+        furyctl_version: "{{ lookup('env', 'FURYCTL_VERSION') | default('v0.32.1') }}"
+
+    - name: Create furyctl pki
+      ansible.builtin.shell: furyctl create pki -p ./pki
+      args:
+        chdir: /root
+      ignore_errors: yes
+      register: furyctl_pki
+
+    - name: Debug furyctl pki creation
+      debug:
+        msg: "{{ furyctl_pki.stdout }}"
+
+    - name: Run create_ingress_certs.sh
+      ansible.builtin.shell: ./create_ingress_certs.sh
+      args:
+        chdir: /root
+
+    - name: Create cluster with furyctl - Kubernetes phase
+      ansible.builtin.shell: furyctl apply cluster -o $PWD -D --phase kubernetes
+      args:
+        chdir: /root
+      register: furyctl_kubernetes
+
+    - name: Debug furyctl kubernetes phase
+      debug:
+        msg: "{{ furyctl_kubernetes.stdout }}"
+
+    - name: Copy prepare playbook on .furyctl ansible directory
+      ansible.builtin.shell: cp 00.prepare-hosts.yaml /root/.furyctl/reevo/kubernetes
+      args:
+        chdir: /root
+
+    - name: Run ansible prepare (prerequisites for storage)
+      ansible.builtin.shell: ansible-playbook 00.prepare-hosts.yaml
+      args:
+        chdir: /root/.furyctl/reevo/kubernetes
+
+    - name: Complete furyctl installation , all phases + post apply phase
+      ansible.builtin.shell: furyctl apply cluster -o $PWD -D --post-apply-phases distribution
+      args:
+        chdir: /root
+      register: furyctl_post_apply
+
+    - name: Debug furyctl with post apply phase
+      ansible.builtin.debug:
+        msg: "{{ furyctl_post_apply.stdout }}"
+
+    - name: Apply distribution again, in the case storage class is not yet available
+      ansible.builtin.shell: sleep 60 && furyctl apply cluster -o $PWD -D --phase distribution
+      args:
+        chdir: /root
+      register: furyctl_distribution
+
+    - name: Debug furyctl final apply
+      ansible.builtin.debug:
+        msg: "{{ furyctl_distribution.stdout }}"
+
+    - name: Slurp kubeconfig file
+      ansible.builtin.slurp:
+        src: "/root/kubeconfig"
+      register: kubeconfig_file
+
+    - name: Decode kubeconfig content
+      set_fact:
+        kubeconfig_decoded: "{{ kubeconfig_file.content | b64decode }}"
+
+    - name: Save kubeconfig to local machine
+      ansible.builtin.copy:
+        content: "{{ kubeconfig_decoded }}"
+        dest: "/cache/kubeconfig"
+      delegate_to: localhost

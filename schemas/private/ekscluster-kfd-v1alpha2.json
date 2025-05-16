@@ -1624,20 +1624,6 @@
           "if": {
             "properties": {
               "type": {
-                "const": "loki"
-              }
-            }
-          },
-          "then": {
-            "required": [
-              "loki"
-            ]
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "type": {
                 "const": "customOutputs"
               }
             }
@@ -1767,10 +1753,7 @@
         "resources": {
           "$ref": "#/$defs/Types.KubeResources"
         }
-      },
-      "required": [
-        "tsdbStartDate"
-      ]
+      }
     },
     "Spec.Distribution.Modules.Logging.Operator": {
       "type": "object",
@@ -1855,6 +1838,9 @@
         "prometheusAgent": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Monitoring.PrometheusAgent"
         },
+        "prometheusAdapter": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Monitoring.PrometheusAdapter"
+        },
         "alertmanager": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Monitoring.AlertManager"
         },
@@ -1906,6 +1892,19 @@
           "items": {
             "type": "object"
           }
+        }
+      }
+    },
+    "Spec.Distribution.Modules.Monitoring.PrometheusAdapter": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "resources": {
+          "$ref": "#/$defs/Types.KubeResources"
+        },
+        "installEnhancedHPAMetrics": {
+          "type": "boolean",
+          "description": "Configures whether to enable advanced HPA metric collection in the Prometheus Adapter. When set to `true`, the Prometheus Adapter component will query Prometheus instances directly to retrieve additional metrics related to the Horizontal Pod Autoscaler (HPA). These metrics provide deeper visibility into HPA behaviour and performance. **Caution:** Enabling this feature results in a significant increase in RAM consumption of the Prometheus Adapter, as it requires managing an additional dataset. Default value: true."
         }
       }
     },
