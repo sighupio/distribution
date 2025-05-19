@@ -53,7 +53,7 @@ additionalKappArgs="-f ../../vendor/modules/opa/katalog/tests/kapp/exists.yaml"
     {{- end }}
 {{- end }}
 
-$kappbin deploy -a kfd -n kube-system -f out.yaml $additionalKappArgs --allow-all-ns -y --default-label-scoping-rules=false --apply-default-update-strategy=fallback-on-replace -c --wait-timeout 30m0s --apply-timeout 30m0s --apply-concurrency 20
+$kappbin deploy -a kfd -n kube-system -f out.yaml $additionalKappArgs --allow-all-ns -y --default-label-scoping-rules=false --apply-default-update-strategy=fallback-on-replace -c --wait-timeout 120m0s --apply-timeout 120m0s --apply-concurrency 20
 
 echo "Executing cleanup migrations on values that can be nil..."
 
