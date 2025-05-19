@@ -4,14 +4,14 @@
 
 version: v1.32.0
 modules:
-  auth: v0.5.1-rc.0
+  auth: v0.5.1
   aws: v5.0.0
   dr: v3.1.0
   ingress: v4.0.0
-  logging: v5.1.0-rc.0
-  monitoring: v3.5.0-rc.3
+  logging: v5.1.0
+  monitoring: v3.5.0
   opa: v1.14.0
-  networking: v2.2.0-rc.2
+  networking: v2.2.0
   tracing: v1.2.0
 kubernetes:
   eks:
@@ -19,7 +19,7 @@ kubernetes:
     installer: v3.2.0
   onpremises:
     version: 1.32.4
-    installer: v1.32.4-rc.1
+    installer: v1.32.4
 furyctlSchemas:
   eks:
     - apiVersion: kfd.sighup.io/v1alpha2
