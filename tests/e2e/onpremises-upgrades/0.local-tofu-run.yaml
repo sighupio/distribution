@@ -1,0 +1,47 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Local Setup - Generate Terraform Files and furyctl Configuration
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name: Run tofu init
+      ansible.builtin.command: tofu init
+
+    - name: Run tofu plan
+      ansible.builtin.command: tofu plan -out=terraform.plan
+
+    - name: Run tofu apply
+      ansible.builtin.command: tofu apply terraform.plan
+
+    - name: Extract furyctl_yaml output
+      ansible.builtin.shell: tofu output --raw furyctl_yaml > to_copy/furyctl.yaml
+
+    - name: Extract furyctl_upgrade_yaml output
+      ansible.builtin.shell: tofu output --raw furyctl_upgrade_yaml > to_copy/furyctl_upgrade.yaml
+
+    - name: Extract req_dns output
+      ansible.builtin.shell: tofu output --raw req_dns > to_copy/req-dns.cnf
+
+    - name: Get haproxy IP from Tofu Output
+      ansible.builtin.shell: tofu output -raw haproxy_ip
+      register: haproxy_ip_output
+
+    - name: Update hosts.yaml with haproxy IP
+      copy:
+        dest: "hosts.yaml"
+        content: |
+          all:
+            children:
+              haproxy:
+                hosts:
+                  haproxy:
+                    ansible_host: "{{ haproxy_ip_output.stdout }}"
+            vars:
+              ansible_python_interpreter: python3
+              ansible_ssh_private_key_file: "/cache/ci-ssh-key"
+              ansible_user: "root"
