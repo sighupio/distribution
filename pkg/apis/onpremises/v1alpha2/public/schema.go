@@ -2231,8 +2231,17 @@ type SpecDistributionModulesNetworkingCilium struct {
 }
 
 type SpecDistributionModulesNetworkingTigeraOperator struct {
+	// BlockSize specifies the CIDR prefex length to use when allocating per-node IP
+	// blocks from the main IP pool CIDR.
+	BlockSize *int `json:"blockSize,omitempty" yaml:"blockSize,omitempty" mapstructure:"blockSize,omitempty"`
+
 	// Overrides corresponds to the JSON schema field "overrides".
 	Overrides *TypesFuryModuleComponentOverrides `json:"overrides,omitempty" yaml:"overrides,omitempty" mapstructure:"overrides,omitempty"`
+
+	// Allows specifing a CIDR for the Pods network different from
+	// `.spec.kubernetes.podCidr`. If not set the default is to use
+	// `.spec.kubernetes.podCidr`.
+	PodCidr *TypesCidr `json:"podCidr,omitempty" yaml:"podCidr,omitempty" mapstructure:"podCidr,omitempty"`
 }
 
 type SpecDistributionModulesNetworkingType string
