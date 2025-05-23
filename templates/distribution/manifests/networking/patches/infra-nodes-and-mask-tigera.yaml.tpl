@@ -22,6 +22,19 @@ spec:
             {{ template "nodeSelector" ( merge (dict "indent" 12) $tigeraOperatorArgs ) }}
           tolerations:
             {{ template "tolerations" ( merge (dict "indent" 12) $tigeraOperatorArgs ) }}
+  calicoNetwork:
+    ipPools:
+    - blockSize: {{ .spec.distribution.modules.networking.tigeraOperator.blockSize }}
+      {{- if and (index .spec "kubernetes") (index .spec.kubernetes "podCidr") }}
+      {{- if index .spec.distribution.modules.networking.tigeraOperator "podCidr" }}
+      cidr: {{ .spec.distribution.modules.networking.tigeraOperator.podCidr }}
+      {{- else }}
+      cidr: {{ .spec.kubernetes.podCidr }}
+      {{- end }}
+      {{- else }}
+      cidr: {{ .spec.distribution.modules.networking.tigeraOperator.podCidr }}
+      {{- end }}
+      name: default-ipv4-ippool
 ---
 apiVersion: apps/v1
 kind: Deployment

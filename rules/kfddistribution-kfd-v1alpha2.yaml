@@ -6,6 +6,10 @@
 distribution:
   - path: .spec.distribution.modules.networking.type
     immutable: true
+  - path: .spec.distribution.modules.networking.tigeraOperator.blockSize
+    immutable: true
+  - path: .spec.distribution.modules.networking.tigeraOperator.podCidr
+    immutable: true
   - path: .spec.distribution.modules.logging.type
     immutable: false
     description: "changes to the logging module type have been detected. This will cause the reconfiguration or deletion of the current logging stack."
