@@ -2007,7 +2007,7 @@ func (j *SpecDistributionModulesNetworkingCilium) UnmarshalJSON(b []byte) error 
 type SpecDistributionModulesNetworkingTigeraOperator struct {
 	// BlockSize specifies the CIDR prefex length to use when allocating per-node IP
 	// blocks from the main IP pool CIDR. WARNING: The value for this field cannot be
-	// changed once set.
+	// changed once set. Default is 26.
 	BlockSize *int `json:"blockSize,omitempty" yaml:"blockSize,omitempty" mapstructure:"blockSize,omitempty"`
 
 	// Overrides corresponds to the JSON schema field "overrides".
