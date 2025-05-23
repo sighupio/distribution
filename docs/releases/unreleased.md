@@ -12,7 +12,7 @@ This version adds customizations to make it easier to install SD on bare metal n
 
 ## New features 🌟
 
-- [[#415](https://github.com/sighupio/distribution/pull/415)]: Adds `blockSize` and `podCidr` to the `spec.distribution.modules.networking.tigeraOperator` section of the OnPremises schema, allowing customizations to the assigned CIDR for each node.
+- [[#415](https://github.com/sighupio/distribution/pull/415)]: Adds `blockSize` and `podCidr` to the `spec.distribution.modules.networking.tigeraOperator` section of the OnPremises and KFDDistribution schemas, allowing customizations to the assigned CIDR for each node.
 How to use it:
 
   ```yaml
