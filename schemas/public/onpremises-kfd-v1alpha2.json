@@ -1750,7 +1750,7 @@
         },
         "blockSize": {
           "type": "integer",
-          "description": "BlockSize specifies the CIDR prefix length to use when allocating per-node IP blocks from the main IP pool CIDR. WARNING: The value for this field cannot be changed once set."
+          "description": "BlockSize specifies the CIDR prefix length to use when allocating per-node IP blocks from the main IP pool CIDR. WARNING: The value for this field cannot be changed once set. Default is 26."
         },
         "overrides": {
           "$ref": "#/$defs/Types.FuryModuleComponentOverrides"
