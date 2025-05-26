@@ -4792,6 +4792,7 @@ Defines the Kubernetes components configuration and the values needed for the ku
 | [cloud](#speckubernetesadvancedcloud)                               | `object` | Optional |
 | [containerd](#speckubernetesadvancedcontainerd)                     | `object` | Optional |
 | [encryption](#speckubernetesadvancedencryption)                     | `object` | Optional |
+| [kernelParameters](#speckubernetesadvancedkernelparameters)         | `array`  | Optional |
 | [kubeletConfiguration](#speckubernetesadvancedkubeletconfiguration) | `object` | Optional |
 | [oidc](#speckubernetesadvancedoidc)                                 | `object` | Optional |
 | [registry](#speckubernetesadvancedregistry)                         | `string` | Optional |
@@ -5057,6 +5058,31 @@ tlsCipherSuites:
   - "TLS_CHACHA20_POLY1305_SHA256"
 ```
 . NOTE: to customize the TLS cipher suites of the kubelet (as well as on control plane and etcd), set only this field - do not configure them under the `KubeletConfiguration`.
+
+## .spec.kubernetes.advanced.kernelParameters
+
+### Properties
+
+| Property                                              | Type     | Required |
+|:------------------------------------------------------|:---------|:---------|
+| [name](#speckubernetesadvancedkernelparametersname)   | `string` | Required |
+| [value](#speckubernetesadvancedkernelparametersvalue) | `string` | Required |
+
+### Description
+
+Allows customization of kernel parameters with sysctl on all Kubernetes nodes. NOTE: if you remove a parameter from this list, it will not be reset to its default value without a reboot.
+
+## .spec.kubernetes.advanced.kernelParameters.name
+
+### Description
+
+The kernel parameter to edit. Example: `kernel.panic`
+
+## .spec.kubernetes.advanced.kernelParameters.value
+
+### Description
+
+The value of the kernel parameter to edit. Example: `"15"`
 
 ## .spec.kubernetes.advanced.kubeletConfiguration
 
@@ -5351,6 +5377,7 @@ The basic-auth username for HAProxy's stats page
 |:-------------------------------------------------------------------|:---------|:---------|
 | [annotations](#speckubernetesmastersannotations)                   | `object` | Optional |
 | [hosts](#speckubernetesmastershosts)                               | `array`  | Required |
+| [kernelParameters](#speckubernetesmasterskernelparameters)         | `array`  | Optional |
 | [kubeletConfiguration](#speckubernetesmasterskubeletconfiguration) | `object` | Optional |
 | [labels](#speckubernetesmasterslabels)                             | `object` | Optional |
 
@@ -5385,6 +5412,31 @@ The IP address of the host
 
 A name to identify the host. This value will be concatenated to `.spec.kubernetes.dnsZone` to calculate the FQDN for the host as `<name>.<dnsZone>`.
 
+## .spec.kubernetes.masters.kernelParameters
+
+### Properties
+
+| Property                                             | Type     | Required |
+|:-----------------------------------------------------|:---------|:---------|
+| [name](#speckubernetesmasterskernelparametersname)   | `string` | Required |
+| [value](#speckubernetesmasterskernelparametersvalue) | `string` | Required |
+
+### Description
+
+Allows customization of kernel parameters with sysctl on all Kubernetes nodes. NOTE: if you remove a parameter from this list, it will not be reset to its default value without a reboot.
+
+## .spec.kubernetes.masters.kernelParameters.name
+
+### Description
+
+The kernel parameter to edit. Example: `kernel.panic`
+
+## .spec.kubernetes.masters.kernelParameters.value
+
+### Description
+
+The value of the kernel parameter to edit. Example: `"15"`
+
 ## .spec.kubernetes.masters.kubeletConfiguration
 
 ### Description
@@ -5409,6 +5461,7 @@ Note: **Existing labels with the same key will be overwritten** and the label se
 |:-----------------------------------------------------------------|:---------|:---------|
 | [annotations](#speckubernetesnodesannotations)                   | `object` | Optional |
 | [hosts](#speckubernetesnodeshosts)                               | `array`  | Required |
+| [kernelParameters](#speckubernetesnodeskernelparameters)         | `array`  | Optional |
 | [kubeletConfiguration](#speckubernetesnodeskubeletconfiguration) | `object` | Optional |
 | [labels](#speckubernetesnodeslabels)                             | `object` | Optional |
 | [name](#speckubernetesnodesname)                                 | `string` | Required |
@@ -5448,6 +5501,31 @@ The IP address of the host
 ### Description
 
 A name to identify the host. This value will be concatenated to `.spec.kubernetes.dnsZone` to calculate the FQDN for the host as `<name>.<dnsZone>`.
+
+## .spec.kubernetes.nodes.kernelParameters
+
+### Properties
+
+| Property                                           | Type     | Required |
+|:---------------------------------------------------|:---------|:---------|
+| [name](#speckubernetesnodeskernelparametersname)   | `string` | Required |
+| [value](#speckubernetesnodeskernelparametersvalue) | `string` | Required |
+
+### Description
+
+Allows customization of kernel parameters with sysctl on all Kubernetes nodes. NOTE: if you remove a parameter from this list, it will not be reset to its default value without a reboot.
+
+## .spec.kubernetes.nodes.kernelParameters.name
+
+### Description
+
+The kernel parameter to edit. Example: `kernel.panic`
+
+## .spec.kubernetes.nodes.kernelParameters.value
+
+### Description
+
+The value of the kernel parameter to edit. Example: `"15"`
 
 ## .spec.kubernetes.nodes.kubeletConfiguration
 
