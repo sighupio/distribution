@@ -195,6 +195,9 @@ data:
           password: minio123
     # networking module configuration
     networking:
+      tigeraOperator:
+        podCidr: null
+        blockSize: 26
       cilium:
         podCidr: null
         maskSize: "24"

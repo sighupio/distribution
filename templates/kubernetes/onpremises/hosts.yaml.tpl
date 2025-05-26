@@ -74,6 +74,10 @@ all:
             {{- end }}
           {{- end }}
         {{- end }}
+        {{- if index .spec.kubernetes.masters "kernelParameters" }}
+        kernel_parameters:
+          {{ .spec.kubernetes.masters.kernelParameters | toYaml | indent 10 | trim }}
+        {{- end -}}
         {{- if and (index .spec.kubernetes "advanced") (index .spec.kubernetes.advanced "cloud") }}
         {{- if index .spec.kubernetes.advanced.cloud "provider" }}
         kubernetes_cloud_provider: "{{ .spec.kubernetes.advanced.cloud.provider }}"
@@ -193,6 +197,11 @@ all:
                 {{- end }}
               {{- end }}
             {{- end }}
+            {{- if index $n "kernelParameters" }}
+            kernel_parameters:
+              {{ $n.kernelParameters | toYaml | indent 14 | trim }}
+            {{- end -}}
+
       {{- end }}
     ungrouped: {}
   vars:
@@ -282,5 +291,9 @@ all:
     kubelet_config_{{ $keyStr | snakecase }}: {{ $value | quote }}
       {{- end }}
     {{- end }}
+    {{- if index .spec.kubernetes.advanced "kernelParameters" }}
+    kernel_parameters:
+      {{ .spec.kubernetes.advanced.kernelParameters | toYaml | indent 6 | trim }}
+    {{- end -}}
 
     {{- end }}
