@@ -414,9 +414,9 @@ type: docker
 
 node:
    performance: low
-
 depends_on:
   - qa
+  - e2e-ekscluster-selfmanaged-alinux2023-nodes-1.32.0
 
 clone:
   depth: 1
@@ -506,7 +506,7 @@ node:
 
 depends_on:
   - qa
-
+  
 clone:
   depth: 1
 
