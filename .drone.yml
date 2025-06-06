@@ -332,7 +332,6 @@ clone:
 trigger:
   ref:
     - refs/tags/e2e-eks-**
-    - refs/tags/e2e-full-eks-**
     - refs/tags/e2e-full-**
     - refs/tags/v**
 
@@ -424,7 +423,6 @@ clone:
 
 trigger:
   ref:
-    - refs/tags/e2e-full-eks-**
     - refs/tags/e2e-selfmanaged-eks-**
 
 steps:
@@ -514,7 +512,6 @@ clone:
 
 trigger:
   ref:
-    - refs/tags/e2e-full-eks-**
     - refs/tags/e2e-selfmanaged-eks-**
 
 steps:
