@@ -54,7 +54,7 @@ spec:
           - 0.0.0.0/0
   kubernetes:
     nodeAllowedSshPublicKey: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA1xMG9TEH97YhkmoehlMaAMwqi9NOIx2ItXKNv2KVnI
-    nodePoolGlobalAmiType: alinux2
+    nodePoolGlobalAmiType: alinux2023
     nodePoolsLaunchKind: launch_templates
     apiServer:
       privateAccess: true
@@ -65,7 +65,7 @@ spec:
         - 0.0.0.0/0
     nodePools:
       - name: infra
-        type: eks-managed
+        type: self-managed
         size:
           min: 6
           max: 9
@@ -114,15 +114,52 @@ spec:
             name: internal.e2e.ci.sighup.cc
             create: true
       logging:
-        type: none
+        type: loki
+        minio:
+          storageSize: 20Gi
+          rootUser:
+            username: sighup
+            password: secretpassword1
+        loki:
+          backend: minio
+          tsdbStartDate: '2024-11-21'
       monitoring:
-        type: none
+        type: mimir
+        prometheus:
+          resources:
+            requests:
+              cpu: 10m
+            limits:
+              cpu: 2000m
+              memory: 6Gi
+        minio:
+          storageSize: 20Gi
+          rootUser:
+            username: sighup
+            password: secretpassword2
       tracing:
-        type: none
+        type: tempo
+        minio:
+          storageSize: 20Gi
+          rootUser:
+            username: sighup
+            password: secretpassword3
       policy:
-        type: none
+        type: kyverno
+        kyverno:
+          additionalExcludedNamespaces:
+            - local-path-storage
+          validationFailureAction: Enforce
+          installDefaultPolicies: true
       dr:
-        type: none
+        type: eks
+        velero:
+          eks:
+            bucketName: e2e-test-eks
+            region: eu-west-1
       auth:
         provider:
-          type: none
+          type: basicAuth
+          basicAuth:
+            username: test
+            password: testpassword
