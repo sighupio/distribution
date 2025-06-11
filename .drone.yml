@@ -809,7 +809,7 @@ trigger:
 
 steps:
   - name: prepare-release-notes
-    image: quay.io/sighup/fury-release-notes-plugin:3.7_2.8.4
+    image: quay.io/sighup/fury-release-notes-plugin:3.12_2.10.0
     depends_on: [clone]
     settings:
       release_notes_file_path: release-notes.md
