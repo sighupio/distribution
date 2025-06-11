@@ -115,7 +115,7 @@
         },
         "SIGNING_KEY": {
           "type": "string",
-          "description": "Signing Key is the base64 representation of one or more PEM-encoded private keys used to sign a user's attestation JWT, which can be consumed by upstream applications to pass along identifying user information like username, id, and groups.\n\nTo generates an P-256 (ES256) signing key:\n\n```bash\nopenssl ecparam  -genkey  -name prime256v1  -noout  -out ec_private.pem\n# careful! this will output your private key in terminal\ncat ec_private.pem | base64\n```"
+          "description": "Signing Key is the base64 representation of one or more PEM-encoded private keys used to sign a user's attestation JWT, which can be consumed by upstream applications to pass along identifying user information like username, id, and groups.\n\nTo generates an P-256 (ES256) signing key:\n\n```bash\nopenssl ecparam -genkey -name prime256v1 -noout -out ec_private.pem\n# careful! this will output your private key in terminal\ncat ec_private.pem | base64\n```"
         }
       },
       "required": [
