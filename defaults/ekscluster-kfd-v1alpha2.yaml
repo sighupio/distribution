@@ -16,6 +16,7 @@ data:
     provider:
       type: eks
     networkPoliciesEnabled: false
+    immutableResources: false
   # the module section will be used to fine tune each module behaviour and configuration
   modules:
     # ingress module configuration

@@ -94,17 +94,24 @@ The name of the cluster. It will also be used as a prefix for all the other reso
 
 ### Properties
 
-| Property                                                        | Type     | Required |
-|:----------------------------------------------------------------|:---------|:---------|
-| [nodeSelector](#specdistributioncommonnodeselector)             | `object` | Optional |
-| [provider](#specdistributioncommonprovider)                     | `object` | Optional |
-| [registry](#specdistributioncommonregistry)                     | `string` | Optional |
-| [relativeVendorPath](#specdistributioncommonrelativevendorpath) | `string` | Optional |
-| [tolerations](#specdistributioncommontolerations)               | `array`  | Optional |
+| Property                                                        | Type      | Required |
+|:----------------------------------------------------------------|:----------|:---------|
+| [immutableResources](#specdistributioncommonimmutableresources) | `boolean` | Optional |
+| [nodeSelector](#specdistributioncommonnodeselector)             | `object`  | Optional |
+| [provider](#specdistributioncommonprovider)                     | `object`  | Optional |
+| [registry](#specdistributioncommonregistry)                     | `string`  | Optional |
+| [relativeVendorPath](#specdistributioncommonrelativevendorpath) | `string`  | Optional |
+| [tolerations](#specdistributioncommontolerations)               | `array`   | Optional |
 
 ### Description
 
 Common configuration for all the distribution modules.
+
+## .spec.distribution.common.immutableResources
+
+### Description
+
+EXPERIMENTAL FEATURE. This field makes the distribution's Secrets and ConfigMaps immutable. Also applies to Secrets/ConfigMaps created with the `customPatches` section. Does not apply to plugins.
 
 ## .spec.distribution.common.nodeSelector
 

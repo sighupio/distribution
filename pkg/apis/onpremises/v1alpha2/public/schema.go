@@ -64,6 +64,11 @@ type SpecDistribution struct {
 
 // Common configuration for all the distribution modules.
 type SpecDistributionCommon struct {
+	// EXPERIMENTAL FEATURE. This field makes the distribution's Secrets and
+	// ConfigMaps immutable. Also applies to Secrets/ConfigMaps created with the
+	// `customPatches` section. Does not apply to plugins.
+	ImmutableResources *bool `json:"immutableResources,omitempty" yaml:"immutableResources,omitempty" mapstructure:"immutableResources,omitempty"`
+
 	// EXPERIMENTAL FEATURE. This field defines whether Network Policies are provided
 	// for core modules.
 	NetworkPoliciesEnabled *bool `json:"networkPoliciesEnabled,omitempty" yaml:"networkPoliciesEnabled,omitempty" mapstructure:"networkPoliciesEnabled,omitempty"`

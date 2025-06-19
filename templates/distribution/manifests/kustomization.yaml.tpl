@@ -44,6 +44,16 @@ patchesStrategicMerge:
 {{- if .spec.distribution.customPatches.patches }}
 patches:
   {{ .spec.distribution.customPatches.patches | toYaml | indent 2 | trim -}}
+  {{- if .spec.distribution.common.immutableResources }}
+  - patch: |-
+      apiVersion: v1
+      kind: not-important
+      metadata:
+        name: not-important
+      immutable: true
+    target:
+      kind: ConfigMap|Secret
+  {{- end }}
 {{- end }}
 
 {{- if .spec.distribution.customPatches.secretGenerator }}
