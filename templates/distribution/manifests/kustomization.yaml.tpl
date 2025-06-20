@@ -53,6 +53,7 @@ patches:
       immutable: true
     target:
       kind: ConfigMap|Secret
+      labelSelector: gatekeeper.sh/system!=yes
   {{- end }}
 {{- end }}
 
