@@ -1308,6 +1308,13 @@
           "additionalProperties": false,
           "description": "Configuration for Velero's external storage backend.",
           "properties": {
+            "type": {
+              "type": "string",
+                "enum": [
+                "s3",
+                "gcs"
+              ]
+            },
             "endpoint": {
               "type": "string",
               "description": "External S3-compatible endpoint for Velero's storage."
@@ -1327,6 +1334,14 @@
             "bucketName": {
               "type": "string",
               "description": "The bucket name of the external S3-compatible object storage."
+            },
+            "clientEmail": {
+              "type": "string",
+              "description": "GCP full client email."
+            },
+            "serviceAccountString": {
+              "type": "string",
+              "description": "Service account JSON string."
             }
           }
         },

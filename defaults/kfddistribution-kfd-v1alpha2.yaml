@@ -249,11 +249,14 @@ data:
       velero:
         backend: minio
         externalEndpoint:
+          type: s3
           endpoint: s3.eu-west-1.amazonaws.com
           insecure: false
           secretAccessKey: example
           accessKeyId: example
           bucketName: velerobucket
+          clientEmail: "velero-service-account@dummy.iam.gserviceaccount.com"
+          serviceAccountString: "dummy"
         schedules:
           install: true
           definitions:
