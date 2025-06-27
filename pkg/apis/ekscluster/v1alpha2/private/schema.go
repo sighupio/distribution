@@ -287,6 +287,11 @@ func (j *TypesKubeToleration) UnmarshalJSON(b []byte) error {
 
 // Common configuration for all the distribution modules.
 type SpecDistributionCommon struct {
+	// EXPERIMENTAL FEATURE. This field makes the distribution's Secrets and
+	// ConfigMaps immutable. Also applies to Secrets/ConfigMaps created with the
+	// `customPatches` section. Does not apply to plugins.
+	ImmutableResources *bool `json:"immutableResources,omitempty" yaml:"immutableResources,omitempty" mapstructure:"immutableResources,omitempty"`
+
 	// The node selector to use to place the pods for all the KFD modules. Follows
 	// Kubernetes selector format. Example: `node.kubernetes.io/role: infra`.
 	NodeSelector TypesKubeNodeSelector `json:"nodeSelector,omitempty" yaml:"nodeSelector,omitempty" mapstructure:"nodeSelector,omitempty"`
@@ -399,7 +404,7 @@ type SpecDistributionModulesAuthPomeriumSecrets struct {
 	// To generates an P-256 (ES256) signing key:
 	//
 	// ```bash
-	// openssl ecparam  -genkey  -name prime256v1  -noout  -out ec_private.pem
+	// openssl ecparam -genkey -name prime256v1 -noout -out ec_private.pem
 	// # careful! this will output your private key in terminal
 	// cat ec_private.pem | base64
 	// ```

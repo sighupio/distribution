@@ -94,17 +94,24 @@ The name of the cluster. It will also be used as a prefix for all the other reso
 
 ### Properties
 
-| Property                                                        | Type     | Required |
-|:----------------------------------------------------------------|:---------|:---------|
-| [nodeSelector](#specdistributioncommonnodeselector)             | `object` | Optional |
-| [provider](#specdistributioncommonprovider)                     | `object` | Optional |
-| [registry](#specdistributioncommonregistry)                     | `string` | Optional |
-| [relativeVendorPath](#specdistributioncommonrelativevendorpath) | `string` | Optional |
-| [tolerations](#specdistributioncommontolerations)               | `array`  | Optional |
+| Property                                                        | Type      | Required |
+|:----------------------------------------------------------------|:----------|:---------|
+| [immutableResources](#specdistributioncommonimmutableresources) | `boolean` | Optional |
+| [nodeSelector](#specdistributioncommonnodeselector)             | `object`  | Optional |
+| [provider](#specdistributioncommonprovider)                     | `object`  | Optional |
+| [registry](#specdistributioncommonregistry)                     | `string`  | Optional |
+| [relativeVendorPath](#specdistributioncommonrelativevendorpath) | `string`  | Optional |
+| [tolerations](#specdistributioncommontolerations)               | `array`   | Optional |
 
 ### Description
 
 Common configuration for all the distribution modules.
+
+## .spec.distribution.common.immutableResources
+
+### Description
+
+EXPERIMENTAL FEATURE. This field makes the distribution's Secrets and ConfigMaps immutable. Also applies to Secrets/ConfigMaps created with the `customPatches` section. Does not apply to plugins.
 
 ## .spec.distribution.common.nodeSelector
 
@@ -919,7 +926,7 @@ Signing Key is the base64 representation of one or more PEM-encoded private keys
 To generates an P-256 (ES256) signing key:
 
 ```bash
-openssl ecparam  -genkey  -name prime256v1  -noout  -out ec_private.pem
+openssl ecparam -genkey -name prime256v1 -noout -out ec_private.pem
 # careful! this will output your private key in terminal
 cat ec_private.pem | base64
 ```

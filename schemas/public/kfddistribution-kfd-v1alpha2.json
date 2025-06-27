@@ -163,6 +163,10 @@
         "networkPoliciesEnabled": {
           "type": "boolean",
           "description": "EXPERIMENTAL FEATURE. This field defines whether Network Policies are provided for core modules."
+        },
+        "immutableResources": {
+          "type": "boolean",
+          "description": "EXPERIMENTAL FEATURE. This field makes the distribution's Secrets and ConfigMaps immutable. Also applies to Secrets/ConfigMaps created with the `customPatches` section. Does not apply to plugins."
         }
       }
     },
@@ -1092,6 +1096,16 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
+        "podCidr": {
+          "$ref": "#/$defs/Types.Cidr",
+          "description": "Allows specifing a CIDR for the Pods network different from `.spec.kubernetes.podCidr`. If not set the default is to use `.spec.kubernetes.podCidr`. WARNING: The value for this field cannot be changed once set."
+        },
+        "blockSize": {
+          "type": "integer",
+          "description": "BlockSize specifies the CIDR prefex length to use when allocating per-node IP blocks from the main IP pool CIDR. WARNING: The value for this field cannot be changed once set. Default is 26.",
+          "minimum": 1,
+          "maximum": 32
+        },
         "overrides": {
           "$ref": "#/$defs/Types.FuryModuleComponentOverrides"
         }
