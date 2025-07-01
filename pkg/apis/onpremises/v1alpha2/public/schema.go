@@ -386,6 +386,10 @@ type SpecDistributionModulesAuthOIDCKubernetesAuth struct {
 	// different instances of Gangplank.
 	SessionSecurityKey *string `json:"sessionSecurityKey,omitempty" yaml:"sessionSecurityKey,omitempty" mapstructure:"sessionSecurityKey,omitempty"`
 
+	// If true, the path to a root CA to trust for self-signed certificates at the
+	// Oauth2 URL will be defined.
+	TrustedCAPath *bool `json:"trustedCAPath,omitempty" yaml:"trustedCAPath,omitempty" mapstructure:"trustedCAPath,omitempty"`
+
 	// The JWT claim to use as the username. This is used in Gangplank's UI. This is
 	// combined with the clusterName for the user portion of the kubeconfig. Defaults
 	// to `nickname`.
