@@ -2385,6 +2385,10 @@
           "type": "boolean",
           "description": "If true, components needed for interacting with the Kubernetes API with OIDC authentication (Gangplank, Dex) be deployed and configued."
         },
+        "trustedCAPath": {
+          "type": "boolean",
+          "description": "If true, the path to a root CA to trust for self-signed certificates at the Oauth2 URL will be defined."
+        },
         "clientID": {
           "type": "string",
           "description": "The client ID that the Kubernetes API will use to authenticate against the OIDC provider (Dex)."
