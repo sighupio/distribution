@@ -16,7 +16,11 @@ resources:
 {{- if ne .spec.distribution.modules.ingress.nginx.type "none" }}
   - resources/ingress-infra.yml
 {{- end }}
-
+{{- if and .spec.distribution.modules.auth.oidcKubernetesAuth.enabled .spec.distribution.modules.auth.oidcKubernetesAuth.trustedCA }}
+  - secrets/gangplank-trusted-ca.yml
+  - secrets/pomerium-trusted-ca.yml
+  - secrets/dex-trusted-ca.yml
+{{- end }}
 {{ if eq .spec.distribution.common.networkPoliciesEnabled true }}
   - policies
 {{- end }}
@@ -24,7 +28,11 @@ resources:
 patchesStrategicMerge:
   - patches/infra-nodes.yml
   - patches/pomerium-ingress.yml
-
+{{- if and .spec.distribution.modules.auth.oidcKubernetesAuth.enabled .spec.distribution.modules.auth.oidcKubernetesAuth.trustedCA }}
+  - patches/gangplank-trusted-ca.yml
+  - patches/pomerium-trusted-ca.yml
+  - patches/dex-trusted-ca.yml
+{{- end }}
 configMapGenerator:
   - name: pomerium
     behavior: replace
@@ -62,6 +70,10 @@ resources:
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/auth/katalog/dex" }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/auth/katalog/gangplank" }}
   - resources/ingress-infra.yml
+{{- if .spec.distribution.modules.auth.oidcKubernetesAuth.trustedCA }}
+  - secrets/gangplank-trusted-ca.yml
+  - secrets/dex-trusted-ca.yml
+{{- end }}
 {{- end }}
 
 {{- if .spec.distribution.modules.auth.oidcKubernetesAuth.enabled }}
@@ -77,6 +89,10 @@ secretGenerator:
 
 patchesStrategicMerge:
   - patches/infra-nodes.yml
+{{- if .spec.distribution.modules.auth.oidcKubernetesAuth.trustedCA }}
+  - patches/gangplank-trusted-ca.yml
+  - patches/dex-trusted-ca.yml
+{{- end }}
 {{- end }}
 
 {{- end }}
@@ -88,6 +104,10 @@ resources:
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/auth/katalog/dex" }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/auth/katalog/gangplank" }}
   - resources/ingress-infra.yml
+{{- if .spec.distribution.modules.auth.oidcKubernetesAuth.trustedCA }}
+  - secrets/gangplank-trusted-ca.yml
+  - secrets/dex-trusted-ca.yml
+{{- end }}
 {{- end }}
 
 {{- if .spec.distribution.modules.auth.oidcKubernetesAuth.enabled }}
@@ -103,6 +123,10 @@ secretGenerator:
 
 patchesStrategicMerge:
   - patches/infra-nodes.yml
+{{- if .spec.distribution.modules.auth.oidcKubernetesAuth.trustedCA }}
+  - patches/gangplank-trusted-ca.yml
+  - patches/dex-trusted-ca.yml
+{{- end }}
 {{- end }}
 
 {{- end }}

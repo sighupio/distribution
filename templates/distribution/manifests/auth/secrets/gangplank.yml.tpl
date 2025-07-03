@@ -6,7 +6,7 @@
 clusterName: "{{ .metadata.name }}"
 apiServerURL: "https://{{ .spec.kubernetes.controlPlaneAddress }}"
 authorizeURL: "https://{{ template "dexUrl" .spec }}/auth"
-{{- if index .spec.distribution.modules.auth.oidcKubernetesAuth "trustedCAPath" }}
+{{- if index .spec.distribution.modules.auth.oidcKubernetesAuth "trustedCA" }}
 trustedCAPath: "/tls/ca.crt"
 {{- end }}
 tokenURL: "https://{{ template "dexUrl" .spec }}/token"
