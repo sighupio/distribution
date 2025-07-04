@@ -2,12 +2,12 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-{{- if and .spec.distribution.modules.auth.oidcKubernetesAuth.enabled .spec.distribution.modules.auth.oidcKubernetesAuth.trustedCA }}
+{{- if ne .spec.distribution.modules.auth.oidcKubernetesAuth.trustedCA "" }}
 ---
 apiVersion: v1
 kind: Secret
 metadata:
-  name: dex-trusted-ca
+  name: oidc-trusted-ca
   namespace: kube-system
 type: Opaque
 data:

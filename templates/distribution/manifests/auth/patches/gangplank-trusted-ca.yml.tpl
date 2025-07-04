@@ -13,13 +13,13 @@ spec:
       containers:
       - name: gangplank
         volumeMounts:
-        - name: trusted-ca-volume
+        - name: trusted-ca
           mountPath: "/tls/ca.crt"
           subPath: ca.crt
       volumes:
-      - name: trusted-ca-volume
+      - name: trusted-ca
         secret:
-          secretName: gangplank-trusted-ca
+          secretName: oidc-trusted-ca
           items:
           - key: ca.crt
             path: ca.crt

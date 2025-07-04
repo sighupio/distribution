@@ -13,13 +13,13 @@ spec:
       containers:
       - name: dex
         volumeMounts:
-        - name: trusted-ca-volume
+        - name: trusted-ca
           mountPath: /etc/dex/tls/ca.crt
           subPath: ca.crt
       volumes:
-      - name: trusted-ca-volume
+      - name: trusted-ca
         secret:
-          secretName: dex-trusted-ca
+          secretName: oidc-trusted-ca
           items:
           - key: ca.crt
             path: ca.crt

@@ -71,7 +71,7 @@ resources:
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/auth/katalog/dex" }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/auth/katalog/gangplank" }}
   - resources/ingress-infra.yml
-{{- if .spec.distribution.modules.auth.oidcKubernetesAuth.trustedCA }}
+{{- if ne .spec.distribution.modules.auth.oidcKubernetesAuth.trustedCA "" }}
   - secrets/gangplank-dex-trusted-ca.yml
 {{- end }}
 {{- end }}

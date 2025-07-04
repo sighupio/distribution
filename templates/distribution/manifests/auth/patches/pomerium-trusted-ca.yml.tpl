@@ -16,13 +16,13 @@ spec:
         - name: CERTIFICATE_AUTHORITY_FILE
           value: "/tls/ca.crt"
         volumeMounts:
-        - name: trusted-ca-volume
+        - name: trusted-ca
           mountPath: /tls/ca.crt
           subPath: ca.crt
       volumes:
-      - name: trusted-ca-volume
+      - name: trusted-ca
         secret:
-          secretName: pomerium-trusted-ca
+          secretName: oidc-trusted-ca
           items:
           - key: ca.crt
             path: ca.crt
