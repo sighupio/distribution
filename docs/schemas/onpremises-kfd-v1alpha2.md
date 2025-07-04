@@ -696,6 +696,7 @@ The value of the toleration
 | [removeCAFromKubeconfig](#specdistributionmodulesauthoidckubernetesauthremovecafromkubeconfig) | `boolean` | Optional |
 | [scopes](#specdistributionmodulesauthoidckubernetesauthscopes)                                 | `array`   | Optional |
 | [sessionSecurityKey](#specdistributionmodulesauthoidckubernetesauthsessionsecuritykey)         | `string`  | Optional |
+| [trustedCA](#specdistributionmodulesauthoidckubernetesauthtrustedca)                           | `string`  | Optional |
 | [usernameClaim](#specdistributionmodulesauthoidckubernetesauthusernameclaim)                   | `string`  | Optional |
 
 ## .spec.distribution.modules.auth.oidcKubernetesAuth.clientID
@@ -745,6 +746,12 @@ Used to specify the scope of the requested Oauth authorization by Gangplank. Def
 ### Description
 
 The Key to use for the sessions in Gangplank. Must be different between different instances of Gangplank.
+
+## .spec.distribution.modules.auth.oidcKubernetesAuth.trustedCA
+
+### Description
+
+The Certificate Authority certificate file's content to trust for self-signed certificates at the OAuth2 URL. You can use the `"{file://<path>}"` notation to get the content from a file.
 
 ## .spec.distribution.modules.auth.oidcKubernetesAuth.usernameClaim
 
