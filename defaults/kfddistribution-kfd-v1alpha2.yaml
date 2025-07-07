@@ -302,6 +302,7 @@ data:
           idTokens: "24h"
       oidcKubernetesAuth: # only needed as default
         enabled: false
+        trustedCA: "" # only needed as default
       baseDomain: ""
 
 templates:
