@@ -307,6 +307,7 @@ data:
         expiry:
           signingKeys: "6h"
           idTokens: "24h"
+      oidcTrustedCA: ""
       oidcKubernetesAuth:
         enabled: false
       baseDomain: ""

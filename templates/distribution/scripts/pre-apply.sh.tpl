@@ -650,6 +650,7 @@ deleteDex() {
   fi
 {{- end }}
   $kubectlbin delete --ignore-not-found --wait --timeout=180s -f delete-dex.yaml
+  $kubectlbin delete --ignore-not-found --wait --timeout=180s -n kube-system secret oidc-trusted-ca
   $kubectlbin delete --ignore-not-found --wait --timeout=180s ingress -n kube-system dex
   echo "dex has been deleted from the cluster"
 }
@@ -682,6 +683,7 @@ deletePomerium() {
   fi
 {{- end }}
   $kubectlbin delete --ignore-not-found --wait --timeout=180s -f delete-pomerium.yaml
+  $kubectlbin delete --ignore-not-found --wait --timeout=180s -n pomerium secret oidc-trusted-ca
   $kubectlbin delete --ignore-not-found --wait --timeout=180s ingress -n pomerium pomerium
   echo "pomerium has been deleted from the cluster"
 }
