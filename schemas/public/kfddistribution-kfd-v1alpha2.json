@@ -1408,6 +1408,10 @@
         },
         "dex": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Auth.Dex"
+        },
+        "oidcTrustedCA": {
+          "type": "string",
+          "description": "The Certificate Authority certificate file's content to trust for self-signed certificates at the OAuth2 URL. You can use the `\"{file://<path>}\"` notation to get the content from a file."
         }
       },
       "required": [
