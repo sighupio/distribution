@@ -2165,6 +2165,10 @@
         },
         "oidcKubernetesAuth": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Auth.OIDCKubernetesAuth"
+        },
+        "oidcTrustedCA": {
+          "type": "string",
+          "description": "The Certificate Authority certificate file's content to trust for self-signed certificates at the OAuth2 URL. You can use the `\"{file://<path>}\"` notation to get the content from a file."
         }
       },
       "required": [
@@ -2384,10 +2388,6 @@
         "enabled": {
           "type": "boolean",
           "description": "If true, components needed for interacting with the Kubernetes API with OIDC authentication (Gangplank, Dex) be deployed and configued."
-        },
-        "trustedCA": {
-          "type": "string",
-          "description": "The Certificate Authority certificate file's content to trust for self-signed certificates at the OAuth2 URL. You can use the `\"{file://<path>}\"` notation to get the content from a file."
         },
         "clientID": {
           "type": "string",
