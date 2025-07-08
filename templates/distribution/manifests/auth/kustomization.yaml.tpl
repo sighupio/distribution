@@ -16,9 +16,9 @@ resources:
 {{- if ne .spec.distribution.modules.ingress.nginx.type "none" }}
   - resources/ingress-infra.yml
 {{- end }}
-{{- if ne .spec.distribution.modules.auth.oidcKubernetesAuth.trustedCA "" }}
-  - secrets/pomerium-trusted-ca.yml
-  - secrets/gangplank-dex-trusted-ca.yml
+{{- if ne .spec.distribution.modules.auth.oidcTrustedCA "" }}
+  - secrets/oidc-trusted-ca.yml
+  - secrets/overlays/kube-system-ca
 {{- end }}
 {{ if eq .spec.distribution.common.networkPoliciesEnabled true }}
   - policies
@@ -27,11 +27,11 @@ resources:
 patches:
   - path: patches/infra-nodes.yml
   - path: patches/pomerium-ingress.yml
-{{- if ne .spec.distribution.modules.auth.oidcKubernetesAuth.trustedCA "" }}
+{{- if ne .spec.distribution.modules.auth.oidcTrustedCA "" }}
   - path: patches/pomerium-trusted-ca.yml
   - path: patches/dex-trusted-ca.yml
 {{- end }}
-{{- if and .spec.distribution.modules.auth.oidcKubernetesAuth.enabled (ne .spec.distribution.modules.auth.oidcKubernetesAuth.trustedCA "") }}
+{{- if and .spec.distribution.modules.auth.oidcKubernetesAuth.enabled (ne .spec.distribution.modules.auth.oidcTrustedCA "") }}
   - path: patches/gangplank-trusted-ca.yml
 {{- end }}
 configMapGenerator:
@@ -71,8 +71,8 @@ resources:
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/auth/katalog/dex" }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/auth/katalog/gangplank" }}
   - resources/ingress-infra.yml
-{{- if ne .spec.distribution.modules.auth.oidcKubernetesAuth.trustedCA "" }}
-  - secrets/gangplank-dex-trusted-ca.yml
+{{- if ne .spec.distribution.modules.auth.oidcTrustedCA "" }}
+  - secrets/overlays/kube-system-ca
 {{- end }}
 {{- end }}
 
@@ -89,7 +89,7 @@ secretGenerator:
 
 patches:
   - path: patches/infra-nodes.yml
-{{- if ne .spec.distribution.modules.auth.oidcKubernetesAuth.trustedCA "" }}
+{{- if ne .spec.distribution.modules.auth.oidcTrustedCA "" }}
   - path: patches/gangplank-trusted-ca.yml
   - path: patches/dex-trusted-ca.yml
 {{- end }}
@@ -104,8 +104,8 @@ resources:
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/auth/katalog/dex" }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/auth/katalog/gangplank" }}
   - resources/ingress-infra.yml
-{{- if ne .spec.distribution.modules.auth.oidcKubernetesAuth.trustedCA "" }}
-  - secrets/gangplank-dex-trusted-ca.yml
+{{- if ne .spec.distribution.modules.auth.oidcTrustedCA "" }}
+  - secrets/overlays/kube-system-ca
 {{- end }}
 {{- end }}
 
@@ -122,7 +122,7 @@ secretGenerator:
 
 patches:
   - path: patches/infra-nodes.yml
-{{- if ne .spec.distribution.modules.auth.oidcKubernetesAuth.trustedCA "" }}
+{{- if ne .spec.distribution.modules.auth.oidcTrustedCA "" }}
   - path: patches/gangplank-trusted-ca.yml
   - path: patches/dex-trusted-ca.yml
 {{- end }}

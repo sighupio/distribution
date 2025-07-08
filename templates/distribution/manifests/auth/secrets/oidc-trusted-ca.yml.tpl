@@ -2,14 +2,14 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-{{- if ne .spec.distribution.modules.auth.oidcKubernetesAuth.trustedCA "" }}
+{{- if ne .spec.distribution.modules.auth.oidcTrustedCA "" }}
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   name: oidc-trusted-ca
-  namespace: kube-system
+  namespace: pomerium
 type: Opaque
 data:
-  ca.crt: {{ .spec.distribution.modules.auth.oidcKubernetesAuth.trustedCA | b64enc }}
+  ca.crt: {{ .spec.distribution.modules.auth.oidcTrustedCA | b64enc }}
 {{- end }}
