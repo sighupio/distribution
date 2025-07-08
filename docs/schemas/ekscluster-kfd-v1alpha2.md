@@ -537,13 +537,14 @@ The type of the secret
 
 ### Properties
 
-| Property                                             | Type     | Required |
-|:-----------------------------------------------------|:---------|:---------|
-| [baseDomain](#specdistributionmodulesauthbasedomain) | `string` | Optional |
-| [dex](#specdistributionmodulesauthdex)               | `object` | Optional |
-| [overrides](#specdistributionmodulesauthoverrides)   | `object` | Optional |
-| [pomerium](#specdistributionmodulesauthpomerium)     | `object` | Optional |
-| [provider](#specdistributionmodulesauthprovider)     | `object` | Required |
+| Property                                                   | Type     | Required |
+|:-----------------------------------------------------------|:---------|:---------|
+| [baseDomain](#specdistributionmodulesauthbasedomain)       | `string` | Optional |
+| [dex](#specdistributionmodulesauthdex)                     | `object` | Optional |
+| [oidcTrustedCA](#specdistributionmodulesauthoidctrustedca) | `string` | Optional |
+| [overrides](#specdistributionmodulesauthoverrides)         | `object` | Optional |
+| [pomerium](#specdistributionmodulesauthpomerium)           | `object` | Optional |
+| [provider](#specdistributionmodulesauthprovider)           | `object` | Required |
 
 ### Description
 
@@ -678,6 +679,12 @@ The key of the toleration
 ### Description
 
 The value of the toleration
+
+## .spec.distribution.modules.auth.oidcTrustedCA
+
+### Description
+
+The Certificate Authority certificate file's content to trust for self-signed certificates at the OAuth2 URL. You can use the `"{file://<path>}"` notation to get the content from a file.
 
 ## .spec.distribution.modules.auth.overrides
 
