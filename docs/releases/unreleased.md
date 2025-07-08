@@ -39,7 +39,7 @@ This version adds customizations to make it easier to install SD on bare metal n
     ```
 
 - [[#425](https://github.com/sighupio/distribution/pull/425)]: Adds trusted CA certificate support in OIDC authentication with self-signed certificates:
-  - `trustedCA` key under `spec.distribution.modules.auth.oidcKubernetesAuth` allows automatic provisioning of custom CA certificates for auth components.
+  - `oidcTrustedCA` key under `spec.distribution.modules.auth` allows automatic provisioning of custom CA certificates for auth components.
   - Adds secret generation and volume mounting for Gangplank, Pomerium, and Dex deployments.
   - Supports `{file://path}` notation.
 
@@ -48,10 +48,7 @@ This version adds customizations to make it easier to install SD on bare metal n
       distribution:
         modules:
           auth:
-            oidcKubernetesAuth:
-              enabled: true
-              trustedCA: "{file://my-ca.crt}"
-              ...
+            oidcTrustedCA: "{file://my-ca.crt}"
     ```
 
 ## Fixes 🐞
