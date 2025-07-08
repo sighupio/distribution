@@ -300,9 +300,9 @@ data:
         expiry:
           signingKeys: "6h"
           idTokens: "24h"
+      oidcTrustedCA: "" # only needed as default
       oidcKubernetesAuth: # only needed as default
         enabled: false
-        trustedCA: "" # only needed as default
       baseDomain: ""
 
 templates:
