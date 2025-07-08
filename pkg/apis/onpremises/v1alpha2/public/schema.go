@@ -309,6 +309,11 @@ type SpecDistributionModulesAuth struct {
 	// OidcKubernetesAuth corresponds to the JSON schema field "oidcKubernetesAuth".
 	OidcKubernetesAuth *SpecDistributionModulesAuthOIDCKubernetesAuth `json:"oidcKubernetesAuth,omitempty" yaml:"oidcKubernetesAuth,omitempty" mapstructure:"oidcKubernetesAuth,omitempty"`
 
+	// The Certificate Authority certificate file's content to trust for self-signed
+	// certificates at the OAuth2 URL. You can use the `"{file://<path>}"` notation to
+	// get the content from a file.
+	OidcTrustedCA *string `json:"oidcTrustedCA,omitempty" yaml:"oidcTrustedCA,omitempty" mapstructure:"oidcTrustedCA,omitempty"`
+
 	// Overrides corresponds to the JSON schema field "overrides".
 	Overrides *SpecDistributionModulesAuthOverrides `json:"overrides,omitempty" yaml:"overrides,omitempty" mapstructure:"overrides,omitempty"`
 
@@ -385,11 +390,6 @@ type SpecDistributionModulesAuthOIDCKubernetesAuth struct {
 	// The Key to use for the sessions in Gangplank. Must be different between
 	// different instances of Gangplank.
 	SessionSecurityKey *string `json:"sessionSecurityKey,omitempty" yaml:"sessionSecurityKey,omitempty" mapstructure:"sessionSecurityKey,omitempty"`
-
-	// The Certificate Authority certificate file's content to trust for self-signed
-	// certificates at the OAuth2 URL. You can use the `"{file://<path>}"` notation to
-	// get the content from a file.
-	TrustedCA *string `json:"trustedCA,omitempty" yaml:"trustedCA,omitempty" mapstructure:"trustedCA,omitempty"`
 
 	// The JWT claim to use as the username. This is used in Gangplank's UI. This is
 	// combined with the clusterName for the user portion of the kubeconfig. Defaults

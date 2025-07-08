@@ -544,6 +544,7 @@ The type of the secret
 | [baseDomain](#specdistributionmodulesauthbasedomain)                 | `string` | Optional |
 | [dex](#specdistributionmodulesauthdex)                               | `object` | Optional |
 | [oidcKubernetesAuth](#specdistributionmodulesauthoidckubernetesauth) | `object` | Optional |
+| [oidcTrustedCA](#specdistributionmodulesauthoidctrustedca)           | `string` | Optional |
 | [overrides](#specdistributionmodulesauthoverrides)                   | `object` | Optional |
 | [pomerium](#specdistributionmodulesauthpomerium)                     | `object` | Optional |
 | [provider](#specdistributionmodulesauthprovider)                     | `object` | Required |
@@ -696,7 +697,6 @@ The value of the toleration
 | [removeCAFromKubeconfig](#specdistributionmodulesauthoidckubernetesauthremovecafromkubeconfig) | `boolean` | Optional |
 | [scopes](#specdistributionmodulesauthoidckubernetesauthscopes)                                 | `array`   | Optional |
 | [sessionSecurityKey](#specdistributionmodulesauthoidckubernetesauthsessionsecuritykey)         | `string`  | Optional |
-| [trustedCA](#specdistributionmodulesauthoidckubernetesauthtrustedca)                           | `string`  | Optional |
 | [usernameClaim](#specdistributionmodulesauthoidckubernetesauthusernameclaim)                   | `string`  | Optional |
 
 ## .spec.distribution.modules.auth.oidcKubernetesAuth.clientID
@@ -747,17 +747,17 @@ Used to specify the scope of the requested Oauth authorization by Gangplank. Def
 
 The Key to use for the sessions in Gangplank. Must be different between different instances of Gangplank.
 
-## .spec.distribution.modules.auth.oidcKubernetesAuth.trustedCA
-
-### Description
-
-The Certificate Authority certificate file's content to trust for self-signed certificates at the OAuth2 URL. You can use the `"{file://<path>}"` notation to get the content from a file.
-
 ## .spec.distribution.modules.auth.oidcKubernetesAuth.usernameClaim
 
 ### Description
 
 The JWT claim to use as the username. This is used in Gangplank's UI. This is combined with the clusterName for the user portion of the kubeconfig. Defaults to `nickname`.
+
+## .spec.distribution.modules.auth.oidcTrustedCA
+
+### Description
+
+The Certificate Authority certificate file's content to trust for self-signed certificates at the OAuth2 URL. You can use the `"{file://<path>}"` notation to get the content from a file.
 
 ## .spec.distribution.modules.auth.overrides
 
