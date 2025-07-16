@@ -508,8 +508,36 @@
         "kubeletConfiguration": {
           "$ref": "#/$defs/Spec.Kubernetes.Advanced.KubeletConfiguration"
         },
-        "kernelParameters": {
-          "$ref": "#/$defs/Spec.Kubernetes.Advanced.KernelParameters"
+        "controllerManager": {
+          "$ref": "#/$defs/Spec.Kubernetes.Advanced.ControllerManager"
+        },
+        "eventRateLimitLimits": {
+          "type": "array",
+          "description": "Configura i limiti del plugin EventRateLimit dell'API Server. Ogni item rappresenta un bucket (Server, Namespace, User, etc).",
+          "items": {
+            "type": "object",
+            "required": ["type", "qps", "burst"],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["Server", "Namespace", "User", "SourceAndObject"],
+                "description": "Tipo di limite da applicare (Server, Namespace, User, SourceAndObject)."
+              },
+              "qps": {
+                "type": "integer",
+                "description": "Query per secondo (QPS) massimo consentito per questo tipo di bucket."
+              },
+              "burst": {
+                "type": "integer",
+                "description": "Burst massimo consentito per questo tipo di bucket."
+              },
+              "cacheSize": {
+                "type": "integer",
+                "description": "Numero massimo di oggetti in cache per questo bucket. Solo per alcuni tipi come Namespace o User."
+              }
+            },
+            "additionalProperties": false
+          }
         }
       }
     },
@@ -735,25 +763,15 @@
       "additionalProperties": true,
       "description": "Advanced configuration for Kubelet. This open field allows users to specify any parameter supported by the `KubeletConfiguration` object. Examples of uses include controlling the maximum number of pods per core (`podsPerCore`), managing container logging (`containerLogMaxSize`), Topology Manager options (`topologyManagerPolicyOptions`). All values must follow the official Kubelet specification: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/.\n\nNOTE: Content will **not** be validated by furyctl. To customize the TLS cipher suites of the Kubelet, set only the `Spec.Kubernetes.Advanced.Encryption.tlsCipherSuites` field - do not configure them under this field."
     },
-    "Spec.Kubernetes.Advanced.KernelParameters": {
-      "type": "array",
-      "description": "Allows customization of kernel parameters with sysctl on all Kubernetes nodes. NOTE: if you remove a parameter from this list, it will not be reset to its default value without a reboot.",
-      "items": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "The kernel parameter to edit. Example: `kernel.panic`"
-          },
-          "value": {
-            "type": "string",
-            "description": "The value of the kernel parameter to edit. Example: `\"15\"`"
-          }
-        },
-        "required": [
-          "name",
-          "value"
-        ]
+    "Spec.Kubernetes.Advanced.ControllerManager": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configurazione avanzata per il controller-manager.",
+      "properties": {
+        "gcThreshold": {
+          "type": "integer",
+          "description": "Numero massimo di Pod terminati conservati dal controller-manager prima dell’eliminazione automatica."
+        }
       }
     },
     "Spec.Distribution": {
