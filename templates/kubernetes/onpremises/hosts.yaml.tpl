@@ -132,6 +132,15 @@ all:
         {{- end }}
         {{- end }}
 
+        {{- if index .spec.kubernetes "advanced" }}
+        {{- if and (index .spec.kubernetes.advanced "eventeventRateLimitLimits") (ne .spec.kubernetes.advanced.eventRateLimitLimits "") }}
+        eventratelimits_server: "{{ .spec.kubernetes.advanced.eventeventRateLimitLimits.type }}"
+        eventratelimits_qps: "{{ .spec.kubernetes.advanced.eventeventRateLimitLimits.qps }}"
+        eventratelimits_burst: "{{ .spec.kubernetes.advanced.eventeventRateLimitLimits.burst }}"
+        eventratelimits_cacheSize: "{{ .spec.kubernetes.advanced.eventeventRateLimitLimits.eventratelimits_cacheSize }}"
+        {{- end }}
+        {{- end }}
+
         {{- if and (index .spec.kubernetes "advanced") (index .spec.kubernetes.advanced "apiServerCertSANs") }}
         kubernetes_apiserver_certSANs:
 {{ .spec.kubernetes.advanced.apiServerCertSANs | toYaml | indent 10 }}
