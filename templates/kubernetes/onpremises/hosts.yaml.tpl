@@ -164,7 +164,7 @@ all:
         {{- if index .spec.kubernetes "advanced" }}
         {{- if index .spec.kubernetes.advanced "kubeletConfiguration" }}
         {{- if index .spec.kubernetes.advanced.kubeletConfiguration "streamingConnectionIdleTimeout" }}
-        streamingConnectionIdleTimeout: "{{ .spec.kubernetes.advanced.kubeletConfiguration.streamingConnectionIdleTimeout }}"
+        kubelet_streaming_connection_idle_timeout: "{{ .spec.kubernetes.advanced.kubeletConfiguration.streamingConnectionIdleTimeout }}"
         {{- end }}
         {{- end }}
         {{- end }}
