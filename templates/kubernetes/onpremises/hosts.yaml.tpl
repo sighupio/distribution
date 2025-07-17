@@ -133,13 +133,45 @@ all:
         {{- end }}
 
         {{- if index .spec.kubernetes "advanced" }}
-        {{- if and (index .spec.kubernetes.advanced "eventeventRateLimitLimits") (ne .spec.kubernetes.advanced.eventRateLimitLimits "") }}
-        eventratelimits_server: "{{ .spec.kubernetes.advanced.eventeventRateLimitLimits.type }}"
-        eventratelimits_qps: "{{ .spec.kubernetes.advanced.eventeventRateLimitLimits.qps }}"
-        eventratelimits_burst: "{{ .spec.kubernetes.advanced.eventeventRateLimitLimits.burst }}"
-        eventratelimits_cacheSize: "{{ .spec.kubernetes.advanced.eventeventRateLimitLimits.eventratelimits_cacheSize }}"
+          {{- $custom := .spec.kubernetes.advanced.eventRateLimits | default (list) }}
+          {{- $default := list
+            (dict "type" "Server" "qps" 5000 "burst" 20000)
+            (dict "type" "Namespace" "qps" 50 "burst" 100 "cacheSize" 2000)
+            (dict "type" "User" "qps" 50 "burst" 100)
+          }}
+          {{- $overrides := dict }}
+          {{- range $custom }}
+            {{- $_ := set $overrides .type true }}
+          {{- end }}
+        eventratelimits:
+        {{- range $default }}
+          {{- if not (hasKey $overrides .type) }}
+          - type: {{ .type }}
+            qps: {{ .qps }}
+            burst: {{ .burst }}
+            {{- if hasKey . "cacheSize" }}
+            cacheSize: {{ .cacheSize }}
+            {{- end }}
+          {{- end }}
+        {{- end }}
+        {{- range $custom }}
+          - type: {{ .type }}
+            qps: {{ .qps }}
+            burst: {{ .burst }}
+            {{- if .cacheSize }}
+            cacheSize: {{ .cacheSize }}
+            {{- end }}
         {{- end }}
         {{- end }}
+
+
+        {{- if .spec.kubernetes.advanced.controllerManager.gcThreshold }}
+        terminated_pod_gc_threshold: {{ .spec.kubernetes.advanced.controllerManager.gcThreshold }}
+        {{- end }}
+
+       
+
+
 
         {{- if and (index .spec.kubernetes "advanced") (index .spec.kubernetes.advanced "apiServerCertSANs") }}
         kubernetes_apiserver_certSANs:
