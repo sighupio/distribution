@@ -169,7 +169,13 @@ all:
         terminated_pod_gc_threshold: {{ .spec.kubernetes.advanced.controllerManager.gcThreshold }}
         {{- end }}
 
-       
+        {{- if index .spec.kubernetes "advanced" }}
+        {{- if index .spec.kubernetes.advanced "kubeletConfiguration" }}
+        {{- if index .spec.kubernetes.advanced.kubeletConfiguration "streamingConnectionIdleTimeout" }}
+        kubelet_config_streaming_connection_idle_timeout: "{{ .spec.kubernetes.advanced.kubeletConfiguration.streamingConnectionIdleTimeout }}"
+        {{- end }}
+        {{- end }}
+        {{- end }}
 
 
 
