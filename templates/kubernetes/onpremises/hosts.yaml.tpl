@@ -132,7 +132,18 @@ all:
         {{- end }}
         {{- end }}
 
-        {{- if .spec.kubernetes.advanced.eventRateLimits }}
+        {{- if index .spec.kubernetes "advanced" }}
+        {{- if and (index .spec.kubernetes.advanced "eventRateLimits") }}
+          {{- $custom := .spec.kubernetes.advanced.eventRateLimits | default (list) }}
+          {{- $default := list
+            (dict "type" "Server" "qps" 5000 "burst" 20000)
+            (dict "type" "Namespace" "qps" 50 "burst" 100 "cacheSize" 2000)
+            (dict "type" "User" "qps" 50 "burst" 100)
+          }}
+          {{- $overrides := dict }}
+          {{- range $custom }}
+            {{- $_ := set $overrides .type true }}
+          {{- end }}
         eventratelimits:
           {{- range .spec.kubernetes.advanced.eventRateLimits }}
           - type: {{ .type }}
@@ -141,12 +152,14 @@ all:
             {{- if .cacheSize }}
             cacheSize: {{ .cacheSize }}
             {{- end }}
-          {{- end }}
+        {{- end }}
+        {{- end }}
         {{- end }}
 
-
-        {{- if .spec.kubernetes.advanced.controllerManager.gcThreshold }}
+        {{- if index .spec.kubernetes "advanced" }}
+        {{- if and (index .spec.kubernetes.advanced "controllerManager") (index .spec.kubernetes.advanced.controllerManager "gcThreshold") }}
         terminated_pod_gc_threshold: {{ .spec.kubernetes.advanced.controllerManager.gcThreshold }}
+        {{- end }}
         {{- end }}
 
         {{- if index .spec.kubernetes "advanced" }}
