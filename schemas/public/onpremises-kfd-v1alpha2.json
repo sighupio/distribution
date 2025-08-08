@@ -495,7 +495,7 @@
         },
         "eventRateLimits": {
           "type": "array",
-          "description": "Configura i limiti del plugin EventRateLimit dell'API Server. Ogni item rappresenta un bucket (Server, Namespace, User, etc).",
+          "description": "Configures the EventRateLimit plugin limits for the API Server. Each item represents a bucket (Server, Namespace, User, etc).",
           "items": {
             "type": "object",
             "required": ["type", "qps", "burst"],
@@ -503,19 +503,19 @@
               "type": {
                 "type": "string",
                 "enum": ["Server", "Namespace", "User", "SourceAndObject"],
-                "description": "Tipo di limite da applicare (Server, Namespace, User, SourceAndObject)."
+                "description": "Type of limit to apply (Server, Namespace, User, SourceAndObject)."
               },
               "qps": {
                 "type": "integer",
-                "description": "Query per secondo (QPS) massimo consentito per questo tipo di bucket."
+                "description": "Maximum queries per second (QPS) allowed for this bucket type."
               },
               "burst": {
                 "type": "integer",
-                "description": "Burst massimo consentito per questo tipo di bucket."
+                "description": "Maximum burst allowed for this bucket type."
               },
               "cacheSize": {
                 "type": "integer",
-                "description": "Numero massimo di oggetti in cache per questo bucket. Solo per alcuni tipi come Namespace o User."
+                "description": "Maximum number of objects in cache for this bucket. Only for certain types like Namespace or User."
               }
             },
             "additionalProperties": false
@@ -752,17 +752,17 @@
       },
         "kubeletCertificateAuthorityFile": {
         "type": "string",
-        "description": "Percorso al file della CA per verificare i certificati TLS server delle kubelet."
+        "description": "Path to the CA file for verifying kubelet server TLS certificates."
       }
     },
     "Spec.Kubernetes.Advanced.ControllerManager": {
       "type": "object",
       "additionalProperties": false,
-      "description": "Configurazione avanzata per il controller-manager.",
+      "description": "Advanced configuration for the controller-manager.",
       "properties": {
         "gcThreshold": {
           "type": "integer",
-          "description": "Numero massimo di Pod terminati conservati dal controller-manager prima dell’eliminazione automatica."
+          "description": "Maximum number of terminated pods kept by the controller-manager before automatic deletion."
         }
       }
     },
