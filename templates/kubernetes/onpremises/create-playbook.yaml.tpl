@@ -201,10 +201,10 @@
     - name: Update node labels
       delegate_to: localhost
       ansible.builtin.command: "{{ .paths.kubectl }} {{ "label node {{ kubernetes_hostname }} {{ node_labels }} --overwrite --kubeconfig={{ kubernetes_kubeconfig_path }}admin.conf" }}"
-      when: node_labels is defined and node_labels|trim != ''
+      when: node_labels is defined and node_labels|trim not in ['', 'None']
 
     # Update the control plane and nodes annotations with what we calculated before only if needed.
     - name: Update node annotations
       delegate_to: localhost
       ansible.builtin.command: "{{ .paths.kubectl }} {{ "annotate node {{ kubernetes_hostname }} {{ node_annotations }} --overwrite --kubeconfig={{ kubernetes_kubeconfig_path }}admin.conf" }}"
-      when: node_annotations is defined and node_annotations|trim != ''
+      when: node_annotations is defined and node_annotations|trim not in ['', 'None']
