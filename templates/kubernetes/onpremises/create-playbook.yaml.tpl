@@ -38,23 +38,7 @@
 
 # cluster
 
-- name: Ensure etcd group and user exist
-  hosts: master, etcd
-  become: true
-  tasks:
-    - name: Ensure group etcd exists
-      group:
-        name: etcd
-        state: present
-        system: true
 
-    - name: Ensure user etcd exists
-      user:
-        name: etcd
-        group: etcd
-        system: true
-        shell: /sbin/nologin
-        create_home: false
 - name: Copy etcd and master PKIs
   hosts: master,etcd
   become: true
@@ -64,9 +48,9 @@
     - name: Create etcd PKI directory
       file:
         path: /etc/etcd/pki/etcd
-        owner: etcd
-        group: etcd
-        mode: 600
+        owner: root
+        group: root
+        mode: 0750
         state: directory
     - name: Create Kubernetes PKI directory
       file:
@@ -79,9 +63,9 @@
       copy:
         src: "{{ "{{ pki_dir }}" }}/etcd/{{ "{{ item }}" }}"
         dest: "/etc/etcd/pki/etcd/{{ "{{ item }}" }}"
-        owner: etcd
-        group: etcd
-        mode: 0600
+        owner: root
+        group: root
+        mode: 0640
       with_items:
         - ca.crt
         - ca.key
