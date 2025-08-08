@@ -129,6 +129,7 @@ spec:
       - port: 443
         protocol: TCP
 ---
+{{- if ne .spec.distribution.modules.ingress.nginx.type "none" }}
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -175,4 +176,5 @@ spec:
       ports:
         - port: 9001
           protocol: TCP
+{{- end }}
 ---
