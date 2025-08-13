@@ -27,7 +27,7 @@ This version adds customizations to make it easier to install SD on bare metal n
               podCidr: 172.16.0.0/16
     ```
 
-  - `kernelParameters` to the `.spec.kubernetes.advanced`, `.spec.kubernetes.masters` and `-spec.kubernetes.nodes[]` sections, to allow customization of kernel parameters of each Kubernetes node. Example:
+  - `kernelParameters` to the `.spec.kubernetes.advanced`, `.spec.kubernetes.masters` and `.spec.kubernetes.nodes[]` sections, to allow customization of kernel parameters of each Kubernetes node. Example:
 
     ```yaml
     spec:
@@ -51,7 +51,7 @@ This version adds customizations to make it easier to install SD on bare metal n
             oidcTrustedCA: "{file://my-ca.crt}"
     ```
 
-- [[[#428](https://github.com/sighupio/distribution/issues/428)]] Configuration for Logging Operator's Fluentd and Fluentbit resources:
+- [[#428](https://github.com/sighupio/distribution/issues/428)] Configuration for Logging Operator's Fluentd and Fluentbit resources:
   - Added new configuration options to the logging module that allows to set Fluentd's resources and replicas number and Fluentbit's resources. Example:
   
   ```yaml
