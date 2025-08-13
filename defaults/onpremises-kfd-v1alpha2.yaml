@@ -85,6 +85,9 @@ data:
             disableAuth: false
             host: ""
             ingressClass: ""
+      operator:
+        fluentd: {}
+        fluentbit: {}
       # can be none, opensearch, loki or customOutputs
       type: opensearch
       opensearch:

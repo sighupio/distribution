@@ -1282,6 +1282,30 @@
       "additionalProperties": false,
       "description": "Configuration for the Logging Operator.",
       "properties": {
+        "fluentd": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Configuration for Fluentd that collects the logs and forwards them to the outputs.",
+          "properties": {
+            "replicas": {
+              "type": "integer",
+              "description": "The number of Fluentd replicas to run. Default is `2`."
+            },
+            "resources": {
+              "$ref": "#/$defs/Types.KubeResources"
+            }
+          }
+        },
+        "fluentbit": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Configuration for Fluent Bit that reads the logs from the workload and forwards them to Fluentd.",
+          "properties": {
+            "resources": {
+              "$ref": "#/$defs/Types.KubeResources"
+            }
+          }
+        },
         "overrides": {
           "$ref": "#/$defs/Types.FuryModuleComponentOverrides"
         }
