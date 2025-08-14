@@ -78,6 +78,10 @@ all:
         kernel_parameters:
           {{ .spec.kubernetes.masters.kernelParameters | toYaml | indent 10 | trim }}
         {{- end -}}
+        {{- if hasKeyAny .spec.kubernetes.masters "taints" }}
+        kubernetes_taints:
+          {{ .spec.kubernetes.masters.taints | toYaml | indent 10 | trim }}
+        {{- end }}
         {{- if and (index .spec.kubernetes "advanced") (index .spec.kubernetes.advanced "cloud") }}
         {{- if index .spec.kubernetes.advanced.cloud "provider" }}
         kubernetes_cloud_provider: "{{ .spec.kubernetes.advanced.cloud.provider }}"
