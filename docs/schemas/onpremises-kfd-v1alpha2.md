@@ -2671,11 +2671,146 @@ The type of OpenSearch deployment. One of: `single` for a single replica or `tri
 
 | Property                                                      | Type     | Required |
 |:--------------------------------------------------------------|:---------|:---------|
+| [fluentbit](#specdistributionmodulesloggingoperatorfluentbit) | `object` | Optional |
+| [fluentd](#specdistributionmodulesloggingoperatorfluentd)     | `object` | Optional |
 | [overrides](#specdistributionmodulesloggingoperatoroverrides) | `object` | Optional |
 
 ### Description
 
 Configuration for the Logging Operator.
+
+## .spec.distribution.modules.logging.operator.fluentbit
+
+### Properties
+
+| Property                                                               | Type     | Required |
+|:-----------------------------------------------------------------------|:---------|:---------|
+| [resources](#specdistributionmodulesloggingoperatorfluentbitresources) | `object` | Optional |
+
+### Description
+
+Configuration for Fluent Bit that reads the logs from the workload and forwards them to Fluentd.
+
+## .spec.distribution.modules.logging.operator.fluentbit.resources
+
+### Properties
+
+| Property                                                                      | Type     | Required |
+|:------------------------------------------------------------------------------|:---------|:---------|
+| [limits](#specdistributionmodulesloggingoperatorfluentbitresourceslimits)     | `object` | Optional |
+| [requests](#specdistributionmodulesloggingoperatorfluentbitresourcesrequests) | `object` | Optional |
+
+## .spec.distribution.modules.logging.operator.fluentbit.resources.limits
+
+### Properties
+
+| Property                                                                        | Type     | Required |
+|:--------------------------------------------------------------------------------|:---------|:---------|
+| [cpu](#specdistributionmodulesloggingoperatorfluentbitresourceslimitscpu)       | `string` | Optional |
+| [memory](#specdistributionmodulesloggingoperatorfluentbitresourceslimitsmemory) | `string` | Optional |
+
+## .spec.distribution.modules.logging.operator.fluentbit.resources.limits.cpu
+
+### Description
+
+The CPU limit for the Pod. Example: `1000m`.
+
+## .spec.distribution.modules.logging.operator.fluentbit.resources.limits.memory
+
+### Description
+
+The memory limit for the Pod. Example: `1G`.
+
+## .spec.distribution.modules.logging.operator.fluentbit.resources.requests
+
+### Properties
+
+| Property                                                                          | Type     | Required |
+|:----------------------------------------------------------------------------------|:---------|:---------|
+| [cpu](#specdistributionmodulesloggingoperatorfluentbitresourcesrequestscpu)       | `string` | Optional |
+| [memory](#specdistributionmodulesloggingoperatorfluentbitresourcesrequestsmemory) | `string` | Optional |
+
+## .spec.distribution.modules.logging.operator.fluentbit.resources.requests.cpu
+
+### Description
+
+The CPU request for the Pod, in cores. Example: `500m`.
+
+## .spec.distribution.modules.logging.operator.fluentbit.resources.requests.memory
+
+### Description
+
+The memory request for the Pod. Example: `500M`.
+
+## .spec.distribution.modules.logging.operator.fluentd
+
+### Properties
+
+| Property                                                             | Type      | Required |
+|:---------------------------------------------------------------------|:----------|:---------|
+| [replicas](#specdistributionmodulesloggingoperatorfluentdreplicas)   | `integer` | Optional |
+| [resources](#specdistributionmodulesloggingoperatorfluentdresources) | `object`  | Optional |
+
+### Description
+
+Configuration for Fluentd that collects the logs and forwards them to the outputs.
+
+## .spec.distribution.modules.logging.operator.fluentd.replicas
+
+### Description
+
+The number of Fluentd replicas to run. Default is `2`.
+
+## .spec.distribution.modules.logging.operator.fluentd.resources
+
+### Properties
+
+| Property                                                                    | Type     | Required |
+|:----------------------------------------------------------------------------|:---------|:---------|
+| [limits](#specdistributionmodulesloggingoperatorfluentdresourceslimits)     | `object` | Optional |
+| [requests](#specdistributionmodulesloggingoperatorfluentdresourcesrequests) | `object` | Optional |
+
+## .spec.distribution.modules.logging.operator.fluentd.resources.limits
+
+### Properties
+
+| Property                                                                      | Type     | Required |
+|:------------------------------------------------------------------------------|:---------|:---------|
+| [cpu](#specdistributionmodulesloggingoperatorfluentdresourceslimitscpu)       | `string` | Optional |
+| [memory](#specdistributionmodulesloggingoperatorfluentdresourceslimitsmemory) | `string` | Optional |
+
+## .spec.distribution.modules.logging.operator.fluentd.resources.limits.cpu
+
+### Description
+
+The CPU limit for the Pod. Example: `1000m`.
+
+## .spec.distribution.modules.logging.operator.fluentd.resources.limits.memory
+
+### Description
+
+The memory limit for the Pod. Example: `1G`.
+
+## .spec.distribution.modules.logging.operator.fluentd.resources.requests
+
+### Properties
+
+| Property                                                                        | Type     | Required |
+|:--------------------------------------------------------------------------------|:---------|:---------|
+| [cpu](#specdistributionmodulesloggingoperatorfluentdresourcesrequestscpu)       | `string` | Optional |
+| [memory](#specdistributionmodulesloggingoperatorfluentdresourcesrequestsmemory) | `string` | Optional |
+
+## .spec.distribution.modules.logging.operator.fluentd.resources.requests.cpu
+
+### Description
+
+The CPU request for the Pod, in cores. Example: `500m`.
+
+## .spec.distribution.modules.logging.operator.fluentd.resources.requests.memory
+
+### Description
+
+The memory request for the Pod. Example: `500M`.
 
 ## .spec.distribution.modules.logging.operator.overrides
 
