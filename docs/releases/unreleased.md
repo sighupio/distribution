@@ -75,22 +75,22 @@ This version adds customizations to make it easier to install SD on bare metal n
   - Added new configuration options to set the control plane nodes taints at cluster creation time. Example:
   
   ```yaml
-# custom taint
-spec:
-  kubernetes:
-    masters:
-      taints:
-        - effect: NoExecute
-          key: soft-cell
-          value: tainted-love
+  # custom taint
+  spec:
+    kubernetes:
+      masters:
+        taints:
+          - effect: NoExecute
+            key: soft-cell
+            value: tainted-love
   ```
   
   ```yaml
-# no taints
-spec:
-  kubernetes:
-    masters:
-      taints: []
+  # no taints
+  spec:
+    kubernetes:
+      masters:
+        taints: []
   ```
 
 ## Fixes 🐞
