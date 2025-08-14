@@ -38,8 +38,6 @@ This version adds customizations to make it easier to install SD on bare metal n
             value: "9223372036854775804"
     ```
 
-  - `immutableResources` flag in the `.spec.distribution.common` section, to make all Secrets and ConfigMaps created by SD modules immutable. This reduces the watch load on the API Server, which can improve performance. Applies also to Secrets/ConfigMaps created with the `.spec.distribution.customPatches` section, not on those created with plugins.
-
 - [[#425](https://github.com/sighupio/distribution/pull/425)] Adds trusted CA certificate support in OIDC authentication with self-signed certificates:
   - `oidcTrustedCA` key under `spec.distribution.modules.auth` allows automatic provisioning of custom CA certificates for auth components.
   - Adds secret generation and volume mounting for Gangplank, Pomerium, and Dex deployments.

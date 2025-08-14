@@ -92,7 +92,6 @@ The name of the cluster. It will also be used as a prefix for all the other reso
 
 | Property                                                                | Type      | Required |
 |:------------------------------------------------------------------------|:----------|:---------|
-| [immutableResources](#specdistributioncommonimmutableresources)         | `boolean` | Optional |
 | [networkPoliciesEnabled](#specdistributioncommonnetworkpoliciesenabled) | `boolean` | Optional |
 | [nodeSelector](#specdistributioncommonnodeselector)                     | `object`  | Optional |
 | [provider](#specdistributioncommonprovider)                             | `object`  | Optional |
@@ -103,12 +102,6 @@ The name of the cluster. It will also be used as a prefix for all the other reso
 ### Description
 
 Common configuration for all the distribution modules.
-
-## .spec.distribution.common.immutableResources
-
-### Description
-
-EXPERIMENTAL FEATURE. This field makes the distribution's Secrets and ConfigMaps immutable. Also applies to Secrets/ConfigMaps created with the `customPatches` section. Does not apply to plugins.
 
 ## .spec.distribution.common.networkPoliciesEnabled
 

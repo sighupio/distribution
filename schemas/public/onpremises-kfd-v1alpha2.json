@@ -838,10 +838,6 @@
         "networkPoliciesEnabled": {
           "type": "boolean",
           "description": "EXPERIMENTAL FEATURE. This field defines whether Network Policies are provided for core modules."
-        },
-        "immutableResources": {
-          "type": "boolean",
-          "description": "EXPERIMENTAL FEATURE. This field makes the distribution's Secrets and ConfigMaps immutable. Also applies to Secrets/ConfigMaps created with the `customPatches` section. Does not apply to plugins."
         }
       }
     },
