@@ -326,7 +326,7 @@
           "items": {
             "$ref": "#/$defs/Types.KubeTaints"
           },
-          "description": "Optional Kubernetes taints that will be added to the control-plane nodes. Follows Kubernetes taints format. Example:\n\n```yaml\n- effect: NoSchedule\n  key: node.kubernetes.io/role\n  value: control-plane\n```\n\nNOTE: Setting an empty list will remove the default control-plane taint (`node-role.kubernetes.io/control-plane:NoSchedule`).\n\nNOTE2: Takes effect only on cluster creation."
+          "description": "Kubernetes taints for the control-plane nodes, follows Kubernetes taints format. Default is `node-role.kubernetes.io/control-plane:NoSchedule`.\n\nExample:\n\n```yaml\n- effect: NoSchedule\n  key: node.kubernetes.io/role\n  value: control-plane\n```\n\nNOTE: Setting an empty list will remove the default control-plane taint.\n\nNOTE2: Takes effect only at cluster creation time."
         }
       },
       "required": [

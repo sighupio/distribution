@@ -72,10 +72,10 @@ This version adds customizations to make it easier to install SD on bare metal n
   ```
 
 - [[#429](https://github.com/sighupio/distribution/issues/429)] Control Plane taints for OnPremises clusters:
-  - Added new configuration options to set the control plane nodes taints at cluster creation time. Example:
+  - Added new configuration option to set the control plane nodes taints at cluster creation time. Example:
   
   ```yaml
-  # custom taint
+  # custom taint. NOTE: the default taint won't be added, just the ones defined.
   spec:
     kubernetes:
       masters:

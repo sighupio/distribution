@@ -2050,8 +2050,10 @@ type SpecKubernetesMasters struct {
 	// setting the `control-plane` role cannot be deleted.
 	Labels TypesKubeLabels_1 `json:"labels,omitempty" yaml:"labels,omitempty" mapstructure:"labels,omitempty"`
 
-	// Optional Kubernetes taints that will be added to the control-plane nodes.
-	// Follows Kubernetes taints format. Example:
+	// Kubernetes taints for the control-plane nodes, follows Kubernetes taints
+	// format. Default is `node-role.kubernetes.io/control-plane:NoSchedule`.
+	//
+	// Example:
 	//
 	// ```yaml
 	// - effect: NoSchedule
@@ -2059,10 +2061,9 @@ type SpecKubernetesMasters struct {
 	//   value: control-plane
 	// ```
 	//
-	// NOTE: Setting an empty list will remove the default control-plane taint
-	// (`node-role.kubernetes.io/control-plane:NoSchedule`).
+	// NOTE: Setting an empty list will remove the default control-plane taint.
 	//
-	// NOTE2: Takes effect only on cluster creation.
+	// NOTE2: Takes effect only at cluster creation time.
 	Taints []TypesKubeTaints `json:"taints,omitempty" yaml:"taints,omitempty" mapstructure:"taints,omitempty"`
 }
 
