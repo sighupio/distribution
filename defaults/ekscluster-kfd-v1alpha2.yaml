@@ -214,6 +214,9 @@ data:
             disableAuth: false
             host: ""
             ingressClass: ""
+      tigeraOperator:
+        podCidr: null # not used
+        blockSize: 26 # not used
       cilium:
         podCidr: "dummy" # cilium not used yet on EKS
         maskSize: "dummy" # cilium not used yet on EKS

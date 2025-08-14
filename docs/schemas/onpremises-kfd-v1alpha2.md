@@ -1048,7 +1048,7 @@ Signing Key is the base64 representation of one or more PEM-encoded private keys
 To generates an P-256 (ES256) signing key:
 
 ```bash
-openssl ecparam  -genkey  -name prime256v1  -noout  -out ec_private.pem
+openssl ecparam -genkey -name prime256v1 -noout -out ec_private.pem
 # careful! this will output your private key in terminal
 cat ec_private.pem | base64
 ```
@@ -4097,9 +4097,17 @@ The value of the toleration
 
 ### Properties
 
-| Property                                                               | Type     | Required |
-|:-----------------------------------------------------------------------|:---------|:---------|
-| [overrides](#specdistributionmodulesnetworkingtigeraoperatoroverrides) | `object` | Optional |
+| Property                                                               | Type      | Required |
+|:-----------------------------------------------------------------------|:----------|:---------|
+| [blockSize](#specdistributionmodulesnetworkingtigeraoperatorblocksize) | `integer` | Optional |
+| [overrides](#specdistributionmodulesnetworkingtigeraoperatoroverrides) | `object`  | Optional |
+| [podCidr](#specdistributionmodulesnetworkingtigeraoperatorpodcidr)     | `string`  | Optional |
+
+## .spec.distribution.modules.networking.tigeraOperator.blockSize
+
+### Description
+
+BlockSize specifies the CIDR prefix length to use when allocating per-node IP blocks from the main IP pool CIDR. WARNING: The value for this field cannot be changed once set. Default is 26.
 
 ## .spec.distribution.modules.networking.tigeraOperator.overrides
 
@@ -4165,6 +4173,22 @@ The key of the toleration
 ### Description
 
 The value of the toleration
+
+## .spec.distribution.modules.networking.tigeraOperator.podCidr
+
+### Description
+
+Allows specifing a CIDR for the Pods network different from `.spec.kubernetes.podCidr`. If not set the default is to use `.spec.kubernetes.podCidr`. WARNING: The value for this field cannot be changed once set.
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}\/(3[0-2]|[1-2][0-9]|[0-9])$
+```
+
+[try pattern](https://regexr.com/?expression=^\(\(25[0-5]|\(2[0-4]|1\d|[1-9]|\)\d\)\.?\b\){4}\\/\(3[0-2]|[1-2][0-9]|[0-9]\)$)
 
 ## .spec.distribution.modules.networking.type
 
@@ -4903,6 +4927,7 @@ Defines the Kubernetes components configuration and the values needed for the ku
 | [cloud](#speckubernetesadvancedcloud)                               | `object` | Optional |
 | [containerd](#speckubernetesadvancedcontainerd)                     | `object` | Optional |
 | [encryption](#speckubernetesadvancedencryption)                     | `object` | Optional |
+| [kernelParameters](#speckubernetesadvancedkernelparameters)         | `array`  | Optional |
 | [kubeletConfiguration](#speckubernetesadvancedkubeletconfiguration) | `object` | Optional |
 | [oidc](#speckubernetesadvancedoidc)                                 | `object` | Optional |
 | [registry](#speckubernetesadvancedregistry)                         | `string` | Optional |
@@ -5168,6 +5193,31 @@ tlsCipherSuites:
   - "TLS_CHACHA20_POLY1305_SHA256"
 ```
 . NOTE: to customize the TLS cipher suites of the kubelet (as well as on control plane and etcd), set only this field - do not configure them under the `KubeletConfiguration`.
+
+## .spec.kubernetes.advanced.kernelParameters
+
+### Properties
+
+| Property                                              | Type     | Required |
+|:------------------------------------------------------|:---------|:---------|
+| [name](#speckubernetesadvancedkernelparametersname)   | `string` | Required |
+| [value](#speckubernetesadvancedkernelparametersvalue) | `string` | Required |
+
+### Description
+
+Allows customization of kernel parameters with sysctl on all Kubernetes nodes. NOTE: if you remove a parameter from this list, it will not be reset to its default value without a reboot.
+
+## .spec.kubernetes.advanced.kernelParameters.name
+
+### Description
+
+The kernel parameter to edit. Example: `kernel.panic`
+
+## .spec.kubernetes.advanced.kernelParameters.value
+
+### Description
+
+The value of the kernel parameter to edit. Example: `"15"`
 
 ## .spec.kubernetes.advanced.kubeletConfiguration
 
@@ -5462,6 +5512,7 @@ The basic-auth username for HAProxy's stats page
 |:-------------------------------------------------------------------|:---------|:---------|
 | [annotations](#speckubernetesmastersannotations)                   | `object` | Optional |
 | [hosts](#speckubernetesmastershosts)                               | `array`  | Required |
+| [kernelParameters](#speckubernetesmasterskernelparameters)         | `array`  | Optional |
 | [kubeletConfiguration](#speckubernetesmasterskubeletconfiguration) | `object` | Optional |
 | [labels](#speckubernetesmasterslabels)                             | `object` | Optional |
 
@@ -5496,6 +5547,31 @@ The IP address of the host
 
 A name to identify the host. This value will be concatenated to `.spec.kubernetes.dnsZone` to calculate the FQDN for the host as `<name>.<dnsZone>`.
 
+## .spec.kubernetes.masters.kernelParameters
+
+### Properties
+
+| Property                                             | Type     | Required |
+|:-----------------------------------------------------|:---------|:---------|
+| [name](#speckubernetesmasterskernelparametersname)   | `string` | Required |
+| [value](#speckubernetesmasterskernelparametersvalue) | `string` | Required |
+
+### Description
+
+Allows customization of kernel parameters with sysctl on all Kubernetes nodes. NOTE: if you remove a parameter from this list, it will not be reset to its default value without a reboot.
+
+## .spec.kubernetes.masters.kernelParameters.name
+
+### Description
+
+The kernel parameter to edit. Example: `kernel.panic`
+
+## .spec.kubernetes.masters.kernelParameters.value
+
+### Description
+
+The value of the kernel parameter to edit. Example: `"15"`
+
 ## .spec.kubernetes.masters.kubeletConfiguration
 
 ### Description
@@ -5520,6 +5596,7 @@ Note: **Existing labels with the same key will be overwritten** and the label se
 |:-----------------------------------------------------------------|:---------|:---------|
 | [annotations](#speckubernetesnodesannotations)                   | `object` | Optional |
 | [hosts](#speckubernetesnodeshosts)                               | `array`  | Required |
+| [kernelParameters](#speckubernetesnodeskernelparameters)         | `array`  | Optional |
 | [kubeletConfiguration](#speckubernetesnodeskubeletconfiguration) | `object` | Optional |
 | [labels](#speckubernetesnodeslabels)                             | `object` | Optional |
 | [name](#speckubernetesnodesname)                                 | `string` | Required |
@@ -5559,6 +5636,31 @@ The IP address of the host
 ### Description
 
 A name to identify the host. This value will be concatenated to `.spec.kubernetes.dnsZone` to calculate the FQDN for the host as `<name>.<dnsZone>`.
+
+## .spec.kubernetes.nodes.kernelParameters
+
+### Properties
+
+| Property                                           | Type     | Required |
+|:---------------------------------------------------|:---------|:---------|
+| [name](#speckubernetesnodeskernelparametersname)   | `string` | Required |
+| [value](#speckubernetesnodeskernelparametersvalue) | `string` | Required |
+
+### Description
+
+Allows customization of kernel parameters with sysctl on all Kubernetes nodes. NOTE: if you remove a parameter from this list, it will not be reset to its default value without a reboot.
+
+## .spec.kubernetes.nodes.kernelParameters.name
+
+### Description
+
+The kernel parameter to edit. Example: `kernel.panic`
+
+## .spec.kubernetes.nodes.kernelParameters.value
+
+### Description
+
+The value of the kernel parameter to edit. Example: `"15"`
 
 ## .spec.kubernetes.nodes.kubeletConfiguration
 

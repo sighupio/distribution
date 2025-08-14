@@ -474,7 +474,7 @@ type SpecDistributionModulesAuthPomeriumSecrets struct {
 	// To generates an P-256 (ES256) signing key:
 	//
 	// ```bash
-	// openssl ecparam  -genkey  -name prime256v1  -noout  -out ec_private.pem
+	// openssl ecparam -genkey -name prime256v1 -noout -out ec_private.pem
 	// # careful! this will output your private key in terminal
 	// cat ec_private.pem | base64
 	// ```
@@ -2005,8 +2005,19 @@ func (j *SpecDistributionModulesNetworkingCilium) UnmarshalJSON(b []byte) error 
 }
 
 type SpecDistributionModulesNetworkingTigeraOperator struct {
+	// BlockSize specifies the CIDR prefex length to use when allocating per-node IP
+	// blocks from the main IP pool CIDR. WARNING: The value for this field cannot be
+	// changed once set. Default is 26.
+	BlockSize *int `json:"blockSize,omitempty" yaml:"blockSize,omitempty" mapstructure:"blockSize,omitempty"`
+
 	// Overrides corresponds to the JSON schema field "overrides".
 	Overrides *TypesFuryModuleComponentOverrides `json:"overrides,omitempty" yaml:"overrides,omitempty" mapstructure:"overrides,omitempty"`
+
+	// Allows specifing a CIDR for the Pods network different from
+	// `.spec.kubernetes.podCidr`. If not set the default is to use
+	// `.spec.kubernetes.podCidr`. WARNING: The value for this field cannot be changed
+	// once set.
+	PodCidr *TypesCidr `json:"podCidr,omitempty" yaml:"podCidr,omitempty" mapstructure:"podCidr,omitempty"`
 }
 
 type SpecDistributionModulesNetworkingType string

@@ -934,7 +934,7 @@ Signing Key is the base64 representation of one or more PEM-encoded private keys
 To generates an P-256 (ES256) signing key:
 
 ```bash
-openssl ecparam  -genkey  -name prime256v1  -noout  -out ec_private.pem
+openssl ecparam -genkey -name prime256v1 -noout -out ec_private.pem
 # careful! this will output your private key in terminal
 cat ec_private.pem | base64
 ```
@@ -3685,9 +3685,17 @@ The value of the toleration
 
 ### Properties
 
-| Property                                                               | Type     | Required |
-|:-----------------------------------------------------------------------|:---------|:---------|
-| [overrides](#specdistributionmodulesnetworkingtigeraoperatoroverrides) | `object` | Optional |
+| Property                                                               | Type      | Required |
+|:-----------------------------------------------------------------------|:----------|:---------|
+| [blockSize](#specdistributionmodulesnetworkingtigeraoperatorblocksize) | `integer` | Optional |
+| [overrides](#specdistributionmodulesnetworkingtigeraoperatoroverrides) | `object`  | Optional |
+| [podCidr](#specdistributionmodulesnetworkingtigeraoperatorpodcidr)     | `string`  | Optional |
+
+## .spec.distribution.modules.networking.tigeraOperator.blockSize
+
+### Description
+
+BlockSize specifies the CIDR prefex length to use when allocating per-node IP blocks from the main IP pool CIDR. WARNING: The value for this field cannot be changed once set. Default is 26.
 
 ## .spec.distribution.modules.networking.tigeraOperator.overrides
 
@@ -3753,6 +3761,22 @@ The key of the toleration
 ### Description
 
 The value of the toleration
+
+## .spec.distribution.modules.networking.tigeraOperator.podCidr
+
+### Description
+
+Allows specifing a CIDR for the Pods network different from `.spec.kubernetes.podCidr`. If not set the default is to use `.spec.kubernetes.podCidr`. WARNING: The value for this field cannot be changed once set.
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}\/(3[0-2]|[1-2][0-9]|[0-9])$
+```
+
+[try pattern](https://regexr.com/?expression=^\(\(25[0-5]|\(2[0-4]|1\d|[1-9]|\)\d\)\.?\b\){4}\\/\(3[0-2]|[1-2][0-9]|[0-9]\)$)
 
 ## .spec.distribution.modules.networking.type
 

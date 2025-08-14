@@ -314,6 +314,9 @@
         "kubeletConfiguration": {
           "description": "Optional Kubelet configuration specific to control-plane nodes. If set, this will override the global `advanced.kubeletConfiguration`. See `advanced.KubeletConfiguration` for more details.",
           "$ref": "#/$defs/Spec.Kubernetes.Advanced.KubeletConfiguration"
+        },
+        "kernelParameters": {
+          "$ref": "#/$defs/Spec.Kubernetes.Advanced.KernelParameters"
         }
       },
       "required": [
@@ -415,6 +418,9 @@
         "kubeletConfiguration": {
           "description": "Optional Kubelet configuration specific to worker nodes. If set, this will override the global `advanced.kubeletConfiguration`. See `advanced.KubeletConfiguration` for more details.",
           "$ref": "#/$defs/Spec.Kubernetes.Advanced.KubeletConfiguration"
+        },
+        "kernelParameters": {
+          "$ref": "#/$defs/Spec.Kubernetes.Advanced.KernelParameters"
         }
       },
       "required": [
@@ -489,6 +495,9 @@
         },
         "kubeletConfiguration": {
           "$ref": "#/$defs/Spec.Kubernetes.Advanced.KubeletConfiguration"
+        },
+        "kernelParameters": {
+          "$ref": "#/$defs/Spec.Kubernetes.Advanced.KernelParameters"
         }
       }
     },
@@ -713,6 +722,27 @@
       "type": "object",
       "additionalProperties": true,
       "description": "Advanced configuration for Kubelet. This open field allows users to specify any parameter supported by the `KubeletConfiguration` object. Examples of uses include controlling the maximum number of pods per core (`podsPerCore`), managing container logging (`containerLogMaxSize`), Topology Manager options (`topologyManagerPolicyOptions`). All values must follow the official Kubelet specification: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/.\n\nNOTE: Content will **not** be validated by furyctl. To customize the TLS cipher suites of the Kubelet, set only the `Spec.Kubernetes.Advanced.Encryption.tlsCipherSuites` field - do not configure them under this field."
+    },
+    "Spec.Kubernetes.Advanced.KernelParameters": {
+      "type": "array",
+          "description": "Allows customization of kernel parameters with sysctl on all Kubernetes nodes. NOTE: if you remove a parameter from this list, it will not be reset to its default value without a reboot.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The kernel parameter to edit. Example: `kernel.panic`"
+              },
+              "value": {
+                "type": "string",
+                "description": "The value of the kernel parameter to edit. Example: `\"15\"`"
+              }
+            },
+            "required": [
+              "name",
+              "value"
+            ]
+          }
     },
     "Spec.Distribution": {
       "type": "object",
@@ -1744,6 +1774,16 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
+        "podCidr": {
+          "$ref": "#/$defs/Types.Cidr",
+          "description": "Allows specifing a CIDR for the Pods network different from `.spec.kubernetes.podCidr`. If not set the default is to use `.spec.kubernetes.podCidr`. WARNING: The value for this field cannot be changed once set."
+        },
+        "blockSize": {
+          "type": "integer",
+          "description": "BlockSize specifies the CIDR prefix length to use when allocating per-node IP blocks from the main IP pool CIDR. WARNING: The value for this field cannot be changed once set. Default is 26.",
+          "minimum": 1,
+          "maximum": 32
+        },
         "overrides": {
           "$ref": "#/$defs/Types.FuryModuleComponentOverrides"
         }
