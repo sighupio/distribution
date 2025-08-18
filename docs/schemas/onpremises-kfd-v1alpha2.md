@@ -5515,6 +5515,7 @@ The basic-auth username for HAProxy's stats page
 | [kernelParameters](#speckubernetesmasterskernelparameters)         | `array`  | Optional |
 | [kubeletConfiguration](#speckubernetesmasterskubeletconfiguration) | `object` | Optional |
 | [labels](#speckubernetesmasterslabels)                             | `object` | Optional |
+| [taints](#speckubernetesmasterstaints)                             | `array`  | Optional |
 
 ### Description
 
@@ -5587,6 +5588,48 @@ NOTE: Content will **not** be validated by furyctl. To customize the TLS cipher 
 Optional additional Kubernetes labels that will be added to the control-plane nodes. Follows Kubernetes labels format.
 
 Note: **Existing labels with the same key will be overwritten** and the label setting the `control-plane` role cannot be deleted.
+
+## .spec.kubernetes.masters.taints
+
+### Properties
+
+| Property                                     | Type     | Required |
+|:---------------------------------------------|:---------|:---------|
+| [effect](#speckubernetesmasterstaintseffect) | `string` | Required |
+| [key](#speckubernetesmasterstaintskey)       | `string` | Required |
+| [value](#speckubernetesmasterstaintsvalue)   | `string` | Required |
+
+### Description
+
+Kubernetes taints for the control-plane nodes, follows Kubernetes taints format. Default is `node-role.kubernetes.io/control-plane:NoSchedule`.
+
+Example:
+
+```yaml
+- effect: NoSchedule
+  key: node.kubernetes.io/role
+  value: control-plane
+```
+
+NOTE: Setting an empty list will remove the default control-plane taint.
+
+NOTE2: Takes effect only at cluster creation time.
+
+## .spec.kubernetes.masters.taints.effect
+
+### Constraints
+
+**enum**: the value of this property must be equal to one of the following string values:
+
+| Value              |
+|:-------------------|
+|`"NoSchedule"`      |
+|`"PreferNoSchedule"`|
+|`"NoExecute"`       |
+
+## .spec.kubernetes.masters.taints.key
+
+## .spec.kubernetes.masters.taints.value
 
 ## .spec.kubernetes.nodes
 

@@ -317,6 +317,16 @@
         },
         "kernelParameters": {
           "$ref": "#/$defs/Spec.Kubernetes.Advanced.KernelParameters"
+        },
+        "taints": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/$defs/Types.KubeTaints"
+          },
+          "description": "Kubernetes taints for the control-plane nodes, follows Kubernetes taints format. Default is `node-role.kubernetes.io/control-plane:NoSchedule`.\n\nExample:\n\n```yaml\n- effect: NoSchedule\n  key: node.kubernetes.io/role\n  value: control-plane\n```\n\nNOTE: Setting an empty list will remove the default control-plane taint.\n\nNOTE2: Takes effect only at cluster creation time."
         }
       },
       "required": [
@@ -355,7 +365,9 @@
           "minItems": 1
         }
       },
-      "required": ["hosts"]
+      "required": [
+        "hosts"
+      ]
     },
     "Spec.Kubernetes.Etcd.Host": {
       "type": "object",
@@ -725,24 +737,24 @@
     },
     "Spec.Kubernetes.Advanced.KernelParameters": {
       "type": "array",
-          "description": "Allows customization of kernel parameters with sysctl on all Kubernetes nodes. NOTE: if you remove a parameter from this list, it will not be reset to its default value without a reboot.",
-          "items": {
-            "type": "object",
-            "properties": {
-              "name": {
-                "type": "string",
-                "description": "The kernel parameter to edit. Example: `kernel.panic`"
-              },
-              "value": {
-                "type": "string",
-                "description": "The value of the kernel parameter to edit. Example: `\"15\"`"
-              }
-            },
-            "required": [
-              "name",
-              "value"
-            ]
+      "description": "Allows customization of kernel parameters with sysctl on all Kubernetes nodes. NOTE: if you remove a parameter from this list, it will not be reset to its default value without a reboot.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The kernel parameter to edit. Example: `kernel.panic`"
+          },
+          "value": {
+            "type": "string",
+            "description": "The value of the kernel parameter to edit. Example: `\"15\"`"
           }
+        },
+        "required": [
+          "name",
+          "value"
+        ]
+      }
     },
     "Spec.Distribution": {
       "type": "object",
@@ -2066,13 +2078,18 @@
       },
       "allOf": [
         {
-          "required": ["type"]
+          "required": [
+            "type"
+          ]
         },
         {
           "if": {
             "properties": {
               "type": {
-                "enum": ["s3", "all"]
+                "enum": [
+                  "s3",
+                  "all"
+                ]
               }
             }
           },
@@ -2086,7 +2103,10 @@
           "if": {
             "properties": {
               "type": {
-                "enum": ["pvc", "all"]
+                "enum": [
+                  "pvc",
+                  "all"
+                ]
               }
             }
           },

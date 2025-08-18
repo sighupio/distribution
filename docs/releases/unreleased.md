@@ -71,6 +71,28 @@ This version adds customizations to make it easier to install SD on bare metal n
                   memory: "1Mi"
   ```
 
+- [[#429](https://github.com/sighupio/distribution/issues/429)] Control Plane taints for OnPremises clusters:
+  - Added new configuration option to set the control plane nodes taints at cluster creation time. Example:
+  
+  ```yaml
+  # custom taint. NOTE: the default taint won't be added, just the ones defined.
+  spec:
+    kubernetes:
+      masters:
+        taints:
+          - effect: NoExecute
+            key: soft-cell
+            value: tainted-love
+  ```
+  
+  ```yaml
+  # no taints
+  spec:
+    kubernetes:
+      masters:
+        taints: []
+  ```
+
 ## Fixes 🐞
 
 - [installer-eks/issues#88](https://github.com/sighupio/installer-eks/issues/88) This PR fixes an issue when using `selfmanaged` nodes with `alinux2023`. The way we used to provision images relied on Amazon's `bootstrap.sh` which has been deprecated in favor of `nodeadm`.
