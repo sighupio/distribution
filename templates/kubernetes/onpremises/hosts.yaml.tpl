@@ -177,6 +177,11 @@ all:
         {{- end }}
         {{- end }}
 
+        {{- if index .spec.kubernetes "advanced" }}
+        {{- if index .spec.kubernetes.advanced "kubeletCertificateAuthorityFile" }}
+        kubelet_certificate_authority_file: "{{ .spec.kubernetes.advanced.kubeletCertificateAuthorityFile }}"
+        {{- end }}
+        {{- end }}
 
 
         {{- if and (index .spec.kubernetes "advanced") (index .spec.kubernetes.advanced "apiServerCertSANs") }}

@@ -767,6 +767,10 @@
           "type": "string",
           "description": "The maximum time a streaming connection can be idle before it is closed. Example: `5m0s`"
         }
+      },
+        "kubeletCertificateAuthorityFile": {
+        "type": "string",
+        "description": "Percorso al file della CA per verificare i certificati TLS server delle kubelet."
       }
     },
     "Spec.Kubernetes.Advanced.ControllerManager": {
