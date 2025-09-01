@@ -38,7 +38,10 @@
             "description": "The url of the repository"
           }
         },
-        "required": ["name", "url"]
+        "required": [
+          "name",
+          "url"
+        ]
       }
     },
     "Spec.Plugins.Helm.Releases": {
@@ -78,7 +81,10 @@
                   "description": "The value of the set"
                 }
               },
-              "required": ["name", "value"]
+              "required": [
+                "name",
+                "value"
+              ]
             }
           },
           "values": {
@@ -93,7 +99,11 @@
             "description": "Disable running `helm diff` validation when installing the plugin, it will still be done when upgrading."
           }
         },
-        "required": ["name", "namespace", "chart"]
+        "required": [
+          "name",
+          "namespace",
+          "chart"
+        ]
       }
     },
     "Spec.Plugins.Kustomize": {
@@ -104,14 +114,18 @@
         "properties": {
           "name": {
             "type": "string",
-            "description": "The name of the kustomize plugin"
+            "description": "The name of the kustomize plugin. A lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', 'local-storage')",
+            "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$"
           },
           "folder": {
             "type": "string",
             "description": "The folder of the kustomize plugin"
           }
         },
-        "required": ["name", "folder"]
+        "required": [
+          "name",
+          "folder"
+        ]
       }
     }
   }
