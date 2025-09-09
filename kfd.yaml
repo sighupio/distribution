@@ -8,7 +8,7 @@ modules:
   aws: v5.1.0-rc.0
   dr: v3.2.0-rc.0
   ingress: v4.1.0-rc.0
-  logging: v5.1.0
+  logging: v5.2.0-rc.0
   monitoring: v3.5.0
   opa: v1.14.0
   networking: v2.2.0
