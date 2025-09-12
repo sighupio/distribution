@@ -649,7 +649,7 @@ steps:
     status:
     - failure
 ---
-name: e2e-onpremises-1.32.0
+name: e2e-onpremises
 kind: pipeline
 type: docker
 node:
@@ -941,6 +941,7 @@ type: docker
 depends_on:
   - e2e-kfddistribution-1.32
   - e2e-kfddistribution-1.31.1-to-1.32.0
+  - e2e-onpremises
 
 platform:
   os: linux
