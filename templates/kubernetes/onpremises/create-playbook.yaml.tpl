@@ -37,8 +37,6 @@
     - haproxy
 
 # cluster
-
-
 - name: Copy etcd and master PKIs
   hosts: master,etcd
   become: true
