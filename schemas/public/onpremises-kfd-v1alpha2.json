@@ -508,6 +508,9 @@
         "kubeletConfiguration": {
           "$ref": "#/$defs/Spec.Kubernetes.Advanced.KubeletConfiguration"
         },
+        "kernelParameters": {
+          "$ref": "#/$defs/Spec.Kubernetes.Advanced.KernelParameters"
+        },
         "controllerManager": {
           "$ref": "#/$defs/Spec.Kubernetes.Advanced.ControllerManager"
         },
@@ -778,6 +781,27 @@
         "kubeletCertificateAuthorityFile": {
         "type": "string",
         "description": "Percorso al file della CA per verificare i certificati TLS server delle kubelet."
+      }
+    },
+    "Spec.Kubernetes.Advanced.KernelParameters": {
+      "type": "array",
+      "description": "Allows customization of kernel parameters with sysctl on all Kubernetes nodes. NOTE: if you remove a parameter from this list, it will not be reset to its default value without a reboot.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The kernel parameter to edit. Example: `kernel.panic`"
+          },
+          "value": {
+            "type": "string",
+            "description": "The value of the kernel parameter to edit. Example: `\"15\"`"
+          }
+        },
+        "required": [
+          "name",
+          "value"
+        ]
       }
     },
     "Spec.Kubernetes.Advanced.ControllerManager": {
