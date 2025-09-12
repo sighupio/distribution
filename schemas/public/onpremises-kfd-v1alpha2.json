@@ -190,6 +190,10 @@
         "additionalConfig": {
           "type": "string",
           "description": "Additional configuration to append to HAProxy's configuration file."
+        },
+        "manageRepositories": {
+          "type": "boolean",
+          "description": "Set to false if you manage the HAProxy repositories externally and wish to skip their configuration with furyctl. Default is true."
         }
       },
       "required": [
@@ -510,6 +514,10 @@
         },
         "kernelParameters": {
           "$ref": "#/$defs/Spec.Kubernetes.Advanced.KernelParameters"
+        },
+        "manageRepositories": {
+          "type": "boolean",
+          "description": "Set to false if you manage the Kubernetes package repositories externally and wish to skip their configuration with furyctl. Default is true."
         }
       }
     },
@@ -586,6 +594,10 @@
       "properties": {
         "registryConfigs": {
           "$ref": "#/$defs/Spec.Kubernetes.Advanced.Containerd.RegistryConfigs"
+        },
+        "manageRepositories": {
+          "type": "boolean",
+          "description": "Set to false if you manage the containerd and NVIDIA repositories externally and wish to skip their configuration with furyctl. Default is true."
         }
       }
     },

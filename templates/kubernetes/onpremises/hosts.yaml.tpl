@@ -17,6 +17,9 @@ all:
         keepalived_ip: "{{ .spec.kubernetes.loadBalancers.keepalived.ip }}"
         keepalived_virtual_router_id: "{{ .spec.kubernetes.loadBalancers.keepalived.virtualRouterId }}"
         keepalived_passphrase: "{{ .spec.kubernetes.loadBalancers.keepalived.passphrase }}"
+        {{- if index .spec.kubernetes.loadBalancers "manageRepositories" }}
+        haproxy_manage_repositories: {{ .spec.kubernetes.loadBalancers.manageRepositories }}
+        {{- end }}
     {{- end }}
     master:
       hosts:
@@ -249,6 +252,9 @@ all:
         {{- end }}
       {{- end }}
     {{- end }}
+    {{- if index .spec.kubernetes.advanced.containerd "manageRepositories" }}
+    containerd_manage_repositories: {{ .spec.kubernetes.advanced.containerd.manageRepositories }}
+    {{- end }}
     {{- end }}
     {{- if (index .spec.kubernetes.advanced "encryption") }}
     {{- if (index .spec.kubernetes.advanced.encryption "tlsCipherSuites") }}
@@ -299,5 +305,8 @@ all:
     kernel_parameters:
       {{ .spec.kubernetes.advanced.kernelParameters | toYaml | indent 6 | trim }}
     {{- end -}}
+    {{- if index .spec.kubernetes.advanced "manageRepositories" }}
+    kubernetes_manage_repositories: {{ .spec.kubernetes.advanced.manageRepositories }}
+    {{- end }}
 
     {{- end }}
