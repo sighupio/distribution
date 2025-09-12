@@ -53,8 +53,17 @@
         path: /tmp/kube-bench
         mode: '0755'
 
+    - name: Copy kubeconfig from local cache to target nodes
+      ansible.builtin.copy:
+        src: "/cache/kubeconfig"
+        dest: "/root/kubeconfig"
+        mode: '0600'
+      delegate_to: localhost
+
     - name: Run kube-bench security tests with sighupio configuration
-      ansible.builtin.shell: /tmp/kube-bench --config /etc/kube-bench/cfg/config.yaml --exit-code 1
+      ansible.builtin.shell: |
+        export KUBECONFIG=/root/kubeconfig
+        /tmp/kube-bench --config /etc/kube-bench/cfg/config.yaml --exit-code 1
       register: kube_bench_output
       failed_when: false  # We'll handle the failure ourselves to show output first
 
