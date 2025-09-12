@@ -4926,7 +4926,9 @@ Defines the Kubernetes components configuration and the values needed for the ku
 | [apiServerCertSANs](#speckubernetesadvancedapiservercertsans)       | `array`  | Optional |
 | [cloud](#speckubernetesadvancedcloud)                               | `object` | Optional |
 | [containerd](#speckubernetesadvancedcontainerd)                     | `object` | Optional |
+| [controllerManager](#speckubernetesadvancedcontrollermanager)       | `object` | Optional |
 | [encryption](#speckubernetesadvancedencryption)                     | `object` | Optional |
+| [eventRateLimits](#speckubernetesadvancedeventratelimits)           | `array`  | Optional |
 | [kernelParameters](#speckubernetesadvancedkernelparameters)         | `array`  | Optional |
 | [kubeletConfiguration](#speckubernetesadvancedkubeletconfiguration) | `object` | Optional |
 | [oidc](#speckubernetesadvancedoidc)                                 | `object` | Optional |
@@ -5145,14 +5147,33 @@ Registry address on which you would like to configure authentication or mirror(s
 
 The username containerd will use to authenticate against the registry.
 
+## .spec.kubernetes.advanced.controllerManager
+
+### Properties
+
+| Property                                                           | Type      | Required |
+|:-------------------------------------------------------------------|:----------|:---------|
+| [gcThreshold](#speckubernetesadvancedcontrollermanagergcthreshold) | `integer` | Optional |
+
+### Description
+
+Configurazione avanzata per il controller-manager.
+
+## .spec.kubernetes.advanced.controllerManager.gcThreshold
+
+### Description
+
+Numero massimo di Pod terminati conservati dal controller-manager prima dell’eliminazione automatica.
+
 ## .spec.kubernetes.advanced.encryption
 
 ### Properties
 
-| Property                                                            | Type     | Required |
-|:--------------------------------------------------------------------|:---------|:---------|
-| [configuration](#speckubernetesadvancedencryptionconfiguration)     | `string` | Optional |
-| [tlsCipherSuites](#speckubernetesadvancedencryptiontlsciphersuites) | `array`  | Optional |
+| Property                                                                          | Type     | Required |
+|:----------------------------------------------------------------------------------|:---------|:---------|
+| [configuration](#speckubernetesadvancedencryptionconfiguration)                   | `string` | Optional |
+| [tlsCipherSuites](#speckubernetesadvancedencryptiontlsciphersuites)               | `array`  | Optional |
+| [tlsCipherSuitesKubelet](#speckubernetesadvancedencryptiontlsciphersuiteskubelet) | `array`  | Optional |
 
 ## .spec.kubernetes.advanced.encryption.configuration
 
@@ -5179,7 +5200,7 @@ resources:
 
 ### Description
 
-The TLS cipher suites to use for etcd, kubelet, and kubeadm static pods. Example:
+The TLS cipher suites to use for etcd and kubeadm static pods. Example:
 ```yaml
 tlsCipherSuites:
   - "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256"
@@ -5192,7 +5213,73 @@ tlsCipherSuites:
   - "TLS_AES_256_GCM_SHA384"
   - "TLS_CHACHA20_POLY1305_SHA256"
 ```
-. NOTE: to customize the TLS cipher suites of the kubelet (as well as on control plane and etcd), set only this field - do not configure them under the `KubeletConfiguration`.
+.
+
+## .spec.kubernetes.advanced.encryption.tlsCipherSuitesKubelet
+
+### Description
+
+The TLS cipher suites to use for etcd, kubelet, and kubeadm static pods. Example:
+```yaml
+tlsCipherSuites:
+  - "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256"
+  - "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"
+  - "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384"
+ - "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305"
+  - "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305"
+  - "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384"
+```
+. NOTE: to customize the TLS cipher suites of the kubelet, set only this field - do not configure them under the `KubeletConfiguration`.
+
+## .spec.kubernetes.advanced.eventRateLimits
+
+### Properties
+
+| Property                                                     | Type      | Required |
+|:-------------------------------------------------------------|:----------|:---------|
+| [burst](#speckubernetesadvancedeventratelimitsburst)         | `integer` | Required |
+| [cacheSize](#speckubernetesadvancedeventratelimitscachesize) | `integer` | Optional |
+| [qps](#speckubernetesadvancedeventratelimitsqps)             | `integer` | Required |
+| [type](#speckubernetesadvancedeventratelimitstype)           | `string`  | Required |
+
+### Description
+
+Configura i limiti del plugin EventRateLimit dell'API Server. Ogni item rappresenta un bucket (Server, Namespace, User, etc).
+
+## .spec.kubernetes.advanced.eventRateLimits.burst
+
+### Description
+
+Burst massimo consentito per questo tipo di bucket.
+
+## .spec.kubernetes.advanced.eventRateLimits.cacheSize
+
+### Description
+
+Numero massimo di oggetti in cache per questo bucket. Solo per alcuni tipi come Namespace o User.
+
+## .spec.kubernetes.advanced.eventRateLimits.qps
+
+### Description
+
+Query per secondo (QPS) massimo consentito per questo tipo di bucket.
+
+## .spec.kubernetes.advanced.eventRateLimits.type
+
+### Description
+
+Tipo di limite da applicare (Server, Namespace, User, SourceAndObject).
+
+### Constraints
+
+**enum**: the value of this property must be equal to one of the following string values:
+
+| Value             |
+|:------------------|
+|`"Server"`         |
+|`"Namespace"`      |
+|`"User"`           |
+|`"SourceAndObject"`|
 
 ## .spec.kubernetes.advanced.kernelParameters
 
@@ -5221,11 +5308,23 @@ The value of the kernel parameter to edit. Example: `"15"`
 
 ## .spec.kubernetes.advanced.kubeletConfiguration
 
+### Properties
+
+| Property                                                                                                    | Type     | Required |
+|:------------------------------------------------------------------------------------------------------------|:---------|:---------|
+| [streamingConnectionIdleTimeout](#speckubernetesadvancedkubeletconfigurationstreamingconnectionidletimeout) | `string` | Optional |
+
 ### Description
 
 Advanced configuration for Kubelet. This open field allows users to specify any parameter supported by the `KubeletConfiguration` object. Examples of uses include controlling the maximum number of pods per core (`podsPerCore`), managing container logging (`containerLogMaxSize`), Topology Manager options (`topologyManagerPolicyOptions`). All values must follow the official Kubelet specification: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/.
 
 NOTE: Content will **not** be validated by furyctl. To customize the TLS cipher suites of the Kubelet, set only the `Spec.Kubernetes.Advanced.Encryption.tlsCipherSuites` field - do not configure them under this field.
+
+## .spec.kubernetes.advanced.kubeletConfiguration.streamingConnectionIdleTimeout
+
+### Description
+
+The maximum time a streaming connection can be idle before it is closed. Example: `5m0s`
 
 ## .spec.kubernetes.advanced.oidc
 
@@ -5575,11 +5674,23 @@ The value of the kernel parameter to edit. Example: `"15"`
 
 ## .spec.kubernetes.masters.kubeletConfiguration
 
+### Properties
+
+| Property                                                                                                   | Type     | Required |
+|:-----------------------------------------------------------------------------------------------------------|:---------|:---------|
+| [streamingConnectionIdleTimeout](#speckubernetesmasterskubeletconfigurationstreamingconnectionidletimeout) | `string` | Optional |
+
 ### Description
 
 Advanced configuration for Kubelet. This open field allows users to specify any parameter supported by the `KubeletConfiguration` object. Examples of uses include controlling the maximum number of pods per core (`podsPerCore`), managing container logging (`containerLogMaxSize`), Topology Manager options (`topologyManagerPolicyOptions`). All values must follow the official Kubelet specification: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/.
 
 NOTE: Content will **not** be validated by furyctl. To customize the TLS cipher suites of the Kubelet, set only the `Spec.Kubernetes.Advanced.Encryption.tlsCipherSuites` field - do not configure them under this field.
+
+## .spec.kubernetes.masters.kubeletConfiguration.streamingConnectionIdleTimeout
+
+### Description
+
+The maximum time a streaming connection can be idle before it is closed. Example: `5m0s`
 
 ## .spec.kubernetes.masters.labels
 
@@ -5707,11 +5818,23 @@ The value of the kernel parameter to edit. Example: `"15"`
 
 ## .spec.kubernetes.nodes.kubeletConfiguration
 
+### Properties
+
+| Property                                                                                                 | Type     | Required |
+|:---------------------------------------------------------------------------------------------------------|:---------|:---------|
+| [streamingConnectionIdleTimeout](#speckubernetesnodeskubeletconfigurationstreamingconnectionidletimeout) | `string` | Optional |
+
 ### Description
 
 Advanced configuration for Kubelet. This open field allows users to specify any parameter supported by the `KubeletConfiguration` object. Examples of uses include controlling the maximum number of pods per core (`podsPerCore`), managing container logging (`containerLogMaxSize`), Topology Manager options (`topologyManagerPolicyOptions`). All values must follow the official Kubelet specification: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/.
 
 NOTE: Content will **not** be validated by furyctl. To customize the TLS cipher suites of the Kubelet, set only the `Spec.Kubernetes.Advanced.Encryption.tlsCipherSuites` field - do not configure them under this field.
+
+## .spec.kubernetes.nodes.kubeletConfiguration.streamingConnectionIdleTimeout
+
+### Description
+
+The maximum time a streaming connection can be idle before it is closed. Example: `5m0s`
 
 ## .spec.kubernetes.nodes.labels
 
@@ -5994,5 +6117,15 @@ The folder of the kustomize plugin
 
 ### Description
 
-The name of the kustomize plugin
+The name of the kustomize plugin. A lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', 'local-storage')
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+```
+
+[try pattern](https://regexr.com/?expression=^[a-z0-9]\([-a-z0-9]*[a-z0-9]\)?\(\.[a-z0-9]\([-a-z0-9]*[a-z0-9]\)?\)*$)
 
