@@ -85,7 +85,7 @@ spec:
       networkPoliciesEnabled: true
     modules:
       networking:
-        type: cilium
+        type: calico
       ingress:
         baseDomain: ingress.${replace(hcloud_server.haproxy.ipv4_address, ".", "-")}.nip.io
         nginx:
@@ -176,4 +176,12 @@ subjectAltName = @alt_names
 DNS.1 = ingress.${replace(hcloud_server.haproxy.ipv4_address, ".", "-")}.nip.io
 DNS.2 = *.ingress.${replace(hcloud_server.haproxy.ipv4_address, ".", "-")}.nip.io
 EOF
+}
+
+output "controlplane_0_ip" {
+  value = hcloud_server.controlplane[0].ipv4_address
+}
+
+output "worker_0_ip" {
+  value = hcloud_server.worker[0].ipv4_address
 }
