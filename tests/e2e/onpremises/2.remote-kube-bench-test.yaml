@@ -58,7 +58,19 @@
         src: "/cache/kubeconfig"
         dest: "/root/kubeconfig"
         mode: '0600'
-      delegate_to: localhost
+
+    - name: Slurp kubeconfig file
+      ansible.builtin.slurp:
+        src: "/root/kubeconfig"
+      register: kubeconfig_file
+
+    - name: Decode kubeconfig content
+      set_fact:
+        kubeconfig_decoded: "{{ kubeconfig_file.content | b64decode }}"
+
+    - name: Print kubeconfig file content
+      ansible.builtin.debug:
+        msg: "{{ kubeconfig_decoded }}"
 
     - name: Run kube-bench security tests with sighupio configuration
       ansible.builtin.shell: |
