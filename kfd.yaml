@@ -4,15 +4,15 @@
 
 version: v1.33.0-rc.0
 modules:
-  auth: v0.6.0-rc.0
-  aws: v5.1.0-rc.0
-  dr: v3.2.0-rc.0
-  ingress: v4.1.0-rc.0
-  logging: v5.2.0-rc.0
+  auth: v0.5.1
+  aws: v5.0.0
+  dr: v3.1.0
+  ingress: v4.0.0
+  logging: v5.1.0
   monitoring: v3.5.0
-  opa: v1.15.0-rc.0
-  networking: v3.0.0-rc.0
-  tracing: v1.3.0-rc.1
+  opa: v1.14.0
+  networking: v2.2.0
+  tracing: v1.2.0
 kubernetes:
   eks:
     version: 1.32
