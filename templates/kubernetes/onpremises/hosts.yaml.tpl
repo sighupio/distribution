@@ -133,27 +133,17 @@ all:
         {{- end }}
 
         {{- if index .spec.kubernetes "advanced" }}
-        {{- if and (index .spec.kubernetes.advanced "eventRateLimits") }}
-          {{- $custom := .spec.kubernetes.advanced.eventRateLimits | default (list) }}
-          {{- $default := list
-            (dict "type" "Server" "qps" 5000 "burst" 20000)
-            (dict "type" "Namespace" "qps" 50 "burst" 100 "cacheSize" 2000)
-            (dict "type" "User" "qps" 50 "burst" 100)
-          }}
-          {{- $overrides := dict }}
-          {{- range $custom }}
-            {{- $_ := set $overrides .type true }}
-          {{- end }}
+          {{- if index .spec.kubernetes.advanced "eventRateLimits" }}
         eventratelimits:
-          {{- range .spec.kubernetes.advanced.eventRateLimits }}
+            {{- range .spec.kubernetes.advanced.eventRateLimits }}
           - type: {{ .type }}
             qps: {{ .qps }}
             burst: {{ .burst }}
-            {{- if .cacheSize }}
+              {{- if .cacheSize }}
             cacheSize: {{ .cacheSize }}
+              {{- end }}
             {{- end }}
-        {{- end }}
-        {{- end }}
+          {{- end }}
         {{- end }}
 
         {{- if index .spec.kubernetes "advanced" }}
