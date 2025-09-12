@@ -713,7 +713,25 @@ steps:
   volumes:
     - name: cache
       path: /cache
-    
+- name: kube-bench-security-test
+  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+    AWS_ACCESS_KEY_ID:
+      from_secret: aws_access_key_id
+    AWS_SECRET_ACCESS_KEY:
+      from_secret: aws_secret_access_key
+    AWS_REGION:
+      from_secret: aws_region
+    TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
+    TF_VAR_hcloud_token:
+      from_secret: hcloud_token
+  commands:
+    - cd tests/e2e/onpremises/
+    - ansible-playbook 2.remote-kube-bench-test.yaml
+  volumes:
+    - name: cache
+      path: /cache
 - name: bats-tests
   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
   environment:
@@ -742,7 +760,7 @@ steps:
     - cd tests/e2e/onpremises/
     - export TF_VAR_public_key=$(cat /cache/ci-ssh-key.pub)
     - export TF_VAR_private_key=$(cat /cache/ci-ssh-key)
-    - ansible-playbook 2.local-tofu-destroy.yaml
+    - ansible-playbook 3.local-tofu-destroy.yaml
   when:
     status:
     - success

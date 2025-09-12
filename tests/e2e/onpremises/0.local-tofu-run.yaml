@@ -28,7 +28,15 @@
       ansible.builtin.shell: tofu output -raw haproxy_ip
       register: haproxy_ip_output
 
-    - name: Update hosts.yaml with haproxy IP
+    - name: Get controlplane 0 IP from Tofu Output
+      ansible.builtin.shell: tofu output -raw controlplane_0_ip
+      register: controlplane_0_ip_output
+
+    - name: Get worker 0 IP from Tofu Output
+      ansible.builtin.shell: tofu output -raw worker_0_ip
+      register: worker_0_ip_output
+
+    - name: Update hosts.yaml with all IPs
       copy:
         dest: "hosts.yaml"
         content: |
@@ -38,6 +46,14 @@
                 hosts:
                   haproxy:
                     ansible_host: "{{ haproxy_ip_output.stdout }}"
+              controlplane_nodes:
+                hosts:
+                  controlplane-0:
+                    ansible_host: "{{ controlplane_0_ip_output.stdout }}"
+              worker_nodes:
+                hosts:
+                  worker-0:
+                    ansible_host: "{{ worker_0_ip_output.stdout }}"
             vars:
               ansible_python_interpreter: python3
               ansible_ssh_private_key_file: "/cache/ci-ssh-key"
