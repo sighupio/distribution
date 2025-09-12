@@ -112,4 +112,3 @@
       ansible.builtin.copy:
         content: "{{ kubeconfig_decoded }}"
         dest: "/cache/kubeconfig"
-      delegate_to: localhost
