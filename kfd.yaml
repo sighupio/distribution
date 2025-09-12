@@ -16,7 +16,7 @@ modules:
 kubernetes:
   eks:
     version: 1.33
-    installer: v3.3.0
+    installer: v3.3.0-rc.1
   onpremises:
     version: 1.33.4
     installer: v1.33.4-rc.4
