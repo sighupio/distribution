@@ -745,7 +745,7 @@ steps:
 - name: delete
   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
   environment:
-    FURYCTL_VERSION: "v0.32.3-rc.2"
+    FURYCTL_VERSION: "v0.32.5"
     DEBIAN_FRONTEND: noninteractive
     AWS_ACCESS_KEY_ID:
       from_secret: aws_access_key_id
