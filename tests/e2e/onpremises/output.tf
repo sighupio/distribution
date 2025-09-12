@@ -85,7 +85,7 @@ spec:
       networkPoliciesEnabled: true
     modules:
       networking:
-        type: calico
+        type: cilium
       ingress:
         baseDomain: ingress.${replace(hcloud_server.haproxy.ipv4_address, ".", "-")}.nip.io
         nginx:
