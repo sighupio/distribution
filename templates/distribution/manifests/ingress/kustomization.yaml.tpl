@@ -24,7 +24,7 @@ resources:
 
 {{- end }}
 
-{{ if eq .spec.distribution.common.networkPoliciesEnabled true }}
+{{- if and (eq .spec.distribution.common.networkPoliciesEnabled true) (or (eq .spec.distribution.modules.ingress.nginx.tls.provider "certManager") (ne .spec.distribution.modules.ingress.nginx.type "none")) }}
   - policies
 {{- end }}
 
@@ -54,9 +54,8 @@ patchesStrategicMerge:
 
   - patches/cert-manager-kapp-group.yml
 
-{{ if or (ne .spec.distribution.modules.ingress.nginx.tls.provider "none") (ne .spec.distribution.modules.ingress.nginx.type "none") }}
+  # cert-manager is always deployed, so we need to patch at least it to include the selectors
   - patches/infra-nodes.yml
-{{- end }}
 
 {{- end }}
 

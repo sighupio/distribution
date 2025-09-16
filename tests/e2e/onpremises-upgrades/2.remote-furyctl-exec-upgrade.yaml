@@ -1,0 +1,54 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Remote Setup - Configure and Deploy on Target Host
+  hosts: haproxy
+  gather_facts: false
+
+  tasks:
+    - name: Install furyctl
+      ansible.builtin.shell: |
+        curl -L "https://github.com/sighupio/furyctl/releases/download/{{ furyctl_version }}/furyctl-$(uname -s)-amd64.tar.gz" | tar xz -C /usr/local/bin/
+      args:
+        creates: /usr/local/bin/furyctl
+      vars:
+        furyctl_version: "{{ lookup('env', 'FURYCTL_VERSION') | default('v0.32.1') }}"
+
+    - name: Clone current commit distribution
+      ansible.builtin.shell: git clone https://github.com/sighupio/distribution.git /tmp/fury-distribution
+      args:
+        chdir: /root
+
+    - name: Clone current commit distribution
+      ansible.builtin.shell: git checkout {{ commit_sha }}
+      args:
+        chdir: /tmp/fury-distribution
+      vars:
+        commit_sha: "{{ lookup('env', 'DRONE_COMMIT_SHA') | default('main') }}"
+
+    - name: Upgrade cluster with furyctl
+      ansible.builtin.shell: furyctl apply cluster -o $PWD -D --distro-location /tmp/fury-distribution --force upgrades
+      args:
+        chdir: /root
+      register: furyctl_kubernetes
+
+    - name: Debug furyctl kubernetes phase
+      debug:
+        msg: "{{ furyctl_kubernetes.stdout }}"
+
+    - name: Slurp kubeconfig file
+      ansible.builtin.slurp:
+        src: "/root/kubeconfig"
+      register: kubeconfig_file
+
+    - name: Decode kubeconfig content
+      set_fact:
+        kubeconfig_decoded: "{{ kubeconfig_file.content | b64decode }}"
+
+    - name: Save kubeconfig to local machine
+      ansible.builtin.copy:
+        content: "{{ kubeconfig_decoded }}"
+        dest: "/cache/kubeconfig"
+      delegate_to: localhost

@@ -37,6 +37,9 @@ resources:
 # into several files, but splitting would complicate the template logic too much IMO.
 patchesStrategicMerge:
   - patches/infra-nodes.yml
+{{- if eq .spec.distribution.modules.policy.type "gatekeeper" }}
+  - patches/gatekeeper-kapp-ordering.yml
+{{- end }}
 
 patches:
 {{- if eq .spec.distribution.modules.policy.type "kyverno" }}

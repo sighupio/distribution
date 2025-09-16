@@ -1,6 +1,6 @@
 # KFDDistribution - Distribution Only Cluster Schema
 
-This document explains the full schema for the `kind: KFDDistribution` for the `furyctl.yaml` file used by `furyctl`. This configuration file will be used to deploy the Kubernetes Fury Distribution modules on top of an existing Kubernetes cluster.
+This document explains the full schema for the `kind: KFDDistribution` for the `furyctl.yaml` file used by `furyctl`. This configuration file will be used to deploy the SIGHUP Distribution modules on top of an existing Kubernetes cluster.
 
 An example configuration file can be created by running the following command:
 
@@ -90,17 +90,24 @@ The name of the cluster. It will also be used as a prefix for all the other reso
 
 ### Properties
 
-| Property                                                        | Type     | Required |
-|:----------------------------------------------------------------|:---------|:---------|
-| [nodeSelector](#specdistributioncommonnodeselector)             | `object` | Optional |
-| [provider](#specdistributioncommonprovider)                     | `object` | Optional |
-| [registry](#specdistributioncommonregistry)                     | `string` | Optional |
-| [relativeVendorPath](#specdistributioncommonrelativevendorpath) | `string` | Optional |
-| [tolerations](#specdistributioncommontolerations)               | `array`  | Optional |
+| Property                                                                | Type      | Required |
+|:------------------------------------------------------------------------|:----------|:---------|
+| [networkPoliciesEnabled](#specdistributioncommonnetworkpoliciesenabled) | `boolean` | Optional |
+| [nodeSelector](#specdistributioncommonnodeselector)                     | `object`  | Optional |
+| [provider](#specdistributioncommonprovider)                             | `object`  | Optional |
+| [registry](#specdistributioncommonregistry)                             | `string`  | Optional |
+| [relativeVendorPath](#specdistributioncommonrelativevendorpath)         | `string`  | Optional |
+| [tolerations](#specdistributioncommontolerations)                       | `array`   | Optional |
 
 ### Description
 
 Common configuration for all the distribution modules.
+
+## .spec.distribution.common.networkPoliciesEnabled
+
+### Description
+
+EXPERIMENTAL FEATURE. This field defines whether Network Policies are provided for core modules.
 
 ## .spec.distribution.common.nodeSelector
 
@@ -538,13 +545,14 @@ The path to the kubeconfig file.
 
 ### Properties
 
-| Property                                             | Type     | Required |
-|:-----------------------------------------------------|:---------|:---------|
-| [baseDomain](#specdistributionmodulesauthbasedomain) | `string` | Optional |
-| [dex](#specdistributionmodulesauthdex)               | `object` | Optional |
-| [overrides](#specdistributionmodulesauthoverrides)   | `object` | Optional |
-| [pomerium](#specdistributionmodulesauthpomerium)     | `object` | Optional |
-| [provider](#specdistributionmodulesauthprovider)     | `object` | Required |
+| Property                                                   | Type     | Required |
+|:-----------------------------------------------------------|:---------|:---------|
+| [baseDomain](#specdistributionmodulesauthbasedomain)       | `string` | Optional |
+| [dex](#specdistributionmodulesauthdex)                     | `object` | Optional |
+| [oidcTrustedCA](#specdistributionmodulesauthoidctrustedca) | `string` | Optional |
+| [overrides](#specdistributionmodulesauthoverrides)         | `object` | Optional |
+| [pomerium](#specdistributionmodulesauthpomerium)           | `object` | Optional |
+| [provider](#specdistributionmodulesauthprovider)           | `object` | Required |
 
 ### Description
 
@@ -679,6 +687,12 @@ The key of the toleration
 ### Description
 
 The value of the toleration
+
+## .spec.distribution.modules.auth.oidcTrustedCA
+
+### Description
+
+The Certificate Authority certificate file's content to trust for self-signed certificates at the OAuth2 URL. You can use the `"{file://<path>}"` notation to get the content from a file.
 
 ## .spec.distribution.modules.auth.overrides
 
@@ -920,7 +934,7 @@ Signing Key is the base64 representation of one or more PEM-encoded private keys
 To generates an P-256 (ES256) signing key:
 
 ```bash
-openssl ecparam  -genkey  -name prime256v1  -noout  -out ec_private.pem
+openssl ecparam -genkey -name prime256v1 -noout -out ec_private.pem
 # careful! this will output your private key in terminal
 cat ec_private.pem | base64
 ```
@@ -1983,7 +1997,8 @@ This value defines where the output from the `systemdEtcd` Flow will be sent. Th
 | [backend](#specdistributionmoduleslogginglokibackend)                   | `string` | Optional |
 | [externalEndpoint](#specdistributionmoduleslogginglokiexternalendpoint) | `object` | Optional |
 | [resources](#specdistributionmoduleslogginglokiresources)               | `object` | Optional |
-| [tsdbStartDate](#specdistributionmoduleslogginglokitsdbstartdate)       | `string` | Required |
+| [retentionTime](#specdistributionmoduleslogginglokiretentiontime)       | `string` | Optional |
+| [tsdbStartDate](#specdistributionmoduleslogginglokitsdbstartdate)       | `string` | Optional |
 
 ### Description
 
@@ -2101,13 +2116,21 @@ The CPU request for the Pod, in cores. Example: `500m`.
 
 The memory request for the Pod. Example: `500M`.
 
+## .spec.distribution.modules.logging.loki.retentionTime
+
+### Description
+
+Optional retention period for logs stored in Loki (default `720h`, 30 days). Setting it to `0s` disables retention. Format must match: `[0-9]+(s|m|h|d|w|y)`.
+
 ## .spec.distribution.modules.logging.loki.tsdbStartDate
 
 ### Description
 
-Starting from versions 1.28.4, 1.29.5 and 1.30.0 of KFD, Loki will change the time series database from BoltDB to TSDB and the schema from v11 to v13 that it uses to store the logs.
+Starting from versions 1.28.4, 1.29.5 and 1.30.0 of SIGHUP Distribution, Loki changed the time series database from BoltDB to TSDB and the schema that it uses to store the logs from v11 to v13.
 
-The value of this field will determine the date when Loki will start writing using the new TSDB and the schema v13, always at midnight UTC. The old BoltDB and schema will be kept until they expire for reading purposes.
+The value of this field will determine the date when Loki will start writing using the new TSDB and the schema v13, always at midnight UTC. The old BoltDB and schema will be kept until all the logs expire for reading purposes.
+
+From versions 1.29.7, 1.30.2 and 1.31.1 of the Distribution, this field will be immutable once set and its value should be a date before upgrading to one of these versions or creating the cluster, Loki does not support writing BoltDB and schema v11 anymore.
 
 Value must be a string in `ISO 8601` date format (`yyyy-mm-dd`). Example: `2024-11-18`.
 
@@ -2541,19 +2564,20 @@ Default is `opensearch`.
 
 ### Properties
 
-| Property                                                               | Type     | Required |
-|:-----------------------------------------------------------------------|:---------|:---------|
-| [alertmanager](#specdistributionmodulesmonitoringalertmanager)         | `object` | Optional |
-| [blackboxExporter](#specdistributionmodulesmonitoringblackboxexporter) | `object` | Optional |
-| [grafana](#specdistributionmodulesmonitoringgrafana)                   | `object` | Optional |
-| [kubeStateMetrics](#specdistributionmodulesmonitoringkubestatemetrics) | `object` | Optional |
-| [mimir](#specdistributionmodulesmonitoringmimir)                       | `object` | Optional |
-| [minio](#specdistributionmodulesmonitoringminio)                       | `object` | Optional |
-| [overrides](#specdistributionmodulesmonitoringoverrides)               | `object` | Optional |
-| [prometheus](#specdistributionmodulesmonitoringprometheus)             | `object` | Optional |
-| [prometheusAgent](#specdistributionmodulesmonitoringprometheusagent)   | `object` | Optional |
-| [type](#specdistributionmodulesmonitoringtype)                         | `string` | Required |
-| [x509Exporter](#specdistributionmodulesmonitoringx509exporter)         | `object` | Optional |
+| Property                                                                 | Type     | Required |
+|:-------------------------------------------------------------------------|:---------|:---------|
+| [alertmanager](#specdistributionmodulesmonitoringalertmanager)           | `object` | Optional |
+| [blackboxExporter](#specdistributionmodulesmonitoringblackboxexporter)   | `object` | Optional |
+| [grafana](#specdistributionmodulesmonitoringgrafana)                     | `object` | Optional |
+| [kubeStateMetrics](#specdistributionmodulesmonitoringkubestatemetrics)   | `object` | Optional |
+| [mimir](#specdistributionmodulesmonitoringmimir)                         | `object` | Optional |
+| [minio](#specdistributionmodulesmonitoringminio)                         | `object` | Optional |
+| [overrides](#specdistributionmodulesmonitoringoverrides)                 | `object` | Optional |
+| [prometheus](#specdistributionmodulesmonitoringprometheus)               | `object` | Optional |
+| [prometheusAdapter](#specdistributionmodulesmonitoringprometheusadapter) | `object` | Optional |
+| [prometheusAgent](#specdistributionmodulesmonitoringprometheusagent)     | `object` | Optional |
+| [type](#specdistributionmodulesmonitoringtype)                           | `string` | Required |
+| [x509Exporter](#specdistributionmodulesmonitoringx509exporter)           | `object` | Optional |
 
 ### Description
 
@@ -3242,6 +3266,72 @@ The retention time for the `k8s` Prometheus instance.
 
 The storage size for the `k8s` Prometheus instance.
 
+## .spec.distribution.modules.monitoring.prometheusAdapter
+
+### Properties
+
+| Property                                                                                                  | Type      | Required |
+|:----------------------------------------------------------------------------------------------------------|:----------|:---------|
+| [installEnhancedHPAMetrics](#specdistributionmodulesmonitoringprometheusadapterinstallenhancedhpametrics) | `boolean` | Optional |
+| [resources](#specdistributionmodulesmonitoringprometheusadapterresources)                                 | `object`  | Optional |
+
+## .spec.distribution.modules.monitoring.prometheusAdapter.installEnhancedHPAMetrics
+
+### Description
+
+Configures whether to enable advanced HPA metric collection in the Prometheus Adapter. When set to `true`, the Prometheus Adapter component will query Prometheus instances directly to retrieve additional metrics related to the Horizontal Pod Autoscaler (HPA). These metrics provide deeper visibility into HPA behaviour and performance. **Caution:** Enabling this feature results in a significant increase in RAM consumption of the Prometheus Adapter, as it requires managing an additional dataset. Default value: true.
+
+## .spec.distribution.modules.monitoring.prometheusAdapter.resources
+
+### Properties
+
+| Property                                                                         | Type     | Required |
+|:---------------------------------------------------------------------------------|:---------|:---------|
+| [limits](#specdistributionmodulesmonitoringprometheusadapterresourceslimits)     | `object` | Optional |
+| [requests](#specdistributionmodulesmonitoringprometheusadapterresourcesrequests) | `object` | Optional |
+
+## .spec.distribution.modules.monitoring.prometheusAdapter.resources.limits
+
+### Properties
+
+| Property                                                                           | Type     | Required |
+|:-----------------------------------------------------------------------------------|:---------|:---------|
+| [cpu](#specdistributionmodulesmonitoringprometheusadapterresourceslimitscpu)       | `string` | Optional |
+| [memory](#specdistributionmodulesmonitoringprometheusadapterresourceslimitsmemory) | `string` | Optional |
+
+## .spec.distribution.modules.monitoring.prometheusAdapter.resources.limits.cpu
+
+### Description
+
+The CPU limit for the Pod. Example: `1000m`.
+
+## .spec.distribution.modules.monitoring.prometheusAdapter.resources.limits.memory
+
+### Description
+
+The memory limit for the Pod. Example: `1G`.
+
+## .spec.distribution.modules.monitoring.prometheusAdapter.resources.requests
+
+### Properties
+
+| Property                                                                             | Type     | Required |
+|:-------------------------------------------------------------------------------------|:---------|:---------|
+| [cpu](#specdistributionmodulesmonitoringprometheusadapterresourcesrequestscpu)       | `string` | Optional |
+| [memory](#specdistributionmodulesmonitoringprometheusadapterresourcesrequestsmemory) | `string` | Optional |
+
+## .spec.distribution.modules.monitoring.prometheusAdapter.resources.requests.cpu
+
+### Description
+
+The CPU request for the Pod, in cores. Example: `500m`.
+
+## .spec.distribution.modules.monitoring.prometheusAdapter.resources.requests.memory
+
+### Description
+
+The memory request for the Pod. Example: `500M`.
+
 ## .spec.distribution.modules.monitoring.prometheusAgent
 
 ### Properties
@@ -3595,9 +3685,17 @@ The value of the toleration
 
 ### Properties
 
-| Property                                                               | Type     | Required |
-|:-----------------------------------------------------------------------|:---------|:---------|
-| [overrides](#specdistributionmodulesnetworkingtigeraoperatoroverrides) | `object` | Optional |
+| Property                                                               | Type      | Required |
+|:-----------------------------------------------------------------------|:----------|:---------|
+| [blockSize](#specdistributionmodulesnetworkingtigeraoperatorblocksize) | `integer` | Optional |
+| [overrides](#specdistributionmodulesnetworkingtigeraoperatoroverrides) | `object`  | Optional |
+| [podCidr](#specdistributionmodulesnetworkingtigeraoperatorpodcidr)     | `string`  | Optional |
+
+## .spec.distribution.modules.networking.tigeraOperator.blockSize
+
+### Description
+
+BlockSize specifies the CIDR prefex length to use when allocating per-node IP blocks from the main IP pool CIDR. WARNING: The value for this field cannot be changed once set. Default is 26.
 
 ## .spec.distribution.modules.networking.tigeraOperator.overrides
 
@@ -3663,6 +3761,22 @@ The key of the toleration
 ### Description
 
 The value of the toleration
+
+## .spec.distribution.modules.networking.tigeraOperator.podCidr
+
+### Description
+
+Allows specifing a CIDR for the Pods network different from `.spec.kubernetes.podCidr`. If not set the default is to use `.spec.kubernetes.podCidr`. WARNING: The value for this field cannot be changed once set.
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}\/(3[0-2]|[1-2][0-9]|[0-9])$
+```
+
+[try pattern](https://regexr.com/?expression=^\(\(25[0-5]|\(2[0-4]|1\d|[1-9]|\)\d\)\.?\b\){4}\\/\(3[0-2]|[1-2][0-9]|[0-9]\)$)
 
 ## .spec.distribution.modules.networking.type
 

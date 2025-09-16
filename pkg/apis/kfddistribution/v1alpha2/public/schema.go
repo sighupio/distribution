@@ -64,6 +64,10 @@ type SpecDistribution struct {
 
 // Common configuration for all the distribution modules.
 type SpecDistributionCommon struct {
+	// EXPERIMENTAL FEATURE. This field defines whether Network Policies are provided
+	// for core modules.
+	NetworkPoliciesEnabled *bool `json:"networkPoliciesEnabled,omitempty" yaml:"networkPoliciesEnabled,omitempty" mapstructure:"networkPoliciesEnabled,omitempty"`
+
 	// The node selector to use to place the pods for all the KFD modules. Follows
 	// Kubernetes selector format. Example: `node.kubernetes.io/role: infra`.
 	NodeSelector TypesKubeNodeSelector `json:"nodeSelector,omitempty" yaml:"nodeSelector,omitempty" mapstructure:"nodeSelector,omitempty"`
@@ -302,6 +306,11 @@ type SpecDistributionModulesAuth struct {
 	// Dex corresponds to the JSON schema field "dex".
 	Dex *SpecDistributionModulesAuthDex `json:"dex,omitempty" yaml:"dex,omitempty" mapstructure:"dex,omitempty"`
 
+	// The Certificate Authority certificate file's content to trust for self-signed
+	// certificates at the OAuth2 URL. You can use the `"{file://<path>}"` notation to
+	// get the content from a file.
+	OidcTrustedCA *string `json:"oidcTrustedCA,omitempty" yaml:"oidcTrustedCA,omitempty" mapstructure:"oidcTrustedCA,omitempty"`
+
 	// Overrides corresponds to the JSON schema field "overrides".
 	Overrides *SpecDistributionModulesAuthOverrides `json:"overrides,omitempty" yaml:"overrides,omitempty" mapstructure:"overrides,omitempty"`
 
@@ -465,7 +474,7 @@ type SpecDistributionModulesAuthPomeriumSecrets struct {
 	// To generates an P-256 (ES256) signing key:
 	//
 	// ```bash
-	// openssl ecparam  -genkey  -name prime256v1  -noout  -out ec_private.pem
+	// openssl ecparam -genkey -name prime256v1 -noout -out ec_private.pem
 	// # careful! this will output your private key in terminal
 	// cat ec_private.pem | base64
 	// ```
@@ -903,17 +912,27 @@ type SpecDistributionModulesLoggingLoki struct {
 	// Resources corresponds to the JSON schema field "resources".
 	Resources *TypesKubeResources `json:"resources,omitempty" yaml:"resources,omitempty" mapstructure:"resources,omitempty"`
 
-	// Starting from versions 1.28.4, 1.29.5 and 1.30.0 of KFD, Loki will change the
-	// time series database from BoltDB to TSDB and the schema from v11 to v13 that it
-	// uses to store the logs.
+	// Optional retention period for logs stored in Loki (default `720h`, 30 days).
+	// Setting it to `0s` disables retention. Format must match:
+	// `[0-9]+(s|m|h|d|w|y)`.
+	RetentionTime *string `json:"retentionTime,omitempty" yaml:"retentionTime,omitempty" mapstructure:"retentionTime,omitempty"`
+
+	// Starting from versions 1.28.4, 1.29.5 and 1.30.0 of SIGHUP Distribution, Loki
+	// changed the time series database from BoltDB to TSDB and the schema that it
+	// uses to store the logs from v11 to v13.
 	//
 	// The value of this field will determine the date when Loki will start writing
 	// using the new TSDB and the schema v13, always at midnight UTC. The old BoltDB
-	// and schema will be kept until they expire for reading purposes.
+	// and schema will be kept until all the logs expire for reading purposes.
+	//
+	// From versions 1.29.7, 1.30.2 and 1.31.1 of the Distribution, this field will be
+	// immutable once set and its value should be a date before upgrading to one of
+	// these versions or creating the cluster, Loki does not support writing BoltDB
+	// and schema v11 anymore.
 	//
 	// Value must be a string in `ISO 8601` date format (`yyyy-mm-dd`). Example:
 	// `2024-11-18`.
-	TsdbStartDate types.SerializableDate `json:"tsdbStartDate" yaml:"tsdbStartDate" mapstructure:"tsdbStartDate"`
+	TsdbStartDate *types.SerializableDate `json:"tsdbStartDate,omitempty" yaml:"tsdbStartDate,omitempty" mapstructure:"tsdbStartDate,omitempty"`
 }
 
 type SpecDistributionModulesLoggingLokiBackend string
@@ -1367,24 +1386,6 @@ type TypesKubeResources struct {
 
 type TypesFuryModuleOverridesIngresses map[string]TypesFuryModuleOverridesIngress
 
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionModulesLoggingLoki) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if v, ok := raw["tsdbStartDate"]; !ok || v == nil {
-		return fmt.Errorf("field tsdbStartDate in SpecDistributionModulesLoggingLoki: required")
-	}
-	type Plain SpecDistributionModulesLoggingLoki
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = SpecDistributionModulesLoggingLoki(plain)
-	return nil
-}
-
 type TypesFuryModuleOverridesIngress struct {
 	// If true, the ingress will not have authentication even if
 	// `.spec.modules.auth.provider.type` is SSO or Basic Auth.
@@ -1823,6 +1824,20 @@ type SpecDistributionModulesMonitoringPrometheus struct {
 	StorageSize *string `json:"storageSize,omitempty" yaml:"storageSize,omitempty" mapstructure:"storageSize,omitempty"`
 }
 
+type SpecDistributionModulesMonitoringPrometheusAdapter struct {
+	// Configures whether to enable advanced HPA metric collection in the Prometheus
+	// Adapter. When set to `true`, the Prometheus Adapter component will query
+	// Prometheus instances directly to retrieve additional metrics related to the
+	// Horizontal Pod Autoscaler (HPA). These metrics provide deeper visibility into
+	// HPA behaviour and performance. **Caution:** Enabling this feature results in a
+	// significant increase in RAM consumption of the Prometheus Adapter, as it
+	// requires managing an additional dataset. Default value: true.
+	InstallEnhancedHPAMetrics *bool `json:"installEnhancedHPAMetrics,omitempty" yaml:"installEnhancedHPAMetrics,omitempty" mapstructure:"installEnhancedHPAMetrics,omitempty"`
+
+	// Resources corresponds to the JSON schema field "resources".
+	Resources *TypesKubeResources `json:"resources,omitempty" yaml:"resources,omitempty" mapstructure:"resources,omitempty"`
+}
+
 type SpecDistributionModulesMonitoringPrometheusAgentRemoteWriteElem map[string]interface{}
 
 type SpecDistributionModulesMonitoringPrometheusAgent struct {
@@ -1906,6 +1921,9 @@ type SpecDistributionModulesMonitoring struct {
 	// Prometheus corresponds to the JSON schema field "prometheus".
 	Prometheus *SpecDistributionModulesMonitoringPrometheus `json:"prometheus,omitempty" yaml:"prometheus,omitempty" mapstructure:"prometheus,omitempty"`
 
+	// PrometheusAdapter corresponds to the JSON schema field "prometheusAdapter".
+	PrometheusAdapter *SpecDistributionModulesMonitoringPrometheusAdapter `json:"prometheusAdapter,omitempty" yaml:"prometheusAdapter,omitempty" mapstructure:"prometheusAdapter,omitempty"`
+
 	// PrometheusAgent corresponds to the JSON schema field "prometheusAgent".
 	PrometheusAgent *SpecDistributionModulesMonitoringPrometheusAgent `json:"prometheusAgent,omitempty" yaml:"prometheusAgent,omitempty" mapstructure:"prometheusAgent,omitempty"`
 
@@ -1987,8 +2005,19 @@ func (j *SpecDistributionModulesNetworkingCilium) UnmarshalJSON(b []byte) error 
 }
 
 type SpecDistributionModulesNetworkingTigeraOperator struct {
+	// BlockSize specifies the CIDR prefex length to use when allocating per-node IP
+	// blocks from the main IP pool CIDR. WARNING: The value for this field cannot be
+	// changed once set. Default is 26.
+	BlockSize *int `json:"blockSize,omitempty" yaml:"blockSize,omitempty" mapstructure:"blockSize,omitempty"`
+
 	// Overrides corresponds to the JSON schema field "overrides".
 	Overrides *TypesFuryModuleComponentOverrides `json:"overrides,omitempty" yaml:"overrides,omitempty" mapstructure:"overrides,omitempty"`
+
+	// Allows specifing a CIDR for the Pods network different from
+	// `.spec.kubernetes.podCidr`. If not set the default is to use
+	// `.spec.kubernetes.podCidr`. WARNING: The value for this field cannot be changed
+	// once set.
+	PodCidr *TypesCidr `json:"podCidr,omitempty" yaml:"podCidr,omitempty" mapstructure:"podCidr,omitempty"`
 }
 
 type SpecDistributionModulesNetworkingType string

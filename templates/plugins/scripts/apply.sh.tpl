@@ -13,7 +13,7 @@ yqbin="{{ .paths.yq }}"
 
 echo "Deploying plugin {{ .name }}..."
 
-$kustomizebin build --load_restrictor LoadRestrictionsNone {{ .folder }} > out.yaml
+$kustomizebin build --load-restrictor LoadRestrictionsNone {{ .folder }} > out.yaml
 
 $kappbin deploy -a kfd-plugin-{{ .name }} -n kube-system -f out.yaml --allow-all-ns -y --default-label-scoping-rules=false --apply-default-update-strategy=fallback-on-replace -c
 

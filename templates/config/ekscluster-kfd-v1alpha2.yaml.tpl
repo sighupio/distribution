@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/sighupio/fury-distribution/{{.DistributionVersion}}/schemas/public/ekscluster-kfd-v1alpha2.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/sighupio/distribution/{{.DistributionVersion}}/schemas/public/ekscluster-kfd-v1alpha2.json
 # Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
@@ -7,7 +7,7 @@
 # This is a sample configuration file to be used as a starting point. For the
 # complete reference of the configuration file schema, please refer to the
 # official documentation:
-# https://docs.kubernetesfury.com/docs/furyctl/providers/ekscluster
+# https://docs.kubernetesfury.com/docs/installation/kfd-configuration/providers/EKSCluster
 
 ---
 apiVersion: kfd.sighup.io/v1alpha2
@@ -231,8 +231,8 @@ spec:
         # can be opensearch, loki, customOutput or none. With none, the logging module won't be installed
         type: loki
         # configurations for the loki package
-        loki:
-          tsdbStartDate: "2024-11-20"
+        # loki:
+        #   retentionTime: "15d"
         # configurations for the minio-ha package
         minio:
           # the PVC size for each minio disk, 6 disks total

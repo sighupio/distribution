@@ -1,0 +1,83 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    app: ldap-server
+  name: ldap
+stringData:
+  LDAP_ADMIN_PASSWORD: HatFriday
+---
+kind: ConfigMap
+metadata:
+  labels:
+    app: ldap-server
+  name: ldap
+apiVersion: v1
+data:
+  LDAP_ORGANISATION: SIGHUP
+  LDAP_DOMAIN: sighup.io
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ldap-server
+spec:
+  ports:
+    - name: "tcp-389"
+      port: 389
+      protocol: TCP
+      targetPort: 389
+    - name: "tcp-363"
+      port: 636
+      protocol: TCP
+      targetPort: 636
+  selector:
+    app: ldap-server
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: ldap-server
+  name: ldap-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ldap-server
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: ldap-server
+    spec:
+      volumes:
+        - name: ldap-ldif
+          configMap:
+            name: ldap-ldif
+      containers:
+        - name: ldap-server
+          image: registry.sighup.io/fury/osixia/openldap:1.5.0
+          command:
+            - "sh"
+            - "-c"
+            - "cp -R /tmp/ldif /container/service/slapd/assets/config/bootstrap/ldif/custom && /container/tool/run"
+          envFrom:
+            - configMapRef:
+                name: ldap
+            - secretRef:
+                name: ldap
+          ports:
+            - containerPort: 389
+              name: "tcp-389"
+            - containerPort: 636
+              name: "tcp-636"
+          resources: {}
+          volumeMounts:
+            - name: ldap-ldif
+              mountPath: /tmp/ldif

@@ -49,8 +49,8 @@ deleteOpensearch() {
 
 {{- if eq .spec.distribution.modules.monitoring.type "none" }}
   if ! $kubectlbin get apiservice v1.monitoring.coreos.com; then
-    cat delete-opensearch.yaml | $yqbin 'select(.apiVersion != "monitoring.coreos.com/v1")' > delete-opensearch-filtered.yaml
-    cp delete-opensearch-filtered.yaml delete-opensearch.yaml
+    $yqbin -i 'select(.apiVersion != "monitoring.coreos.com/v1")' delete-opensearch.yaml
+    $yqbin -i 'select(.apiVersion != "monitoring.coreos.com/v1")' delete-opensearch-dashboards.yaml
   fi
 {{- end }}
 
@@ -67,8 +67,7 @@ deleteLoki() {
 
 {{- if eq .spec.distribution.modules.monitoring.type "none" }}
   if ! $kubectlbin get apiservice v1.monitoring.coreos.com; then
-    cat delete-loki.yaml | $yqbin 'select(.apiVersion != "monitoring.coreos.com/v1")' > delete-loki-filtered.yaml
-    cp delete-loki-filtered.yaml delete-loki.yaml
+     $yqbin -i 'select(.apiVersion != "monitoring.coreos.com/v1")' delete-loki.yaml
   fi
 {{- end }}
 
@@ -80,11 +79,18 @@ deleteLoki() {
 
 deleteLoggingOperator() {
 
-  $kustomizebin build $vendorPath/modules/logging/katalog/logging-operated | $kubectlbin delete --ignore-not-found --wait --timeout=180s -f -
+  $kustomizebin build $vendorPath/modules/logging/katalog/logging-operated > delete-logging-operated.yaml
+  $kustomizebin build $vendorPath/modules/logging/katalog/logging-operator > delete-logging-operator.yaml
+{{- if eq .spec.distribution.modules.monitoring.type "none" }}
+  if ! $kubectlbin get apiservice v1.monitoring.coreos.com; then
+    $yqbin -i 'select(.apiVersion != "monitoring.coreos.com/v1")' delete-logging-operated.yaml
+    $yqbin -i 'select(.apiVersion != "monitoring.coreos.com/v1")' delete-logging-operator.yaml
+  fi
+{{- end }}
+
+  $kubectlbin delete --ignore-not-found --wait --timeout=180s -f delete-logging-operated.yaml
   $kustomizebin build $vendorPath/modules/logging/katalog/configs | $kubectlbin delete --ignore-not-found --wait --timeout=180s -f -
-
-  $kustomizebin build $vendorPath/modules/logging/katalog/logging-operator | $kubectlbin delete --ignore-not-found --wait --timeout=180s -f -
-
+  $kubectlbin delete --ignore-not-found --wait --timeout=180s -f delete-logging-operator.yaml
   echo "Logging Operator and NS deleted"
 }
 
@@ -94,8 +100,7 @@ $kustomizebin build $vendorPath/modules/logging/katalog/minio-ha > delete-loggin
 
 {{- if eq .spec.distribution.modules.monitoring.type "none" }}
   if ! $kubectlbin get apiservice v1.monitoring.coreos.com; then
-    cat delete-logging-minio-ha.yaml | $yqbin 'select(.apiVersion != "monitoring.coreos.com/v1")' > delete-logging-minio-ha-filtered.yaml
-    cp delete-logging-minio-ha-filtered.yaml delete-tracing-minio-ha.yaml
+    $yqbin -i 'select(.apiVersion != "monitoring.coreos.com/v1")' delete-logging-minio-ha.yaml
   fi
 {{- end }}
   $kubectlbin delete --ignore-not-found --wait --timeout=180s -f delete-logging-minio-ha.yaml
@@ -645,6 +650,7 @@ deleteDex() {
   fi
 {{- end }}
   $kubectlbin delete --ignore-not-found --wait --timeout=180s -f delete-dex.yaml
+  $kubectlbin delete --ignore-not-found --wait --timeout=180s -n kube-system secret oidc-trusted-ca
   $kubectlbin delete --ignore-not-found --wait --timeout=180s ingress -n kube-system dex
   echo "dex has been deleted from the cluster"
 }
@@ -677,6 +683,7 @@ deletePomerium() {
   fi
 {{- end }}
   $kubectlbin delete --ignore-not-found --wait --timeout=180s -f delete-pomerium.yaml
+  $kubectlbin delete --ignore-not-found --wait --timeout=180s -n pomerium secret oidc-trusted-ca
   $kubectlbin delete --ignore-not-found --wait --timeout=180s ingress -n pomerium pomerium
   echo "pomerium has been deleted from the cluster"
 }

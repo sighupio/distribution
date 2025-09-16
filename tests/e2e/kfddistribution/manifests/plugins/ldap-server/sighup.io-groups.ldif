@@ -1,0 +1,27 @@
+version: 1
+
+dn: ou=groups,dc=sighup,dc=io
+objectClass: top
+objectClass: organizationalUnit
+ou: groups
+
+dn: ou=people,dc=sighup,dc=io
+objectClass: top
+objectClass: organizationalUnit
+ou: people
+
+dn: cn=ramiro,ou=people,dc=sighup,dc=io
+objectClass: top
+objectClass: person
+objectClass: inetOrgPerson
+cn: samuele
+sn: chiocca
+mail: samuele@sighup.io
+displayName: "Samuele Chiocca"
+userPassword: samuele
+
+dn: cn=engineering,ou=groups,dc=sighup,dc=io
+objectClass: top
+objectClass: groupOfNames
+cn: engineering
+member: cn=samuele,ou=people,dc=sighup,dc=io

@@ -92,6 +92,9 @@ data:
             disableAuth: false
             host: ""
             ingressClass: ""
+      operator:
+        fluentd: {}
+        fluentbit: {}
       # can be none, opensearch, loki or customOutputs
       type: opensearch
       opensearch:
@@ -106,6 +109,7 @@ data:
           username: minio
           password: minio123
       loki:
+        tsdbStartDate: "2025-05-15" # we needed this field when migrating from BoltDB to TSDB. Now TSDB is the default.
         backend: minio
         externalEndpoint:
           endpoint: s3.eu-west-1.amazonaws.com
@@ -113,6 +117,8 @@ data:
           secretAccessKey: example
           accessKeyId: example
           bucketName: lokibucket
+        # retentionTime can be set to 0s to disable retention
+        retentionTime: 720h # 30 days
       customOutputs: {}
     # monitoring module configuration
     monitoring:
@@ -147,6 +153,8 @@ data:
         retentionSize: 120GB
         storageSize: 150Gi
       prometheusAgent: {}
+      prometheusAdapter:
+        installEnhancedHPAMetrics: true
       alertmanager:
         installDefaultRules: true
         deadManSwitchWebhookUrl: ""
@@ -206,6 +214,9 @@ data:
             disableAuth: false
             host: ""
             ingressClass: ""
+      tigeraOperator:
+        podCidr: null # not used
+        blockSize: 26 # not used
       cilium:
         podCidr: "dummy" # cilium not used yet on EKS
         maskSize: "dummy" # cilium not used yet on EKS
@@ -237,6 +248,8 @@ data:
       overrides:
         nodeSelector: null
         tolerations: null
+      etcdBackup:
+        type: "none"
       # the standard configuration for velero on the dr module
       velero:
         backend: minio
@@ -303,6 +316,7 @@ data:
         expiry:
           signingKeys: "6h"
           idTokens: "24h"
+      oidcTrustedCA: "" # only needed as default
       oidcKubernetesAuth: # only needed as default
         enabled: false
       baseDomain: ""

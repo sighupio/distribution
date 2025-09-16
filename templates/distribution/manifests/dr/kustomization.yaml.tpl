@@ -7,6 +7,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
+  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/dr/katalog/velero/velero-node-agent" }}
 {{- if eq .spec.distribution.common.provider.type "eks" }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/dr/katalog/velero/velero-aws" }}
 {{- else if eq .spec.distribution.common.provider.type "none" }}
@@ -18,11 +19,18 @@ resources:
   - resources/storageLocation.yaml
   - resources/volumeSnapshotLocation.yaml
 {{- end }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/dr/katalog/velero/velero-node-agent" }}
 {{- if .spec.distribution.modules.dr.velero.snapshotController.install }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/dr/katalog/velero/snapshot-controller" }}
 {{- end }}
-
+{{- if eq .spec.distribution.modules.dr.etcdBackup.type "all" "s3" }}
+  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/dr/katalog/etcd-backup-s3" }}
+{{- end}}
+{{- if eq .spec.distribution.modules.dr.etcdBackup.type "all" "pvc" }}
+  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/dr/katalog/etcd-backup-pvc" }}
+{{- if not (index .spec.distribution.modules.dr.etcdBackup.pvc "name") }}
+  - resources/etcd-backup-pvc.yml
+{{- end }}
+{{- end }}
 {{- end }}
 {{- if .spec.distribution.modules.dr.velero.schedules.install }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/dr/katalog/velero/velero-schedules" }}
@@ -30,6 +38,28 @@ resources:
 {{- if eq .spec.distribution.common.provider.type "eks" }}
   - resources/eks-velero-backupstoragelocation.yml
   - resources/eks-velero-volumesnapshotlocation.yml
+{{- end }}
+
+{{- if eq .spec.distribution.common.provider.type "none" }}
+{{- if ne .spec.distribution.modules.dr.etcdBackup.type "none" }}
+patches:
+  - path: patches/etcd-backup-schedule.yml
+{{- if eq .spec.distribution.modules.dr.etcdBackup.type "all" "pvc" }}
+  - patch: |-
+      - op: replace
+        path: /spec/jobTemplate/spec/template/spec/volumes/2/persistentVolumeClaim/claimName
+{{- if index .spec.distribution.modules.dr.etcdBackup.pvc "name" }}
+        value: {{ .spec.distribution.modules.dr.etcdBackup.pvc.name }}
+{{- else }}
+        value: "etcd-backup-pvc-storage"
+{{- end }}
+    target:
+      group: batch
+      version: v1
+      kind: CronJob
+      name: etcd-backup-pvc
+{{- end }}
+{{- end }}
 {{- end }}
 
 patchesStrategicMerge:
@@ -43,11 +73,54 @@ patchesStrategicMerge:
 {{- end }}
 
 {{- if eq .spec.distribution.common.provider.type "none" }}
-{{- if eq .spec.distribution.modules.dr.velero.backend "externalEndpoint" }}
+{{- if ne .spec.distribution.modules.dr.etcdBackup.type "none" }}
+configMapGenerator:
+{{- if eq .spec.distribution.modules.dr.etcdBackup.type "all" "s3" }}
+  - name: etcd-backup-s3-config
+    behavior: replace
+    literals:
+      - target={{ print "s3:" .spec.distribution.modules.dr.etcdBackup.s3.bucketName }}
+      - retention={{ .spec.distribution.modules.dr.etcdBackup.s3.retentionTime }}
+
+    {{/*
+      We specifically check for nil because otherwise Go's template engine considers a nil value (i.e. a non existing field) the same as the zero value (falsy-values).
+
+      The rationale here is if backupPrefix's left unset (i.e. nil value) we apply the cluster's name, if empty we want an empty prefix (i.e. only the date + .etcdb).
+    */}}
+    {{- if eq (index .spec.distribution.modules.dr.etcdBackup "backupPrefix") nil }}
+      - backup-prefix={{ print .metadata.name "-" }}
+    {{- else }}
+      - backup-prefix={{ .spec.distribution.modules.dr.etcdBackup.backupPrefix }}
+    {{- end }}
+
+{{- end }}
+{{- if eq .spec.distribution.modules.dr.etcdBackup.type "all" "pvc" }}
+  - name: etcd-backup-pvc-config
+    behavior: replace
+    literals:
+      - retention={{ .spec.distribution.modules.dr.etcdBackup.pvc.retentionTime }}
+    {{/* Same comment as above. */}}
+    {{- if eq (index .spec.distribution.modules.dr.etcdBackup "backupPrefix") nil }}
+      - backup-prefix={{ print .metadata.name "-" }}
+    {{- else }}
+      - backup-prefix={{ .spec.distribution.modules.dr.etcdBackup.backupPrefix }}
+    {{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{- if eq .spec.distribution.common.provider.type "none" }}
 secretGenerator:
-- name: cloud-credentials
-  namespace: kube-system
-  files:
-    - cloud=secrets/cloud-credentials.config
+{{- if eq .spec.distribution.modules.dr.velero.backend "externalEndpoint" }}
+  - name: cloud-credentials
+    namespace: kube-system
+    files:
+      - cloud=secrets/cloud-credentials.config
+{{- end }}
+{{- if eq .spec.distribution.modules.dr.etcdBackup.type "all" "s3" }}
+  - name: etcd-backup-s3-rclone-conf
+    behavior: replace
+    files:
+      - secrets/rclone.conf
 {{- end }}
 {{- end }}

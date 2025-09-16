@@ -6,19 +6,23 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-{{ $loggingType := .spec.distribution.modules.logging.type }}
-{{ $customOutputs := .spec.distribution.modules.logging.customOutputs }}
+{{- $loggingType := .spec.distribution.modules.logging.type }}
+{{- $customOutputs := .spec.distribution.modules.logging.customOutputs }}
+{{- $loki := index .spec.distribution.modules.logging "loki" }}
+{{- $fluentdReplicas := index .spec.distribution.modules.logging.operator.fluentd "replicas" }}
+{{- $fluentdResources := index .spec.distribution.modules.logging.operator.fluentd "resources" }}
+{{- $fluentbitResources := index .spec.distribution.modules.logging.operator.fluentbit "resources" }}
 
 resources:
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/logging-operator" }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/logging-operated" }}
-{{- if or (eq $loggingType "loki") (eq $loggingType "opensearch") }}
+{{- if eq $loggingType "loki" "opensearch" }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/minio-ha" }}
   {{- if ne .spec.distribution.modules.ingress.nginx.type "none" }}
   - resources/ingress-infra.yml
   {{- end }}
 {{- end }}
-{{- if or (eq $loggingType "opensearch") (eq $loggingType "customOutputs") }}
+{{- if eq $loggingType "opensearch" "customOutputs" }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/configs/audit" }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/configs/events" }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/configs/infra" }}
@@ -47,31 +51,25 @@ resources:
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/loki-distributed" }}
 {{- end }}
 
-{{ if eq .spec.distribution.common.networkPoliciesEnabled true }}
+{{- if eq .spec.distribution.common.networkPoliciesEnabled true }}
   - policies
 {{- end }}
 
-# The kustomize version we are using does not support specifing more than 1 strategicMerge patch
-# in a single YAML file under the `patches` directive like the old versions did for `patchesStrategicMerge`.
-# Until the fix is released and we switch to that version we can't move this under the `patch` directive.
-# Refs:
-# - https://github.com/kubernetes-sigs/kustomize/issues/5049
-# - https://github.com/kubernetes-sigs/kustomize/pull/5194
-# A workaround would be to split the infra-nodes.yml file into several files (one per patch).
-patchesStrategicMerge:
-  - patches/infra-nodes.yml
-{{- if or (eq $loggingType "opensearch") (eq $loggingType "loki") }}
-  - patches/minio.yml
+patches:
+  - path: patches/infra-nodes.yml
+{{- if or $fluentdReplicas $fluentdResources $fluentbitResources }}
+  - path: patches/logging-operated-resources.yaml
+{{- end }}
+{{- if eq $loggingType "opensearch" "loki" }}
+  - path: patches/minio.yml
   {{- if eq $loggingType "opensearch" }}
-  - patches/opensearch.yml
-  {{- else }}
-  - patches/loki.yml
+  - path: patches/opensearch.yml
+  {{- /* The patch file below can be empty when loki resources is not defined but kustomize 5.6.0 (our current version) fails when a patch file is empty, so we need to apply it conditionally. */ -}}
+  {{- else if hasKeyAny $loki "resources" }}
+  - path: patches/loki-resources.yml
   {{- end }}
 {{- end }}
-
-{{- if or (eq $loggingType "customOutputs") (eq .spec.distribution.modules.monitoring.type "none") }}
-patches:
-  {{- if eq $loggingType "customOutputs" }}
+{{- if eq $loggingType "customOutputs" }}
   - target:
       kind: Output
       group: logging.banzaicloud.io
@@ -152,8 +150,8 @@ patches:
         path: /spec
         value:
 {{ $customOutputs.errors | indent 10 }}
-  {{- end }}
-  {{- if eq .spec.distribution.modules.monitoring.type "none" }}
+{{- end }}
+{{- if eq .spec.distribution.modules.monitoring.type "none" }}
   - patch: |-
       apiVersion: logging.banzaicloud.io/v1beta1
       kind: Logging
@@ -164,18 +162,22 @@ patches:
           metrics:
             serviceMonitor: false
             prometheusRules: false
-  {{- end }}
 {{- end }}
 
 
-{{- if or (eq $loggingType "opensearch") (eq $loggingType "loki") }}
+{{- if eq $loggingType "opensearch" "loki" }}
 secretGenerator:
   {{- if eq $loggingType "loki" }}
-  - name: loki-distributed
+  - name: loki
     namespace: logging
     behavior: merge
     files:
       - config.yaml=patches/loki-config.yaml
+  - name: minio-credentials-loki
+    namespace: logging
+    behavior: replace
+    envs:
+      - patches/minio.credentials.loki.env
   {{- end }}
   - name: minio-logging
     namespace: logging

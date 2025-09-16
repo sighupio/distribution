@@ -1,33 +1,108 @@
-# Kubernetes Fury Distribution Release vTBD
+# SIGHUP Distribution Release vTBD
 
-Welcome to KFD release `vTBD`.
+Welcome to SD release `vTBD`.
 
-The distribution is maintained with ❤️ by the team [SIGHUP](https://sighup.io/).
+The distribution is maintained with ❤️ by the team [SIGHUP by ReeVo](https://sighup.io/).
 
-## New Features since `v1.31.0`
+## New Features since `v1.32.0`
 
-### Installer Updates
-
-- TBD
-
-### Module updates
-
-- TBD
+This version adds customizations to make it easier to install SD on bare metal nodes.
 
 ## Breaking changes 💔
 
-- TBD
-
 ## New features 🌟
+
+- [[#415](https://github.com/sighupio/distribution/pull/415)] Adds customizations to make it easier to install SD on bare metal nodes:
+  - `blockSize` and `podCidr` to the `spec.distribution.modules.networking.tigeraOperator` section of the OnPremises and KFDDistribution schemas, allowing customizations to the assigned CIDR for each node.
+  How to use it:
+
+    ```yaml
+    spec:
+      distribution:
+        modules:
+          networking:
+            type: calico
+            tigeraOperator:
+              blockSize: 26
+              podCidr: 172.16.0.0/16
+    ```
+
+  - `kernelParameters` to the `.spec.kubernetes.advanced`, `.spec.kubernetes.masters` and `.spec.kubernetes.nodes[]` sections, to allow customization of kernel parameters of each Kubernetes node. Example:
+
+    ```yaml
+    spec:
+      kubernetes:
+        masters:
+          kernelParameters:
+          - name: "fs.file-max"
+            value: "9223372036854775804"
+    ```
+
+- [[#425](https://github.com/sighupio/distribution/pull/425)] Adds trusted CA certificate support in OIDC authentication with self-signed certificates:
+  - `oidcTrustedCA` key under `spec.distribution.modules.auth` allows automatic provisioning of custom CA certificates for auth components.
+  - Adds secret generation and volume mounting for Gangplank, Pomerium, and Dex deployments.
+  - Supports `{file://path}` notation.
+
+    ```yaml
+    spec:
+      distribution:
+        modules:
+          auth:
+            oidcTrustedCA: "{file://my-ca.crt}"
+    ```
+
+- [[#428](https://github.com/sighupio/distribution/issues/428)] Configuration for Logging Operator's Fluentd and Fluentbit resources:
+  - Added new configuration options to the logging module that allows to set Fluentd's resources and replicas number and Fluentbit's resources. Example:
+  
+  ```yaml
+  spec:
+    distribution:
+      modules:
+        logging:
+          operator:
+            fluentd:
+              replicas: 1
+                resources:
+                  limits:
+                    cpu: "2500m"
+            fluentbit:
+              resources:
+                requests:
+                  memory: "1Mi"
+  ```
+
+- [[#429](https://github.com/sighupio/distribution/issues/429)] Control Plane taints for OnPremises clusters:
+  - Added new configuration option to set the control plane nodes taints at cluster creation time. Example:
+  
+  ```yaml
+  # custom taint. NOTE: the default taint won't be added, just the ones defined.
+  spec:
+    kubernetes:
+      masters:
+        taints:
+          - effect: NoExecute
+            key: soft-cell
+            value: tainted-love
+  ```
+  
+  ```yaml
+  # no taints
+  spec:
+    kubernetes:
+      masters:
+        taints: []
+  ```
 
 - [[#353](https://github.com/sighupio/fury-distribution/pull/353)] **Add EKS self-managed node pool default override options for IDMS**: add a variable to override the default properies for EKS self-managed node pools. Currently support only the IDMS ones.
 
 ## Fixes 🐞
 
-- [[#334](https://github.com/sighupio/fury-distribution/pull/334)] **Fix to policy module templates**: setting the policy module type to `gatekeeper` and the `additionalExcludedNamespaces` option for Kyverno at the same time resulted in an error do to an bug in the templates logic, this has been fixed.
-- [[#336](https://github.com/sighupio/fury-distribution/pull/336)] **Fix race condition when deleting Kyverno**: changing the policy module type from `kyverno` to `none` could, sometimes, end up in a race condition where the API for ClusterPolicy CRD is unregistered before the deletion of the ClusterPolicy objects, resulting in an error in the deletion command execution. The deletion command has been tweaked to avoid this condition.
-- [[#344](https://github.com/sighupio/fury-distribution/pull/344)] **Fix Cidr Block additional firewall rule in EKS Cluster**: remove the limitation to have a single CIDR Block additional firewall rule as the EKS installer supports a list.
-- [[#348](https://github.com/sighupio/fury-distribution/pull/348)] **Fix `Get previous cluster configuration` failure on first apply**: fixed an issue on `furyctl apply` for on-premises clusters that made it fail with an `ansible-playbook create-playbook.yaml: command failed - exit status 2` error on the very first time it was executed.
+- [installer-eks/issues#88](https://github.com/sighupio/installer-eks/issues/88) This PR fixes an issue when using `selfmanaged` nodes with `alinux2023`. The way we used to provision images relied on Amazon's `bootstrap.sh` which has been deprecated in favor of `nodeadm`.
+
+- Plugins names are now pattern-validated in the schema to avoid potential errors at runtime when setting invalid names.
+
+### Security fixes
+
 ## Upgrade procedure
 
-Check the [upgrade docs](https://docs.kubernetesfury.com/docs/installation/upgrades) for the detailed procedure.
+Check the [upgrade docs](https://docs.sighup.io/docs/installation/upgrades/) for the detailed procedure.

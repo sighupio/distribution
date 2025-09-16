@@ -6,6 +6,10 @@
 distribution:
   - path: .spec.distribution.modules.networking.type
     immutable: true
+  - path: .spec.distribution.modules.networking.tigeraOperator.blockSize
+    immutable: true
+  - path: .spec.distribution.modules.networking.tigeraOperator.podCidr
+    immutable: true
   - path: .spec.distribution.modules.logging.type
     immutable: false
     description: "changes to the logging module type have been detected. This will cause the reconfiguration or deletion of the current logging stack."
@@ -14,6 +18,19 @@ distribution:
     reducers:
       - key: distributionModulesLoggingType
         lifecycle: pre-apply
+  - path: .spec.distribution.modules.logging.loki.tsdbStartDate
+    immutable: true
+    description: "changes to Loki's TSDB start date have been detected. This parameter cannot be changed once set."  
+    safe:
+      - fromNodes:
+        - path: ".spec.distribution.modules.logging.type"
+          from: "none"
+        - path: ".spec.distribution.modules.logging.type"
+          to: "none"
+        - path: ".spec.distribution.modules.logging.type"
+          from: "opensearch"
+        - path: ".spec.distribution.modules.logging.type"
+          to: "opensearch"
   - path: .spec.distribution.modules.monitoring.alertmanager.installDefaultRules
     immutable: false
     description: "changes to the monitoring alertmanager configs have been detected. This will cause the reconfiguration, creation or deletion of the default alertmanager configs."

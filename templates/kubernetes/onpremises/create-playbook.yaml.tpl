@@ -38,7 +38,7 @@
 
 # cluster
 - name: Copy etcd and master PKIs
-  hosts: master
+  hosts: master,etcd
   become: true
   vars:
     pki_dir: "{{ .spec.kubernetes.pkiFolder }}"
@@ -85,15 +85,15 @@
     - pki
 
 - name: Kubernetes node preparation
-  hosts: master,nodes
+  hosts: master,nodes,etcd
   become: true
   roles:
     - kube-node-common
   tags:
     - kube-node-common
 
-- name: etcd cluster preparation
-  hosts: master
+- name: Etcd cluster preparation
+  hosts: etcd
   become: true
   vars:
     etcd_address: "{{ "{{ ansible_host }}" }}"

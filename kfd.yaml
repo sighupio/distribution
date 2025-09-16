@@ -2,24 +2,24 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-version: v1.31.0
+version: v1.32.1-rc.0
 modules:
-  auth: v0.4.0
-  aws: v4.3.0
-  dr: v3.0.0
-  ingress: v3.0.1
-  logging: v4.0.0
-  monitoring: v3.3.0
-  opa: v1.13.0
-  networking: v2.0.0
-  tracing: v1.1.0
+  auth: v0.5.1
+  aws: v5.0.0
+  dr: v3.1.0
+  ingress: v4.0.0
+  logging: v5.1.0
+  monitoring: v3.5.0
+  opa: v1.14.0
+  networking: v2.2.0
+  tracing: v1.2.0
 kubernetes:
   eks:
-    version: 1.31
-    installer: v3.2.0
+    version: 1.32
+    installer: v3.2.1
   onpremises:
-    version: 1.31.4
-    installer: v1.31.4
+    version: 1.32.4
+    installer: v1.32.4-rev.2
 furyctlSchemas:
   eks:
     - apiVersion: kfd.sighup.io/v1alpha2
@@ -35,9 +35,9 @@ tools:
     furyagent:
       version: 0.4.0
     kubectl:
-      version: 1.31.4
+      version: 1.31.7
     kustomize:
-      version: 3.10.0
+      version: 5.6.0
     terraform:
       version: 1.4.6
     yq:
@@ -47,7 +47,7 @@ tools:
     helmfile:
       version: 0.156.0
     kapp:
-      version: 0.64.0
+      version: 0.64.2
   eks:
     awscli:
       version: ">= 2.8.12"

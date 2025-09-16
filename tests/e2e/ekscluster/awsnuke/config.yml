@@ -1,0 +1,40 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+regions:
+  - "eu-west-1"
+
+blocklist:
+- ACCOUNT_ID_PROD_PLACEHOLDER # production
+
+resource-types:
+  includes:
+    - EC2Subnet
+    - EC2SecurityGroup
+    - EC2InternetGateway
+    - EC2InternetGatewayAttachment
+    - EC2NetworkInterface
+    - EKSCluster
+    - EKSNodegroup
+    - EC2Address
+    - EC2NATGateway
+    - CloudWatchLogsLogGroup
+    - EC2Volume
+    - EC2Snapshot
+    - EC2VPC
+    - EC2Instance
+    - EC2LaunchTemplate
+    - AutoScalingGroup
+    - ELBv2
+    - EC2RouteTable
+    - Route53HostedZone
+    - Route53RecordSet
+    - Route53HealthCheck
+    - Route53ResolverEndpoint
+    - Route53ResolverRule
+    - Route53ResolverRuleAssociation
+
+accounts:
+  ACCOUNT_ID_PLACEHOLDER: {}

@@ -28,7 +28,7 @@ If applicable, add screenshots to help explain your problem.
 ### Software versions
 Please complete the following information:
 
- - Kubernetes Fury Distribution version: [e.g. 1.30.0]
+ - SIGHUP Distribution version: [e.g. 1.30.0]
  - furyctl version: [e.g. 0.30.0]
 
 ### Additional context
