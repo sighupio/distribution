@@ -4920,18 +4920,19 @@ Defines the Kubernetes components configuration and the values needed for the ku
 
 ### Properties
 
-| Property                                                            | Type     | Required |
-|:--------------------------------------------------------------------|:---------|:---------|
-| [airGap](#speckubernetesadvancedairgap)                             | `object` | Optional |
-| [apiServerCertSANs](#speckubernetesadvancedapiservercertsans)       | `array`  | Optional |
-| [cloud](#speckubernetesadvancedcloud)                               | `object` | Optional |
-| [containerd](#speckubernetesadvancedcontainerd)                     | `object` | Optional |
-| [encryption](#speckubernetesadvancedencryption)                     | `object` | Optional |
-| [kernelParameters](#speckubernetesadvancedkernelparameters)         | `array`  | Optional |
-| [kubeletConfiguration](#speckubernetesadvancedkubeletconfiguration) | `object` | Optional |
-| [oidc](#speckubernetesadvancedoidc)                                 | `object` | Optional |
-| [registry](#speckubernetesadvancedregistry)                         | `string` | Optional |
-| [users](#speckubernetesadvancedusers)                               | `object` | Optional |
+| Property                                                            | Type      | Required |
+|:--------------------------------------------------------------------|:----------|:---------|
+| [airGap](#speckubernetesadvancedairgap)                             | `object`  | Optional |
+| [apiServerCertSANs](#speckubernetesadvancedapiservercertsans)       | `array`   | Optional |
+| [cloud](#speckubernetesadvancedcloud)                               | `object`  | Optional |
+| [containerd](#speckubernetesadvancedcontainerd)                     | `object`  | Optional |
+| [encryption](#speckubernetesadvancedencryption)                     | `object`  | Optional |
+| [kernelParameters](#speckubernetesadvancedkernelparameters)         | `array`   | Optional |
+| [kubeletConfiguration](#speckubernetesadvancedkubeletconfiguration) | `object`  | Optional |
+| [manageRepositories](#speckubernetesadvancedmanagerepositories)     | `boolean` | Optional |
+| [oidc](#speckubernetesadvancedoidc)                                 | `object`  | Optional |
+| [registry](#speckubernetesadvancedregistry)                         | `string`  | Optional |
+| [users](#speckubernetesadvancedusers)                               | `object`  | Optional |
 
 ## .spec.kubernetes.advanced.airGap
 
@@ -5090,13 +5091,20 @@ Sets the cloud provider for the Kubelet
 
 ### Properties
 
-| Property                                                            | Type    | Required |
-|:--------------------------------------------------------------------|:--------|:---------|
-| [registryConfigs](#speckubernetesadvancedcontainerdregistryconfigs) | `array` | Optional |
+| Property                                                                  | Type      | Required |
+|:--------------------------------------------------------------------------|:----------|:---------|
+| [manageRepositories](#speckubernetesadvancedcontainerdmanagerepositories) | `boolean` | Optional |
+| [registryConfigs](#speckubernetesadvancedcontainerdregistryconfigs)       | `array`   | Optional |
 
 ### Description
 
 Advanced configuration for containerd
+
+## .spec.kubernetes.advanced.containerd.manageRepositories
+
+### Description
+
+Set to false if you manage the containerd and NVIDIA repositories externally and wish to skip their configuration with furyctl. Default is true.
 
 ## .spec.kubernetes.advanced.containerd.registryConfigs
 
@@ -5226,6 +5234,12 @@ The value of the kernel parameter to edit. Example: `"15"`
 Advanced configuration for Kubelet. This open field allows users to specify any parameter supported by the `KubeletConfiguration` object. Examples of uses include controlling the maximum number of pods per core (`podsPerCore`), managing container logging (`containerLogMaxSize`), Topology Manager options (`topologyManagerPolicyOptions`). All values must follow the official Kubelet specification: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/.
 
 NOTE: Content will **not** be validated by furyctl. To customize the TLS cipher suites of the Kubelet, set only the `Spec.Kubernetes.Advanced.Encryption.tlsCipherSuites` field - do not configure them under this field.
+
+## .spec.kubernetes.advanced.manageRepositories
+
+### Description
+
+Set to false if you manage the Kubernetes package repositories externally and wish to skip their configuration with furyctl. Default is true.
 
 ## .spec.kubernetes.advanced.oidc
 
@@ -5392,13 +5406,14 @@ A name to identify the etcd node. This value will be concatenated to `.spec.kube
 
 ### Properties
 
-| Property                                                         | Type      | Required |
-|:-----------------------------------------------------------------|:----------|:---------|
-| [additionalConfig](#speckubernetesloadbalancersadditionalconfig) | `string`  | Optional |
-| [enabled](#speckubernetesloadbalancersenabled)                   | `boolean` | Required |
-| [hosts](#speckubernetesloadbalancershosts)                       | `array`   | Optional |
-| [keepalived](#speckubernetesloadbalancerskeepalived)             | `object`  | Optional |
-| [stats](#speckubernetesloadbalancersstats)                       | `object`  | Optional |
+| Property                                                             | Type      | Required |
+|:---------------------------------------------------------------------|:----------|:---------|
+| [additionalConfig](#speckubernetesloadbalancersadditionalconfig)     | `string`  | Optional |
+| [enabled](#speckubernetesloadbalancersenabled)                       | `boolean` | Required |
+| [hosts](#speckubernetesloadbalancershosts)                           | `array`   | Optional |
+| [keepalived](#speckubernetesloadbalancerskeepalived)                 | `object`  | Optional |
+| [manageRepositories](#speckubernetesloadbalancersmanagerepositories) | `boolean` | Optional |
+| [stats](#speckubernetesloadbalancersstats)                           | `object`  | Optional |
 
 ## .spec.kubernetes.loadBalancers.additionalConfig
 
@@ -5478,6 +5493,12 @@ Password for accessing vrrpd. Make it unique between Keepalived clusters.
 ### Description
 
 The virtual router ID of Keepalived, an arbitrary unique number from 1 to 255 used to differentiate multiple instances of vrrpd running on the same network interface and address family and multicast/unicast (and hence same socket).
+
+## .spec.kubernetes.loadBalancers.manageRepositories
+
+### Description
+
+Set to false if you manage the HAProxy repositories externally and wish to skip their configuration with furyctl. Default is true.
 
 ## .spec.kubernetes.loadBalancers.stats
 
@@ -5994,5 +6015,15 @@ The folder of the kustomize plugin
 
 ### Description
 
-The name of the kustomize plugin
+The name of the kustomize plugin. A lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', 'local-storage')
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+```
+
+[try pattern](https://regexr.com/?expression=^[a-z0-9]\([-a-z0-9]*[a-z0-9]\)?\(\.[a-z0-9]\([-a-z0-9]*[a-z0-9]\)?\)*$)
 

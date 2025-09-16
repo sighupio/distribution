@@ -1719,6 +1719,10 @@ type SpecKubernetesAdvanced struct {
 	// "kubeletConfiguration".
 	KubeletConfiguration SpecKubernetesAdvancedKubeletConfiguration `json:"kubeletConfiguration,omitempty" yaml:"kubeletConfiguration,omitempty" mapstructure:"kubeletConfiguration,omitempty"`
 
+	// Set to false if you manage the Kubernetes package repositories externally and
+	// wish to skip their configuration with furyctl. Default is true.
+	ManageRepositories *bool `json:"manageRepositories,omitempty" yaml:"manageRepositories,omitempty" mapstructure:"manageRepositories,omitempty"`
+
 	// Oidc corresponds to the JSON schema field "oidc".
 	Oidc *SpecKubernetesAdvancedOIDC `json:"oidc,omitempty" yaml:"oidc,omitempty" mapstructure:"oidc,omitempty"`
 
@@ -1816,6 +1820,10 @@ type SpecKubernetesAdvancedCloud struct {
 
 // Advanced configuration for containerd
 type SpecKubernetesAdvancedContainerd struct {
+	// Set to false if you manage the containerd and NVIDIA repositories externally
+	// and wish to skip their configuration with furyctl. Default is true.
+	ManageRepositories *bool `json:"manageRepositories,omitempty" yaml:"manageRepositories,omitempty" mapstructure:"manageRepositories,omitempty"`
+
 	// RegistryConfigs corresponds to the JSON schema field "registryConfigs".
 	RegistryConfigs SpecKubernetesAdvancedContainerdRegistryConfigs `json:"registryConfigs,omitempty" yaml:"registryConfigs,omitempty" mapstructure:"registryConfigs,omitempty"`
 }
@@ -1980,6 +1988,10 @@ type SpecKubernetesLoadBalancers struct {
 
 	// Keepalived corresponds to the JSON schema field "keepalived".
 	Keepalived *SpecKubernetesLoadBalancersKeepalived `json:"keepalived,omitempty" yaml:"keepalived,omitempty" mapstructure:"keepalived,omitempty"`
+
+	// Set to false if you manage the HAProxy repositories externally and wish to skip
+	// their configuration with furyctl. Default is true.
+	ManageRepositories *bool `json:"manageRepositories,omitempty" yaml:"manageRepositories,omitempty" mapstructure:"manageRepositories,omitempty"`
 
 	// Stats corresponds to the JSON schema field "stats".
 	Stats *SpecKubernetesLoadBalancersStats `json:"stats,omitempty" yaml:"stats,omitempty" mapstructure:"stats,omitempty"`
@@ -2205,7 +2217,9 @@ type SpecPluginsKustomize []struct {
 	// The folder of the kustomize plugin
 	Folder string `json:"folder" yaml:"folder" mapstructure:"folder"`
 
-	// The name of the kustomize plugin
+	// The name of the kustomize plugin. A lowercase RFC 1123 subdomain must consist
+	// of lower case alphanumeric characters, '-' or '.', and must start and end with
+	// an alphanumeric character (e.g. 'example.com', 'local-storage')
 	Name string `json:"name" yaml:"name" mapstructure:"name"`
 }
 
