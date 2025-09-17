@@ -5,6 +5,11 @@
  */
 
 cluster_name = {{ .metadata.name | quote }}
+tags = {
+{{- range $key, $value := .spec.tags }}
+  {{ $key }} = "{{ $value }}"
+{{- end }}
+}
 
 {{- if hasKeyAny .spec.kubernetes "logsTypes" }}
 cluster_enabled_log_types = {{ toJson .spec.kubernetes.logsTypes }}
