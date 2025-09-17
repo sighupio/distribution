@@ -1820,8 +1820,8 @@ type SpecKubernetesAdvancedCloud struct {
 
 // Advanced configuration for containerd
 type SpecKubernetesAdvancedContainerd struct {
-	// Set to false if you manage the containerd and NVIDIA repositories externally
-	// and wish to skip their configuration with furyctl. Default is true.
+	// Set to false if you manage the NVIDIA repositories externally and wish to skip
+	// their configuration with furyctl. Default is true.
 	ManageRepositories *bool `json:"manageRepositories,omitempty" yaml:"manageRepositories,omitempty" mapstructure:"manageRepositories,omitempty"`
 
 	// RegistryConfigs corresponds to the JSON schema field "registryConfigs".

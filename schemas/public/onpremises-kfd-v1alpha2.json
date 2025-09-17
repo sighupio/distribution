@@ -597,7 +597,7 @@
         },
         "manageRepositories": {
           "type": "boolean",
-          "description": "Set to false if you manage the containerd and NVIDIA repositories externally and wish to skip their configuration with furyctl. Default is true."
+          "description": "Set to false if you manage the NVIDIA repositories externally and wish to skip their configuration with furyctl. Default is true."
         }
       }
     },
