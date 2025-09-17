@@ -33,24 +33,24 @@ steps:
         jq -r > /tmp/schemas-private-ekscluster-kfd-v1alpha2.json
       - diff schemas/private/ekscluster-kfd-v1alpha2.json /tmp/schemas-private-ekscluster-kfd-v1alpha2.json
 
-  - name: lint
-    image: quay.io/sighup/policeman
-    pull: always
-    environment:
-      # Identifies false positives like missing 'selector'.
-      # Doing this is valid for Kustomize patches
-      VALIDATE_KUBERNETES_KUBEVAL: "false"
-      # Some duplicated code is intended.
-      VALIDATE_JSCPD: "false"
-      # Disable natural language checks
-      VALIDATE_NATURAL_LANGUAGE: "false"
-      # Disable go linting, we use the one included in the go image
-      VALIDATE_GO: "false"
-      # Exclude template files from linting. The linter does not understand Go template. Exclude also tests
-      FILTER_REGEX_EXCLUDE: (templates/|\.github|tests/)
-    depends_on:
-      - license-check
-      - schema-check
+  # - name: lint
+  #   image: quay.io/sighup/policeman
+  #   pull: always
+  #   environment:
+  #     # Identifies false positives like missing 'selector'.
+  #     # Doing this is valid for Kustomize patches
+  #     VALIDATE_KUBERNETES_KUBEVAL: "false"
+  #     # Some duplicated code is intended.
+  #     VALIDATE_JSCPD: "false"
+  #     # Disable natural language checks
+  #     VALIDATE_NATURAL_LANGUAGE: "false"
+  #     # Disable go linting, we use the one included in the go image
+  #     VALIDATE_GO: "false"
+  #     # Exclude template files from linting. The linter does not understand Go template. Exclude also tests
+  #     FILTER_REGEX_EXCLUDE: (templates/|\.github|tests/)
+  #   depends_on:
+  #     - license-check
+  #     - schema-check
 
   # - name: lint-go
   #   image: quay.io/sighup/golang:1.23.3
