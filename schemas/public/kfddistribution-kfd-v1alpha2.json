@@ -1327,31 +1327,31 @@
             },
             "endpoint": {
               "type": "string",
-              "description": "External S3-compatible endpoint for Velero's storage."
+              "description": "External S3-compatible endpoint for Velero's storage. Has effect only when type is 's3'."
             },
             "insecure": {
               "type": "boolean",
-              "description": "If true, will use HTTP as protocol instead of HTTPS."
+              "description": "If true, will use HTTP as protocol instead of HTTPS. Has effect only when type is 's3'."
             },
             "secretAccessKey": {
               "type": "string",
-              "description": "The secret access key (password) for the external S3-compatible bucket."
+              "description": "The secret access key (password) for the external S3-compatible bucket. Has effect only when type is 's3'."
             },
             "accessKeyId": {
               "type": "string",
-              "description": "The access key ID (username) for the external S3-compatible bucket."
+              "description": "The access key ID (username) for the external S3-compatible bucket. Has effect only when type is 's3'."
             },
             "bucketName": {
               "type": "string",
-              "description": "The bucket name of the external S3-compatible object storage."
+              "description": "The bucket name of the external object storage. Valid for both types (gcs and s3)"
             },
             "clientEmail": {
               "type": "string",
-              "description": "GCP full client email."
+              "description": "Full client email. Has effect only when type is 'gcs'."
             },
             "serviceAccountString": {
               "type": "string",
-              "description": "Service account JSON string."
+              "description": "Service account JSON string. Has effect only when type is 'gcs'."
             }
           }
         },
