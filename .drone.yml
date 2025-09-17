@@ -16,6 +16,10 @@ platform:
 clone:
   depth: 1
 
+environment:
+  MISE_DATA_DIR: /mise-data
+  MISE_OVERRIDE_CONFIG_FILENAMES: "mise.ci.toml"
+
 steps:
   - name: license-check
     image: quay.io/sighup/golang:1.23.3
@@ -62,20 +66,26 @@ steps:
   #     - schema-check
 
   - name: test-schema
-    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
+    image: quay.io/sighup/mise:v2025.4.4
     pull: always
     depends_on:
       - license-check
       - schema-check
     environment:
       JV_VERSION: 6.0.1
+    volumes:
+      - name: mise-cache
+        path: /mise-data
     commands:
+      - |
+        mise use bats
+        eval "$(mise activate bash --shims)"
       # we need to download `jv` for running the JSON Schemas tests.
       - curl -L https://github.com/santhosh-tekuri/jsonschema/releases/download/v$${JV_VERSION}/jv-v$${JV_VERSION}-linux-amd64.tar.gz | tar zx --directory /usr/local/bin/
       - bats -t tests/e2e/kfddistribution/schema.sh
 
   - name: render
-    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
+    image: quay.io/sighup/mise:v2025.4.4
     pull: always
     depends_on:
       - license-check
@@ -89,7 +99,13 @@ steps:
       FURYCTL_OUTDIR: ./
       FURYCTL_DISABLE_ANALYTICS: "true"
       KUBECONFIG: ./dummy
+    volumes:
+      - name: mise-cache
+        path: /mise-data
     commands:
+      - |
+        mise use kustomize yq
+        eval "$(mise activate bash --shims)"
       - echo $${NETRC_FILE} > /root/.netrc
       - echo "Installing furyctl version $${FURYCTL_VERSION}..."
       - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-$(uname -s)-amd64.tar.gz" | tar xz -C /usr/local/bin/
@@ -108,6 +124,11 @@ steps:
       # we use --ignore-deprecations because we don't want the CI to fail when the API has not been removed yet.
       - /pluto detect distribution.yml --ignore-deprecations --target-versions=k8s=v1.32.0
 
+volumes:
+  - name: mise-cache
+    host:
+      path: /root/mise_data_dir
+
 ---
 name: e2e-kfddistribution-1.32
 kind: pipeline
@@ -123,6 +144,14 @@ platform:
   os: linux
   arch: amd64
 
+environment:
+  MISE_DATA_DIR: "/mise-data"
+  MISE_OVERRIDE_CONFIG_FILENAMES: "mise.ci.toml"
+  CLUSTER_VERSION: "v1.32.2"
+  CLUSTER_NAME: "${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}"
+  KUBECONFIG: "/drone/src/kubeconfig"
+  FURYCTL_VERSION: "v0.32.5"
+
 trigger:
   ref:
     include:
@@ -132,19 +161,17 @@ trigger:
 
 steps:
   - name: create Kind cluster
-    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.27.0_1.32.2_5.6.0
+    image: quay.io/sighup/mise:v2025.4.4
     pull: always
     volumes:
       - name: dockersock
         path: /var/run/docker.sock
-    environment:
-      CLUSTER_VERSION: v1.32.2
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}
-      # /drone/src is the default workdir for the pipeline
-      # using this folder we don't need to mount another
-      # shared volume between the steps
-      KUBECONFIG: /drone/src/kubeconfig
+      - name: mise-cache
+        path: /mise-data
     commands:
+      - |
+        mise use kind kubectl
+        eval "$(mise activate bash --shims)"
       # create a custom config to disable Kind's default CNI so
       # we can test using KFD's networking module.
       - |
@@ -165,17 +192,21 @@ steps:
       - kind get kubeconfig --name $${CLUSTER_NAME} > $${KUBECONFIG}
 
   - name: e2e-kfddistribution
-    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
+    image: quay.io/sighup/mise:v2025.4.4
     pull: always
     # we need to use host network to access Kind API port that is listening on the worker's loopback
     # beacuse we mount the host's Docker socket to run Kind.
     network_mode: host
-    environment:
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}
-      KUBECONFIG: /drone/src/kubeconfig
-      FURYCTL_VERSION: v0.32.5
+    volumes:
+      - name: dockersock
+        path: /var/run/docker.sock
+      - name: mise-cache
+        path: /mise-data
     depends_on: [create Kind cluster]
     commands:
+      - |
+        mise use awscli bats helm jq kubectl kustomize yq
+        eval "$(mise activate bash --shims)"
       - export KUBECONFIG=/drone/src/kubeconfig
       # We change the loopback IP in the kubeconfig to use the service hostname and keep the port.
       # - 'sed -Ei "s#(server: https://)(.*)(:.*)#\1kind-cluster\3#" $${KUBECONFIG}'
@@ -191,13 +222,17 @@ steps:
       - tests/e2e/kfddistribution/e2e-kfddistribution.sh
 
   - name: delete-kind-cluster
-    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.27.0_1.32.2_5.6.0
+    image: quay.io/sighup/mise:v2025.4.4
+    pull: always
     volumes:
       - name: dockersock
         path: /var/run/docker.sock
-    environment:
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}
+      - name: mise-cache
+        path: /mise-data
     commands:
+      - |
+        mise use kind
+        eval "$(mise activate bash --shims)"
       # does not matter if the command fails
       - kind delete cluster --name $${CLUSTER_NAME} || true
     depends_on:
@@ -211,6 +246,9 @@ volumes:
   - name: dockersock
     host:
       path: /var/run/docker.sock
+  - name: mise-cache
+    host:
+      path: /root/mise_data_dir
 ---
 # We test 1.31.1 -> 1.32.2 on a v1.32.x cluster, even though support for 1.32 isn't official in KFDDistribution 1.31.1.
 name: e2e-kfddistribution-1.31.1-to-1.32.0
@@ -227,6 +265,14 @@ platform:
   os: linux
   arch: amd64
 
+environment:
+  MISE_DATA_DIR: /mise-data
+  MISE_OVERRIDE_CONFIG_FILENAMES: "mise.ci.toml"
+  CLUSTER_VERSION: v1.31.1
+  CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-upgrades
+  KUBECONFIG: /drone/src/kubeconfig-upgrades
+  FURYCTL_VERSION: v0.32.5
+
 trigger:
   ref:
     include:
@@ -236,19 +282,20 @@ trigger:
 
 steps:
   - name: create Kind cluster
-    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.27.0_1.32.2_5.6.0
+    image: quay.io/sighup/mise:v2025.4.4
     pull: always
     volumes:
       - name: dockersock
         path: /var/run/docker.sock
-    environment:
-      CLUSTER_VERSION: v1.31.1
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-upgrades
-      # /drone/src is the default workdir for the pipeline
-      # using this folder we don't need to mount another
-      # shared volume between the steps
-      KUBECONFIG: /drone/src/kubeconfig-upgrades
+      - name: mise-cache
+        path: /mise-data
+    # /drone/src is the default workdir for the pipeline
+    # using this folder we don't need to mount another
+    # shared volume between the steps
     commands:
+      - |
+        mise use kind kubectl
+        eval "$(mise activate bash --shims)"
       # create a custom config to disable Kind's default CNI so
       # we can test using KFD's networking module.
       - |
@@ -269,17 +316,21 @@ steps:
       - kind get kubeconfig --name $${CLUSTER_NAME} > $${KUBECONFIG}
 
   - name: e2e-kfddistribution
-    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
+    image: quay.io/sighup/mise:v2025.4.4
     pull: always
     # we need to use host network to access Kind API port that is listening on the worker's loopback
     # beacuse we mount the host's Docker socket to run Kind.
     network_mode: host
-    environment:
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-upgrades
-      KUBECONFIG: /drone/src/kubeconfig-upgrades
-      FURYCTL_VERSION: v0.32.3-rc.2
+    volumes:
+      - name: dockersock
+        path: /var/run/docker.sock
+      - name: mise-cache
+        path: /mise-data
     depends_on: [create Kind cluster]
     commands:
+      - |
+        mise use awscli bats helm jq kubectl kustomize yq
+        eval "$(mise activate bash --shims)"
       - export KUBECONFIG=/drone/src/kubeconfig-upgrades
       # We change the loopback IP in the kubeconfig to use the service hostname and keep the port.
       # - 'sed -Ei "s#(server: https://)(.*)(:.*)#\1kind-cluster\3#" $${KUBECONFIG}'
@@ -295,13 +346,17 @@ steps:
       - tests/e2e/kfddistribution/e2e-kfddistribution-upgrades.sh
 
   - name: delete-kind-cluster
-    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.27.0_1.32.2_5.6.0
+    image: quay.io/sighup/mise:v2025.4.4
+    pull: always
     volumes:
       - name: dockersock
         path: /var/run/docker.sock
-    environment:
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-upgrades
+      - name: mise-cache
+        path: /mise-data
     commands:
+      - |
+        mise use kind
+        eval "$(mise activate bash --shims)"
       # does not matter if the command fails
       - kind delete cluster --name $${CLUSTER_NAME} || true
     depends_on:
@@ -315,6 +370,9 @@ volumes:
   - name: dockersock
     host:
       path: /var/run/docker.sock
+  - name: mise-cache
+    host:
+      path: /root/mise_data_dir
 ---
 name: e2e-ekscluster-1.32.0
 kind: pipeline
@@ -329,6 +387,20 @@ depends_on:
 clone:
   depth: 1
 
+environment:
+  MISE_DATA_DIR: /mise-data
+  MISE_OVERRIDE_CONFIG_FILENAMES: "mise.ci.toml"
+  FURYCTL_VERSION: "v0.32.5"
+  DISTRIBUTION_VERSION: "v1.32.0"
+  DEBIAN_FRONTEND: noninteractive
+  CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}
+  AWS_ACCESS_KEY_ID:
+    from_secret: aws_access_key_id
+  AWS_SECRET_ACCESS_KEY:
+    from_secret: aws_secret_access_key
+  AWS_REGION:
+    from_secret: aws_region
+
 trigger:
   ref:
     - refs/tags/e2e-eks-**
@@ -337,19 +409,14 @@ trigger:
 
 steps:
 - name: run-tests
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
-  environment:
-    FURYCTL_VERSION: "v0.32.3-rc.2"
-    DISTRIBUTION_VERSION: "v1.32.0"
-    DEBIAN_FRONTEND: noninteractive
-    CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}
-    AWS_ACCESS_KEY_ID:
-      from_secret: aws_access_key_id
-    AWS_SECRET_ACCESS_KEY:
-      from_secret: aws_secret_access_key
-    AWS_REGION:
-      from_secret: aws_region
+  image: quay.io/sighup/mise:v2025.4.4
+  volumes:
+    - name: mise-cache
+      path: /mise-data
   commands:
+    - |
+      mise use awscli bats helm jq kubectl kustomize yq
+      eval "$(mise activate bash --shims)"
     - apt update
     - apt-get install -y expect
     - echo "Installing the correct furyctl version..."
@@ -359,19 +426,14 @@ steps:
     - ./tests/e2e/ekscluster/e2e-ekscluster.sh
 
 - name: furyctl-delete
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
-  environment:
-    FURYCTL_VERSION: "v0.32.3-rc.2"
-    CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}
-    DEBIAN_FRONTEND: noninteractive
-    DISTRIBUTION_VERSION: "v1.32.0"
-    AWS_ACCESS_KEY_ID:
-      from_secret: aws_access_key_id
-    AWS_SECRET_ACCESS_KEY:
-      from_secret: aws_secret_access_key
-    AWS_REGION:
-      from_secret: aws_region
+  image: quay.io/sighup/mise:v2025.4.4
+  volumes:
+    - name: mise-cache
+      path: /mise-data
   commands:
+    - |
+      mise use awscli bats helm jq kubectl kustomize yq
+      eval "$(mise activate bash --shims)"
     - apt update
     - apt-get install -y expect
     - echo "Installing the correct furyctl version..."
@@ -382,19 +444,16 @@ steps:
     - aws s3 rm s3://e2e-drone-eks/$CLUSTER_NAME --recursive
 
 - name: furyctl-delete-force
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
+  image: quay.io/sighup/mise:v2025.4.4
   environment:
-    FURYCTL_VERSION: "v0.32.3-rc.2"
     CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-upgrades
-    DEBIAN_FRONTEND: noninteractive
-    DISTRIBUTION_VERSION: "v1.32.0"
-    AWS_ACCESS_KEY_ID:
-      from_secret: aws_access_key_id
-    AWS_SECRET_ACCESS_KEY:
-      from_secret: aws_secret_access_key
-    AWS_REGION:
-      from_secret: aws_region
+  volumes:
+    - name: mise-cache
+      path: /mise-data
   commands:
+    - |
+      mise use awscli bats helm jq kubectl kustomize yq
+      eval "$(mise activate bash --shims)"
     - apt update
     - apt-get install -y expect
     - echo "Installing the correct furyctl version..."
@@ -406,6 +465,11 @@ steps:
   when:
     status:
     - failure
+
+volumes:
+  - name: mise-cache
+    host:
+      path: /root/mise_data_dir
 ---
 name: e2e-ekscluster-selfmanaged-alinux2023-nodes-1.32.0
 kind: pipeline
@@ -421,25 +485,34 @@ depends_on:
 clone:
   depth: 1
 
+environment:
+  MISE_DATA_DIR: /mise-data
+  MISE_OVERRIDE_CONFIG_FILENAMES: "mise.ci.toml"
+  FURYCTL_VERSION: "v0.32.5"
+  DISTRIBUTION_VERSION: "v1.32.0"
+  DEBIAN_FRONTEND: noninteractive
+  CLUSTER_NAME: e2e-eks-selfmanaged-alinux2023-${DRONE_BUILD_NUMBER}
+  AWS_ACCESS_KEY_ID:
+    from_secret: aws_access_key_id
+  AWS_SECRET_ACCESS_KEY:
+    from_secret: aws_secret_access_key
+  AWS_REGION:
+    from_secret: aws_region
+
 trigger:
   ref:
     - refs/tags/e2e-selfmanaged-eks-**
 
 steps:
 - name: run-tests
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
-  environment:
-    FURYCTL_VERSION: "v0.32.3-rc.2"
-    DISTRIBUTION_VERSION: "v1.32.0"
-    DEBIAN_FRONTEND: noninteractive
-    CLUSTER_NAME: e2e-eks-selfmanaged-alinux2023-${DRONE_BUILD_NUMBER}
-    AWS_ACCESS_KEY_ID:
-      from_secret: aws_access_key_id
-    AWS_SECRET_ACCESS_KEY:
-      from_secret: aws_secret_access_key
-    AWS_REGION:
-      from_secret: aws_region
+  image: quay.io/sighup/mise:v2025.4.4
+  volumes:
+    - name: mise-cache
+      path: /mise-data
   commands:
+    - |
+      mise use awscli bats helm jq kubectl kustomize yq
+      eval "$(mise activate bash --shims)"
     - apt update
     - apt-get install -y expect
     - echo "Installing the correct furyctl version..."
@@ -449,19 +522,14 @@ steps:
     - ./tests/e2e/ekscluster/e2e-ekscluster-selfmanaged-alinux2023.sh
 
 - name: furyctl-delete
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
-  environment:
-    FURYCTL_VERSION: "v0.32.3-rc.2"
-    CLUSTER_NAME: e2e-eks-selfmanaged-alinux2023-${DRONE_BUILD_NUMBER}
-    DEBIAN_FRONTEND: noninteractive
-    DISTRIBUTION_VERSION: "v1.32.0"
-    AWS_ACCESS_KEY_ID:
-      from_secret: aws_access_key_id
-    AWS_SECRET_ACCESS_KEY:
-      from_secret: aws_secret_access_key
-    AWS_REGION:
-      from_secret: aws_region
+  image: quay.io/sighup/mise:v2025.4.4
+  volumes:
+    - name: mise-cache
+      path: /mise-data
   commands:
+    - |
+      mise use awscli bats helm jq kubectl kustomize yq
+      eval "$(mise activate bash --shims)"
     - apt update
     - apt-get install -y expect
     - echo "Installing the correct furyctl version..."
@@ -472,19 +540,16 @@ steps:
     - aws s3 rm s3://e2e-drone-eks/$CLUSTER_NAME --recursive
 
 - name: furyctl-delete-force
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
+  image: quay.io/sighup/mise:v2025.4.4
   environment:
-    FURYCTL_VERSION: "v0.32.3-rc.2"
     CLUSTER_NAME: e2e-eks-selfmanaged-alinux2023-${DRONE_BUILD_NUMBER}-upgrades
-    DEBIAN_FRONTEND: noninteractive
-    DISTRIBUTION_VERSION: "v1.32.0"
-    AWS_ACCESS_KEY_ID:
-      from_secret: aws_access_key_id
-    AWS_SECRET_ACCESS_KEY:
-      from_secret: aws_secret_access_key
-    AWS_REGION:
-      from_secret: aws_region
+  volumes:
+    - name: mise-cache
+      path: /mise-data
   commands:
+    - |
+      mise use awscli bats helm jq kubectl kustomize yq
+      eval "$(mise activate bash --shims)"
     - apt update
     - apt-get install -y expect
     - echo "Installing the correct furyctl version..."
@@ -496,6 +561,11 @@ steps:
   when:
     status:
     - failure
+
+volumes:
+  - name: mise-cache
+    host:
+      path: /root/mise_data_dir
 ---
 name: e2e-ekscluster-selfmanaged-alinux2-nodes-1.32.0
 kind: pipeline
@@ -510,25 +580,34 @@ depends_on:
 clone:
   depth: 1
 
+environment:
+  MISE_DATA_DIR: /mise-data
+  MISE_OVERRIDE_CONFIG_FILENAMES: "mise.ci.toml"
+  FURYCTL_VERSION: "v0.32.5"
+  DISTRIBUTION_VERSION: "v1.32.0"
+  DEBIAN_FRONTEND: noninteractive
+  CLUSTER_NAME: e2e-eks-selfmanaged-alinux2-${DRONE_BUILD_NUMBER}
+  AWS_ACCESS_KEY_ID:
+    from_secret: aws_access_key_id
+  AWS_SECRET_ACCESS_KEY:
+    from_secret: aws_secret_access_key
+  AWS_REGION:
+    from_secret: aws_region
+
 trigger:
   ref:
     - refs/tags/e2e-selfmanaged-eks-**
 
 steps:
 - name: run-tests
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
-  environment:
-    FURYCTL_VERSION: "v0.32.3-rc.2"
-    DISTRIBUTION_VERSION: "v1.32.0"
-    DEBIAN_FRONTEND: noninteractive
-    CLUSTER_NAME: e2e-eks-selfmanaged-alinux2-${DRONE_BUILD_NUMBER}
-    AWS_ACCESS_KEY_ID:
-      from_secret: aws_access_key_id
-    AWS_SECRET_ACCESS_KEY:
-      from_secret: aws_secret_access_key
-    AWS_REGION:
-      from_secret: aws_region
+  image: quay.io/sighup/mise:v2025.4.4
+  volumes:
+    - name: mise-cache
+      path: /mise-data
   commands:
+    - |
+      mise use awscli bats helm jq kubectl kustomize yq
+      eval "$(mise activate bash --shims)"
     - apt update
     - apt-get install -y expect
     - echo "Installing the correct furyctl version..."
@@ -538,19 +617,14 @@ steps:
     - ./tests/e2e/ekscluster/e2e-ekscluster-selfmanaged-alinux2.sh
 
 - name: furyctl-delete
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
-  environment:
-    FURYCTL_VERSION: "v0.32.3-rc.2"
-    CLUSTER_NAME: e2e-eks-selfmanaged-alinux2-${DRONE_BUILD_NUMBER}
-    DEBIAN_FRONTEND: noninteractive
-    DISTRIBUTION_VERSION: "v1.32.0"
-    AWS_ACCESS_KEY_ID:
-      from_secret: aws_access_key_id
-    AWS_SECRET_ACCESS_KEY:
-      from_secret: aws_secret_access_key
-    AWS_REGION:
-      from_secret: aws_region
+  image: quay.io/sighup/mise:v2025.4.4
+  volumes:
+    - name: mise-cache
+      path: /mise-data
   commands:
+    - |
+      mise use awscli bats helm jq kubectl kustomize yq
+      eval "$(mise activate bash --shims)"
     - apt update
     - apt-get install -y expect
     - echo "Installing the correct furyctl version..."
@@ -561,19 +635,16 @@ steps:
     - aws s3 rm s3://e2e-drone-eks/$CLUSTER_NAME --recursive
 
 - name: furyctl-delete-force
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
+  image: quay.io/sighup/mise:v2025.4.4
   environment:
-    FURYCTL_VERSION: "v0.32.3-rc.2"
     CLUSTER_NAME: e2e-eks-selfmanaged-alinux2-${DRONE_BUILD_NUMBER}-upgrades
-    DEBIAN_FRONTEND: noninteractive
-    DISTRIBUTION_VERSION: "v1.32.0"
-    AWS_ACCESS_KEY_ID:
-      from_secret: aws_access_key_id
-    AWS_SECRET_ACCESS_KEY:
-      from_secret: aws_secret_access_key
-    AWS_REGION:
-      from_secret: aws_region
+  volumes:
+    - name: mise-cache
+      path: /mise-data
   commands:
+    - |
+      mise use awscli bats helm jq kubectl kustomize yq
+      eval "$(mise activate bash --shims)"
     - apt update
     - apt-get install -y expect
     - echo "Installing the correct furyctl version..."
@@ -585,6 +656,11 @@ steps:
   when:
     status:
     - failure
+
+volumes:
+  - name: mise-cache
+    host:
+      path: /root/mise_data_dir
 ---
 name: e2e-ekscluster-upgrades-1.31.1-1.32.0
 kind: pipeline
@@ -599,6 +675,20 @@ depends_on:
 clone:
   depth: 1
 
+environment:
+  MISE_DATA_DIR: /mise-data
+  MISE_OVERRIDE_CONFIG_FILENAMES: "mise.ci.toml"
+  FURYCTL_VERSION: "v0.32.5"
+  DISTRIBUTION_VERSION: "v1.32.0"
+  CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-upgrades
+  DEBIAN_FRONTEND: noninteractive
+  AWS_ACCESS_KEY_ID:
+    from_secret: aws_access_key_id
+  AWS_SECRET_ACCESS_KEY:
+    from_secret: aws_secret_access_key
+  AWS_REGION:
+    from_secret: aws_region
+
 trigger:
   ref:
     - refs/tags/e2e-eks-**
@@ -607,19 +697,14 @@ trigger:
 
 steps:
 - name: run-tests
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
-  environment:
-    FURYCTL_VERSION: "v0.32.3-rc.2"
-    DISTRIBUTION_VERSION: "v1.32.0"
-    CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-upgrades
-    DEBIAN_FRONTEND: noninteractive
-    AWS_ACCESS_KEY_ID:
-      from_secret: aws_access_key_id
-    AWS_SECRET_ACCESS_KEY:
-      from_secret: aws_secret_access_key
-    AWS_REGION:
-      from_secret: aws_region
+  image: quay.io/sighup/mise:v2025.4.4
+  volumes:
+    - name: mise-cache
+      path: /mise-data
   commands:
+    - |
+      mise use awscli bats helm jq kubectl kustomize yq
+      eval "$(mise activate bash --shims)"
     - apt update
     - apt-get install -y expect
     - echo "Installing the correct furyctl version..."
@@ -629,19 +714,14 @@ steps:
     - ./tests/e2e/ekscluster-upgrades/e2e-ekscluster-upgrades.sh
 
 - name: furyctl-delete
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
-  environment:
-    FURYCTL_VERSION: "v0.32.3-rc.2"
-    CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-upgrades
-    DEBIAN_FRONTEND: noninteractive
-    DISTRIBUTION_VERSION: "v1.32.0"
-    AWS_ACCESS_KEY_ID:
-      from_secret: aws_access_key_id
-    AWS_SECRET_ACCESS_KEY:
-      from_secret: aws_secret_access_key
-    AWS_REGION:
-      from_secret: aws_region
+  image: quay.io/sighup/mise:v2025.4.4
+  volumes:
+    - name: mise-cache
+      path: /mise-data
   commands:
+    - |
+      mise use awscli bats helm jq kubectl kustomize yq
+      eval "$(mise activate bash --shims)"
     - apt update
     - apt-get install -y expect
     - echo "Installing the correct furyctl version..."
@@ -652,19 +732,14 @@ steps:
     - aws s3 rm s3://e2e-drone-eks/$CLUSTER_NAME --recursive
 
 - name: furyctl-delete-force
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
-  environment:
-    FURYCTL_VERSION: "v0.32.3-rc.2"
-    CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-upgrades
-    DEBIAN_FRONTEND: noninteractive
-    DISTRIBUTION_VERSION: "v1.32.0"
-    AWS_ACCESS_KEY_ID:
-      from_secret: aws_access_key_id
-    AWS_SECRET_ACCESS_KEY:
-      from_secret: aws_secret_access_key
-    AWS_REGION:
-      from_secret: aws_region
+  image: quay.io/sighup/mise:v2025.4.4
+  volumes:
+    - name: mise-cache
+      path: /mise-data
   commands:
+    - |
+      mise use awscli bats helm jq kubectl kustomize yq
+      eval "$(mise activate bash --shims)"
     - apt update
     - apt-get install -y expect
     - echo "Installing the correct furyctl version..."
@@ -676,6 +751,11 @@ steps:
   when:
     status:
     - failure
+
+volumes:
+  - name: mise-cache
+    host:
+      path: /root/mise_data_dir
 # ---
 # name: e2e-onpremises-1.32.0
 # kind: pipeline
