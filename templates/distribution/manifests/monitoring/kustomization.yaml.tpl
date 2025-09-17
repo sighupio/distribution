@@ -12,6 +12,7 @@ kind: Kustomization
 
 resources:
 {{- /* common components for all the monitoring types */}}
+  - kapp-configs/prometheus-operator-crd.yaml
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/monitoring/katalog/prometheus-operator" }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/monitoring/katalog/kube-proxy-metrics" }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/monitoring/katalog/kube-state-metrics" }}
