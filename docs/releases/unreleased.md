@@ -92,7 +92,21 @@ This version adds customizations to make it easier to install SD on bare metal n
       masters:
         taints: []
   ```
-
+- [[#442](https://github.com/sighupio/distribution/issues/442)] Enable GCS backend for Velero storage location:
+  - Added new configuration options to use a GCS bucket on GCP. Example:
+  ```yaml
+  spec:
+    distribution:
+      modules:
+        dr:
+          velero:
+            backend: externalEndpoint
+            externalEndpoint:
+              type: gcs # can be s3 or gcs, defaults to s3
+              bucketName: backup-name
+              clientEmail: "velero-service-account@dummy.iam.gserviceaccount.com" # Full client email
+              serviceAccountString: "dummy" # service account JSON string
+  ```
 ## Fixes 🐞
 
 - [installer-eks/issues#88](https://github.com/sighupio/installer-eks/issues/88) This PR fixes an issue when using `selfmanaged` nodes with `alinux2023`. The way we used to provision images relied on Amazon's `bootstrap.sh` which has been deprecated in favor of `nodeadm`.
