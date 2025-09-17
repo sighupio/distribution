@@ -1320,7 +1320,7 @@
           "properties": {
             "type": {
               "type": "string",
-                "enum": [
+              "enum": [
                 "s3",
                 "gcs"
               ]
