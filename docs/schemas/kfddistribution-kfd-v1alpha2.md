@@ -4610,5 +4610,15 @@ The folder of the kustomize plugin
 
 ### Description
 
-The name of the kustomize plugin
+The name of the kustomize plugin. A lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', 'local-storage')
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+```
+
+[try pattern](https://regexr.com/?expression=^[a-z0-9]\([-a-z0-9]*[a-z0-9]\)?\(\.[a-z0-9]\([-a-z0-9]*[a-z0-9]\)?\)*$)
 

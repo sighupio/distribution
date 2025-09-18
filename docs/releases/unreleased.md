@@ -93,6 +93,25 @@ This version adds customizations to make it easier to install SD on bare metal n
         taints: []
   ```
 
+- [[#435](https://github.com/sighupio/distribution/pull/435)] Repository management lifecycle configuration for OnPremises provider:
+  - Added new boolean configuration fields for environments where package repositories are configured outside of furyctl.
+    - `spec.kubernetes.loadBalancers.manageRepositories`: Controls HAProxy repository setup
+    - `spec.kubernetes.advanced.containerd.manageRepositories`: Controls NVIDIA container toolkit's repository setup
+    - `spec.kubernetes.advanced.manageRepositories`: Controls Kubernetes package repository setup
+  - All fields are optional. If omitted, the system defaults to automatic repository management.
+
+    ```yaml
+    spec:
+      kubernetes:
+        loadBalancers:
+          enabled: true
+          manageRepositories: false
+        advanced:
+          manageRepositories: false
+          containerd:
+            manageRepositories: false
+    ```
+
 - [[#353](https://github.com/sighupio/fury-distribution/pull/353)] **Add EKS self-managed node pool default override options for IDMS**: add a variable to override the default properies for EKS self-managed node pools. Currently support only the IDMS ones.
 
 ## Fixes 🐞

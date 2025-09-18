@@ -5871,7 +5871,7 @@ The type of Node Pool, can be `self-managed` for using customization like custom
 
 ### Description
 
-All the common self-managed node pool definitions. Currently supports only the IMDS properties.
+Additional properties in common for all self-managed node pools. Currently only IMDS properties are supported.
 
 ## .spec.kubernetes.nodePoolsCommon.metadataHttpEndpoint
 
@@ -6118,7 +6118,17 @@ The folder of the kustomize plugin
 
 ### Description
 
-The name of the kustomize plugin
+The name of the kustomize plugin. A lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', 'local-storage')
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+```
+
+[try pattern](https://regexr.com/?expression=^[a-z0-9]\([-a-z0-9]*[a-z0-9]\)?\(\.[a-z0-9]\([-a-z0-9]*[a-z0-9]\)?\)*$)
 
 ## .spec.region
 

@@ -1719,6 +1719,10 @@ type SpecKubernetesAdvanced struct {
 	// "kubeletConfiguration".
 	KubeletConfiguration SpecKubernetesAdvancedKubeletConfiguration `json:"kubeletConfiguration,omitempty" yaml:"kubeletConfiguration,omitempty" mapstructure:"kubeletConfiguration,omitempty"`
 
+	// Set to false if you manage the Kubernetes package repositories externally and
+	// wish to skip their configuration with furyctl. Default is true.
+	ManageRepositories *bool `json:"manageRepositories,omitempty" yaml:"manageRepositories,omitempty" mapstructure:"manageRepositories,omitempty"`
+
 	// Oidc corresponds to the JSON schema field "oidc".
 	Oidc *SpecKubernetesAdvancedOIDC `json:"oidc,omitempty" yaml:"oidc,omitempty" mapstructure:"oidc,omitempty"`
 
@@ -1816,6 +1820,13 @@ type SpecKubernetesAdvancedCloud struct {
 
 // Advanced configuration for containerd
 type SpecKubernetesAdvancedContainerd struct {
+	// Set to false if you manage the NVIDIA container toolkit's repositories
+	// externally and wish to skip their configuration with furyctl. Default is true.
+	// Notice that containerd itself is installed from binaries and does not use a
+	// repository. See `.spec.kubernetes.advanced.airGap` for other download options
+	// for containerd.
+	ManageRepositories *bool `json:"manageRepositories,omitempty" yaml:"manageRepositories,omitempty" mapstructure:"manageRepositories,omitempty"`
+
 	// RegistryConfigs corresponds to the JSON schema field "registryConfigs".
 	RegistryConfigs SpecKubernetesAdvancedContainerdRegistryConfigs `json:"registryConfigs,omitempty" yaml:"registryConfigs,omitempty" mapstructure:"registryConfigs,omitempty"`
 }
@@ -1980,6 +1991,10 @@ type SpecKubernetesLoadBalancers struct {
 
 	// Keepalived corresponds to the JSON schema field "keepalived".
 	Keepalived *SpecKubernetesLoadBalancersKeepalived `json:"keepalived,omitempty" yaml:"keepalived,omitempty" mapstructure:"keepalived,omitempty"`
+
+	// Set to false if you manage the HAProxy repositories externally and wish to skip
+	// their configuration with furyctl. Default is true.
+	ManageRepositories *bool `json:"manageRepositories,omitempty" yaml:"manageRepositories,omitempty" mapstructure:"manageRepositories,omitempty"`
 
 	// Stats corresponds to the JSON schema field "stats".
 	Stats *SpecKubernetesLoadBalancersStats `json:"stats,omitempty" yaml:"stats,omitempty" mapstructure:"stats,omitempty"`
