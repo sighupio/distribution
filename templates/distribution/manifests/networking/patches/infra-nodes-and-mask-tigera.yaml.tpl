@@ -23,6 +23,7 @@ spec:
           tolerations:
             {{ template "tolerations" ( merge (dict "indent" 12) $tigeraOperatorArgs ) }}
   {{- if ne .spec.distribution.common.provider.type "eks" }}
+  {{/* .spec.kubernetes.podCidr is filled only inside OnPremises clusters */}}
   {{- if and (index .spec "kubernetes") (index .spec.kubernetes "podCidr") }}
   calicoNetwork:
     ipPools:
@@ -33,6 +34,8 @@ spec:
         cidr: {{ .spec.kubernetes.podCidr }}
     {{- end }}
         name: default-ipv4-ippool
+  {{/* Here we're handling the KFDDistribution part. The idea is avoid outputting anything if the user 
+  leaves `podCidr` unfilled, since the Tigera operator doesn't like very much the null value as a pod CIDR. */}}
   {{- else if index .spec.distribution.modules.networking.tigeraOperator "podCidr" }}
   calicoNetwork:
     ipPools:
