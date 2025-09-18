@@ -5104,7 +5104,8 @@ Advanced configuration for containerd
 
 ### Description
 
-Set to false if you manage the NVIDIA repositories externally and wish to skip their configuration with furyctl. Default is true.
+Set to false if you manage the NVIDIA container toolkit's repositories externally and wish to skip their configuration with furyctl. Default is true.
+Notice that containerd itself is installed from binaries and does not use a repository. See `.spec.kubernetes.advanced.airGap` for other download options for containerd.
 
 ## .spec.kubernetes.advanced.containerd.registryConfigs
 
