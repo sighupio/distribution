@@ -93,6 +93,8 @@ This version adds customizations to make it easier to install SD on bare metal n
         taints: []
   ```
 
+- [[#353](https://github.com/sighupio/fury-distribution/pull/353)] **Add EKS self-managed node pool default override options for IDMS**: add a variable to override the default properies for EKS self-managed node pools. Currently support only the IDMS ones.
+
 ## Fixes 🐞
 
 - [installer-eks/issues#88](https://github.com/sighupio/installer-eks/issues/88) This PR fixes an issue when using `selfmanaged` nodes with `alinux2023`. The way we used to provision images relied on Amazon's `bootstrap.sh` which has been deprecated in favor of `nodeadm`.

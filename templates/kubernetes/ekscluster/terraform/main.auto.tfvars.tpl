@@ -92,6 +92,20 @@ cluster_iam_role_name_prefix_override = {{ .spec.kubernetes.clusterIAMRoleNamePr
 workers_iam_role_name_prefix_override = {{ .spec.kubernetes.workersIAMRoleNamePrefixOverride | quote }}
 {{- end }}
 
+{{- if hasKeyAny .spec.kubernetes "nodePoolsCommon" }}
+workers_group_defaults = {
+  {{- if hasKeyAny .spec.kubernetes.nodePoolsCommon "metadataHttpEndpoint" }}
+    metadata_http_endpoint = {{ .spec.kubernetes.nodePoolsCommon.metadataHttpEndpoint | quote }}
+  {{- end}}
+  {{- if hasKeyAny .spec.kubernetes.nodePoolsCommon "metadataHttpTokens" }}
+    metadata_http_tokens = {{ .spec.kubernetes.nodePoolsCommon.metadataHttpTokens | quote }}
+  {{- end}}
+  {{- if hasKeyAny .spec.kubernetes.nodePoolsCommon "metadataHttpPutResponseHopLimit" }}
+    metadata_http_put_response_hop_limit = {{ .spec.kubernetes.nodePoolsCommon.metadataHttpPutResponseHopLimit }}
+  {{- end}}
+}
+{{- end }}
+
 {{- if gt (len .spec.kubernetes.nodePools) 0 }}
     {{- $nodePools := list }}
 

@@ -5107,6 +5107,7 @@ The network CIDR that will be used to assign IP addresses to the VPN clients whe
 | [nodeAllowedSshPublicKey](#speckubernetesnodeallowedsshpublickey)                   | `object`  | Required |
 | [nodePoolGlobalAmiType](#speckubernetesnodepoolglobalamitype)                       | `string`  | Required |
 | [nodePools](#speckubernetesnodepools)                                               | `array`   | Required |
+| [nodePoolsCommon](#speckubernetesnodepoolscommon)                                   | `object`  | Optional |
 | [nodePoolsLaunchKind](#speckubernetesnodepoolslaunchkind)                           | `string`  | Required |
 | [serviceIpV4Cidr](#speckubernetesserviceipv4cidr)                                   | `string`  | Optional |
 | [subnetIds](#speckubernetessubnetids)                                               | `array`   | Optional |
@@ -5857,6 +5858,56 @@ The type of Node Pool, can be `self-managed` for using customization like custom
 |:---------------|
 |`"eks-managed"` |
 |`"self-managed"`|
+
+## .spec.kubernetes.nodePoolsCommon
+
+### Properties
+
+| Property                                                                                         | Type      | Required |
+|:-------------------------------------------------------------------------------------------------|:----------|:---------|
+| [metadataHttpEndpoint](#speckubernetesnodepoolscommonmetadatahttpendpoint)                       | `string`  | Optional |
+| [metadataHttpPutResponseHopLimit](#speckubernetesnodepoolscommonmetadatahttpputresponsehoplimit) | `integer` | Optional |
+| [metadataHttpTokens](#speckubernetesnodepoolscommonmetadatahttptokens)                           | `string`  | Optional |
+
+### Description
+
+All the common self-managed node pool definitions. Currently supports only the IMDS properties.
+
+## .spec.kubernetes.nodePoolsCommon.metadataHttpEndpoint
+
+### Description
+
+Specifies whether the instance metadata service (IMDS) is enabled or disabled. When set to 'disabled', instance metadata is not accessible.
+
+### Constraints
+
+**enum**: the value of this property must be equal to one of the following string values:
+
+| Value      |
+|:-----------|
+|`"enabled"` |
+|`"disabled"`|
+
+## .spec.kubernetes.nodePoolsCommon.metadataHttpPutResponseHopLimit
+
+### Description
+
+Specifies the maximum number of network hops allowed for instance metadata PUT response packets. This helps control access to instance metadata across different network layers.
+
+## .spec.kubernetes.nodePoolsCommon.metadataHttpTokens
+
+### Description
+
+Defines whether the use of IMDS session tokens is required. When set to 'required', all metadata requests must include a valid session token.
+
+### Constraints
+
+**enum**: the value of this property must be equal to one of the following string values:
+
+| Value      |
+|:-----------|
+|`"optional"`|
+|`"required"`|
 
 ## .spec.kubernetes.nodePoolsLaunchKind
 

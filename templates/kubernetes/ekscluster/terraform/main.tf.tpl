@@ -66,6 +66,7 @@ module "fury" {
   tags                                  = var.tags
   cluster_iam_role_name                 = var.cluster_iam_role_name_prefix_override
   workers_role_name                     = var.workers_iam_role_name_prefix_override
+  workers_group_defaults                = var.workers_group_defaults
 
   # AWS-specific variables.
   # Enables managing auth using these variables
