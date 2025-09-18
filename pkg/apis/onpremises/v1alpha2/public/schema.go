@@ -1715,8 +1715,8 @@ type SpecKubernetesAdvanced struct {
 	// Encryption corresponds to the JSON schema field "encryption".
 	Encryption *SpecKubernetesAdvancedEncryption `json:"encryption,omitempty" yaml:"encryption,omitempty" mapstructure:"encryption,omitempty"`
 
-	// Configura i limiti del plugin EventRateLimit dell'API Server. Ogni item
-	// rappresenta un bucket (Server, Namespace, User, etc).
+	// Configures the limits of the API Server's EventRateLimit plugin. Each item
+	// represents a bucket (Server, Namespace, User, etc).
 	EventRateLimits []SpecKubernetesAdvancedEventRateLimitsElem `json:"eventRateLimits,omitempty" yaml:"eventRateLimits,omitempty" mapstructure:"eventRateLimits,omitempty"`
 
 	// KernelParameters corresponds to the JSON schema field "kernelParameters".
@@ -1901,10 +1901,10 @@ type SpecKubernetesAdvancedContainerdRegistryConfigs []struct {
 	Username *string `json:"username,omitempty" yaml:"username,omitempty" mapstructure:"username,omitempty"`
 }
 
-// Configurazione avanzata per il controller-manager.
+// Advanced configuration for the controller-manager.
 type SpecKubernetesAdvancedControllerManager struct {
-	// Numero massimo di Pod terminati conservati dal controller-manager prima
-	// dell’eliminazione automatica.
+	// Maximum number of terminated Pods retained by the controller-manager before
+	// automatic deletion.
 	GcThreshold *int `json:"gcThreshold,omitempty" yaml:"gcThreshold,omitempty" mapstructure:"gcThreshold,omitempty"`
 }
 
@@ -1961,17 +1961,17 @@ type SpecKubernetesAdvancedEncryption struct {
 }
 
 type SpecKubernetesAdvancedEventRateLimitsElem struct {
-	// Burst massimo consentito per questo tipo di bucket.
+	// Maximum allowed burst for this bucket type.
 	Burst int `json:"burst" yaml:"burst" mapstructure:"burst"`
 
-	// Numero massimo di oggetti in cache per questo bucket. Solo per alcuni tipi come
-	// Namespace o User.
+	// Maximum number of cached objects for this bucket. Only for certain types like
+	// Namespace or User.
 	CacheSize *int `json:"cacheSize,omitempty" yaml:"cacheSize,omitempty" mapstructure:"cacheSize,omitempty"`
 
-	// Query per secondo (QPS) massimo consentito per questo tipo di bucket.
+	// Maximum allowed queries per second (QPS) for this bucket type.
 	Qps int `json:"qps" yaml:"qps" mapstructure:"qps"`
 
-	// Tipo di limite da applicare (Server, Namespace, User, SourceAndObject).
+	// Type of limit to apply (Server, Namespace, User, SourceAndObject).
 	Type SpecKubernetesAdvancedEventRateLimitsElemType `json:"type" yaml:"type" mapstructure:"type"`
 }
 
@@ -2008,6 +2008,9 @@ type SpecKubernetesAdvancedKernelParameters []struct {
 // `Spec.Kubernetes.Advanced.Encryption.tlsCipherSuites` field - do not configure
 // them under this field.
 type SpecKubernetesAdvancedKubeletConfiguration struct {
+	// Path to the CA file used to verify the kubelet servers' TLS certificates.
+	KubeletCertificateAuthorityFile *string `json:"kubeletCertificateAuthorityFile,omitempty" yaml:"kubeletCertificateAuthorityFile,omitempty" mapstructure:"kubeletCertificateAuthorityFile,omitempty"`
+
 	// The maximum time a streaming connection can be idle before it is closed.
 	// Example: `5m0s`
 	StreamingConnectionIdleTimeout *string `json:"streamingConnectionIdleTimeout,omitempty" yaml:"streamingConnectionIdleTimeout,omitempty" mapstructure:"streamingConnectionIdleTimeout,omitempty"`
