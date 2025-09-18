@@ -93,6 +93,25 @@ This version adds customizations to make it easier to install SD on bare metal n
         taints: []
   ```
 
+- [[#435](https://github.com/sighupio/distribution/pull/435)] Repository management lifecycle configuration for OnPremises provider:
+  - Added new boolean configuration fields for environments where package repositories are configured outside of furyctl.
+    - `spec.kubernetes.loadBalancers.manageRepositories`: Controls HAProxy repository setup
+    - `spec.kubernetes.advanced.containerd.manageRepositories`: Controls NVIDIA container toolkit's repository setup
+    - `spec.kubernetes.advanced.manageRepositories`: Controls Kubernetes package repository setup
+  - All fields are optional. If omitted, the system defaults to automatic repository management.
+
+    ```yaml
+    spec:
+      kubernetes:
+        loadBalancers:
+          enabled: true
+          manageRepositories: false
+        advanced:
+          manageRepositories: false
+          containerd:
+            manageRepositories: false
+    ```
+
 ## Fixes 🐞
 
 - [installer-eks/issues#88](https://github.com/sighupio/installer-eks/issues/88) This PR fixes an issue when using `selfmanaged` nodes with `alinux2023`. The way we used to provision images relied on Amazon's `bootstrap.sh` which has been deprecated in favor of `nodeadm`.
