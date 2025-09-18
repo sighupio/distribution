@@ -133,42 +133,31 @@ all:
         {{- if and (index .spec.kubernetes.advanced "registry") (ne .spec.kubernetes.advanced.registry "") }}
         kubernetes_image_registry: "{{ .spec.kubernetes.advanced.registry }}"
         {{- end }}
-        {{- end }}
 
-        {{- if index .spec.kubernetes "advanced" }}
-          {{- if index .spec.kubernetes.advanced "eventRateLimits" }}
+        {{- if index .spec.kubernetes.advanced "eventRateLimits" }}
         eventratelimits:
-            {{- range .spec.kubernetes.advanced.eventRateLimits }}
+          {{- range .spec.kubernetes.advanced.eventRateLimits }}
           - type: {{ .type }}
             qps: {{ .qps }}
             burst: {{ .burst }}
-              {{- if .cacheSize }}
+            {{- if .cacheSize }}
             cacheSize: {{ .cacheSize }}
-              {{- end }}
             {{- end }}
           {{- end }}
         {{- end }}
 
-        {{- if index .spec.kubernetes "advanced" }}
         {{- if and (index .spec.kubernetes.advanced "controllerManager") (index .spec.kubernetes.advanced.controllerManager "gcThreshold") }}
         terminated_pod_gc_threshold: {{ .spec.kubernetes.advanced.controllerManager.gcThreshold }}
         {{- end }}
-        {{- end }}
 
-        {{- if index .spec.kubernetes "advanced" }}
-        {{- if index .spec.kubernetes.advanced "kubeletConfiguration" }}
-        {{- if index .spec.kubernetes.advanced.kubeletConfiguration "streamingConnectionIdleTimeout" }}
+        {{- if and (index .spec.kubernetes.advanced "kubeletConfiguration") (index .spec.kubernetes.advanced.kubeletConfiguration "streamingConnectionIdleTimeout") }}
         kubelet_config_streaming_connection_idle_timeout: "{{ .spec.kubernetes.advanced.kubeletConfiguration.streamingConnectionIdleTimeout }}"
         {{- end }}
-        {{- end }}
-        {{- end }}
 
-        {{- if index .spec.kubernetes "advanced" }}
         {{- if index .spec.kubernetes.advanced "kubeletCertificateAuthorityFile" }}
         kubelet_certificate_authority_file: "{{ .spec.kubernetes.advanced.kubeletCertificateAuthorityFile }}"
         {{- end }}
         {{- end }}
-
 
         {{- if and (index .spec.kubernetes "advanced") (index .spec.kubernetes.advanced "apiServerCertSANs") }}
         kubernetes_apiserver_certSANs:
