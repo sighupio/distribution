@@ -11,6 +11,7 @@ metadata:
   name: default
   namespace: kube-system
 spec:
+  default: true
   provider: gcp
   objectStorage:
     bucket: {{ .spec.distribution.modules.dr.velero.externalEndpoint.bucketName }}
