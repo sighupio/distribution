@@ -11,6 +11,7 @@ metadata:
   name: default
   namespace: kube-system
 spec:
+  default: true
   config:
     region: custom
     s3ForcePathStyle: "true"
