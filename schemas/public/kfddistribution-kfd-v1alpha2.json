@@ -1105,7 +1105,17 @@
         "overrides": {
           "$ref": "#/$defs/Types.FuryModuleComponentOverrides"
         }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["blockSize"]
+          },
+          "then": {
+            "required": ["podCidr"]
+          }
+        }
+      ]
     },
     "Spec.Distribution.Modules.Networking.Cilium": {
       "type": "object",
