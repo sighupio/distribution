@@ -5243,13 +5243,13 @@ The Containerd systemd service directory used in the config.toml file.
 
 ### Description
 
-Configurazione avanzata per il controller-manager.
+Advanced configuration for the controller-manager.
 
 ## .spec.kubernetes.advanced.controllerManager.gcThreshold
 
 ### Description
 
-Numero massimo di Pod terminati conservati dal controller-manager prima dell’eliminazione automatica.
+Maximum number of terminated Pods retained by the controller-manager before automatic deletion.
 
 ## .spec.kubernetes.advanced.encryption
 
@@ -5330,31 +5330,31 @@ tlsCipherSuites:
 
 ### Description
 
-Configura i limiti del plugin EventRateLimit dell'API Server. Ogni item rappresenta un bucket (Server, Namespace, User, etc).
+Configures the limits of the API Server's EventRateLimit plugin. Each item represents a bucket (Server, Namespace, User, etc).
 
 ## .spec.kubernetes.advanced.eventRateLimits.burst
 
 ### Description
 
-Burst massimo consentito per questo tipo di bucket.
+Maximum allowed burst for this bucket type.
 
 ## .spec.kubernetes.advanced.eventRateLimits.cacheSize
 
 ### Description
 
-Numero massimo di oggetti in cache per questo bucket. Solo per alcuni tipi come Namespace o User.
+Maximum number of cached objects for this bucket. Only for certain types like Namespace or User.
 
 ## .spec.kubernetes.advanced.eventRateLimits.qps
 
 ### Description
 
-Query per secondo (QPS) massimo consentito per questo tipo di bucket.
+Maximum allowed queries per second (QPS) for this bucket type.
 
 ## .spec.kubernetes.advanced.eventRateLimits.type
 
 ### Description
 
-Tipo di limite da applicare (Server, Namespace, User, SourceAndObject).
+Type of limit to apply (Server, Namespace, User, SourceAndObject).
 
 ### Constraints
 
@@ -5396,15 +5396,22 @@ The value of the kernel parameter to edit. Example: `"15"`
 
 ### Properties
 
-| Property                                                                                                    | Type     | Required |
-|:------------------------------------------------------------------------------------------------------------|:---------|:---------|
-| [streamingConnectionIdleTimeout](#speckubernetesadvancedkubeletconfigurationstreamingconnectionidletimeout) | `string` | Optional |
+| Property                                                                                                      | Type     | Required |
+|:--------------------------------------------------------------------------------------------------------------|:---------|:---------|
+| [kubeletCertificateAuthorityFile](#speckubernetesadvancedkubeletconfigurationkubeletcertificateauthorityfile) | `string` | Optional |
+| [streamingConnectionIdleTimeout](#speckubernetesadvancedkubeletconfigurationstreamingconnectionidletimeout)   | `string` | Optional |
 
 ### Description
 
 Advanced configuration for Kubelet. This open field allows users to specify any parameter supported by the `KubeletConfiguration` object. Examples of uses include controlling the maximum number of pods per core (`podsPerCore`), managing container logging (`containerLogMaxSize`), Topology Manager options (`topologyManagerPolicyOptions`). All values must follow the official Kubelet specification: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/.
 
 NOTE: Content will **not** be validated by furyctl. To customize the TLS cipher suites of the Kubelet, set only the `Spec.Kubernetes.Advanced.Encryption.tlsCipherSuites` field - do not configure them under this field.
+
+## .spec.kubernetes.advanced.kubeletConfiguration.kubeletCertificateAuthorityFile
+
+### Description
+
+Path to the CA file used to verify the kubelet servers' TLS certificates.
 
 ## .spec.kubernetes.advanced.kubeletConfiguration.streamingConnectionIdleTimeout
 
@@ -5775,15 +5782,22 @@ The value of the kernel parameter to edit. Example: `"15"`
 
 ### Properties
 
-| Property                                                                                                   | Type     | Required |
-|:-----------------------------------------------------------------------------------------------------------|:---------|:---------|
-| [streamingConnectionIdleTimeout](#speckubernetesmasterskubeletconfigurationstreamingconnectionidletimeout) | `string` | Optional |
+| Property                                                                                                     | Type     | Required |
+|:-------------------------------------------------------------------------------------------------------------|:---------|:---------|
+| [kubeletCertificateAuthorityFile](#speckubernetesmasterskubeletconfigurationkubeletcertificateauthorityfile) | `string` | Optional |
+| [streamingConnectionIdleTimeout](#speckubernetesmasterskubeletconfigurationstreamingconnectionidletimeout)   | `string` | Optional |
 
 ### Description
 
 Advanced configuration for Kubelet. This open field allows users to specify any parameter supported by the `KubeletConfiguration` object. Examples of uses include controlling the maximum number of pods per core (`podsPerCore`), managing container logging (`containerLogMaxSize`), Topology Manager options (`topologyManagerPolicyOptions`). All values must follow the official Kubelet specification: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/.
 
 NOTE: Content will **not** be validated by furyctl. To customize the TLS cipher suites of the Kubelet, set only the `Spec.Kubernetes.Advanced.Encryption.tlsCipherSuites` field - do not configure them under this field.
+
+## .spec.kubernetes.masters.kubeletConfiguration.kubeletCertificateAuthorityFile
+
+### Description
+
+Path to the CA file used to verify the kubelet servers' TLS certificates.
 
 ## .spec.kubernetes.masters.kubeletConfiguration.streamingConnectionIdleTimeout
 
@@ -5919,15 +5933,22 @@ The value of the kernel parameter to edit. Example: `"15"`
 
 ### Properties
 
-| Property                                                                                                 | Type     | Required |
-|:---------------------------------------------------------------------------------------------------------|:---------|:---------|
-| [streamingConnectionIdleTimeout](#speckubernetesnodeskubeletconfigurationstreamingconnectionidletimeout) | `string` | Optional |
+| Property                                                                                                   | Type     | Required |
+|:-----------------------------------------------------------------------------------------------------------|:---------|:---------|
+| [kubeletCertificateAuthorityFile](#speckubernetesnodeskubeletconfigurationkubeletcertificateauthorityfile) | `string` | Optional |
+| [streamingConnectionIdleTimeout](#speckubernetesnodeskubeletconfigurationstreamingconnectionidletimeout)   | `string` | Optional |
 
 ### Description
 
 Advanced configuration for Kubelet. This open field allows users to specify any parameter supported by the `KubeletConfiguration` object. Examples of uses include controlling the maximum number of pods per core (`podsPerCore`), managing container logging (`containerLogMaxSize`), Topology Manager options (`topologyManagerPolicyOptions`). All values must follow the official Kubelet specification: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/.
 
 NOTE: Content will **not** be validated by furyctl. To customize the TLS cipher suites of the Kubelet, set only the `Spec.Kubernetes.Advanced.Encryption.tlsCipherSuites` field - do not configure them under this field.
+
+## .spec.kubernetes.nodes.kubeletConfiguration.kubeletCertificateAuthorityFile
+
+### Description
+
+Path to the CA file used to verify the kubelet servers' TLS certificates.
 
 ## .spec.kubernetes.nodes.kubeletConfiguration.streamingConnectionIdleTimeout
 

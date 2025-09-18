@@ -524,7 +524,7 @@
         },
         "eventRateLimits": {
           "type": "array",
-          "description": "Configura i limiti del plugin EventRateLimit dell'API Server. Ogni item rappresenta un bucket (Server, Namespace, User, etc).",
+          "description": "Configures the limits of the API Server's EventRateLimit plugin. Each item represents a bucket (Server, Namespace, User, etc).",
           "items": {
             "type": "object",
             "required": ["type", "qps", "burst"],
@@ -532,19 +532,19 @@
               "type": {
                 "type": "string",
                 "enum": ["Server", "Namespace", "User", "SourceAndObject"],
-                "description": "Tipo di limite da applicare (Server, Namespace, User, SourceAndObject)."
+                "description": "Type of limit to apply (Server, Namespace, User, SourceAndObject)."
               },
               "qps": {
                 "type": "integer",
-                "description": "Query per secondo (QPS) massimo consentito per questo tipo di bucket."
+                "description": "Maximum allowed queries per second (QPS) for this bucket type."
               },
               "burst": {
                 "type": "integer",
-                "description": "Burst massimo consentito per questo tipo di bucket."
+                "description": "Maximum allowed burst for this bucket type."
               },
               "cacheSize": {
                 "type": "integer",
-                "description": "Numero massimo di oggetti in cache per questo bucket. Solo per alcuni tipi come Namespace o User."
+                "description": "Maximum number of cached objects for this bucket. Only for certain types like Namespace or User."
               }
             },
             "additionalProperties": false
@@ -832,11 +832,11 @@
         "streamingConnectionIdleTimeout": {
           "type": "string",
           "description": "The maximum time a streaming connection can be idle before it is closed. Example: `5m0s`"
-        }
-      },
+        },
         "kubeletCertificateAuthorityFile": {
-        "type": "string",
-        "description": "Percorso al file della CA per verificare i certificati TLS server delle kubelet."
+          "type": "string",
+          "description": "Path to the CA file used to verify the kubelet servers' TLS certificates."
+        }
       }
     },
     "Spec.Kubernetes.Advanced.KernelParameters": {
@@ -863,11 +863,11 @@
     "Spec.Kubernetes.Advanced.ControllerManager": {
       "type": "object",
       "additionalProperties": false,
-      "description": "Configurazione avanzata per il controller-manager.",
+      "description": "Advanced configuration for the controller-manager.",
       "properties": {
         "gcThreshold": {
           "type": "integer",
-          "description": "Numero massimo di Pod terminati conservati dal controller-manager prima dell’eliminazione automatica."
+          "description": "Maximum number of terminated Pods retained by the controller-manager before automatic deletion."
         }
       }
     },
