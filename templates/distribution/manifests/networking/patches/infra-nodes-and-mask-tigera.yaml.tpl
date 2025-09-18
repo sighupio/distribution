@@ -23,12 +23,22 @@ spec:
           tolerations:
             {{ template "tolerations" ( merge (dict "indent" 12) $tigeraOperatorArgs ) }}
   {{- if ne .spec.distribution.common.provider.type "eks" }}
-  {{- if index .spec.distribution.modules.networking.tigeraOperator "podCidr" }}
+  {{- if and (index .spec "kubernetes") (index .spec.kubernetes "podCidr") }}
   calicoNetwork:
     ipPools:
-    - blockSize: {{ .spec.distribution.modules.networking.tigeraOperator.blockSize }}
-      cidr: {{ .spec.distribution.modules.networking.tigeraOperator.podCidr }}
-      name: default-ipv4-ippool
+      - blockSize: {{ .spec.distribution.modules.networking.tigeraOperator.blockSize }}
+    {{- if index .spec.distribution.modules.networking.tigeraOperator "podCidr" }}
+        cidr: {{ .spec.distribution.modules.networking.tigeraOperator.podCidr }}
+    {{- else }}
+        cidr: {{ .spec.kubernetes.podCidr }}
+    {{- end }}
+        name: default-ipv4-ippool
+  {{- else if index .spec.distribution.modules.networking.tigeraOperator "podCidr" }}
+  calicoNetwork:
+    ipPools:
+      - blockSize: {{ .spec.distribution.modules.networking.tigeraOperator.blockSize }}
+        cidr: {{ .spec.distribution.modules.networking.tigeraOperator.podCidr }}
+        name: default-ipv4-ippool
   {{- end }}
   {{- end }}
 
