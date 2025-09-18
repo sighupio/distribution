@@ -231,3 +231,13 @@ variable "node_pools_global_ami_type" {
     error_message = "The global AMI type must be either 'alinux2' or 'alinux2023'."
   }
 }
+
+variable "workers_group_defaults" {
+  type = any
+
+  default = {
+    metadata_http_endpoint               = "enabled"
+    metadata_http_tokens                 = "optional"
+    metadata_http_put_response_hop_limit = null
+  }
+}

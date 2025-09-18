@@ -8,10 +8,10 @@ modules:
   aws: v5.1.0-rc.0
   dr: v3.2.0-rc.0
   ingress: v4.1.0-rc.0
-  logging: v5.2.0-rc.0
-  monitoring: v4.0.0-rc.0
+  logging: v5.2.0-rc.1
+  monitoring: v4.0.0-rc.1
   opa: v1.15.0-rc.0
-  networking: v3.0.0-rc.0
+  networking: v3.0.0-rc.1
   tracing: v1.3.0-rc.1
 kubernetes:
   eks:
