@@ -2005,7 +2005,7 @@ func (j *SpecDistributionModulesNetworkingCilium) UnmarshalJSON(b []byte) error 
 }
 
 type SpecDistributionModulesNetworkingTigeraOperator struct {
-	// BlockSize specifies the CIDR prefex length to use when allocating per-node IP
+	// BlockSize specifies the CIDR prefix length to use when allocating per-node IP
 	// blocks from the main IP pool CIDR. WARNING: The value for this field cannot be
 	// changed once set. Default is 26.
 	BlockSize *int `json:"blockSize,omitempty" yaml:"blockSize,omitempty" mapstructure:"blockSize,omitempty"`
@@ -2013,10 +2013,13 @@ type SpecDistributionModulesNetworkingTigeraOperator struct {
 	// Overrides corresponds to the JSON schema field "overrides".
 	Overrides *TypesFuryModuleComponentOverrides `json:"overrides,omitempty" yaml:"overrides,omitempty" mapstructure:"overrides,omitempty"`
 
-	// Allows specifing a CIDR for the Pods network different from
-	// `.spec.kubernetes.podCidr`. If not set the default is to use
-	// `.spec.kubernetes.podCidr`. WARNING: The value for this field cannot be changed
-	// once set.
+	// Specifies a custom CIDR for the default Pods IPPool.
+	// If unset, the Tigera Operator will try to detect it from the cluster:
+	// - OpenShift -> OpenShift Network config
+	// - kubeadm -> kubeadm-config ConfigMap
+	// - EKS -> defaults to 172.16.0.0/16 (VXLAN)
+	// - otherwise -> defaults to 192.168.0.0/16.
+	// WARNING: this field cannot be changed once set.
 	PodCidr *TypesCidr `json:"podCidr,omitempty" yaml:"podCidr,omitempty" mapstructure:"podCidr,omitempty"`
 }
 

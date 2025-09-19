@@ -1820,6 +1820,17 @@ type SpecKubernetesAdvancedCloud struct {
 
 // Advanced configuration for containerd
 type SpecKubernetesAdvancedContainerd struct {
+	// The Containerd debug level used in the config.toml file.
+	DebugLevel *string `json:"debugLevel,omitempty" yaml:"debugLevel,omitempty" mapstructure:"debugLevel,omitempty"`
+
+	// The Containerd gRPC maximum receive message size in bytes used in the
+	// config.toml file.
+	GrpcMaxRecvMessageSize *int `json:"grpcMaxRecvMessageSize,omitempty" yaml:"grpcMaxRecvMessageSize,omitempty" mapstructure:"grpcMaxRecvMessageSize,omitempty"`
+
+	// The Containerd gRPC maximum send message size in bytes used in the config.toml
+	// file.
+	GrpcMaxSendMessageSize *int `json:"grpcMaxSendMessageSize,omitempty" yaml:"grpcMaxSendMessageSize,omitempty" mapstructure:"grpcMaxSendMessageSize,omitempty"`
+
 	// Set to false if you manage the NVIDIA container toolkit's repositories
 	// externally and wish to skip their configuration with furyctl. Default is true.
 	// Notice that containerd itself is installed from binaries and does not use a
@@ -1827,8 +1838,29 @@ type SpecKubernetesAdvancedContainerd struct {
 	// for containerd.
 	ManageRepositories *bool `json:"manageRepositories,omitempty" yaml:"manageRepositories,omitempty" mapstructure:"manageRepositories,omitempty"`
 
+	// The maximum container log line size in bytes used in the config.toml file.
+	MaxContainerLogLineSize *int `json:"maxContainerLogLineSize,omitempty" yaml:"maxContainerLogLineSize,omitempty" mapstructure:"maxContainerLogLineSize,omitempty"`
+
+	// The Containerd metrics address used in the config.toml file.
+	MetricsAddress *string `json:"metricsAddress,omitempty" yaml:"metricsAddress,omitempty" mapstructure:"metricsAddress,omitempty"`
+
+	// Enable Containerd metrics gRPC histogram in the config.toml file.
+	MetricsGrpcHistogram *bool `json:"metricsGrpcHistogram,omitempty" yaml:"metricsGrpcHistogram,omitempty" mapstructure:"metricsGrpcHistogram,omitempty"`
+
+	// The Containerd OOM score adjustment used in the config.toml file.
+	OomScore *int `json:"oomScore,omitempty" yaml:"oomScore,omitempty" mapstructure:"oomScore,omitempty"`
+
 	// RegistryConfigs corresponds to the JSON schema field "registryConfigs".
 	RegistryConfigs SpecKubernetesAdvancedContainerdRegistryConfigs `json:"registryConfigs,omitempty" yaml:"registryConfigs,omitempty" mapstructure:"registryConfigs,omitempty"`
+
+	// The Containerd state directory used in the config.toml file.
+	StateDir *string `json:"stateDir,omitempty" yaml:"stateDir,omitempty" mapstructure:"stateDir,omitempty"`
+
+	// The Containerd storage directory used in the config.toml file.
+	StorageDir *string `json:"storageDir,omitempty" yaml:"storageDir,omitempty" mapstructure:"storageDir,omitempty"`
+
+	// The Containerd systemd service directory used in the config.toml file.
+	SystemdDir *string `json:"systemdDir,omitempty" yaml:"systemdDir,omitempty" mapstructure:"systemdDir,omitempty"`
 }
 
 // Allows specifying custom configuration for a registry at containerd level. You

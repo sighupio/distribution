@@ -5091,14 +5091,42 @@ Sets the cloud provider for the Kubelet
 
 ### Properties
 
-| Property                                                                  | Type      | Required |
-|:--------------------------------------------------------------------------|:----------|:---------|
-| [manageRepositories](#speckubernetesadvancedcontainerdmanagerepositories) | `boolean` | Optional |
-| [registryConfigs](#speckubernetesadvancedcontainerdregistryconfigs)       | `array`   | Optional |
+| Property                                                                            | Type      | Required |
+|:------------------------------------------------------------------------------------|:----------|:---------|
+| [debugLevel](#speckubernetesadvancedcontainerddebuglevel)                           | `string`  | Optional |
+| [grpcMaxRecvMessageSize](#speckubernetesadvancedcontainerdgrpcmaxrecvmessagesize)   | `integer` | Optional |
+| [grpcMaxSendMessageSize](#speckubernetesadvancedcontainerdgrpcmaxsendmessagesize)   | `integer` | Optional |
+| [manageRepositories](#speckubernetesadvancedcontainerdmanagerepositories)           | `boolean` | Optional |
+| [maxContainerLogLineSize](#speckubernetesadvancedcontainerdmaxcontainerloglinesize) | `integer` | Optional |
+| [metricsAddress](#speckubernetesadvancedcontainerdmetricsaddress)                   | `string`  | Optional |
+| [metricsGrpcHistogram](#speckubernetesadvancedcontainerdmetricsgrpchistogram)       | `boolean` | Optional |
+| [oomScore](#speckubernetesadvancedcontainerdoomscore)                               | `integer` | Optional |
+| [registryConfigs](#speckubernetesadvancedcontainerdregistryconfigs)                 | `array`   | Optional |
+| [stateDir](#speckubernetesadvancedcontainerdstatedir)                               | `string`  | Optional |
+| [storageDir](#speckubernetesadvancedcontainerdstoragedir)                           | `string`  | Optional |
+| [systemdDir](#speckubernetesadvancedcontainerdsystemddir)                           | `string`  | Optional |
 
 ### Description
 
 Advanced configuration for containerd
+
+## .spec.kubernetes.advanced.containerd.debugLevel
+
+### Description
+
+The Containerd debug level used in the config.toml file.
+
+## .spec.kubernetes.advanced.containerd.grpcMaxRecvMessageSize
+
+### Description
+
+The Containerd gRPC maximum receive message size in bytes used in the config.toml file.
+
+## .spec.kubernetes.advanced.containerd.grpcMaxSendMessageSize
+
+### Description
+
+The Containerd gRPC maximum send message size in bytes used in the config.toml file.
 
 ## .spec.kubernetes.advanced.containerd.manageRepositories
 
@@ -5106,6 +5134,30 @@ Advanced configuration for containerd
 
 Set to false if you manage the NVIDIA container toolkit's repositories externally and wish to skip their configuration with furyctl. Default is true.
 Notice that containerd itself is installed from binaries and does not use a repository. See `.spec.kubernetes.advanced.airGap` for other download options for containerd.
+
+## .spec.kubernetes.advanced.containerd.maxContainerLogLineSize
+
+### Description
+
+The maximum container log line size in bytes used in the config.toml file.
+
+## .spec.kubernetes.advanced.containerd.metricsAddress
+
+### Description
+
+The Containerd metrics address used in the config.toml file.
+
+## .spec.kubernetes.advanced.containerd.metricsGrpcHistogram
+
+### Description
+
+Enable Containerd metrics gRPC histogram in the config.toml file.
+
+## .spec.kubernetes.advanced.containerd.oomScore
+
+### Description
+
+The Containerd OOM score adjustment used in the config.toml file.
 
 ## .spec.kubernetes.advanced.containerd.registryConfigs
 
@@ -5153,6 +5205,24 @@ Registry address on which you would like to configure authentication or mirror(s
 ### Description
 
 The username containerd will use to authenticate against the registry.
+
+## .spec.kubernetes.advanced.containerd.stateDir
+
+### Description
+
+The Containerd state directory used in the config.toml file.
+
+## .spec.kubernetes.advanced.containerd.storageDir
+
+### Description
+
+The Containerd storage directory used in the config.toml file.
+
+## .spec.kubernetes.advanced.containerd.systemdDir
+
+### Description
+
+The Containerd systemd service directory used in the config.toml file.
 
 ## .spec.kubernetes.advanced.encryption
 
