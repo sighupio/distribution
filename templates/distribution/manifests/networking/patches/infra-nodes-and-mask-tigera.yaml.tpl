@@ -23,8 +23,8 @@ spec:
           tolerations:
             {{ template "tolerations" ( merge (dict "indent" 12) $tigeraOperatorArgs ) }}
   {{- if ne .spec.distribution.common.provider.type "eks" }}
-  {{/* .spec.kubernetes.podCidr is filled only inside OnPremises clusters */}}
-  {{- if and (index .spec "kubernetes") (index .spec.kubernetes "podCidr") }}
+  {{/* .spec.kubernetes is available only inside OnPremises clusters */}}
+  {{- if index .spec "kubernetes" }}
   calicoNetwork:
     ipPools:
       - blockSize: {{ .spec.distribution.modules.networking.tigeraOperator.blockSize }}
