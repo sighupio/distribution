@@ -598,6 +598,46 @@
         "manageRepositories": {
           "type": "boolean",
           "description": "Set to false if you manage the NVIDIA container toolkit's repositories externally and wish to skip their configuration with furyctl. Default is true.\nNotice that containerd itself is installed from binaries and does not use a repository. See `.spec.kubernetes.advanced.airGap` for other download options for containerd."
+        },
+        "storageDir": {
+          "type": "string",
+          "description": "The Containerd storage directory used in the config.toml file."
+        },
+        "stateDir": {
+          "type": "string",
+          "description": "The Containerd state directory used in the config.toml file."
+        },
+        "systemdDir": {
+          "type": "string",
+          "description": "The Containerd systemd service directory used in the config.toml file."
+        },
+        "oomScore": {
+          "type": "integer",
+          "description": "The Containerd OOM score adjustment used in the config.toml file."
+        },
+        "grpcMaxRecvMessageSize": {
+          "type": "integer",
+          "description": "The Containerd gRPC maximum receive message size in bytes used in the config.toml file."
+        },
+        "grpcMaxSendMessageSize": {
+          "type": "integer",
+          "description": "The Containerd gRPC maximum send message size in bytes used in the config.toml file."
+        },
+        "debugLevel": {
+          "type": "string",
+          "description": "The Containerd debug level used in the config.toml file."
+        },
+        "metricsAddress": {
+          "type": "string",
+          "description": "The Containerd metrics address used in the config.toml file."
+        },
+        "metricsGrpcHistogram": {
+          "type": "boolean",
+          "description": "Enable Containerd metrics gRPC histogram in the config.toml file."
+        },
+        "maxContainerLogLineSize": {
+          "type": "integer",
+          "description": "The maximum container log line size in bytes used in the config.toml file."
         }
       }
     },
