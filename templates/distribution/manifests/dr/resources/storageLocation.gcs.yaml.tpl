@@ -11,10 +11,9 @@ metadata:
   name: default
   namespace: kube-system
 spec:
-  config:
-    region: custom
-    s3ForcePathStyle: "true"
-    s3Url: {{ ternary "http" "https" .spec.distribution.modules.dr.velero.externalEndpoint.insecure }}://{{ .spec.distribution.modules.dr.velero.externalEndpoint.endpoint }}
+  default: true
+  provider: gcp
   objectStorage:
     bucket: {{ .spec.distribution.modules.dr.velero.externalEndpoint.bucketName }}
-  provider: aws
+  config:
+    serviceAccount: {{ .spec.distribution.modules.dr.velero.externalEndpoint.clientEmail }}
