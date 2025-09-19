@@ -50,6 +50,31 @@ This version adds customizations to make it easier to install SD on bare metal n
               - "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"
               - "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305"
     ```
+    
+    When not explicitly defined, the following default values will be applied:
+
+    ```yaml
+    tls_cipher_suites:
+      - TLS_AES_128_GCM_SHA256
+      - TLS_AES_256_GCM_SHA384
+      - TLS_CHACHA20_POLY1305_SHA256
+      - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
+      - TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+      - TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305
+      - TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256
+      - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+      - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+      - TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305
+      - TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
+
+    kubelet_tls_cipher_suites:
+      - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
+      - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+      - TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305
+      - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+      - TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305
+      - TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+    ```
 
   - `streamingConnectionIdleTimeout` to the `spec.kubernetes.advanced.kubeletConfiguration` to configure idle timeouts ensuring protection against Denial-of-Service attacks, inactive connections and running out of ephemeral ports:
 
