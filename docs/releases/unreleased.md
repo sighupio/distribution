@@ -94,7 +94,7 @@ degraded performance and availability:
       kubernetes:
         advanced:
           controllerManager:
-            gcThreshold: "5m"
+            gcThreshold: 2000
     ```
 
   - `eventRateLimits` to the `spec.kubernetes.advanced` to enforce a limit on the number of events that the API Server will accept in a given time slice:
