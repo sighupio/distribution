@@ -150,14 +150,6 @@ all:
         terminated_pod_gc_threshold: {{ .spec.kubernetes.advanced.controllerManager.gcThreshold }}
         {{- end }}
 
-        {{- if index .spec.kubernetes.advanced "kubeletConfiguration" }}
-        {{- if index .spec.kubernetes.advanced.kubeletConfiguration "streamingConnectionIdleTimeout" }}
-        kubelet_config_streaming_connection_idle_timeout: "{{ .spec.kubernetes.advanced.kubeletConfiguration.streamingConnectionIdleTimeout }}"
-        {{- end }}
-        {{- if index .spec.kubernetes.advanced.kubeletConfiguration "kubeletCertificateAuthorityFile" }}
-        kubelet_certificate_authority_file: "{{ .spec.kubernetes.advanced.kubeletConfiguration.kubeletCertificateAuthorityFile }}"
-        {{- end }}
-        {{- end }}
         {{- end }}
 
         {{- if and (index .spec.kubernetes "advanced") (index .spec.kubernetes.advanced "apiServerCertSANs") }}
