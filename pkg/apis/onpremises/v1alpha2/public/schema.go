@@ -1823,6 +1823,10 @@ type SpecKubernetesAdvancedContainerd struct {
 	// The Containerd debug level used in the config.toml file.
 	DebugLevel *string `json:"debugLevel,omitempty" yaml:"debugLevel,omitempty" mapstructure:"debugLevel,omitempty"`
 
+	// Set to apply device ownership from the container runtime's security context
+	// instead of the host's defaults, used in the config.toml file.
+	DeviceOwnershipFromSecurityContext *bool `json:"deviceOwnershipFromSecurityContext,omitempty" yaml:"deviceOwnershipFromSecurityContext,omitempty" mapstructure:"deviceOwnershipFromSecurityContext,omitempty"`
+
 	// The Containerd gRPC maximum receive message size in bytes used in the
 	// config.toml file.
 	GrpcMaxRecvMessageSize *int `json:"grpcMaxRecvMessageSize,omitempty" yaml:"grpcMaxRecvMessageSize,omitempty" mapstructure:"grpcMaxRecvMessageSize,omitempty"`

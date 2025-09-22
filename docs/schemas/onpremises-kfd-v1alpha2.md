@@ -5091,20 +5091,21 @@ Sets the cloud provider for the Kubelet
 
 ### Properties
 
-| Property                                                                            | Type      | Required |
-|:------------------------------------------------------------------------------------|:----------|:---------|
-| [debugLevel](#speckubernetesadvancedcontainerddebuglevel)                           | `string`  | Optional |
-| [grpcMaxRecvMessageSize](#speckubernetesadvancedcontainerdgrpcmaxrecvmessagesize)   | `integer` | Optional |
-| [grpcMaxSendMessageSize](#speckubernetesadvancedcontainerdgrpcmaxsendmessagesize)   | `integer` | Optional |
-| [manageRepositories](#speckubernetesadvancedcontainerdmanagerepositories)           | `boolean` | Optional |
-| [maxContainerLogLineSize](#speckubernetesadvancedcontainerdmaxcontainerloglinesize) | `integer` | Optional |
-| [metricsAddress](#speckubernetesadvancedcontainerdmetricsaddress)                   | `string`  | Optional |
-| [metricsGrpcHistogram](#speckubernetesadvancedcontainerdmetricsgrpchistogram)       | `boolean` | Optional |
-| [oomScore](#speckubernetesadvancedcontainerdoomscore)                               | `integer` | Optional |
-| [registryConfigs](#speckubernetesadvancedcontainerdregistryconfigs)                 | `array`   | Optional |
-| [stateDir](#speckubernetesadvancedcontainerdstatedir)                               | `string`  | Optional |
-| [storageDir](#speckubernetesadvancedcontainerdstoragedir)                           | `string`  | Optional |
-| [systemdDir](#speckubernetesadvancedcontainerdsystemddir)                           | `string`  | Optional |
+| Property                                                                                                  | Type      | Required |
+|:----------------------------------------------------------------------------------------------------------|:----------|:---------|
+| [debugLevel](#speckubernetesadvancedcontainerddebuglevel)                                                 | `string`  | Optional |
+| [deviceOwnershipFromSecurityContext](#speckubernetesadvancedcontainerddeviceownershipfromsecuritycontext) | `boolean` | Optional |
+| [grpcMaxRecvMessageSize](#speckubernetesadvancedcontainerdgrpcmaxrecvmessagesize)                         | `integer` | Optional |
+| [grpcMaxSendMessageSize](#speckubernetesadvancedcontainerdgrpcmaxsendmessagesize)                         | `integer` | Optional |
+| [manageRepositories](#speckubernetesadvancedcontainerdmanagerepositories)                                 | `boolean` | Optional |
+| [maxContainerLogLineSize](#speckubernetesadvancedcontainerdmaxcontainerloglinesize)                       | `integer` | Optional |
+| [metricsAddress](#speckubernetesadvancedcontainerdmetricsaddress)                                         | `string`  | Optional |
+| [metricsGrpcHistogram](#speckubernetesadvancedcontainerdmetricsgrpchistogram)                             | `boolean` | Optional |
+| [oomScore](#speckubernetesadvancedcontainerdoomscore)                                                     | `integer` | Optional |
+| [registryConfigs](#speckubernetesadvancedcontainerdregistryconfigs)                                       | `array`   | Optional |
+| [stateDir](#speckubernetesadvancedcontainerdstatedir)                                                     | `string`  | Optional |
+| [storageDir](#speckubernetesadvancedcontainerdstoragedir)                                                 | `string`  | Optional |
+| [systemdDir](#speckubernetesadvancedcontainerdsystemddir)                                                 | `string`  | Optional |
 
 ### Description
 
@@ -5115,6 +5116,12 @@ Advanced configuration for containerd
 ### Description
 
 The Containerd debug level used in the config.toml file.
+
+## .spec.kubernetes.advanced.containerd.deviceOwnershipFromSecurityContext
+
+### Description
+
+Set to apply device ownership from the container runtime's security context instead of the host's defaults, used in the config.toml file.
 
 ## .spec.kubernetes.advanced.containerd.grpcMaxRecvMessageSize
 
