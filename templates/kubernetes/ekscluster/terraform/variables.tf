@@ -234,10 +234,10 @@ variable "node_pools_global_ami_type" {
 
 variable "workers_group_defaults" {
   type = any
-
+  description = "Override default values for self-managed eks node pool."  
   default = {
     metadata_http_endpoint               = "enabled"
-    metadata_http_tokens                 = "optional"
-    metadata_http_put_response_hop_limit = null
+    metadata_http_tokens                 = "required"
+    metadata_http_put_response_hop_limit = 2 # As recommended by AWS https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-IMDS-new-instances.html#set-imdsv2-account-defaults
   }
 }
