@@ -638,6 +638,10 @@
         "maxContainerLogLineSize": {
           "type": "integer",
           "description": "The maximum container log line size in bytes used in the config.toml file."
+        },
+        "deviceOwnershipFromSecurityContext": {
+          "type": "boolean",
+          "description": "Set to true to apply device ownership from the container runtime's security context instead of the host's defaults, used in the config.toml file."
         }
       }
     },

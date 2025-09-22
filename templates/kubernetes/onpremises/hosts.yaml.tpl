@@ -285,6 +285,9 @@ all:
     {{- if hasKeyAny .spec.kubernetes.advanced.containerd "maxContainerLogLineSize" }}
     containerd_max_container_log_line_size: {{ .spec.kubernetes.advanced.containerd.maxContainerLogLineSize }}
     {{- end }}
+    {{- if hasKeyAny .spec.kubernetes.advanced.containerd "deviceOwnershipFromSecurityContext" }}
+    containerd_device_ownership_from_security_context: {{ .spec.kubernetes.advanced.containerd.deviceOwnershipFromSecurityContext }}
+    {{- end }}
     {{- end }}
     {{- if (index .spec.kubernetes.advanced "encryption") }}
     {{- if (index .spec.kubernetes.advanced.encryption "tlsCipherSuites") }}
