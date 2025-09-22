@@ -5335,7 +5335,7 @@ The SSH public key that can connect to the nodes via SSH using the `ec2-user` us
 
 ### Description
 
-Global default AMI type used for EKS worker nodes. This will apply to all node pools unless overridden by a specific node pool.
+Global default AMI type used for EKS worker nodes. This will apply to all node pools unless overridden by a specific node pool. Only Amazon Linux 2023 (alinux2023) images are supported. 
 
 ### Constraints
 
@@ -5343,7 +5343,6 @@ Global default AMI type used for EKS worker nodes. This will apply to all node p
 
 | Value        |
 |:-------------|
-|`"alinux2"`   |
 |`"alinux2023"`|
 
 ## .spec.kubernetes.nodePools
@@ -5676,7 +5675,7 @@ The owner of the AMI to use for the nodes, must be set toghether with the `id` f
 
 ### Description
 
-The AMI type defines the AMI to use for `eks-managed` and `self-managed` type of Node Pools. Only Amazon Linux based AMIs are supported. It can't be set at the same time than `ami.id` and `ami.owner`.
+The AMI type defines the AMI to use for `eks-managed` and `self-managed` type of Node Pools. Only Amazon Linux based AMIs are supported. For Kubernetes versions 1.33 and later, EKS will not provide pre-built optimized Amazon Linux 2 (alinux2). Only Amazon Linux 2023 (alinux2023) images are supported. It can't be set at the same time than `ami.id` and `ami.owner`.
 
 ### Constraints
 
@@ -5684,7 +5683,6 @@ The AMI type defines the AMI to use for `eks-managed` and `self-managed` type of
 
 | Value        |
 |:-------------|
-|`"alinux2"`   |
 |`"alinux2023"`|
 
 ## .spec.kubernetes.nodePools.attachedTargetGroups

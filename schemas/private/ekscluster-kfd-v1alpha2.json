@@ -483,10 +483,9 @@
         "nodePoolGlobalAmiType": {
           "type": "string",
           "enum": [
-            "alinux2",
             "alinux2023"
           ],
-          "description": "Global default AMI type used for EKS worker nodes. This will apply to all node pools unless overridden by a specific node pool."
+          "description": "Global default AMI type used for EKS worker nodes. This will apply to all node pools unless overridden by a specific node pool. Only Amazon Linux 2023 (alinux2023) images are supported. "
         },
         "logRetentionDays": {
           "type": "integer",
@@ -727,9 +726,8 @@
         },
         "type": {
           "type": "string",
-          "description": "The AMI type defines the AMI to use for `eks-managed` and `self-managed` type of Node Pools. Only Amazon Linux based AMIs are supported. It can't be set at the same time than `ami.id` and `ami.owner`.",
+          "description": "The AMI type defines the AMI to use for `eks-managed` and `self-managed` type of Node Pools. Only Amazon Linux based AMIs are supported. For Kubernetes versions 1.33 and later, EKS will not provide pre-built optimized Amazon Linux 2 (alinux2). Only Amazon Linux 2023 (alinux2023) images are supported. It can't be set at the same time than `ami.id` and `ami.owner`.",
           "enum": [
-            "alinux2",
             "alinux2023"
           ]
         }
