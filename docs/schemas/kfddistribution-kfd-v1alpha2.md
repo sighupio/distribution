@@ -3695,7 +3695,7 @@ The value of the toleration
 
 ### Description
 
-BlockSize specifies the CIDR prefex length to use when allocating per-node IP blocks from the main IP pool CIDR. WARNING: The value for this field cannot be changed once set. Default is 26.
+BlockSize specifies the CIDR prefix length to use when allocating per-node IP blocks from the main IP pool CIDR. WARNING: The value for this field cannot be changed once set. Default is 26.
 
 ## .spec.distribution.modules.networking.tigeraOperator.overrides
 
@@ -3766,7 +3766,13 @@ The value of the toleration
 
 ### Description
 
-Allows specifing a CIDR for the Pods network different from `.spec.kubernetes.podCidr`. If not set the default is to use `.spec.kubernetes.podCidr`. WARNING: The value for this field cannot be changed once set.
+Specifies a custom CIDR for the default Pods IPPool.
+If unset, the Tigera Operator will try to detect it from the cluster:
+- OpenShift -> OpenShift Network config
+- kubeadm -> kubeadm-config ConfigMap
+- EKS -> defaults to 172.16.0.0/16 (VXLAN)
+- otherwise -> defaults to 192.168.0.0/16.
+WARNING: this field cannot be changed once set.
 
 ### Constraints
 

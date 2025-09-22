@@ -255,6 +255,39 @@ all:
     {{- if hasKeyAny .spec.kubernetes.advanced.containerd "manageRepositories" }}
     containerd_manage_repositories: {{ .spec.kubernetes.advanced.containerd.manageRepositories }}
     {{- end }}
+    {{- if hasKeyAny .spec.kubernetes.advanced.containerd "storageDir" }}
+    containerd_storage_dir: "{{ .spec.kubernetes.advanced.containerd.storageDir }}"
+    {{- end }}
+    {{- if hasKeyAny .spec.kubernetes.advanced.containerd "stateDir" }}
+    containerd_state_dir: "{{ .spec.kubernetes.advanced.containerd.stateDir }}"
+    {{- end }}
+    {{- if hasKeyAny .spec.kubernetes.advanced.containerd "systemdDir" }}
+    containerd_systemd_dir: "{{ .spec.kubernetes.advanced.containerd.systemdDir }}"
+    {{- end }}
+    {{- if hasKeyAny .spec.kubernetes.advanced.containerd "oomScore" }}
+    containerd_oom_score: {{ .spec.kubernetes.advanced.containerd.oomScore }}
+    {{- end }}
+    {{- if hasKeyAny .spec.kubernetes.advanced.containerd "grpcMaxRecvMessageSize" }}
+    containerd_grpc_max_recv_message_size: {{ .spec.kubernetes.advanced.containerd.grpcMaxRecvMessageSize }}
+    {{- end }}
+    {{- if hasKeyAny .spec.kubernetes.advanced.containerd "grpcMaxSendMessageSize" }}
+    containerd_grpc_max_send_message_size: {{ .spec.kubernetes.advanced.containerd.grpcMaxSendMessageSize }}
+    {{- end }}
+    {{- if hasKeyAny .spec.kubernetes.advanced.containerd "debugLevel" }}
+    containerd_debug_level: "{{ .spec.kubernetes.advanced.containerd.debugLevel }}"
+    {{- end }}
+    {{- if hasKeyAny .spec.kubernetes.advanced.containerd "metricsAddress" }}
+    containerd_metrics_address: "{{ .spec.kubernetes.advanced.containerd.metricsAddress }}"
+    {{- end }}
+    {{- if hasKeyAny .spec.kubernetes.advanced.containerd "metricsGrpcHistogram" }}
+    containerd_metrics_grpc_histogram: {{ .spec.kubernetes.advanced.containerd.metricsGrpcHistogram }}
+    {{- end }}
+    {{- if hasKeyAny .spec.kubernetes.advanced.containerd "maxContainerLogLineSize" }}
+    containerd_max_container_log_line_size: {{ .spec.kubernetes.advanced.containerd.maxContainerLogLineSize }}
+    {{- end }}
+    {{- if hasKeyAny .spec.kubernetes.advanced.containerd "deviceOwnershipFromSecurityContext" }}
+    containerd_device_ownership_from_security_context: {{ .spec.kubernetes.advanced.containerd.deviceOwnershipFromSecurityContext }}
+    {{- end }}
     {{- end }}
     {{- if (index .spec.kubernetes.advanced "encryption") }}
     {{- if (index .spec.kubernetes.advanced.encryption "tlsCipherSuites") }}
