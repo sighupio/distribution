@@ -9,7 +9,14 @@ The distribution is maintained with ❤️ by the team [SIGHUP by ReeVo](https:/
 This version adds customizations to make it easier to install SD on bare metal nodes.
 
 ## Breaking changes 💔
-
+- [[#445](https://github.com/sighupio/distribution/pull/445)] Amazon Linux 2 AMI deprecation
+  - For Kubernetes versions 1.33 and later, EKS will not provide pre-built optimized Amazon Linux 2 (AL2) Amazon Machine Images (AMIs). Users must migrate to Amazon Linux 2023 (alinux2023).
+  ```yaml
+  spec:
+    kubernetes:
+      # The only valid value is `alinux2023`. All other values (including `alinux2`) result in a schema validation error.
+      nodePoolGlobalAmiType: "alinux2023"
+  ```
 ## New features 🌟
 
 - [[#415](https://github.com/sighupio/distribution/pull/415)] Adds customizations to make it easier to install SD on bare metal nodes:
