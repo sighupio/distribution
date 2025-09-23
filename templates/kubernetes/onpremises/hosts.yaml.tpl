@@ -133,6 +133,23 @@ all:
         {{- if and (index .spec.kubernetes.advanced "registry") (ne .spec.kubernetes.advanced.registry "") }}
         kubernetes_image_registry: "{{ .spec.kubernetes.advanced.registry }}"
         {{- end }}
+
+        {{- if index .spec.kubernetes.advanced "eventRateLimits" }}
+        eventratelimits:
+          {{- range .spec.kubernetes.advanced.eventRateLimits }}
+          - type: {{ .type }}
+            qps: {{ .qps }}
+            burst: {{ .burst }}
+            {{- if .cacheSize }}
+            cacheSize: {{ .cacheSize }}
+            {{- end }}
+          {{- end }}
+        {{- end }}
+
+        {{- if and (index .spec.kubernetes.advanced "controllerManager") (index .spec.kubernetes.advanced.controllerManager "gcThreshold") }}
+        terminated_pod_gc_threshold: {{ .spec.kubernetes.advanced.controllerManager.gcThreshold }}
+        {{- end }}
+
         {{- end }}
 
         {{- if and (index .spec.kubernetes "advanced") (index .spec.kubernetes.advanced "apiServerCertSANs") }}
@@ -293,6 +310,10 @@ all:
     {{- if (index .spec.kubernetes.advanced.encryption "tlsCipherSuites") }}
     tls_cipher_suites:
       {{- toYaml .spec.kubernetes.advanced.encryption.tlsCipherSuites | nindent 6 }}
+    {{- end }}
+    {{- if (index .spec.kubernetes.advanced.encryption "tlsCipherSuitesKubelet") }}
+    kubelet_tls_cipher_suites:
+      {{- toYaml .spec.kubernetes.advanced.encryption.tlsCipherSuitesKubelet | nindent 6 }}
     {{- end }}
     {{- if (index .spec.kubernetes.advanced.encryption "configuration") }}
     kubernetes_encryption_config: "./encryption-config.yaml"

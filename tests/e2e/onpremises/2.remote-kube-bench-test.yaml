@@ -1,0 +1,103 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Kube-bench Security Testing - Run CIS Kubernetes Benchmark
+  hosts: controlplane_nodes,worker_nodes
+  gather_facts: false
+
+  tasks:
+    - name: Install required packages
+      apt:
+        name:
+          - git
+          - curl
+        state: present
+        update_cache: yes
+
+    - name: Clone installer-on-premises repository for kube-bench config
+      ansible.builtin.git:
+        repo: https://github.com/sighupio/installer-on-premises.git
+        dest: /tmp/installer-on-premises
+        version: main
+        force: yes
+
+    - name: Create kube-bench configuration directory
+      ansible.builtin.file:
+        path: /etc/kube-bench/cfg
+        state: directory
+        mode: '0755'
+
+    - name: Copy kube-bench configuration from sighupio repository
+      ansible.builtin.copy:
+        src: /tmp/installer-on-premises/utils/kube-bench/
+        dest: /etc/kube-bench/cfg/
+        remote_src: yes
+        mode: '0644'
+
+    - name: Download kube-bench binary
+      ansible.builtin.get_url:
+        url: "https://github.com/aquasecurity/kube-bench/releases/download/v0.12.0/kube-bench_0.12.0_linux_amd64.tar.gz"
+        dest: /tmp/kube-bench_0.12.0_linux_amd64.tar.gz
+        mode: '0644'
+
+    - name: Extract kube-bench binary
+      ansible.builtin.unarchive:
+        src: /tmp/kube-bench_0.12.0_linux_amd64.tar.gz
+        dest: /tmp/
+        remote_src: yes
+
+    - name: Make kube-bench executable
+      ansible.builtin.file:
+        path: /tmp/kube-bench
+        mode: '0755'
+
+    - name: Copy kubeconfig from local cache to target nodes
+      ansible.builtin.copy:
+        src: "/cache/kubeconfig"
+        dest: "/root/kubeconfig"
+        mode: '0600'
+
+    - name: Slurp kubeconfig file
+      ansible.builtin.slurp:
+        src: "/root/kubeconfig"
+      register: kubeconfig_file
+
+    - name: Decode kubeconfig content
+      set_fact:
+        kubeconfig_decoded: "{{ kubeconfig_file.content | b64decode }}"
+
+    - name: Print kubeconfig file content
+      ansible.builtin.debug:
+        msg: "{{ kubeconfig_decoded }}"
+
+    - name: Run kube-bench security tests with sighupio configuration
+      ansible.builtin.shell: |
+        export KUBECONFIG=/root/kubeconfig
+        /tmp/kube-bench --config /etc/kube-bench/cfg/config.yaml --exit-code 1
+      register: kube_bench_output
+      failed_when: false  # We'll handle the failure ourselves to show output first
+
+    - name: Display kube-bench test results
+      ansible.builtin.debug:
+        msg: "{{ kube_bench_output.stdout_lines }}"
+
+    - name: Display kube-bench error output (if any)
+      ansible.builtin.debug:
+        msg: "{{ kube_bench_output.stderr_lines }}"
+      when: kube_bench_output.stderr_lines | length > 0
+
+    - name: Fail if kube-bench tests failed
+      ansible.builtin.fail:
+        msg: "Kube-bench security tests failed on {{ inventory_hostname }}. Exit code: {{ kube_bench_output.rc }}"
+      when: kube_bench_output.rc != 0
+
+    - name: Cleanup temporary files
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /tmp/kube-bench_0.12.0_linux_amd64.tar.gz
+        - /tmp/kube-bench
+        - /tmp/installer-on-premises
