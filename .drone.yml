@@ -83,7 +83,7 @@ steps:
     environment:
       NETRC_FILE:
         from_secret: NETRC_FILE
-      FURYCTL_VERSION: v0.32.3-rc.2
+      FURYCTL_VERSION: v0.32.5
       FURYCTL_CONFIG: tests/e2e/kfddistribution/manifests/furyctl-init-cluster.yaml
       FURYCTL_DISTRO_LOCATION: ./
       FURYCTL_OUTDIR: ./
@@ -109,7 +109,7 @@ steps:
       - /pluto detect distribution.yml --ignore-deprecations --target-versions=k8s=v1.32.0
 
 ---
-name: e2e-kfddistribution-1.32
+name: e2e-kfddistribution-1.33
 kind: pipeline
 type: docker
 
@@ -139,7 +139,7 @@ steps:
       - name: dockersock
         path: /var/run/docker.sock
     environment:
-      CLUSTER_VERSION: v1.32.2
+      CLUSTER_VERSION: v1.33.0
       CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}
       # /drone/src is the default workdir for the pipeline
       # using this folder we don't need to mount another
@@ -212,111 +212,111 @@ volumes:
   - name: dockersock
     host:
       path: /var/run/docker.sock
----
-# We test 1.31.1 -> 1.32.2 on a v1.32.x cluster, even though support for 1.32 isn't official in KFDDistribution 1.31.1.
-name: e2e-kfddistribution-1.31.1-to-1.32.0
-kind: pipeline
-type: docker
+# ---
+# # We test 1.32.0 -> 1.33.0 upgrade pipeline - COMMENTED OUT FOR STEP BY STEP APPROACH
+# name: e2e-kfddistribution-1.32.0-to-1.33.0
+# kind: pipeline
+# type: docker
 
-depends_on:
-  - qa
+# depends_on:
+#   - qa
 
-clone:
-  depth: 1
+# clone:
+#   depth: 1
 
-platform:
-  os: linux
-  arch: amd64
+# platform:
+#   os: linux
+#   arch: amd64
 
-trigger:
-  ref:
-    include:
-      - refs/tags/**
-    exclude:
-      - refs/tags/**-docs*
-      - refs/tags/e2e-eks-**
+# trigger:
+#   ref:
+#     include:
+#       - refs/tags/**
+#     exclude:
+#       - refs/tags/**-docs*
+#       - refs/tags/e2e-eks-**
 
-steps:
-  - name: create Kind cluster
-    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.27.0_1.32.2_5.6.0
-    pull: always
-    volumes:
-      - name: dockersock
-        path: /var/run/docker.sock
-    environment:
-      CLUSTER_VERSION: v1.31.1
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-upgrades
-      # /drone/src is the default workdir for the pipeline
-      # using this folder we don't need to mount another
-      # shared volume between the steps
-      KUBECONFIG: /drone/src/kubeconfig-upgrades
-    commands:
-      # create a custom config to disable Kind's default CNI so
-      # we can test using KFD's networking module.
-      - |
-        cat <<EOF > kind-config.yaml
-        kind: Cluster
-        apiVersion: kind.x-k8s.io/v1alpha4
-        networking:
-          disableDefaultCNI: true
-        nodes:
-          - role: control-plane
-          - role: worker
-          - role: worker
-        EOF
-      # NOTE: kind's `--wait` flag that waits for the control-plane ot be ready
-      # does not work when disabling the default CNI. It will always go in timeout.
-      - kind create cluster --name $${CLUSTER_NAME} --image registry.sighup.io/fury/kindest/node:$${CLUSTER_VERSION} --config kind-config.yaml
-      # save the kubeconfig so we can use it from other steps.
-      - kind get kubeconfig --name $${CLUSTER_NAME} > $${KUBECONFIG}
+# steps:
+#   - name: create Kind cluster
+#     image: quay.io/sighup/dind-kind-kubectl-kustomize:0.27.0_1.32.2_5.6.0
+#     pull: always
+#     volumes:
+#       - name: dockersock
+#         path: /var/run/docker.sock
+#     environment:
+#       CLUSTER_VERSION: v1.32.2
+#       CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-upgrades
+#       # /drone/src is the default workdir for the pipeline
+#       # using this folder we don't need to mount another
+#       # shared volume between the steps
+#       KUBECONFIG: /drone/src/kubeconfig-upgrades
+#     commands:
+#       # create a custom config to disable Kind's default CNI so
+#       # we can test using KFD's networking module.
+#       - |
+#         cat <<EOF > kind-config.yaml
+#         kind: Cluster
+#         apiVersion: kind.x-k8s.io/v1alpha4
+#         networking:
+#           disableDefaultCNI: true
+#         nodes:
+#           - role: control-plane
+#           - role: worker
+#           - role: worker
+#         EOF
+#       # NOTE: kind's `--wait` flag that waits for the control-plane ot be ready
+#       # does not work when disabling the default CNI. It will always go in timeout.
+#       - kind create cluster --name $${CLUSTER_NAME} --image registry.sighup.io/fury/kindest/node:$${CLUSTER_VERSION} --config kind-config.yaml
+#       # save the kubeconfig so we can use it from other steps.
+#       - kind get kubeconfig --name $${CLUSTER_NAME} > $${KUBECONFIG}
 
-  - name: e2e-kfddistribution
-    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
-    pull: always
-    # we need to use host network to access Kind API port that is listening on the worker's loopback
-    # beacuse we mount the host's Docker socket to run Kind.
-    network_mode: host
-    environment:
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-upgrades
-      KUBECONFIG: /drone/src/kubeconfig-upgrades
-      FURYCTL_VERSION: v0.32.3-rc.2
-    depends_on: [create Kind cluster]
-    commands:
-      - export KUBECONFIG=/drone/src/kubeconfig-upgrades
-      # We change the loopback IP in the kubeconfig to use the service hostname and keep the port.
-      # - 'sed -Ei "s#(server: https://)(.*)(:.*)#\1kind-cluster\3#" $${KUBECONFIG}'
-      - echo "Installing the correct furyctl version..."
-      - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-$(uname -s)-amd64.tar.gz" -o /tmp/furyctl.tar.gz && tar xfz /tmp/furyctl.tar.gz -C /tmp
-      # to use furyctl latest, use the following instead:
-      # - curl -L "https://github.com/sighupio/furyctl/releases/latest/download/furyctl-$(uname -s)-amd64.tar.gz" -o /tmp/furyctl.tar.gz && tar xfz /tmp/furyctl.tar.gz -C /tmp
-      - chmod +x /tmp/furyctl
-      # check that the kind cluster is ready before we move on
-      # - kubectl wait --timeout=180s --for=condition=ready pod --all -n kube-system
-      - until kubectl get serviceaccount default > /dev/null 2>&1; do echo "waiting for control-plane" && sleep 1; done
-      # finally, run the e2e tests
-      - tests/e2e/kfddistribution/e2e-kfddistribution-upgrades.sh
+#   - name: e2e-kfddistribution
+#     image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
+#     pull: always
+#     # we need to use host network to access Kind API port that is listening on the worker's loopback
+#     # beacuse we mount the host's Docker socket to run Kind.
+#     network_mode: host
+#     environment:
+#       CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-upgrades
+#       KUBECONFIG: /drone/src/kubeconfig-upgrades
+#       FURYCTL_VERSION: v0.32.5
+#     depends_on: [create Kind cluster]
+#     commands:
+#       - export KUBECONFIG=/drone/src/kubeconfig-upgrades
+#       # We change the loopback IP in the kubeconfig to use the service hostname and keep the port.
+#       # - 'sed -Ei "s#(server: https://)(.*)(:.*)#\1kind-cluster\3#" $${KUBECONFIG}'
+#       - echo "Installing the correct furyctl version..."
+#       - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-$(uname -s)-amd64.tar.gz" -o /tmp/furyctl.tar.gz && tar xfz /tmp/furyctl.tar.gz -C /tmp
+#       # to use furyctl latest, use the following instead:
+#       # - curl -L "https://github.com/sighupio/furyctl/releases/latest/download/furyctl-$(uname -s)-amd64.tar.gz" -o /tmp/furyctl.tar.gz && tar xfz /tmp/furyctl.tar.gz -C /tmp
+#       - chmod +x /tmp/furyctl
+#       # check that the kind cluster is ready before we move on
+#       # - kubectl wait --timeout=180s --for=condition=ready pod --all -n kube-system
+#       - until kubectl get serviceaccount default > /dev/null 2>&1; do echo "waiting for control-plane" && sleep 1; done
+#       # finally, run the e2e tests
+#       - tests/e2e/kfddistribution/e2e-kfddistribution-upgrades.sh
 
-  - name: delete-kind-cluster
-    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.27.0_1.32.2_5.6.0
-    volumes:
-      - name: dockersock
-        path: /var/run/docker.sock
-    environment:
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-upgrades
-    commands:
-      # does not matter if the command fails
-      - kind delete cluster --name $${CLUSTER_NAME} || true
-    depends_on:
-      - e2e-kfddistribution
-    when:
-      status:
-        - success
-        - failure
+#   - name: delete-kind-cluster
+#     image: quay.io/sighup/dind-kind-kubectl-kustomize:0.27.0_1.32.2_5.6.0
+#     volumes:
+#       - name: dockersock
+#         path: /var/run/docker.sock
+#     environment:
+#       CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-upgrades
+#     commands:
+#       # does not matter if the command fails
+#       - kind delete cluster --name $${CLUSTER_NAME} || true
+#     depends_on:
+#       - e2e-kfddistribution
+#     when:
+#       status:
+#         - success
+#         - failure
 
-volumes:
-  - name: dockersock
-    host:
-      path: /var/run/docker.sock
+# volumes:
+#   - name: dockersock
+#     host:
+#       path: /var/run/docker.sock
 ---
 name: e2e-ekscluster-1.32.0
 kind: pipeline
@@ -974,8 +974,8 @@ kind: pipeline
 type: docker
 
 depends_on:
-  - e2e-kfddistribution-1.32
-  - e2e-kfddistribution-1.31.1-to-1.32.0
+  - e2e-kfddistribution-1.33
+  # - e2e-kfddistribution-1.32.0-to-1.33.0  # init only to start
 
 platform:
   os: linux
