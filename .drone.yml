@@ -55,7 +55,7 @@ steps:
     environment:
       NETRC_FILE:
         from_secret: NETRC_FILE
-      FURYCTL_VERSION: v0.32.3-rc.2
+      FURYCTL_VERSION: v0.32.5
       FURYCTL_CONFIG: tests/e2e/kfddistribution/manifests/furyctl-init-cluster.yaml
       FURYCTL_DISTRO_LOCATION: ./
       FURYCTL_OUTDIR: ./
@@ -81,7 +81,7 @@ steps:
       - /pluto detect distribution.yml --ignore-deprecations --target-versions=k8s=v1.32.0
 
 ---
-name: e2e-kfddistribution-1.32
+name: e2e-kfddistribution-1.33
 kind: pipeline
 type: docker
 
@@ -111,7 +111,7 @@ steps:
       - name: dockersock
         path: /var/run/docker.sock
     environment:
-      CLUSTER_VERSION: v1.32.2
+      CLUSTER_VERSION: v1.33.0
       CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}
       # /drone/src is the default workdir for the pipeline
       # using this folder we don't need to mount another
@@ -185,8 +185,8 @@ volumes:
     host:
       path: /var/run/docker.sock
 ---
-# We test 1.31.1 -> 1.32.2 on a v1.32.x cluster, even though support for 1.32 isn't official in KFDDistribution 1.31.1.
-name: e2e-kfddistribution-1.31.1-to-1.32.0
+# We test 1.32.0 -> 1.33.0 upgrade pipeline
+name: e2e-kfddistribution-1.32.0-to-1.33.0
 kind: pipeline
 type: docker
 
@@ -216,7 +216,7 @@ steps:
       - name: dockersock
         path: /var/run/docker.sock
     environment:
-      CLUSTER_VERSION: v1.31.1
+      CLUSTER_VERSION: v1.32.2
       CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-upgrades
       # /drone/src is the default workdir for the pipeline
       # using this folder we don't need to mount another
@@ -251,7 +251,7 @@ steps:
     environment:
       CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-upgrades
       KUBECONFIG: /drone/src/kubeconfig-upgrades
-      FURYCTL_VERSION: v0.32.3-rc.2
+      FURYCTL_VERSION: v0.32.5
     depends_on: [create Kind cluster]
     commands:
       - export KUBECONFIG=/drone/src/kubeconfig-upgrades
