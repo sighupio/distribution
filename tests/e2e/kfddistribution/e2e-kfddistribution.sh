@@ -16,15 +16,15 @@ echo "Executing furyctl cleanup all modules and configurations"
 /tmp/furyctl create cluster --config tests/e2e/kfddistribution/manifests/furyctl-cleanup-all.yaml --outdir "$PWD" --distro-location ./ --skip-deps-download --force all --disable-analytics
 bats -t tests/e2e/kfddistribution/e2e-kfddistribution-cleanup-all.sh
 
-# echo "----------------------------------------------------------------------------" 
-# echo "Patching the furyctl-init-cluster.yaml to use the secured registry"
-# yq e -i '.spec.distribution.common.registry = "registry.sighup.io/fury-secured"' tests/e2e/kfddistribution/manifests/furyctl-init-cluster.yaml
+echo "----------------------------------------------------------------------------" 
+echo "Patching the furyctl-init-cluster.yaml to use the secured registry"
+yq e -i '.spec.distribution.common.registry = "registry.sighup.io/fury-secured"' tests/e2e/kfddistribution/manifests/furyctl-init-cluster.yaml
 
-# echo "----------------------------------------------------------------------------"
-# echo "Executing furyctl with the secured registry"
-# /tmp/furyctl create cluster --config tests/e2e/kfddistribution/manifests/furyctl-init-cluster.yaml --outdir "$PWD" --distro-location ./ --force all --disable-analytics
-# echo "Testing that the components are running"
-# bats -t tests/e2e/kfddistribution/e2e-kfddistribution-init-cluster.sh
+echo "----------------------------------------------------------------------------"
+echo "Executing furyctl with the secured registry"
+/tmp/furyctl create cluster --config tests/e2e/kfddistribution/manifests/furyctl-init-cluster.yaml --outdir "$PWD" --distro-location ./ --force all --disable-analytics
+echo "Testing that the components are running"
+bats -t tests/e2e/kfddistribution/e2e-kfddistribution-init-cluster.sh
 
 echo "----------------------------------------------------------------------------"
 echo "Patching furyctl-init-cluster.yaml back to the default registry"
