@@ -773,7 +773,8 @@ volumes:
 - name: cache
   temp: {}
 # ---
-# name: e2e-onpremises-upgrades-1.31.1-1.32.0
+# # On-premises upgrade pipeline - only the init for the first run
+# name: e2e-onpremises-upgrades-1.32.0-1.33.0
 # kind: pipeline
 # type: docker
 
@@ -796,8 +797,8 @@ volumes:
 # - name: create-hetzner-infrastructure
 #   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
 #   environment:
-#     FURYCTL_VERSION: "v0.32.3-rc.2"
-#     DISTRIBUTION_VERSION: "v1.31.1"
+#     FURYCTL_VERSION: "v0.32.5"
+#     DISTRIBUTION_VERSION: "v1.32.0"
 #     DEBIAN_FRONTEND: noninteractive
 #     AWS_ACCESS_KEY_ID:
 #       from_secret: aws_access_key_id
@@ -818,11 +819,11 @@ volumes:
 #     - name: cache-upgrades
 #       path: /cache
 
-# - name: install-cluster-1.31.1-with-furyctl
+# - name: install-cluster-1.32.0-with-furyctl
 #   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
 #   environment:
-#     FURYCTL_VERSION: "v0.32.3-rc.2"
-#     DISTRIBUTION_VERSION: "v1.31.1" # distribution version is hardcoded in the tofu outputs
+#     FURYCTL_VERSION: "v0.32.5"
+#     DISTRIBUTION_VERSION: "v1.32.0" # distribution version is hardcoded in the tofu outputs
 #     DEBIAN_FRONTEND: noninteractive
 #     AWS_ACCESS_KEY_ID:
 #       from_secret: aws_access_key_id
@@ -839,7 +840,7 @@ volumes:
 #   volumes:
 #     - name: cache-upgrades
 #       path: /cache
-    
+
 # - name: bats-tests
 #   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
 #   environment:
@@ -850,11 +851,11 @@ volumes:
 #     - name: cache-upgrades
 #       path: /cache
 
-# - name: upgrade-cluster-to-1.32.0-with-furyctl
+# - name: upgrade-cluster-to-1.33.0-with-furyctl
 #   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
 #   environment:
-#     FURYCTL_VERSION: "v0.32.3-rc.2"
-#     DISTRIBUTION_VERSION: "v1.32.0" # distribution version is hardcoded in the tofu outputs
+#     FURYCTL_VERSION: "v0.32.5"
+#     DISTRIBUTION_VERSION: "v1.33.0" # distribution version is hardcoded in the tofu outputs
 #     DEBIAN_FRONTEND: noninteractive
 #     AWS_ACCESS_KEY_ID:
 #       from_secret: aws_access_key_id
@@ -871,7 +872,7 @@ volumes:
 #   volumes:
 #     - name: cache-upgrades
 #       path: /cache
-    
+
 # - name: bats-tests-upgrades
 #   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
 #   environment:
@@ -885,9 +886,9 @@ volumes:
 # - name: delete
 #   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
 #   environment:
-#     FURYCTL_VERSION: "v0.32.3-rc.2"
+#     FURYCTL_VERSION: "v0.32.5"
 #     DEBIAN_FRONTEND: noninteractive
-#     DISTRIBUTION_VERSION: "v1.32.0"
+#     DISTRIBUTION_VERSION: "v1.33.0"
 #     AWS_ACCESS_KEY_ID:
 #       from_secret: aws_access_key_id
 #     AWS_SECRET_ACCESS_KEY:
@@ -962,6 +963,7 @@ depends_on:
   - e2e-kfddistribution-1.32
   - e2e-kfddistribution-1.31.1-to-1.32.0
   - e2e-onpremises
+  # - e2e-onpremises-upgrades-1.32.0-1.33.0  # COMMENTED OUT FOR STEP BY STEP APPROACH
 
 platform:
   os: linux
