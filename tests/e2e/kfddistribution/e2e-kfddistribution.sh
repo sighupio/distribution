@@ -7,7 +7,7 @@ set -e
 
 echo "----------------------------------------------------------------------------"
 echo "Executing furyctl for the initial setup"
-/tmp/furyctl create cluster --config tests/e2e/kfddistribution/manifests/furyctl-init-cluster.yaml --outdir "$PWD" --distro-location ./ --force all --disable-analytics
+/tmp/furyctl create cluster --config tests/e2e/kfddistribution/manifests/furyctl-init-cluster.yaml --outdir "$PWD" --distro-location ./ --force all --disable-analytics -D
 echo "Testing that the components are running"
 bats -t tests/e2e/kfddistribution/e2e-kfddistribution-init-cluster.sh
 
