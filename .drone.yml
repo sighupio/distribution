@@ -294,8 +294,8 @@ name: e2e-ekscluster-1.32.0
 kind: pipeline
 type: docker
 
-node:
-   performance: low
+# node:
+#    performance: low
 
 depends_on:
   - qa
@@ -385,8 +385,8 @@ name: e2e-ekscluster-selfmanaged-alinux2023-nodes-1.32.0
 kind: pipeline
 type: docker
 
-node:
-   performance: low
+# node:
+#    performance: low
 
 depends_on:
   - qa
@@ -475,8 +475,8 @@ name: e2e-ekscluster-upgrades-1.32.0-1.33.0
 kind: pipeline
 type: docker
 
-node:
-   performance: low
+# node:
+#    performance: low
 
 depends_on:
   - qa
