@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/sighupio/fury-distribution/v1.32.0/schemas/public/ekscluster-kfd-v1alpha2.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/sighupio/distribution/v1.32.0/schemas/public/ekscluster-kfd-v1alpha2.json
 # Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
@@ -63,8 +63,12 @@ spec:
         - 0.0.0.0/0
       publicAccessCidrs:
         - 0.0.0.0/0
+    nodePoolsCommon:
+      metadataHttpEndpoint: enabled
+      metadataHttpTokens: required
+      #metadataHttpPutResponseHopLimit: 2
     nodePools:
-      - name: infra
+      - name: infra-alinux2023
         type: eks-managed
         size:
           min: 6
@@ -75,11 +79,13 @@ spec:
           volumeSize: 50
           volumeType: gp2
         labels:
-          nodepool: infra
+          nodepool: infra-alinux2023
           node.kubernetes.io/role: infra
+          os-type: alinux2023
         tags:
-          k8s.io/cluster-autoscaler/node-template/label/nodepool: worker
-          k8s.io/cluster-autoscaler/node-template/label/node.kubernetes.io/role: worker
+          k8s.io/cluster-autoscaler/node-template/label/nodepool: infra-alinux2023
+          k8s.io/cluster-autoscaler/node-template/label/node.kubernetes.io/role: infra
+          k8s.io/cluster-autoscaler/node-template/label/os-type: alinux2023
     awsAuth:
       additionalAccounts: []
       users: []
