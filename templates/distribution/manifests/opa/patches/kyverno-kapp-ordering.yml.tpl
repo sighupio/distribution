@@ -85,5 +85,6 @@ metadata:
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
 metadata:
+  name: disallow-latest-tag
   annotations:
     kapp.k14s.io/change-rule: "upsert after upserting customresourcedefinition/clusterpolicies.kyverno.io"
