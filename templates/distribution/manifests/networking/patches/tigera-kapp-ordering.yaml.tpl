@@ -10,14 +10,6 @@ metadata:
   annotations:
     kapp.k14s.io/change-group: "tigera-core"
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  name: tigera-operator
-  namespace: tigera-operator
-  annotations:
-    kapp.k14s.io/change-group: "tigera-core"
----
 apiVersion: operator.tigera.io/v1
 kind: Installation
 metadata:
