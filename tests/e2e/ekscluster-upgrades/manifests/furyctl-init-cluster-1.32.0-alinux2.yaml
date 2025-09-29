@@ -56,10 +56,6 @@ spec:
     nodeAllowedSshPublicKey: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA1xMG9TEH97YhkmoehlMaAMwqi9NOIx2ItXKNv2KVnI
     nodePoolGlobalAmiType: alinux2
     nodePoolsLaunchKind: launch_templates
-    nodePoolsCommon:
-      metadataHttpEndpoint: enabled
-      metadataHttpTokens: required
-      #metadataHttpPutResponseHopLimit: 2
     apiServer:
       privateAccess: true
       publicAccess: true
