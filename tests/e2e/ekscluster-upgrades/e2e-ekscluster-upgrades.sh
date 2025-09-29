@@ -15,7 +15,7 @@ echo "--------------------------------------------------------------------------
 echo "Executing nodepool migration to alinux2023 (with 1.32.0)"
 FURYCTL_YAML=tests/e2e/ekscluster-upgrades/manifests/furyctl-migrate-nodepool-1.32.0-alinux2023.yaml
 tests/e2e/ekscluster/replace_variables.sh --cluster-name "$CLUSTER_NAME" --furyctl-yaml "$FURYCTL_YAML"
-tests/e2e/ekscluster-upgrades/furyctl_upgrade.expect $FURYCTL_YAML /tmp ./
+/drone/src/tests/e2e/ekscluster/furyctl_apply.expect $FURYCTL_YAML /tmp
 
 echo "----------------------------------------------------------------------------"
 echo "Executing version upgrade to 1.33.0 (with alinux2023)"
