@@ -962,8 +962,8 @@ kind: pipeline
 type: docker
 
 depends_on:
-  - e2e-kfddistribution-1.32
-  - e2e-kfddistribution-1.31.1-to-1.32.0
+  - e2e-kfddistribution-1.33
+  - e2e-kfddistribution-1.32.0-to-1.33.0
   - e2e-onpremises
   - e2e-onpremises-upgrades-1.32.0-1.33.0
 
