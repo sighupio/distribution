@@ -59,6 +59,7 @@ resources:
 
 patches:
   - path: patches/infra-nodes.yml
+  - path: patches/logging-kapp-ordering.yml
 {{- if or $fluentdReplicas $fluentdResources $fluentbitResources }}
   - path: patches/logging-operated-resources.yaml
 {{- end }}

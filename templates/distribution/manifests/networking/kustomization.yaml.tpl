@@ -27,7 +27,6 @@ resources:
 patchesStrategicMerge:
 {{- if eq .spec.distribution.common.provider.type "eks" }}
   - patches/infra-nodes-and-mask-tigera.yaml
-  - patches/tigera-kapp-ordering.yaml
 {{- end }}
 {{- if eq .spec.distribution.common.provider.type "none" }}
   {{- if eq .spec.distribution.modules.networking.type "calico" }}
