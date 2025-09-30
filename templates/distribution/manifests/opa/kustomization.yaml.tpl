@@ -40,9 +40,6 @@ patchesStrategicMerge:
 {{- if eq .spec.distribution.modules.policy.type "gatekeeper" }}
   - patches/gatekeeper-kapp-ordering.yml
 {{- end }}
-{{- if eq .spec.distribution.modules.policy.type "kyverno" }}
-  - patches/kyverno-kapp-ordering.yml
-{{- end }}
 
 patches:
 {{- if eq .spec.distribution.modules.policy.type "kyverno" }}
