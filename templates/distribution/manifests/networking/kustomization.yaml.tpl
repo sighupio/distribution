@@ -11,7 +11,7 @@ resources:
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/networking/katalog/tigera/eks-policy-only" }}
 {{- end }}
 
-{{- if eq .spec.distribution.common.provider.type "none" }}{{/* none == on-prem */}}
+{{- if eq .spec.distribution.common.provider.type "none" }}{{/* none == on-prem, kfddistribution */}}
     {{- if eq .spec.distribution.modules.networking.type "calico" }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/networking/katalog/tigera/on-prem" }}
   - resources/calico-ns.yml
@@ -24,23 +24,13 @@ resources:
     {{- end }}
 {{- end }}
 
-patchesStrategicMerge:
+patches:
 {{- if eq .spec.distribution.common.provider.type "eks" }}
-  - patches/infra-nodes-and-mask-tigera.yaml
+  - path: patches/infra-nodes-and-mask-tigera.yaml
 {{- end }}
 {{- if eq .spec.distribution.common.provider.type "none" }}
   {{- if eq .spec.distribution.modules.networking.type "calico" }}
-  - patches/infra-nodes-and-mask-tigera.yaml
-  {{- end }}
-  {{- if eq .spec.distribution.modules.networking.type "cilium" }}
-  - patches/infra-nodes-distro-cilium.yaml
-  {{- end }}
-{{- end }}
-
-{{- if eq .spec.distribution.common.provider.type "none" }}
-  {{- if eq .spec.distribution.modules.networking.type "calico" }}
-
-patchesJson6902:
+  - path: patches/infra-nodes-and-mask-tigera.yaml
   - target:
       group: apps
       version: v1
@@ -48,10 +38,9 @@ patchesJson6902:
       name: tigera-operator
       namespace: tigera-operator
     path: patchesjson/tigera-tolerations.yaml
-
-  {{- else if eq .spec.distribution.modules.networking.type "cilium" }}
-
-patchesJson6902:
+  {{- end }}
+  {{- if eq .spec.distribution.modules.networking.type "cilium" }}
+  - path: patches/infra-nodes-distro-cilium.yaml
   - target:
       group: apps
       version: v1
@@ -59,13 +48,16 @@ patchesJson6902:
       name: cilium-operator
       namespace: kube-system
     path: patchesjson/cilium-operator-tolerations.yaml
+  {{- end }}
+{{- end }}
 
+{{- if eq .spec.distribution.common.provider.type "none" }}
+  {{- if eq .spec.distribution.modules.networking.type "cilium" }}
 configMapGenerator:
   - behavior: merge
     envs:
     - patches/cilium.env
     name: cilium-config
     namespace: kube-system
-
   {{- end }}
 {{- end }}
