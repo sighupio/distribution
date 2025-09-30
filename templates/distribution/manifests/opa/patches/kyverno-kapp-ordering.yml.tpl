@@ -53,37 +53,30 @@ metadata:
 apiVersion: v1
 kind: Service
 metadata:
-  name: kyverno-background-controller-metrics
-  namespace: kyverno
-  annotations:
-    kapp.k14s.io/change-group: "kyverno-core"
----
-apiVersion: v1
-kind: Service
-metadata:
   name: kyverno-cleanup-controller
   namespace: kyverno
   annotations:
     kapp.k14s.io/change-group: "kyverno-core"
 ---
-apiVersion: v1
-kind: Service
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
 metadata:
-  name: kyverno-cleanup-controller-metrics
-  namespace: kyverno
+  name: kyverno-mutating-webhook-configuration
   annotations:
-    kapp.k14s.io/change-group: "kyverno-core"
+    kapp.k14s.io/change-group: "kyverno-webhooks"
+    kapp.k14s.io/change-rule: "upsert after upserting kyverno-core"
 ---
-apiVersion: v1
-kind: Service
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
 metadata:
-  name: kyverno-reports-controller-metrics
-  namespace: kyverno
+  name: kyverno-validating-webhook-configuration
   annotations:
-    kapp.k14s.io/change-group: "kyverno-core"
+    kapp.k14s.io/change-group: "kyverno-webhooks"
+    kapp.k14s.io/change-rule: "upsert after upserting kyverno-core"
 ---
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
 metadata:
   annotations:
-    kapp.k14s.io/change-rule: "upsert after upserting customresourcedefinition/clusterpolicies.kyverno.io"
+    kapp.k14s.io/change-group: "kyverno-policies"
+    kapp.k14s.io/change-rule: "upsert after upserting kyverno-webhooks"
