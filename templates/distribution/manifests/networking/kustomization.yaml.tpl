@@ -26,28 +26,28 @@ resources:
 
 patches:
 {{- if eq .spec.distribution.common.provider.type "eks" }}
-  - path: patches/infra-nodes-and-mask-tigera.yaml
+  - path: patches/tigera/infra-nodes-and-mask.yaml
 {{- end }}
 {{- if eq .spec.distribution.common.provider.type "none" }}
   {{- if eq .spec.distribution.modules.networking.type "calico" }}
-  - path: patches/infra-nodes-and-mask-tigera.yaml
+  - path: patches/tigera/infra-nodes-and-mask.yaml
   - target:
       group: apps
       version: v1
       kind: Deployment
       name: tigera-operator
       namespace: tigera-operator
-    path: patchesjson/tigera-tolerations.yaml
+    path: patches/tigera/tigera-operator-tolerations.yaml
   {{- end }}
   {{- if eq .spec.distribution.modules.networking.type "cilium" }}
-  - path: patches/infra-nodes-distro-cilium.yaml
+  - path: patches/cilium/infra-nodes.yaml
   - target:
       group: apps
       version: v1
       kind: Deployment
       name: cilium-operator
       namespace: kube-system
-    path: patchesjson/cilium-operator-tolerations.yaml
+    path: patches/cilium/cilium-operator-tolerations.yaml
   {{- end }}
 {{- end }}
 
@@ -56,7 +56,7 @@ patches:
 configMapGenerator:
   - behavior: merge
     envs:
-    - patches/cilium.env
+    - patches/cilium/cilium-config.env
     name: cilium-config
     namespace: kube-system
   {{- end }}
