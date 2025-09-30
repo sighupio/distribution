@@ -290,7 +290,7 @@ volumes:
     host:
       path: /var/run/docker.sock
 ---
-name: e2e-ekscluster-1.32.0
+name: e2e-ekscluster-1.33.0
 kind: pipeline
 type: docker
 
@@ -314,7 +314,7 @@ steps:
   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
   environment:
     FURYCTL_VERSION: "v0.32.5"
-    DISTRIBUTION_VERSION: "v1.32.0"
+    DISTRIBUTION_VERSION: "v1.33.0"
     DEBIAN_FRONTEND: noninteractive
     CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}
     AWS_ACCESS_KEY_ID:
@@ -335,10 +335,10 @@ steps:
 - name: furyctl-delete
   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
   environment:
-    FURYCTL_VERSION: "v0.32.3-rc.2"
+    FURYCTL_VERSION: "v0.32.5"
     CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}
     DEBIAN_FRONTEND: noninteractive
-    DISTRIBUTION_VERSION: "v1.32.0"
+    DISTRIBUTION_VERSION: "v1.33.0"
     AWS_ACCESS_KEY_ID:
       from_secret: aws_access_key_id
     AWS_SECRET_ACCESS_KEY:
@@ -358,7 +358,7 @@ steps:
 - name: furyctl-delete-force
   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
   environment:
-    FURYCTL_VERSION: "v0.32.3-rc.2"
+    FURYCTL_VERSION: "v0.32.5"
     CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-upgrades
     DEBIAN_FRONTEND: noninteractive
     DISTRIBUTION_VERSION: "v1.32.0"
@@ -375,7 +375,7 @@ steps:
     - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-linux-amd64.tar.gz" | tar -xz
     - mv furyctl /usr/local/bin
     - chmod +x /usr/local/bin/furyctl
-    - tests/e2e/ekscluster/furyctl_delete_force.expect tests/e2e/ekscluster-upgrades/manifests/furyctl-init-cluster-1.31.1.yaml
+    - tests/e2e/ekscluster/furyctl_delete_force.expect $(cat ./last_furyctl_yaml.txt)
     - aws s3 rm s3://e2e-drone-eks/$CLUSTER_NAME --recursive
   when:
     status:
@@ -403,7 +403,7 @@ steps:
 - name: run-tests
   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
   environment:
-    FURYCTL_VERSION: "v0.32.3-rc.2"
+    FURYCTL_VERSION: "v0.32.5"
     DISTRIBUTION_VERSION: "v1.32.0"
     DEBIAN_FRONTEND: noninteractive
     CLUSTER_NAME: e2e-eks-selfmanaged-alinux2023-${DRONE_BUILD_NUMBER}
@@ -425,10 +425,10 @@ steps:
 - name: furyctl-delete
   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
   environment:
-    FURYCTL_VERSION: "v0.32.3-rc.2"
+    FURYCTL_VERSION: "v0.32.5"
     CLUSTER_NAME: e2e-eks-selfmanaged-alinux2023-${DRONE_BUILD_NUMBER}
     DEBIAN_FRONTEND: noninteractive
-    DISTRIBUTION_VERSION: "v1.32.0"
+    DISTRIBUTION_VERSION: "v1.33.0"
     AWS_ACCESS_KEY_ID:
       from_secret: aws_access_key_id
     AWS_SECRET_ACCESS_KEY:
@@ -448,7 +448,7 @@ steps:
 - name: furyctl-delete-force
   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
   environment:
-    FURYCTL_VERSION: "v0.32.3-rc.2"
+    FURYCTL_VERSION: "v0.32.5"
     CLUSTER_NAME: e2e-eks-selfmanaged-alinux2023-${DRONE_BUILD_NUMBER}-upgrades
     DEBIAN_FRONTEND: noninteractive
     DISTRIBUTION_VERSION: "v1.32.0"
@@ -465,7 +465,7 @@ steps:
     - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-linux-amd64.tar.gz" | tar -xz
     - mv furyctl /usr/local/bin
     - chmod +x /usr/local/bin/furyctl
-    - tests/e2e/ekscluster/furyctl_delete_force.expect tests/e2e/ekscluster-upgrades/manifests/furyctl-init-cluster-1.31.1.yaml
+    - tests/e2e/ekscluster/furyctl_delete_force.expect $(cat ./last_furyctl_yaml.txt)
     - aws s3 rm s3://e2e-drone-eks/$CLUSTER_NAME --recursive
   when:
     status:
