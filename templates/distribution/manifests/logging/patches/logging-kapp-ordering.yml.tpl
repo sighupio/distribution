@@ -7,4 +7,4 @@ kind: Logging
 metadata:
   name: infra
   annotations:
-    kapp.k14s.io/change-rule: "upsert after upserting apps/v1/Deployment/logging/logging-operator"
+    kapp.k14s.io/change-rule: "upsert after upserting customresourcedefinition/loggings.logging.banzaicloud.io"
