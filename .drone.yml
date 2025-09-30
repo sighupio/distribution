@@ -390,7 +390,7 @@ type: docker
 
 depends_on:
   - qa
-  - e2e-ekscluster-1.32.0
+  - e2e-ekscluster-1.33.0
   
 clone:
   depth: 1
