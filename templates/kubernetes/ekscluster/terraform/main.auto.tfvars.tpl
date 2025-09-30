@@ -104,6 +104,18 @@ workers_group_defaults = {
     metadata_http_put_response_hop_limit = {{ .spec.kubernetes.nodePoolsCommon.metadataHttpPutResponseHopLimit }}
   {{- end}}
 }
+
+node_groups_defaults = {
+  {{- if hasKeyAny .spec.kubernetes.nodePoolsCommon "metadataHttpEndpoint" }}
+    metadata_http_endpoint = {{ .spec.kubernetes.nodePoolsCommon.metadataHttpEndpoint | quote }}
+  {{- end}}
+  {{- if hasKeyAny .spec.kubernetes.nodePoolsCommon "metadataHttpTokens" }}
+    metadata_http_tokens = {{ .spec.kubernetes.nodePoolsCommon.metadataHttpTokens | quote }}
+  {{- end}}
+  {{- if hasKeyAny .spec.kubernetes.nodePoolsCommon "metadataHttpPutResponseHopLimit" }}
+    metadata_http_put_response_hop_limit = {{ .spec.kubernetes.nodePoolsCommon.metadataHttpPutResponseHopLimit }}
+  {{- end}}
+}
 {{- end }}
 
 {{- if gt (len .spec.kubernetes.nodePools) 0 }}

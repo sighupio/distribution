@@ -77,9 +77,11 @@ spec:
         labels:
           nodepool: infra
           node.kubernetes.io/role: infra
+          os-type: alinux2
         tags:
-          k8s.io/cluster-autoscaler/node-template/label/nodepool: worker
-          k8s.io/cluster-autoscaler/node-template/label/node.kubernetes.io/role: worker
+          k8s.io/cluster-autoscaler/node-template/label/nodepool: infra
+          k8s.io/cluster-autoscaler/node-template/label/node.kubernetes.io/role: infra
+          k8s.io/cluster-autoscaler/node-template/label/os-type: alinux2
     awsAuth:
       additionalAccounts: []
       users: []
