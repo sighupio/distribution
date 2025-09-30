@@ -16,4 +16,4 @@ metadata:
   name: default
   annotations:
     kapp.k14s.io/change-group: "tigera-installation"
-    kapp.k14s.io/change-rule: "upsert after upserting tigera-core and after upserting customresourcedefinition/installations.operator.tigera.io"
+    kapp.k14s.io/change-rule: "upsert after upserting tigera-core"
