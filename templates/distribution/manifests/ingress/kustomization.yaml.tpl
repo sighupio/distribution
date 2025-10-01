@@ -45,37 +45,31 @@ resources:
   - secrets/tls.yml
 {{- end }}
 
-patchesStrategicMerge:
-{{ if and (.spec.distribution.modules.ingress.certManager) (.spec.distribution.modules.ingress.certManager.clusterIssuer) }}
-
-{{- if and (eq .spec.distribution.modules.ingress.nginx.tls.provider "certManager") (eq .spec.distribution.modules.ingress.certManager.clusterIssuer.type "dns01") }}
-  - patches/cert-manager.yml
-{{- end }}
-
-  - patches/cert-manager-kapp-group.yml
-
+{{/* This patches section can probably be refactored */}}
+patches:
+{{- if and .spec.distribution.modules.ingress.certManager .spec.distribution.modules.ingress.certManager.clusterIssuer }}
+  {{- if and (eq .spec.distribution.modules.ingress.nginx.tls.provider "certManager") (eq .spec.distribution.modules.ingress.certManager.clusterIssuer.type "dns01") }}
+  - path: patches/cert-manager-sa-route53-role-arn.yml
+  {{- end }}
+  - path: patches/cert-manager-kapp-group.yml
   # cert-manager is always deployed, so we need to patch at least it to include the selectors
-  - patches/infra-nodes.yml
-
+  - path: patches/infra-nodes.yml
 {{- end }}
 
 {{- if eq .spec.distribution.common.provider.type "eks" }}
+  {{- if eq .spec.distribution.modules.ingress.nginx.type "dual" }}
+  - path: patches/eks-ingress-nginx-external.yml
+  - path: patches/eks-ingress-nginx-internal.yml
+  {{- else if eq .spec.distribution.modules.ingress.nginx.type "single" }}
+  - path: patches/eks-ingress-nginx.yml
+  {{- end }}
 
-{{- if eq .spec.distribution.modules.ingress.nginx.type "dual" }}
-  - patches/eks-ingress-nginx-external.yml
-  - patches/eks-ingress-nginx-internal.yml
-{{- else if eq .spec.distribution.modules.ingress.nginx.type "single" }}
-  - patches/eks-ingress-nginx.yml
-{{- end }}
-
-{{- if ne .spec.distribution.modules.ingress.nginx.type "none" }}
-  - patches/external-dns.yml
-{{- end }}
-
+  {{- if ne .spec.distribution.modules.ingress.nginx.type "none" }}
+  - path: patches/external-dns.yml
+  {{- end }}
 {{- end }}
 
 {{ if eq .spec.distribution.modules.ingress.nginx.tls.provider "certManager" -}}
-patchesJson6902:
   - target:
       group: apps
       version: v1
@@ -90,8 +84,8 @@ patchesJson6902:
         path: /spec/template/spec/containers/0/args/-
         value: "--dns01-recursive-nameservers=8.8.8.8:53,1.1.1.1:53"
 {{- end }}
+
 {{ if eq .spec.distribution.modules.ingress.nginx.tls.provider "secret" }}
-patchesJson6902:
   {{- if eq .spec.distribution.modules.ingress.nginx.type "dual" }}
   - target:
       group: apps
