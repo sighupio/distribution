@@ -14,14 +14,12 @@ resources:
 {{- end }}
 
 {{- if eq .spec.distribution.common.provider.type "eks" }}
-
-{{- if eq .spec.distribution.modules.ingress.nginx.type "dual" }}
+  {{- if eq .spec.distribution.modules.ingress.nginx.type "dual" }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/ingress/katalog/external-dns/private" }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/ingress/katalog/external-dns/public" }}
-{{- else if eq .spec.distribution.modules.ingress.nginx.type "single" }}
+  {{- else if eq .spec.distribution.modules.ingress.nginx.type "single" }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/ingress/katalog/external-dns/public" }}
-{{- end }}
-
+  {{- end }}
 {{- end }}
 
 {{- if and (eq .spec.distribution.common.networkPoliciesEnabled true) (or (eq .spec.distribution.modules.ingress.nginx.tls.provider "certManager") (ne .spec.distribution.modules.ingress.nginx.type "none")) }}
@@ -41,7 +39,7 @@ resources:
   - resources/ingress-infra.yml
 {{- end }}
 
-{{ if and (eq .spec.distribution.modules.ingress.nginx.tls.provider "secret") (ne .spec.distribution.modules.ingress.nginx.type "none") }}
+{{- if and (eq .spec.distribution.modules.ingress.nginx.tls.provider "secret") (ne .spec.distribution.modules.ingress.nginx.type "none") }}
   - secrets/tls.yml
 {{- end }}
 
@@ -69,7 +67,7 @@ patches:
   {{- end }}
 {{- end }}
 
-{{ if eq .spec.distribution.modules.ingress.nginx.tls.provider "certManager" -}}
+{{- if eq .spec.distribution.modules.ingress.nginx.tls.provider "certManager" }}
   - target:
       group: apps
       version: v1
@@ -85,7 +83,7 @@ patches:
         value: "--dns01-recursive-nameservers=8.8.8.8:53,1.1.1.1:53"
 {{- end }}
 
-{{ if eq .spec.distribution.modules.ingress.nginx.tls.provider "secret" }}
+{{- if eq .spec.distribution.modules.ingress.nginx.tls.provider "secret" }}
   {{- if eq .spec.distribution.modules.ingress.nginx.type "dual" }}
   - target:
       group: apps
