@@ -139,7 +139,6 @@ Current supported versions of SD are:
 | [`1.33.0`](https://github.com/sighupio/distribution/releases/tag/v1.33.0) |      `1.33.x`      |
 | [`1.32.0`](https://github.com/sighupio/distribution/releases/tag/v1.32.0) |      `1.32.x`      |
 | [`1.31.1`](https://github.com/sighupio/distribution/releases/tag/v1.31.1) |      `1.31.x`      |
-| [`1.30.2`](https://github.com/sighupio/distribution/releases/tag/v1.30.2) |      `1.30.x`      |
 
 Check the [compatibility matrix][compatibility-matrix] for additional information about previous releases of the Distribution and the compatibility with `furyctl`.
 
