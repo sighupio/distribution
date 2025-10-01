@@ -2,295 +2,295 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-name: qa
-kind: pipeline
-type: docker
+# name: qa
+# kind: pipeline
+# type: docker
 
-node:
-   performance: low
+# node:
+#    performance: low
 
-platform:
-  os: linux
-  arch: amd64
+# platform:
+#   os: linux
+#   arch: amd64
 
-clone:
-  depth: 1
+# clone:
+#   depth: 1
 
-steps:
-  - name: license-check
-    image: quay.io/sighup/golang:1.23.3
-    pull: always
-    commands:
-      - make license-check
+# steps:
+#   - name: license-check
+#     image: quay.io/sighup/golang:1.23.3
+#     pull: always
+#     commands:
+#       - make license-check
 
-  - name: schema-check
-    image: quay.io/sighup/golang:1.23.3
-    pull: always
-    commands:
-      - |-
-        cat schemas/public/ekscluster-kfd-v1alpha2.json | \
-        json-patch -p schemas/private/ekscluster-kfd-v1alpha2.patch.json | \
-        jq -r > /tmp/schemas-private-ekscluster-kfd-v1alpha2.json
-      - diff schemas/private/ekscluster-kfd-v1alpha2.json /tmp/schemas-private-ekscluster-kfd-v1alpha2.json
+#   - name: schema-check
+#     image: quay.io/sighup/golang:1.23.3
+#     pull: always
+#     commands:
+#       - |-
+#         cat schemas/public/ekscluster-kfd-v1alpha2.json | \
+#         json-patch -p schemas/private/ekscluster-kfd-v1alpha2.patch.json | \
+#         jq -r > /tmp/schemas-private-ekscluster-kfd-v1alpha2.json
+#       - diff schemas/private/ekscluster-kfd-v1alpha2.json /tmp/schemas-private-ekscluster-kfd-v1alpha2.json
 
-  - name: test-schema
-    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
-    pull: always
-    depends_on:
-      - license-check
-      - schema-check
-    environment:
-      JV_VERSION: 6.0.1
-    commands:
-      # we need to download `jv` for running the JSON Schemas tests.
-      - curl -L https://github.com/santhosh-tekuri/jsonschema/releases/download/v$${JV_VERSION}/jv-v$${JV_VERSION}-linux-amd64.tar.gz | tar zx --directory /usr/local/bin/
-      - bats -t tests/e2e/kfddistribution/schema.sh
+#   - name: test-schema
+#     image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
+#     pull: always
+#     depends_on:
+#       - license-check
+#       - schema-check
+#     environment:
+#       JV_VERSION: 6.0.1
+#     commands:
+#       # we need to download `jv` for running the JSON Schemas tests.
+#       - curl -L https://github.com/santhosh-tekuri/jsonschema/releases/download/v$${JV_VERSION}/jv-v$${JV_VERSION}-linux-amd64.tar.gz | tar zx --directory /usr/local/bin/
+#       - bats -t tests/e2e/kfddistribution/schema.sh
 
-  - name: render
-    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
-    pull: always
-    depends_on:
-      - license-check
-      - schema-check
-    environment:
-      NETRC_FILE:
-        from_secret: NETRC_FILE
-      FURYCTL_VERSION: v0.33.0-rc.0
-      FURYCTL_CONFIG: tests/e2e/kfddistribution/manifests/furyctl-init-cluster.yaml
-      FURYCTL_DISTRO_LOCATION: ./
-      FURYCTL_OUTDIR: ./
-      FURYCTL_DISABLE_ANALYTICS: "true"
-      KUBECONFIG: ./dummy
-    commands:
-      - echo $${NETRC_FILE} > /root/.netrc
-      - echo "Installing furyctl version $${FURYCTL_VERSION}..."
-      - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-$(uname -s)-amd64.tar.gz" | tar xz -C /usr/local/bin/
-      - furyctl download dependencies && furyctl dump template
-      # Move the folder with the manifests generated from the templates into the right path
-      - mv distribution $${FURYTCL_OUTDIR}.furyctl/$$(yq .metadata.name $FURYCTL_CONFIG)
-      # Build the whole distribution
-      - kustomize build $${FURYTCL_OUTDIR}.furyctl/$$(yq .metadata.name $FURYCTL_CONFIG)/distribution/manifests > distribution.yml
+#   - name: render
+#     image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
+#     pull: always
+#     depends_on:
+#       - license-check
+#       - schema-check
+#     environment:
+#       NETRC_FILE:
+#         from_secret: NETRC_FILE
+#       FURYCTL_VERSION: v0.33.0-rc.0
+#       FURYCTL_CONFIG: tests/e2e/kfddistribution/manifests/furyctl-init-cluster.yaml
+#       FURYCTL_DISTRO_LOCATION: ./
+#       FURYCTL_OUTDIR: ./
+#       FURYCTL_DISABLE_ANALYTICS: "true"
+#       KUBECONFIG: ./dummy
+#     commands:
+#       - echo $${NETRC_FILE} > /root/.netrc
+#       - echo "Installing furyctl version $${FURYCTL_VERSION}..."
+#       - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-$(uname -s)-amd64.tar.gz" | tar xz -C /usr/local/bin/
+#       - furyctl download dependencies && furyctl dump template
+#       # Move the folder with the manifests generated from the templates into the right path
+#       - mv distribution $${FURYTCL_OUTDIR}.furyctl/$$(yq .metadata.name $FURYCTL_CONFIG)
+#       # Build the whole distribution
+#       - kustomize build $${FURYTCL_OUTDIR}.furyctl/$$(yq .metadata.name $FURYCTL_CONFIG)/distribution/manifests > distribution.yml
 
-  - name: check-deprecated-apis
-    image: us-docker.pkg.dev/fairwinds-ops/oss/pluto:v5
-    pull: always
-    depends_on:
-      - render
-    commands:
-      # we use --ignore-deprecations because we don't want the CI to fail when the API has not been removed yet.
-      - /pluto detect distribution.yml --ignore-deprecations --target-versions=k8s=v1.32.0
+#   - name: check-deprecated-apis
+#     image: us-docker.pkg.dev/fairwinds-ops/oss/pluto:v5
+#     pull: always
+#     depends_on:
+#       - render
+#     commands:
+#       # we use --ignore-deprecations because we don't want the CI to fail when the API has not been removed yet.
+#       - /pluto detect distribution.yml --ignore-deprecations --target-versions=k8s=v1.32.0
 
----
-name: e2e-kfddistribution-1.33
-kind: pipeline
-type: docker
+# ---
+# name: e2e-kfddistribution-1.33
+# kind: pipeline
+# type: docker
 
-depends_on:
-  - qa
+# depends_on:
+#   - qa
 
-clone:
-  depth: 1
+# clone:
+#   depth: 1
 
-platform:
-  os: linux
-  arch: amd64
+# platform:
+#   os: linux
+#   arch: amd64
 
-trigger:
-  ref:
-    include:
-      - refs/tags/**
-    exclude:
-      - refs/tags/**-docs*
-      - refs/tags/e2e-eks-**
-      - refs/tags/e2e-onpremises-**
+# trigger:
+#   ref:
+#     include:
+#       - refs/tags/**
+#     exclude:
+#       - refs/tags/**-docs*
+#       - refs/tags/e2e-eks-**
+#       - refs/tags/e2e-onpremises-**
 
-steps:
-  - name: create Kind cluster
-    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.27.0_1.32.2_5.6.0
-    pull: always
-    volumes:
-      - name: dockersock
-        path: /var/run/docker.sock
-    environment:
-      CLUSTER_VERSION: v1.33.0
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}
-      # /drone/src is the default workdir for the pipeline
-      # using this folder we don't need to mount another
-      # shared volume between the steps
-      KUBECONFIG: /drone/src/kubeconfig
-    commands:
-      # create a custom config to disable Kind's default CNI so
-      # we can test using KFD's networking module.
-      - |
-        cat <<EOF > kind-config.yaml
-        kind: Cluster
-        apiVersion: kind.x-k8s.io/v1alpha4
-        networking:
-          disableDefaultCNI: true
-        nodes:
-          - role: control-plane
-          - role: worker
-          - role: worker
-        EOF
-      # NOTE: kind's `--wait` flag that waits for the control-plane ot be ready
-      # does not work when disabling the default CNI. It will always go in timeout.
-      - kind create cluster --name $${CLUSTER_NAME} --image registry.sighup.io/fury/kindest/node:$${CLUSTER_VERSION} --config kind-config.yaml
-      # save the kubeconfig so we can use it from other steps.
-      - kind get kubeconfig --name $${CLUSTER_NAME} > $${KUBECONFIG}
+# steps:
+#   - name: create Kind cluster
+#     image: quay.io/sighup/dind-kind-kubectl-kustomize:0.27.0_1.32.2_5.6.0
+#     pull: always
+#     volumes:
+#       - name: dockersock
+#         path: /var/run/docker.sock
+#     environment:
+#       CLUSTER_VERSION: v1.33.0
+#       CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}
+#       # /drone/src is the default workdir for the pipeline
+#       # using this folder we don't need to mount another
+#       # shared volume between the steps
+#       KUBECONFIG: /drone/src/kubeconfig
+#     commands:
+#       # create a custom config to disable Kind's default CNI so
+#       # we can test using KFD's networking module.
+#       - |
+#         cat <<EOF > kind-config.yaml
+#         kind: Cluster
+#         apiVersion: kind.x-k8s.io/v1alpha4
+#         networking:
+#           disableDefaultCNI: true
+#         nodes:
+#           - role: control-plane
+#           - role: worker
+#           - role: worker
+#         EOF
+#       # NOTE: kind's `--wait` flag that waits for the control-plane ot be ready
+#       # does not work when disabling the default CNI. It will always go in timeout.
+#       - kind create cluster --name $${CLUSTER_NAME} --image registry.sighup.io/fury/kindest/node:$${CLUSTER_VERSION} --config kind-config.yaml
+#       # save the kubeconfig so we can use it from other steps.
+#       - kind get kubeconfig --name $${CLUSTER_NAME} > $${KUBECONFIG}
 
-  - name: e2e-kfddistribution
-    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
-    pull: always
-    # we need to use host network to access Kind API port that is listening on the worker's loopback
-    # beacuse we mount the host's Docker socket to run Kind.
-    network_mode: host
-    environment:
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}
-      KUBECONFIG: /drone/src/kubeconfig
-      FURYCTL_VERSION: v0.33.0-rc.0
-    depends_on: [create Kind cluster]
-    commands:
-      - export KUBECONFIG=/drone/src/kubeconfig
-      # We change the loopback IP in the kubeconfig to use the service hostname and keep the port.
-      # - 'sed -Ei "s#(server: https://)(.*)(:.*)#\1kind-cluster\3#" $${KUBECONFIG}'
-      - echo "Installing the correct furyctl version..."
-      - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-$(uname -s)-amd64.tar.gz" -o /tmp/furyctl.tar.gz && tar xfz /tmp/furyctl.tar.gz -C /tmp
-      # to use furyctl latest, use the following instead:
-      # - curl -L "https://github.com/sighupio/furyctl/releases/latest/download/furyctl-$(uname -s)-amd64.tar.gz" -o /tmp/furyctl.tar.gz && tar xfz /tmp/furyctl.tar.gz -C /tmp
-      - chmod +x /tmp/furyctl
-      # check that the kind cluster is ready before we move on
-      # - kubectl wait --timeout=180s --for=condition=ready pod --all -n kube-system
-      - until kubectl get serviceaccount default > /dev/null 2>&1; do echo "waiting for control-plane" && sleep 1; done
-      # finally, run the e2e tests
-      - tests/e2e/kfddistribution/e2e-kfddistribution.sh
+#   - name: e2e-kfddistribution
+#     image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
+#     pull: always
+#     # we need to use host network to access Kind API port that is listening on the worker's loopback
+#     # beacuse we mount the host's Docker socket to run Kind.
+#     network_mode: host
+#     environment:
+#       CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}
+#       KUBECONFIG: /drone/src/kubeconfig
+#       FURYCTL_VERSION: v0.33.0-rc.0
+#     depends_on: [create Kind cluster]
+#     commands:
+#       - export KUBECONFIG=/drone/src/kubeconfig
+#       # We change the loopback IP in the kubeconfig to use the service hostname and keep the port.
+#       # - 'sed -Ei "s#(server: https://)(.*)(:.*)#\1kind-cluster\3#" $${KUBECONFIG}'
+#       - echo "Installing the correct furyctl version..."
+#       - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-$(uname -s)-amd64.tar.gz" -o /tmp/furyctl.tar.gz && tar xfz /tmp/furyctl.tar.gz -C /tmp
+#       # to use furyctl latest, use the following instead:
+#       # - curl -L "https://github.com/sighupio/furyctl/releases/latest/download/furyctl-$(uname -s)-amd64.tar.gz" -o /tmp/furyctl.tar.gz && tar xfz /tmp/furyctl.tar.gz -C /tmp
+#       - chmod +x /tmp/furyctl
+#       # check that the kind cluster is ready before we move on
+#       # - kubectl wait --timeout=180s --for=condition=ready pod --all -n kube-system
+#       - until kubectl get serviceaccount default > /dev/null 2>&1; do echo "waiting for control-plane" && sleep 1; done
+#       # finally, run the e2e tests
+#       - tests/e2e/kfddistribution/e2e-kfddistribution.sh
 
-  - name: delete-kind-cluster
-    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.27.0_1.32.2_5.6.0
-    volumes:
-      - name: dockersock
-        path: /var/run/docker.sock
-    environment:
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}
-    commands:
-      # does not matter if the command fails
-      - kind delete cluster --name $${CLUSTER_NAME} || true
-    depends_on:
-      - e2e-kfddistribution
-    when:
-      status:
-        - success
-        - failure
+#   - name: delete-kind-cluster
+#     image: quay.io/sighup/dind-kind-kubectl-kustomize:0.27.0_1.32.2_5.6.0
+#     volumes:
+#       - name: dockersock
+#         path: /var/run/docker.sock
+#     environment:
+#       CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}
+#     commands:
+#       # does not matter if the command fails
+#       - kind delete cluster --name $${CLUSTER_NAME} || true
+#     depends_on:
+#       - e2e-kfddistribution
+#     when:
+#       status:
+#         - success
+#         - failure
 
-volumes:
-  - name: dockersock
-    host:
-      path: /var/run/docker.sock
----
-# We test 1.32.0 -> 1.33.0 upgrade pipeline
-name: e2e-kfddistribution-1.32.0-to-1.33.0
-kind: pipeline
-type: docker
+# volumes:
+#   - name: dockersock
+#     host:
+#       path: /var/run/docker.sock
+# ---
+# # We test 1.32.0 -> 1.33.0 upgrade pipeline
+# name: e2e-kfddistribution-1.32.0-to-1.33.0
+# kind: pipeline
+# type: docker
 
-depends_on:
-  - qa
+# depends_on:
+#   - qa
 
-clone:
-  depth: 1
+# clone:
+#   depth: 1
 
-platform:
-  os: linux
-  arch: amd64
+# platform:
+#   os: linux
+#   arch: amd64
 
-trigger:
-  ref:
-    include:
-      - refs/tags/**
-    exclude:
-      - refs/tags/**-docs*
-      - refs/tags/e2e-eks-**
-      - refs/tags/e2e-onpremises-**
+# trigger:
+#   ref:
+#     include:
+#       - refs/tags/**
+#     exclude:
+#       - refs/tags/**-docs*
+#       - refs/tags/e2e-eks-**
+#       - refs/tags/e2e-onpremises-**
 
-steps:
-  - name: create Kind cluster
-    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.27.0_1.32.2_5.6.0
-    pull: always
-    volumes:
-      - name: dockersock
-        path: /var/run/docker.sock
-    environment:
-      CLUSTER_VERSION: v1.32.2
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-upgrades
-      # /drone/src is the default workdir for the pipeline
-      # using this folder we don't need to mount another
-      # shared volume between the steps
-      KUBECONFIG: /drone/src/kubeconfig-upgrades
-    commands:
-      # create a custom config to disable Kind's default CNI so
-      # we can test using KFD's networking module.
-      - |
-        cat <<EOF > kind-config.yaml
-        kind: Cluster
-        apiVersion: kind.x-k8s.io/v1alpha4
-        networking:
-          disableDefaultCNI: true
-        nodes:
-          - role: control-plane
-          - role: worker
-          - role: worker
-        EOF
-      # NOTE: kind's `--wait` flag that waits for the control-plane ot be ready
-      # does not work when disabling the default CNI. It will always go in timeout.
-      - kind create cluster --name $${CLUSTER_NAME} --image registry.sighup.io/fury/kindest/node:$${CLUSTER_VERSION} --config kind-config.yaml
-      # save the kubeconfig so we can use it from other steps.
-      - kind get kubeconfig --name $${CLUSTER_NAME} > $${KUBECONFIG}
+# steps:
+#   - name: create Kind cluster
+#     image: quay.io/sighup/dind-kind-kubectl-kustomize:0.27.0_1.32.2_5.6.0
+#     pull: always
+#     volumes:
+#       - name: dockersock
+#         path: /var/run/docker.sock
+#     environment:
+#       CLUSTER_VERSION: v1.32.2
+#       CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-upgrades
+#       # /drone/src is the default workdir for the pipeline
+#       # using this folder we don't need to mount another
+#       # shared volume between the steps
+#       KUBECONFIG: /drone/src/kubeconfig-upgrades
+#     commands:
+#       # create a custom config to disable Kind's default CNI so
+#       # we can test using KFD's networking module.
+#       - |
+#         cat <<EOF > kind-config.yaml
+#         kind: Cluster
+#         apiVersion: kind.x-k8s.io/v1alpha4
+#         networking:
+#           disableDefaultCNI: true
+#         nodes:
+#           - role: control-plane
+#           - role: worker
+#           - role: worker
+#         EOF
+#       # NOTE: kind's `--wait` flag that waits for the control-plane ot be ready
+#       # does not work when disabling the default CNI. It will always go in timeout.
+#       - kind create cluster --name $${CLUSTER_NAME} --image registry.sighup.io/fury/kindest/node:$${CLUSTER_VERSION} --config kind-config.yaml
+#       # save the kubeconfig so we can use it from other steps.
+#       - kind get kubeconfig --name $${CLUSTER_NAME} > $${KUBECONFIG}
 
-  - name: e2e-kfddistribution
-    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
-    pull: always
-    # we need to use host network to access Kind API port that is listening on the worker's loopback
-    # beacuse we mount the host's Docker socket to run Kind.
-    network_mode: host
-    environment:
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-upgrades
-      KUBECONFIG: /drone/src/kubeconfig-upgrades
-      FURYCTL_VERSION: v0.33.0-rc.0
-    depends_on: [create Kind cluster]
-    commands:
-      - export KUBECONFIG=/drone/src/kubeconfig-upgrades
-      # We change the loopback IP in the kubeconfig to use the service hostname and keep the port.
-      # - 'sed -Ei "s#(server: https://)(.*)(:.*)#\1kind-cluster\3#" $${KUBECONFIG}'
-      - echo "Installing the correct furyctl version..."
-      - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-$(uname -s)-amd64.tar.gz" -o /tmp/furyctl.tar.gz && tar xfz /tmp/furyctl.tar.gz -C /tmp
-      # to use furyctl latest, use the following instead:
-      # - curl -L "https://github.com/sighupio/furyctl/releases/latest/download/furyctl-$(uname -s)-amd64.tar.gz" -o /tmp/furyctl.tar.gz && tar xfz /tmp/furyctl.tar.gz -C /tmp
-      - chmod +x /tmp/furyctl
-      # check that the kind cluster is ready before we move on
-      # - kubectl wait --timeout=180s --for=condition=ready pod --all -n kube-system
-      - until kubectl get serviceaccount default > /dev/null 2>&1; do echo "waiting for control-plane" && sleep 1; done
-      # finally, run the e2e tests
-      - tests/e2e/kfddistribution/e2e-kfddistribution-upgrades.sh
+#   - name: e2e-kfddistribution
+#     image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
+#     pull: always
+#     # we need to use host network to access Kind API port that is listening on the worker's loopback
+#     # beacuse we mount the host's Docker socket to run Kind.
+#     network_mode: host
+#     environment:
+#       CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-upgrades
+#       KUBECONFIG: /drone/src/kubeconfig-upgrades
+#       FURYCTL_VERSION: v0.33.0-rc.0
+#     depends_on: [create Kind cluster]
+#     commands:
+#       - export KUBECONFIG=/drone/src/kubeconfig-upgrades
+#       # We change the loopback IP in the kubeconfig to use the service hostname and keep the port.
+#       # - 'sed -Ei "s#(server: https://)(.*)(:.*)#\1kind-cluster\3#" $${KUBECONFIG}'
+#       - echo "Installing the correct furyctl version..."
+#       - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-$(uname -s)-amd64.tar.gz" -o /tmp/furyctl.tar.gz && tar xfz /tmp/furyctl.tar.gz -C /tmp
+#       # to use furyctl latest, use the following instead:
+#       # - curl -L "https://github.com/sighupio/furyctl/releases/latest/download/furyctl-$(uname -s)-amd64.tar.gz" -o /tmp/furyctl.tar.gz && tar xfz /tmp/furyctl.tar.gz -C /tmp
+#       - chmod +x /tmp/furyctl
+#       # check that the kind cluster is ready before we move on
+#       # - kubectl wait --timeout=180s --for=condition=ready pod --all -n kube-system
+#       - until kubectl get serviceaccount default > /dev/null 2>&1; do echo "waiting for control-plane" && sleep 1; done
+#       # finally, run the e2e tests
+#       - tests/e2e/kfddistribution/e2e-kfddistribution-upgrades.sh
 
-  - name: delete-kind-cluster
-    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.27.0_1.32.2_5.6.0
-    volumes:
-      - name: dockersock
-        path: /var/run/docker.sock
-    environment:
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-upgrades
-    commands:
-      # does not matter if the command fails
-      - kind delete cluster --name $${CLUSTER_NAME} || true
-    depends_on:
-      - e2e-kfddistribution
-    when:
-      status:
-        - success
-        - failure
+#   - name: delete-kind-cluster
+#     image: quay.io/sighup/dind-kind-kubectl-kustomize:0.27.0_1.32.2_5.6.0
+#     volumes:
+#       - name: dockersock
+#         path: /var/run/docker.sock
+#     environment:
+#       CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-upgrades
+#     commands:
+#       # does not matter if the command fails
+#       - kind delete cluster --name $${CLUSTER_NAME} || true
+#     depends_on:
+#       - e2e-kfddistribution
+#     when:
+#       status:
+#         - success
+#         - failure
 
-volumes:
-  - name: dockersock
-    host:
-      path: /var/run/docker.sock
+# volumes:
+#   - name: dockersock
+#     host:
+#       path: /var/run/docker.sock
 # ---
 # e2e tests are failing on CI: race conditions on the applications of some (apparently) unrelated CRDs. 
 # Manual testing (running the same pipeline locally macOS M1 Pro, with drone exec) results in a successful run.
@@ -566,139 +566,139 @@ volumes:
 #   when:
 #     status:
 #     - failure
----
-name: e2e-onpremises
-kind: pipeline
-type: docker
-node:
-   performance: low
+# ---
+# name: e2e-onpremises
+# kind: pipeline
+# type: docker
+# node:
+#    performance: low
 
-depends_on:
-  - qa
-clone:
-  depth: 1
+# depends_on:
+#   - qa
+# clone:
+#   depth: 1
 
-trigger:
-  ref:
-    - refs/tags/e2e-onpremises-**
-    - refs/tags/e2e-full-**
-    - refs/tags/v**
+# trigger:
+#   ref:
+#     - refs/tags/e2e-onpremises-**
+#     - refs/tags/e2e-full-**
+#     - refs/tags/v**
 
-steps:
-- name: create-hetzner-infrastructure
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
-  environment:
-    FURYCTL_VERSION: "v0.33.0-rc.0"
-    DEBIAN_FRONTEND: noninteractive
-    AWS_ACCESS_KEY_ID:
-      from_secret: aws_access_key_id
-    AWS_SECRET_ACCESS_KEY:
-      from_secret: aws_secret_access_key
-    AWS_REGION:
-      from_secret: aws_region
-    TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
-    TF_VAR_hcloud_token:
-      from_secret: hcloud_token
-  commands:
-    - cd tests/e2e/onpremises/
-    - ssh-keygen -N '' -t rsa -b 4096 -C "sighup" -f /cache/ci-ssh-key
-    - export TF_VAR_public_key=$(cat /cache/ci-ssh-key.pub)
-    - export TF_VAR_private_key=$(cat /cache/ci-ssh-key)
-    - ansible-playbook 0.local-tofu-run.yaml
-  volumes:
-    - name: cache
-      path: /cache
+# steps:
+# - name: create-hetzner-infrastructure
+#   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
+#   environment:
+#     FURYCTL_VERSION: "v0.33.0-rc.0"
+#     DEBIAN_FRONTEND: noninteractive
+#     AWS_ACCESS_KEY_ID:
+#       from_secret: aws_access_key_id
+#     AWS_SECRET_ACCESS_KEY:
+#       from_secret: aws_secret_access_key
+#     AWS_REGION:
+#       from_secret: aws_region
+#     TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
+#     TF_VAR_hcloud_token:
+#       from_secret: hcloud_token
+#   commands:
+#     - cd tests/e2e/onpremises/
+#     - ssh-keygen -N '' -t rsa -b 4096 -C "sighup" -f /cache/ci-ssh-key
+#     - export TF_VAR_public_key=$(cat /cache/ci-ssh-key.pub)
+#     - export TF_VAR_private_key=$(cat /cache/ci-ssh-key)
+#     - ansible-playbook 0.local-tofu-run.yaml
+#   volumes:
+#     - name: cache
+#       path: /cache
 
-- name: install-cluster-with-furyctl
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
-  environment:
-    FURYCTL_VERSION: "v0.33.0-rc.0"
-    DEBIAN_FRONTEND: noninteractive
-    AWS_ACCESS_KEY_ID:
-      from_secret: aws_access_key_id
-    AWS_SECRET_ACCESS_KEY:
-      from_secret: aws_secret_access_key
-    AWS_REGION:
-      from_secret: aws_region
-    TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
-    TF_VAR_hcloud_token:
-      from_secret: hcloud_token
-  commands:
-    - cd tests/e2e/onpremises/
-    - ansible-playbook 1.remote-furyctl-exec.yaml
-  volumes:
-    - name: cache
-      path: /cache
-- name: kube-bench-security-test
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
-  environment:
-    DEBIAN_FRONTEND: noninteractive
-    AWS_ACCESS_KEY_ID:
-      from_secret: aws_access_key_id
-    AWS_SECRET_ACCESS_KEY:
-      from_secret: aws_secret_access_key
-    AWS_REGION:
-      from_secret: aws_region
-    TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
-    TF_VAR_hcloud_token:
-      from_secret: hcloud_token
-  commands:
-    - cd tests/e2e/onpremises/
-    - ansible-playbook 2.remote-kube-bench-test.yaml
-  volumes:
-    - name: cache
-      path: /cache
-- name: bats-tests
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
-  environment:
-    KUBECONFIG: /cache/kubeconfig
-  commands:
-    - ./tests/e2e/onpremises/e2e-onpremises.sh
-  volumes:
-    - name: cache
-      path: /cache
+# - name: install-cluster-with-furyctl
+#   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
+#   environment:
+#     FURYCTL_VERSION: "v0.33.0-rc.0"
+#     DEBIAN_FRONTEND: noninteractive
+#     AWS_ACCESS_KEY_ID:
+#       from_secret: aws_access_key_id
+#     AWS_SECRET_ACCESS_KEY:
+#       from_secret: aws_secret_access_key
+#     AWS_REGION:
+#       from_secret: aws_region
+#     TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
+#     TF_VAR_hcloud_token:
+#       from_secret: hcloud_token
+#   commands:
+#     - cd tests/e2e/onpremises/
+#     - ansible-playbook 1.remote-furyctl-exec.yaml
+#   volumes:
+#     - name: cache
+#       path: /cache
+# - name: kube-bench-security-test
+#   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
+#   environment:
+#     DEBIAN_FRONTEND: noninteractive
+#     AWS_ACCESS_KEY_ID:
+#       from_secret: aws_access_key_id
+#     AWS_SECRET_ACCESS_KEY:
+#       from_secret: aws_secret_access_key
+#     AWS_REGION:
+#       from_secret: aws_region
+#     TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
+#     TF_VAR_hcloud_token:
+#       from_secret: hcloud_token
+#   commands:
+#     - cd tests/e2e/onpremises/
+#     - ansible-playbook 2.remote-kube-bench-test.yaml
+#   volumes:
+#     - name: cache
+#       path: /cache
+# - name: bats-tests
+#   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
+#   environment:
+#     KUBECONFIG: /cache/kubeconfig
+#   commands:
+#     - ./tests/e2e/onpremises/e2e-onpremises.sh
+#   volumes:
+#     - name: cache
+#       path: /cache
 
-- name: delete
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
-  environment:
-    FURYCTL_VERSION: "v0.33.0-rc.0"
-    DEBIAN_FRONTEND: noninteractive
-    AWS_ACCESS_KEY_ID:
-      from_secret: aws_access_key_id
-    AWS_SECRET_ACCESS_KEY:
-      from_secret: aws_secret_access_key
-    AWS_REGION:
-      from_secret: aws_region
-    TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
-    TF_VAR_hcloud_token:
-      from_secret: hcloud_token
-  commands:
-    - cd tests/e2e/onpremises/
-    - export TF_VAR_public_key=$(cat /cache/ci-ssh-key.pub)
-    - export TF_VAR_private_key=$(cat /cache/ci-ssh-key)
-    - ansible-playbook 3.local-tofu-destroy.yaml
-  when:
-    status:
-    - success
-    - failure
-  volumes:
-    - name: cache
-      path: /cache
+# - name: delete
+#   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
+#   environment:
+#     FURYCTL_VERSION: "v0.33.0-rc.0"
+#     DEBIAN_FRONTEND: noninteractive
+#     AWS_ACCESS_KEY_ID:
+#       from_secret: aws_access_key_id
+#     AWS_SECRET_ACCESS_KEY:
+#       from_secret: aws_secret_access_key
+#     AWS_REGION:
+#       from_secret: aws_region
+#     TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
+#     TF_VAR_hcloud_token:
+#       from_secret: hcloud_token
+#   commands:
+#     - cd tests/e2e/onpremises/
+#     - export TF_VAR_public_key=$(cat /cache/ci-ssh-key.pub)
+#     - export TF_VAR_private_key=$(cat /cache/ci-ssh-key)
+#     - ansible-playbook 3.local-tofu-destroy.yaml
+#   when:
+#     status:
+#     - success
+#     - failure
+#   volumes:
+#     - name: cache
+#       path: /cache
 
-volumes:
-- name: cache
-  temp: {}
----
+# volumes:
+# - name: cache
+#   temp: {}
+# ---
 # On-premises upgrade pipeline - v1.32.0 to v1.33.0
 name: e2e-onpremises-upgrades-1.32.0-1.33.0
 kind: pipeline
 type: docker
 
-node:
-   performance: low
+# node:
+#    performance: low
 
-depends_on:
-  - qa
+# depends_on:
+#   - qa
 
 clone:
   depth: 1
@@ -830,128 +830,128 @@ steps:
 volumes:
 - name: cache-upgrades
   temp: {}
----
-kind: pipeline
-type: docker
-name: scheduled-aws-nuke
+# ---
+# kind: pipeline
+# type: docker
+# name: scheduled-aws-nuke
 
-trigger:
-  cron:
-    - "scheduled-aws-nuke"
+# trigger:
+#   cron:
+#     - "scheduled-aws-nuke"
 
-clone:
-  depth: 1
+# clone:
+#   depth: 1
 
-steps:
-  - name: run-aws-nuke
-    image: amazon/aws-cli:latest
-    environment:
-      AWS_ACCESS_KEY_ID:
-        from_secret: aws_access_key_id
-      AWS_SECRET_ACCESS_KEY:
-        from_secret: aws_secret_access_key
-      AWS_DEFAULT_REGION: eu-west-1
-      ACCOUNT_ID_PROD:
-        from_secret: aws_account_id_prod
-      AWS_NUKE_VERSION: "v3.51.1"
-    commands:
-      # Install required tools
-      - yum update -y
-      - yum install -y wget tar gzip jq
-      # Install AWS Nuke
-      - wget https://github.com/ekristen/aws-nuke/releases/download/$${AWS_NUKE_VERSION}/aws-nuke-$${AWS_NUKE_VERSION}-linux-amd64.tar.gz
-      - tar -xvf aws-nuke-$${AWS_NUKE_VERSION}-linux-amd64.tar.gz
-      - mv aws-nuke /usr/local/bin/aws-nuke
-      - chmod +x /usr/local/bin/aws-nuke
-      - export ACCOUNT_ID=$(aws sts get-caller-identity | jq -r ".Account")
-      - sed "s/ACCOUNT_ID_PLACEHOLDER/$ACCOUNT_ID/" tests/e2e/ekscluster/awsnuke/config.yml > ./aws-nuke-config.yml
-      - sed -i "s/ACCOUNT_ID_PROD_PLACEHOLDER/$ACCOUNT_ID_PROD/" ./aws-nuke-config.yml
-      # Run AWS Nuke
-      - aws-nuke nuke -c ./aws-nuke-config.yml --force --no-dry-run
-      - aws s3 rm s3://e2e-drone-eks --recursive
+# steps:
+#   - name: run-aws-nuke
+#     image: amazon/aws-cli:latest
+#     environment:
+#       AWS_ACCESS_KEY_ID:
+#         from_secret: aws_access_key_id
+#       AWS_SECRET_ACCESS_KEY:
+#         from_secret: aws_secret_access_key
+#       AWS_DEFAULT_REGION: eu-west-1
+#       ACCOUNT_ID_PROD:
+#         from_secret: aws_account_id_prod
+#       AWS_NUKE_VERSION: "v3.51.1"
+#     commands:
+#       # Install required tools
+#       - yum update -y
+#       - yum install -y wget tar gzip jq
+#       # Install AWS Nuke
+#       - wget https://github.com/ekristen/aws-nuke/releases/download/$${AWS_NUKE_VERSION}/aws-nuke-$${AWS_NUKE_VERSION}-linux-amd64.tar.gz
+#       - tar -xvf aws-nuke-$${AWS_NUKE_VERSION}-linux-amd64.tar.gz
+#       - mv aws-nuke /usr/local/bin/aws-nuke
+#       - chmod +x /usr/local/bin/aws-nuke
+#       - export ACCOUNT_ID=$(aws sts get-caller-identity | jq -r ".Account")
+#       - sed "s/ACCOUNT_ID_PLACEHOLDER/$ACCOUNT_ID/" tests/e2e/ekscluster/awsnuke/config.yml > ./aws-nuke-config.yml
+#       - sed -i "s/ACCOUNT_ID_PROD_PLACEHOLDER/$ACCOUNT_ID_PROD/" ./aws-nuke-config.yml
+#       # Run AWS Nuke
+#       - aws-nuke nuke -c ./aws-nuke-config.yml --force --no-dry-run
+#       - aws s3 rm s3://e2e-drone-eks --recursive
 
----
-name: release
-kind: pipeline
-type: docker
+# ---
+# name: release
+# kind: pipeline
+# type: docker
 
-depends_on:
-  - e2e-kfddistribution-1.33
-  - e2e-kfddistribution-1.32.0-to-1.33.0
-  - e2e-onpremises
-  - e2e-onpremises-upgrades-1.32.0-1.33.0
+# depends_on:
+#   - e2e-kfddistribution-1.33
+#   - e2e-kfddistribution-1.32.0-to-1.33.0
+#   # - e2e-onpremises
+#   - e2e-onpremises-upgrades-1.32.0-1.33.0
 
-platform:
-  os: linux
-  arch: amd64
+# platform:
+#   os: linux
+#   arch: amd64
 
-trigger:
-  ref:
-    include:
-      - refs/tags/v**
-    exclude:
-      - refs/tags/**-docs*
+# trigger:
+#   ref:
+#     include:
+#       - refs/tags/v**
+#     exclude:
+#       - refs/tags/**-docs*
 
-steps:
-  - name: prepare-release-notes
-    image: quay.io/sighup/fury-release-notes-plugin:3.12_2.10.0
-    depends_on: [clone]
-    settings:
-      release_notes_file_path: release-notes.md
-    when:
-      ref:
-        include:
-          - refs/tags/v**
-        exclude:
-          - refs/tags/**-docs*
+# steps:
+#   - name: prepare-release-notes
+#     image: quay.io/sighup/fury-release-notes-plugin:3.12_2.10.0
+#     depends_on: [clone]
+#     settings:
+#       release_notes_file_path: release-notes.md
+#     when:
+#       ref:
+#         include:
+#           - refs/tags/v**
+#         exclude:
+#           - refs/tags/**-docs*
 
-  - name: publish-prerelease
-    image: plugins/github-release
-    pull: always
-    depends_on:
-      - prepare-release-notes
-    settings:
-      api_key:
-        from_secret: github_token
-      file_exists: skip
-      files:
-        - kfd.yaml
-      prerelease: true
-      overwrite: true
-      title: "Prerelease ${DRONE_TAG}"
-      note: release-notes.md
-      checksum:
-        - md5
-        - sha256
-    when:
-      ref:
-        include:
-          - refs/tags/v**-rc**
-        exclude:
-          - refs/tags/**-docs*
+#   - name: publish-prerelease
+#     image: plugins/github-release
+#     pull: always
+#     depends_on:
+#       - prepare-release-notes
+#     settings:
+#       api_key:
+#         from_secret: github_token
+#       file_exists: skip
+#       files:
+#         - kfd.yaml
+#       prerelease: true
+#       overwrite: true
+#       title: "Prerelease ${DRONE_TAG}"
+#       note: release-notes.md
+#       checksum:
+#         - md5
+#         - sha256
+#     when:
+#       ref:
+#         include:
+#           - refs/tags/v**-rc**
+#         exclude:
+#           - refs/tags/**-docs*
 
-  - name: publish-stable
-    image: plugins/github-release
-    pull: always
-    depends_on:
-      - prepare-release-notes
-    settings:
-      api_key:
-        from_secret: github_token
-      file_exists: skip
-      files:
-        - kfd.yaml
-      prerelease: false
-      overwrite: true
-      title: "Release ${DRONE_TAG}"
-      note: release-notes.md
-      checksum:
-        - md5
-        - sha256
-    when:
-      ref:
-        exclude:
-          - refs/tags/v**-rc**
-          - refs/tags/**-docs*
-        include:
-          - refs/tags/v**
+#   - name: publish-stable
+#     image: plugins/github-release
+#     pull: always
+#     depends_on:
+#       - prepare-release-notes
+#     settings:
+#       api_key:
+#         from_secret: github_token
+#       file_exists: skip
+#       files:
+#         - kfd.yaml
+#       prerelease: false
+#       overwrite: true
+#       title: "Release ${DRONE_TAG}"
+#       note: release-notes.md
+#       checksum:
+#         - md5
+#         - sha256
+#     when:
+#       ref:
+#         exclude:
+#           - refs/tags/v**-rc**
+#           - refs/tags/**-docs*
+#         include:
+#           - refs/tags/v**
