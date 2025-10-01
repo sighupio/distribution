@@ -40,36 +40,34 @@ resources:
   - resources/eks-velero-volumesnapshotlocation.yml
 {{- end }}
 
-{{- if eq .spec.distribution.common.provider.type "none" }}
-{{- if ne .spec.distribution.modules.dr.etcdBackup.type "none" }}
 patches:
+  - path: patches/infra-nodes.yml
+{{- if .spec.distribution.modules.dr.velero.schedules.install }}
+  - path: patches/velero-schedule-manifests.yml
+  - path: patches/velero-schedule-full.yml
+{{- end }}
+{{- if eq .spec.distribution.common.provider.type "eks" }}
+  - path: patches/eks-velero.yml
+{{- end }}
+{{- if eq .spec.distribution.common.provider.type "none" }}
+  {{- if ne .spec.distribution.modules.dr.etcdBackup.type "none" }}
   - path: patches/etcd-backup-schedule.yml
-{{- if eq .spec.distribution.modules.dr.etcdBackup.type "all" "pvc" }}
+    {{- if eq .spec.distribution.modules.dr.etcdBackup.type "all" "pvc" }}
   - patch: |-
       - op: replace
         path: /spec/jobTemplate/spec/template/spec/volumes/2/persistentVolumeClaim/claimName
-{{- if index .spec.distribution.modules.dr.etcdBackup.pvc "name" }}
+      {{- if index .spec.distribution.modules.dr.etcdBackup.pvc "name" }}
         value: {{ .spec.distribution.modules.dr.etcdBackup.pvc.name }}
-{{- else }}
+      {{- else }}
         value: "etcd-backup-pvc-storage"
-{{- end }}
+      {{- end }}
     target:
       group: batch
       version: v1
       kind: CronJob
       name: etcd-backup-pvc
-{{- end }}
-{{- end }}
-{{- end }}
-
-patchesStrategicMerge:
-  - patches/infra-nodes.yml
-{{- if eq .spec.distribution.common.provider.type "eks" }}
-  - patches/eks-velero.yml
-{{- end }}
-{{- if .spec.distribution.modules.dr.velero.schedules.install }}
-  - patches/velero-schedule-manifests.yml
-  - patches/velero-schedule-full.yml
+    {{- end }}
+  {{- end }}
 {{- end }}
 
 {{- if eq .spec.distribution.common.provider.type "none" }}
