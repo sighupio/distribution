@@ -24,7 +24,7 @@ For a complete list of all SD releases and their compatibility with Kubernetes v
 ## Warnings ⚠️
 
 - v1.31.0 (OnPremises): **use only with `furyctl >= 0.31.1`**. This SD version used the version `1.31.4` of the On-premises installer that had an issue in the upgrade process to v1.31. This issue was patched in `v1.31.4-rev.1` of the installer and is automatically used when using furyctl >= 0.31.1.
-- v1.33.0 (EKSCluster): removed support for `alinux2`, only `alinux2023` is going to be supported from now on. See the upgrade guide in the release notes. 
+- v1.33.0 (EKSCluster): removed support for `alinux2`, only `alinux2023` is going to be supported from now on. See the upgrade guide in the [release notes](https://github.com/sighupio/distribution/releases/tag/v1.33.0). 
 
 
 ### furyctl and SD compatibility
