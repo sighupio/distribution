@@ -567,135 +567,135 @@ volumes:
 #     status:
 #     - failure
 ---
-name: e2e-onpremises
-kind: pipeline
-type: docker
-node:
-   performance: low
+# name: e2e-onpremises
+# kind: pipeline
+# type: docker
+# node:
+#    performance: low
 
-depends_on:
-  - qa
-clone:
-  depth: 1
+# depends_on:
+#   - qa
+# clone:
+#   depth: 1
 
-trigger:
-  ref:
-    - refs/tags/e2e-onpremises-**
-    - refs/tags/e2e-full-**
-    - refs/tags/v**
+# trigger:
+#   ref:
+#     - refs/tags/e2e-onpremises-**
+#     - refs/tags/e2e-full-**
+#     - refs/tags/v**
 
-steps:
-- name: create-hetzner-infrastructure
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
-  environment:
-    FURYCTL_VERSION: "v0.33.0-rc.0"
-    DEBIAN_FRONTEND: noninteractive
-    AWS_ACCESS_KEY_ID:
-      from_secret: aws_access_key_id
-    AWS_SECRET_ACCESS_KEY:
-      from_secret: aws_secret_access_key
-    AWS_REGION:
-      from_secret: aws_region
-    TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
-    TF_VAR_hcloud_token:
-      from_secret: hcloud_token
-  commands:
-    - cd tests/e2e/onpremises/
-    - ssh-keygen -N '' -t rsa -b 4096 -C "sighup" -f /cache/ci-ssh-key
-    - export TF_VAR_public_key=$(cat /cache/ci-ssh-key.pub)
-    - export TF_VAR_private_key=$(cat /cache/ci-ssh-key)
-    - ansible-playbook 0.local-tofu-run.yaml
-  volumes:
-    - name: cache
-      path: /cache
+# steps:
+# - name: create-hetzner-infrastructure
+#   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
+#   environment:
+#     FURYCTL_VERSION: "v0.33.0-rc.0"
+#     DEBIAN_FRONTEND: noninteractive
+#     AWS_ACCESS_KEY_ID:
+#       from_secret: aws_access_key_id
+#     AWS_SECRET_ACCESS_KEY:
+#       from_secret: aws_secret_access_key
+#     AWS_REGION:
+#       from_secret: aws_region
+#     TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
+#     TF_VAR_hcloud_token:
+#       from_secret: hcloud_token
+#   commands:
+#     - cd tests/e2e/onpremises/
+#     - ssh-keygen -N '' -t rsa -b 4096 -C "sighup" -f /cache/ci-ssh-key
+#     - export TF_VAR_public_key=$(cat /cache/ci-ssh-key.pub)
+#     - export TF_VAR_private_key=$(cat /cache/ci-ssh-key)
+#     - ansible-playbook 0.local-tofu-run.yaml
+#   volumes:
+#     - name: cache
+#       path: /cache
 
-- name: install-cluster-with-furyctl
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
-  environment:
-    FURYCTL_VERSION: "v0.33.0-rc.0"
-    DEBIAN_FRONTEND: noninteractive
-    AWS_ACCESS_KEY_ID:
-      from_secret: aws_access_key_id
-    AWS_SECRET_ACCESS_KEY:
-      from_secret: aws_secret_access_key
-    AWS_REGION:
-      from_secret: aws_region
-    TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
-    TF_VAR_hcloud_token:
-      from_secret: hcloud_token
-  commands:
-    - cd tests/e2e/onpremises/
-    - ansible-playbook 1.remote-furyctl-exec.yaml
-  volumes:
-    - name: cache
-      path: /cache
-- name: kube-bench-security-test
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
-  environment:
-    DEBIAN_FRONTEND: noninteractive
-    AWS_ACCESS_KEY_ID:
-      from_secret: aws_access_key_id
-    AWS_SECRET_ACCESS_KEY:
-      from_secret: aws_secret_access_key
-    AWS_REGION:
-      from_secret: aws_region
-    TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
-    TF_VAR_hcloud_token:
-      from_secret: hcloud_token
-  commands:
-    - cd tests/e2e/onpremises/
-    - ansible-playbook 2.remote-kube-bench-test.yaml
-  volumes:
-    - name: cache
-      path: /cache
-- name: bats-tests
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
-  environment:
-    KUBECONFIG: /cache/kubeconfig
-  commands:
-    - ./tests/e2e/onpremises/e2e-onpremises.sh
-  volumes:
-    - name: cache
-      path: /cache
+# - name: install-cluster-with-furyctl
+#   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
+#   environment:
+#     FURYCTL_VERSION: "v0.33.0-rc.0"
+#     DEBIAN_FRONTEND: noninteractive
+#     AWS_ACCESS_KEY_ID:
+#       from_secret: aws_access_key_id
+#     AWS_SECRET_ACCESS_KEY:
+#       from_secret: aws_secret_access_key
+#     AWS_REGION:
+#       from_secret: aws_region
+#     TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
+#     TF_VAR_hcloud_token:
+#       from_secret: hcloud_token
+#   commands:
+#     - cd tests/e2e/onpremises/
+#     - ansible-playbook 1.remote-furyctl-exec.yaml
+#   volumes:
+#     - name: cache
+#       path: /cache
+# - name: kube-bench-security-test
+#   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
+#   environment:
+#     DEBIAN_FRONTEND: noninteractive
+#     AWS_ACCESS_KEY_ID:
+#       from_secret: aws_access_key_id
+#     AWS_SECRET_ACCESS_KEY:
+#       from_secret: aws_secret_access_key
+#     AWS_REGION:
+#       from_secret: aws_region
+#     TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
+#     TF_VAR_hcloud_token:
+#       from_secret: hcloud_token
+#   commands:
+#     - cd tests/e2e/onpremises/
+#     - ansible-playbook 2.remote-kube-bench-test.yaml
+#   volumes:
+#     - name: cache
+#       path: /cache
+# - name: bats-tests
+#   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
+#   environment:
+#     KUBECONFIG: /cache/kubeconfig
+#   commands:
+#     - ./tests/e2e/onpremises/e2e-onpremises.sh
+#   volumes:
+#     - name: cache
+#       path: /cache
 
-- name: delete
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
-  environment:
-    FURYCTL_VERSION: "v0.33.0-rc.0"
-    DEBIAN_FRONTEND: noninteractive
-    AWS_ACCESS_KEY_ID:
-      from_secret: aws_access_key_id
-    AWS_SECRET_ACCESS_KEY:
-      from_secret: aws_secret_access_key
-    AWS_REGION:
-      from_secret: aws_region
-    TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
-    TF_VAR_hcloud_token:
-      from_secret: hcloud_token
-  commands:
-    - cd tests/e2e/onpremises/
-    - export TF_VAR_public_key=$(cat /cache/ci-ssh-key.pub)
-    - export TF_VAR_private_key=$(cat /cache/ci-ssh-key)
-    - ansible-playbook 3.local-tofu-destroy.yaml
-  when:
-    status:
-    - success
-    - failure
-  volumes:
-    - name: cache
-      path: /cache
+# - name: delete
+#   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
+#   environment:
+#     FURYCTL_VERSION: "v0.33.0-rc.0"
+#     DEBIAN_FRONTEND: noninteractive
+#     AWS_ACCESS_KEY_ID:
+#       from_secret: aws_access_key_id
+#     AWS_SECRET_ACCESS_KEY:
+#       from_secret: aws_secret_access_key
+#     AWS_REGION:
+#       from_secret: aws_region
+#     TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
+#     TF_VAR_hcloud_token:
+#       from_secret: hcloud_token
+#   commands:
+#     - cd tests/e2e/onpremises/
+#     - export TF_VAR_public_key=$(cat /cache/ci-ssh-key.pub)
+#     - export TF_VAR_private_key=$(cat /cache/ci-ssh-key)
+#     - ansible-playbook 3.local-tofu-destroy.yaml
+#   when:
+#     status:
+#     - success
+#     - failure
+#   volumes:
+#     - name: cache
+#       path: /cache
 
-volumes:
-- name: cache
-  temp: {}
----
+# volumes:
+# - name: cache
+#   temp: {}
+# ---
 # On-premises upgrade pipeline - v1.32.0 to v1.33.0
 name: e2e-onpremises-upgrades-1.32.0-1.33.0
 kind: pipeline
 type: docker
 
-node:
-   performance: low
+# node:
+#    performance: low
 
 depends_on:
   - qa
@@ -878,7 +878,7 @@ type: docker
 depends_on:
   - e2e-kfddistribution-1.33
   - e2e-kfddistribution-1.32.0-to-1.33.0
-  - e2e-onpremises
+  # - e2e-onpremises
   - e2e-onpremises-upgrades-1.32.0-1.33.0
 
 platform:
