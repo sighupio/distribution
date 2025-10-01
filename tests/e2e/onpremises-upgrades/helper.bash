@@ -38,12 +38,3 @@ loop_it(){
   done
   return 0
 }
-
-check_sts_fluentd_ready() {
-  local name=$1
-  local namespace=$2
-  local desired ready
-  desired=$(kubectl get sts "$name" -n "$namespace" -o jsonpath='{.status.replicas}' 2>/dev/null || echo "0")
-  ready=$(kubectl get sts "$name" -n "$namespace" -o jsonpath='{.status.readyReplicas}' 2>/dev/null || echo "0")
-  [ "$desired" -eq "$ready" ] && [ "$desired" -gt 0 ]
-}
