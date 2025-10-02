@@ -18,7 +18,7 @@ kind: OnPremises
 metadata:
   name: reevo
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.33.0-non-existent # to be sure we are not patching via furyctl patches
   kubernetes:
     pkiFolder: ./pki
     ssh:
@@ -30,6 +30,7 @@ spec:
     svcCidr: 172.30.0.0/16
     loadBalancers:
       enabled: true
+      selfmanagedRepositories: false
       hosts:
         - name: haproxy-10-10-1-2
           ip: 10.10.1.2
@@ -71,7 +72,10 @@ spec:
     #advancedAnsible:
       #config: |
       #  ansible_ssh_common_args='-o ProxyCommand="ssh -W %h:%p -q root@${hcloud_server.haproxy.ipv4_address}"'
-    advanced: 
+    advanced:
+      selfmanagedRepositories: false
+      containerd:
+        selfmanagedRepositories: false
       encryption:
         configuration: "{file://./encrypted-secret-config.yaml}"
   distribution:
@@ -176,4 +180,12 @@ subjectAltName = @alt_names
 DNS.1 = ingress.${replace(hcloud_server.haproxy.ipv4_address, ".", "-")}.nip.io
 DNS.2 = *.ingress.${replace(hcloud_server.haproxy.ipv4_address, ".", "-")}.nip.io
 EOF
+}
+
+output "controlplane_0_ip" {
+  value = hcloud_server.controlplane[0].ipv4_address
+}
+
+output "worker_0_ip" {
+  value = hcloud_server.worker[0].ipv4_address
 }

@@ -5,7 +5,7 @@
 
 set -e
 
-LAST_FURYCTL_YAML=tests/e2e/ekscluster/manifests/furyctl-selfmanaged-alinux2-init-cluster.yaml
+LAST_FURYCTL_YAML=tests/e2e/ekscluster/manifests/furyctl-selfmanaged-alinux2023-init-cluster.yaml
 tests/e2e/ekscluster/replace_variables.sh --distribution-version "$DISTRIBUTION_VERSION" --cluster-name "$CLUSTER_NAME" --furyctl-yaml "$LAST_FURYCTL_YAML"
 echo "----------------------------------------------------------------------------"
 echo "Executing furyctl with self-managed nodes with alinux2023"
