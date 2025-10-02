@@ -17,8 +17,8 @@ all:
         keepalived_ip: "{{ .spec.kubernetes.loadBalancers.keepalived.ip }}"
         keepalived_virtual_router_id: "{{ .spec.kubernetes.loadBalancers.keepalived.virtualRouterId }}"
         keepalived_passphrase: "{{ .spec.kubernetes.loadBalancers.keepalived.passphrase }}"
-        {{- if hasKeyAny .spec.kubernetes.loadBalancers "manageRepositories" }}
-        haproxy_manage_repositories: {{ .spec.kubernetes.loadBalancers.manageRepositories }}
+        {{- if hasKeyAny .spec.kubernetes.loadBalancers "selfmanagedRepositories" }}
+        haproxy_self_managed_repositories: {{ .spec.kubernetes.loadBalancers.selfmanagedRepositories }}
         {{- end }}
     {{- end }}
     master:
@@ -269,8 +269,8 @@ all:
         {{- end }}
       {{- end }}
     {{- end }}
-    {{- if hasKeyAny .spec.kubernetes.advanced.containerd "manageRepositories" }}
-    containerd_manage_repositories: {{ .spec.kubernetes.advanced.containerd.manageRepositories }}
+    {{- if hasKeyAny .spec.kubernetes.advanced.containerd "selfmanagedRepositories" }}
+    containerd_self_managed_repositories: {{ .spec.kubernetes.advanced.containerd.selfmanagedRepositories }}
     {{- end }}
     {{- if hasKeyAny .spec.kubernetes.advanced.containerd "storageDir" }}
     containerd_storage_dir: "{{ .spec.kubernetes.advanced.containerd.storageDir }}"
@@ -360,8 +360,8 @@ all:
       {{ .spec.kubernetes.advanced.kernelParameters | toYaml | indent 6 | trim }}
     {{- end -}}
 
-    {{- if hasKeyAny .spec.kubernetes.advanced "manageRepositories" }}
-    kubernetes_manage_repositories: {{ .spec.kubernetes.advanced.manageRepositories }}
+    {{- if hasKeyAny .spec.kubernetes.advanced "selfmanagedRepositories" }}
+    kubernetes_self_managed_repositories: {{ .spec.kubernetes.advanced.selfmanagedRepositories }}
     {{- end }}
 
     {{- end }}
