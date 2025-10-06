@@ -85,8 +85,8 @@ spec:
     nodeAllowedSshPublicKey: "ssh-ed25519 XYZ"
     # Either `launch_configurations`, `launch_templates` or `both`. For new clusters use `launch_templates`, for existing cluster you'll need to migrate from `launch_configurations` to `launch_templates` using `both` as interim.
     nodePoolsLaunchKind: "launch_templates"
-    # Global default AMI type used for EKS worker nodes. This will apply to all node pools unless overridden by a specific node pool. Valid values are: `alinux2`, `alinux2023`
-    nodePoolGlobalAmiType: "alinux2"
+    # Global default AMI type used for EKS worker nodes. This will apply to all node pools unless overridden by a specific node pool. Valid values are: `alinux2023`
+    nodePoolGlobalAmiType: "alinux2023"
     # Optional Kubernetes Cluster log retention in days. Defaults to 90 days.
     # logRetentionDays: 90
     # This map defines the access to the Kubernetes API server

@@ -15,7 +15,7 @@ kind: EKSCluster
 metadata:
   name: e2e-test-eks
 spec:
-  distributionVersion: v1.31.1
+  distributionVersion: v1.31.2
   toolsConfiguration:
     terraform:
       state:

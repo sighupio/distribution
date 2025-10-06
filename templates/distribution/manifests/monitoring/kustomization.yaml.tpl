@@ -11,6 +11,7 @@ kind: Kustomization
 
 resources:
 {{- /* common components for all the monitoring types */}}
+  - kapp-configs/prometheus-operator-crd.yaml
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/monitoring/katalog/prometheus-operator" }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/monitoring/katalog/kube-proxy-metrics" }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/monitoring/katalog/kube-state-metrics" }}
@@ -58,53 +59,69 @@ resources:
   - policies
 {{- end }}
 
-patchesStrategicMerge:
-  - patches/infra-nodes.yml
+patches:
+  - path: patches/infra-nodes.yml
 {{- if eq .spec.distribution.common.provider.type "eks" }}{{/* in EKS there are no files to monitor on nodes */}}
-  - |-
-    $patch: delete
-    apiVersion: apps/v1
-    kind: DaemonSet
-    metadata:
-      namespace: monitoring
-      name: x509-certificate-exporter-data-plane
+  - patch: |-
+      $patch: delete
+      apiVersion: apps/v1
+      kind: DaemonSet
+      metadata:
+        namespace: monitoring
+        name: x509-certificate-exporter-data-plane
 {{- end }}
 {{- if or (eq $monitoringType "prometheus") (eq $monitoringType "mimir") }}
-  - patches/alertmanager-operated.yml
+  - path: patches/alertmanager-operated.yml
   {{- if .checks.storageClassAvailable }}
   {{- /* notice that prometheus-operated is (also) installed as a dependency of mimir in its kustomize base */}}
-  - patches/prometheus-operated.yml
+  - path: patches/prometheus-operated.yml
     {{- if and (eq $monitoringType "mimir") (eq .spec.distribution.modules.monitoring.mimir.backend "minio") }}
-  - patches/minio.yml
+  - path: patches/minio.yml
     {{- end }}
   {{- end }}
 {{- end }}
 {{- if not .spec.distribution.modules.monitoring.alertmanager.installDefaultRules }}
 {{- if .spec.distribution.modules.monitoring.alertmanager.deadManSwitchWebhookUrl }}
-  - |-
-    $patch: delete
-    apiVersion: v1
-    kind: Secret
-    metadata:
-      namespace: monitoring
-      name: healthchecks-webhook
+  - patch: |-
+      $patch: delete
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        namespace: monitoring
+        name: healthchecks-webhook
 {{- end }}
 {{- if .spec.distribution.modules.monitoring.alertmanager.slackWebhookUrl }}
-  - |-
-    $patch: delete
-    apiVersion: v1
-    kind: Secret
-    metadata:
-      namespace: monitoring
-      name: infra-slack-webhook
-  - |-
-    $patch: delete
-    apiVersion: v1
-    kind: Secret
-    metadata:
-      namespace: monitoring
-      name: k8s-slack-webhook
+  - patch: |-
+      $patch: delete
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        namespace: monitoring
+        name: infra-slack-webhook
+  - patch: |-
+      $patch: delete
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        namespace: monitoring
+        name: k8s-slack-webhook
 {{- end }}
+{{- end }}
+{{- if or (eq $monitoringType "prometheus") (eq $monitoringType "mimir") }}
+  {{- if not $installEnhancedHPAMetrics }}
+  - patch: |-
+      $patch: delete
+      apiVersion: apiregistration.k8s.io/v1
+      kind: APIService
+      metadata:
+        name: v1beta1.custom.metrics.k8s.io
+  - patch: |-
+      $patch: delete
+      apiVersion: apiregistration.k8s.io/v1
+      kind: APIService
+      metadata:
+        name: v1beta1.external.metrics.k8s.io
+  {{- end }}
 {{- end }}
 
 

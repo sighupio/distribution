@@ -12,7 +12,8 @@ kind: Kustomization
 resources:
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/logging-operator" }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/logging-operated" }}
-{{- if or (eq $loggingType "loki") (eq $loggingType "opensearch") }}
+  - kapp-configs/logging-operator-crd.yaml
+{{- if eq $loggingType "loki" "opensearch" }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/minio-ha" }}
   {{- if ne .spec.distribution.modules.ingress.nginx.type "none" }}
   - resources/ingress-infra.yml
@@ -45,6 +46,7 @@ resources:
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/loki-configs/kubernetes" }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/loki-configs/systemd" }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/loki-distributed" }}
+  - kapp-configs/loki-hpa.yaml
 {{- end }}
 
 {{ if eq .spec.distribution.common.networkPoliciesEnabled true }}

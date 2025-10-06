@@ -15,7 +15,7 @@ kind: EKSCluster
 metadata:
   name: e2e-test-eks
 spec:
-  distributionVersion: v1.31.1
+  distributionVersion: v1.31.2
   toolsConfiguration:
     terraform:
       state:
@@ -54,7 +54,7 @@ spec:
           - 0.0.0.0/0
   kubernetes:
     nodeAllowedSshPublicKey: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA1xMG9TEH97YhkmoehlMaAMwqi9NOIx2ItXKNv2KVnI
-    nodePoolGlobalAmiType: alinux2
+    nodePoolGlobalAmiType: alinux2023
     nodePoolsLaunchKind: launch_templates
     apiServer:
       privateAccess: true

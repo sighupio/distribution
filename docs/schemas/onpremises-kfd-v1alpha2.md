@@ -4680,17 +4680,21 @@ Defines the Kubernetes components configuration and the values needed for the ku
 
 ### Properties
 
-| Property                                                            | Type     | Required |
-|:--------------------------------------------------------------------|:---------|:---------|
-| [airGap](#speckubernetesadvancedairgap)                             | `object` | Optional |
-| [apiServerCertSANs](#speckubernetesadvancedapiservercertsans)       | `array`  | Optional |
-| [cloud](#speckubernetesadvancedcloud)                               | `object` | Optional |
-| [containerd](#speckubernetesadvancedcontainerd)                     | `object` | Optional |
-| [encryption](#speckubernetesadvancedencryption)                     | `object` | Optional |
-| [kubeletConfiguration](#speckubernetesadvancedkubeletconfiguration) | `object` | Optional |
-| [oidc](#speckubernetesadvancedoidc)                                 | `object` | Optional |
-| [registry](#speckubernetesadvancedregistry)                         | `string` | Optional |
-| [users](#speckubernetesadvancedusers)                               | `object` | Optional |
+| Property                                                                  | Type      | Required |
+|:--------------------------------------------------------------------------|:----------|:---------|
+| [airGap](#speckubernetesadvancedairgap)                                   | `object`  | Optional |
+| [apiServerCertSANs](#speckubernetesadvancedapiservercertsans)             | `array`   | Optional |
+| [cloud](#speckubernetesadvancedcloud)                                     | `object`  | Optional |
+| [containerd](#speckubernetesadvancedcontainerd)                           | `object`  | Optional |
+| [controllerManager](#speckubernetesadvancedcontrollermanager)             | `object`  | Optional |
+| [encryption](#speckubernetesadvancedencryption)                           | `object`  | Optional |
+| [eventRateLimits](#speckubernetesadvancedeventratelimits)                 | `array`   | Optional |
+| [kernelParameters](#speckubernetesadvancedkernelparameters)               | `array`   | Optional |
+| [kubeletConfiguration](#speckubernetesadvancedkubeletconfiguration)       | `object`  | Optional |
+| [oidc](#speckubernetesadvancedoidc)                                       | `object`  | Optional |
+| [registry](#speckubernetesadvancedregistry)                               | `string`  | Optional |
+| [selfmanagedRepositories](#speckubernetesadvancedselfmanagedrepositories) | `boolean` | Optional |
+| [users](#speckubernetesadvancedusers)                                     | `object`  | Optional |
 
 ## .spec.kubernetes.advanced.airGap
 
@@ -4849,13 +4853,73 @@ Sets the cloud provider for the Kubelet
 
 ### Properties
 
-| Property                                                            | Type    | Required |
-|:--------------------------------------------------------------------|:--------|:---------|
-| [registryConfigs](#speckubernetesadvancedcontainerdregistryconfigs) | `array` | Optional |
+| Property                                                                                                  | Type      | Required |
+|:----------------------------------------------------------------------------------------------------------|:----------|:---------|
+| [debugLevel](#speckubernetesadvancedcontainerddebuglevel)                                                 | `string`  | Optional |
+| [deviceOwnershipFromSecurityContext](#speckubernetesadvancedcontainerddeviceownershipfromsecuritycontext) | `boolean` | Optional |
+| [grpcMaxRecvMessageSize](#speckubernetesadvancedcontainerdgrpcmaxrecvmessagesize)                         | `integer` | Optional |
+| [grpcMaxSendMessageSize](#speckubernetesadvancedcontainerdgrpcmaxsendmessagesize)                         | `integer` | Optional |
+| [maxContainerLogLineSize](#speckubernetesadvancedcontainerdmaxcontainerloglinesize)                       | `integer` | Optional |
+| [metricsAddress](#speckubernetesadvancedcontainerdmetricsaddress)                                         | `string`  | Optional |
+| [metricsGrpcHistogram](#speckubernetesadvancedcontainerdmetricsgrpchistogram)                             | `boolean` | Optional |
+| [oomScore](#speckubernetesadvancedcontainerdoomscore)                                                     | `integer` | Optional |
+| [registryConfigs](#speckubernetesadvancedcontainerdregistryconfigs)                                       | `array`   | Optional |
+| [selfmanagedRepositories](#speckubernetesadvancedcontainerdselfmanagedrepositories)                       | `boolean` | Optional |
+| [stateDir](#speckubernetesadvancedcontainerdstatedir)                                                     | `string`  | Optional |
+| [storageDir](#speckubernetesadvancedcontainerdstoragedir)                                                 | `string`  | Optional |
+| [systemdDir](#speckubernetesadvancedcontainerdsystemddir)                                                 | `string`  | Optional |
 
 ### Description
 
 Advanced configuration for containerd
+
+## .spec.kubernetes.advanced.containerd.debugLevel
+
+### Description
+
+The Containerd debug level used in the config.toml file.
+
+## .spec.kubernetes.advanced.containerd.deviceOwnershipFromSecurityContext
+
+### Description
+
+Set to true to apply device ownership from the container runtime's security context instead of the host's defaults, used in the config.toml file.
+
+## .spec.kubernetes.advanced.containerd.grpcMaxRecvMessageSize
+
+### Description
+
+The Containerd gRPC maximum receive message size in bytes used in the config.toml file.
+
+## .spec.kubernetes.advanced.containerd.grpcMaxSendMessageSize
+
+### Description
+
+The Containerd gRPC maximum send message size in bytes used in the config.toml file.
+
+## .spec.kubernetes.advanced.containerd.maxContainerLogLineSize
+
+### Description
+
+The maximum container log line size in bytes used in the config.toml file.
+
+## .spec.kubernetes.advanced.containerd.metricsAddress
+
+### Description
+
+The Containerd metrics address used in the config.toml file.
+
+## .spec.kubernetes.advanced.containerd.metricsGrpcHistogram
+
+### Description
+
+Enable Containerd metrics gRPC histogram in the config.toml file.
+
+## .spec.kubernetes.advanced.containerd.oomScore
+
+### Description
+
+The Containerd OOM score adjustment used in the config.toml file.
 
 ## .spec.kubernetes.advanced.containerd.registryConfigs
 
@@ -4904,14 +4968,58 @@ Registry address on which you would like to configure authentication or mirror(s
 
 The username containerd will use to authenticate against the registry.
 
+## .spec.kubernetes.advanced.containerd.selfmanagedRepositories
+
+### Description
+
+Set to true if you manage the NVIDIA container toolkit's repositories externally and wish to skip their automatic configuration with furyctl. Default is false (furyctl manages repositories automatically).
+Notice that containerd itself is installed from binaries and does not use a repository. See `.spec.kubernetes.advanced.airGap` for other download options for containerd.
+
+## .spec.kubernetes.advanced.containerd.stateDir
+
+### Description
+
+The Containerd state directory used in the config.toml file.
+
+## .spec.kubernetes.advanced.containerd.storageDir
+
+### Description
+
+The Containerd storage directory used in the config.toml file.
+
+## .spec.kubernetes.advanced.containerd.systemdDir
+
+### Description
+
+The Containerd systemd service directory used in the config.toml file.
+
+## .spec.kubernetes.advanced.controllerManager
+
+### Properties
+
+| Property                                                           | Type      | Required |
+|:-------------------------------------------------------------------|:----------|:---------|
+| [gcThreshold](#speckubernetesadvancedcontrollermanagergcthreshold) | `integer` | Optional |
+
+### Description
+
+Advanced configuration for the controller-manager.
+
+## .spec.kubernetes.advanced.controllerManager.gcThreshold
+
+### Description
+
+Maximum number of terminated Pods retained by the controller-manager before automatic deletion.
+
 ## .spec.kubernetes.advanced.encryption
 
 ### Properties
 
-| Property                                                            | Type     | Required |
-|:--------------------------------------------------------------------|:---------|:---------|
-| [configuration](#speckubernetesadvancedencryptionconfiguration)     | `string` | Optional |
-| [tlsCipherSuites](#speckubernetesadvancedencryptiontlsciphersuites) | `array`  | Optional |
+| Property                                                                          | Type     | Required |
+|:----------------------------------------------------------------------------------|:---------|:---------|
+| [configuration](#speckubernetesadvancedencryptionconfiguration)                   | `string` | Optional |
+| [tlsCipherSuites](#speckubernetesadvancedencryptiontlsciphersuites)               | `array`  | Optional |
+| [tlsCipherSuitesKubelet](#speckubernetesadvancedencryptiontlsciphersuiteskubelet) | `array`  | Optional |
 
 ## .spec.kubernetes.advanced.encryption.configuration
 
@@ -4938,7 +5046,7 @@ resources:
 
 ### Description
 
-The TLS cipher suites to use for etcd, kubelet, and kubeadm static pods. Example:
+The TLS cipher suites to use for etcd and kubeadm static pods. Example:
 ```yaml
 tlsCipherSuites:
   - "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256"
@@ -4951,15 +5059,125 @@ tlsCipherSuites:
   - "TLS_AES_256_GCM_SHA384"
   - "TLS_CHACHA20_POLY1305_SHA256"
 ```
-. NOTE: to customize the TLS cipher suites of the kubelet (as well as on control plane and etcd), set only this field - do not configure them under the `KubeletConfiguration`.
+.
+
+## .spec.kubernetes.advanced.encryption.tlsCipherSuitesKubelet
+
+### Description
+
+The TLS cipher suites to use for the kubelet. Example:
+```yaml
+tlsCipherSuitesKubelet:
+  - "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256"
+  - "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"
+  - "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384"
+ - "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305"
+  - "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305"
+  - "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384"
+```
+. NOTE: to customize the TLS cipher suites of the kubelet, set only this field - do not configure them under the `KubeletConfiguration`.
+
+## .spec.kubernetes.advanced.eventRateLimits
+
+### Properties
+
+| Property                                                     | Type      | Required |
+|:-------------------------------------------------------------|:----------|:---------|
+| [burst](#speckubernetesadvancedeventratelimitsburst)         | `integer` | Required |
+| [cacheSize](#speckubernetesadvancedeventratelimitscachesize) | `integer` | Optional |
+| [qps](#speckubernetesadvancedeventratelimitsqps)             | `integer` | Required |
+| [type](#speckubernetesadvancedeventratelimitstype)           | `string`  | Required |
+
+### Description
+
+Configures the limits of the API Server's EventRateLimit plugin. Each item represents a bucket (Server, Namespace, User, etc).
+
+## .spec.kubernetes.advanced.eventRateLimits.burst
+
+### Description
+
+Maximum allowed burst for this bucket type.
+
+## .spec.kubernetes.advanced.eventRateLimits.cacheSize
+
+### Description
+
+Maximum number of cached objects for this bucket. Only for certain types like Namespace or User.
+
+## .spec.kubernetes.advanced.eventRateLimits.qps
+
+### Description
+
+Maximum allowed queries per second (QPS) for this bucket type.
+
+## .spec.kubernetes.advanced.eventRateLimits.type
+
+### Description
+
+Type of limit to apply (Server, Namespace, User, SourceAndObject).
+
+### Constraints
+
+**enum**: the value of this property must be equal to one of the following string values:
+
+| Value             |
+|:------------------|
+|`"Server"`         |
+|`"Namespace"`      |
+|`"User"`           |
+|`"SourceAndObject"`|
+
+## .spec.kubernetes.advanced.kernelParameters
+
+### Properties
+
+| Property                                              | Type     | Required |
+|:------------------------------------------------------|:---------|:---------|
+| [name](#speckubernetesadvancedkernelparametersname)   | `string` | Required |
+| [value](#speckubernetesadvancedkernelparametersvalue) | `string` | Required |
+
+### Description
+
+Allows customization of kernel parameters with sysctl on all Kubernetes nodes. NOTE: if you remove a parameter from this list, it will not be reset to its default value without a reboot.
+
+## .spec.kubernetes.advanced.kernelParameters.name
+
+### Description
+
+The kernel parameter to edit. Example: `kernel.panic`
+
+## .spec.kubernetes.advanced.kernelParameters.value
+
+### Description
+
+The value of the kernel parameter to edit. Example: `"15"`
 
 ## .spec.kubernetes.advanced.kubeletConfiguration
+
+### Properties
+
+| Property                                                                                                      | Type     | Required |
+|:--------------------------------------------------------------------------------------------------------------|:---------|:---------|
+| [kubeletCertificateAuthorityFile](#speckubernetesadvancedkubeletconfigurationkubeletcertificateauthorityfile) | `string` | Optional |
+| [streamingConnectionIdleTimeout](#speckubernetesadvancedkubeletconfigurationstreamingconnectionidletimeout)   | `string` | Optional |
 
 ### Description
 
 Advanced configuration for Kubelet. This open field allows users to specify any parameter supported by the `KubeletConfiguration` object. Examples of uses include controlling the maximum number of pods per core (`podsPerCore`), managing container logging (`containerLogMaxSize`), Topology Manager options (`topologyManagerPolicyOptions`). All values must follow the official Kubelet specification: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/.
 
-NOTE: Content will **not** be validated by furyctl. To customize the TLS cipher suites of the Kubelet, set only the `Spec.Kubernetes.Advanced.Encryption.tlsCipherSuites` field - do not configure them under this field.
+NOTE: Content will **not** be validated by furyctl. To customize the TLS cipher suites of the Kubelet, set only the `Spec.Kubernetes.Advanced.Encryption.tlsCipherSuitesKubelet` field - do not configure them under this field.
+
+## .spec.kubernetes.advanced.kubeletConfiguration.kubeletCertificateAuthorityFile
+
+### Description
+
+Path to the CA file used to verify the kubelet servers' TLS certificates.
+
+## .spec.kubernetes.advanced.kubeletConfiguration.streamingConnectionIdleTimeout
+
+### Description
+
+The maximum time a streaming connection can be idle before it is closed. Example: `5m0s`
 
 ## .spec.kubernetes.advanced.oidc
 
@@ -5026,6 +5244,12 @@ Prefix prepended to username claims to prevent clashes with existing names (such
 ### Description
 
 URL of the registry where to pull images from for the Kubernetes phase. (Default is registry.sighup.io/fury/on-premises).
+
+## .spec.kubernetes.advanced.selfmanagedRepositories
+
+### Description
+
+Set to true if you manage the Kubernetes package repositories externally and wish to skip their automatic configuration with furyctl. Default is false (furyctl manages repositories automatically).
 
 ## .spec.kubernetes.advanced.users
 
@@ -5126,13 +5350,14 @@ A name to identify the etcd node. This value will be concatenated to `.spec.kube
 
 ### Properties
 
-| Property                                                         | Type      | Required |
-|:-----------------------------------------------------------------|:----------|:---------|
-| [additionalConfig](#speckubernetesloadbalancersadditionalconfig) | `string`  | Optional |
-| [enabled](#speckubernetesloadbalancersenabled)                   | `boolean` | Required |
-| [hosts](#speckubernetesloadbalancershosts)                       | `array`   | Optional |
-| [keepalived](#speckubernetesloadbalancerskeepalived)             | `object`  | Optional |
-| [stats](#speckubernetesloadbalancersstats)                       | `object`  | Optional |
+| Property                                                                       | Type      | Required |
+|:-------------------------------------------------------------------------------|:----------|:---------|
+| [additionalConfig](#speckubernetesloadbalancersadditionalconfig)               | `string`  | Optional |
+| [enabled](#speckubernetesloadbalancersenabled)                                 | `boolean` | Required |
+| [hosts](#speckubernetesloadbalancershosts)                                     | `array`   | Optional |
+| [keepalived](#speckubernetesloadbalancerskeepalived)                           | `object`  | Optional |
+| [selfmanagedRepositories](#speckubernetesloadbalancersselfmanagedrepositories) | `boolean` | Optional |
+| [stats](#speckubernetesloadbalancersstats)                                     | `object`  | Optional |
 
 ## .spec.kubernetes.loadBalancers.additionalConfig
 
@@ -5213,6 +5438,12 @@ Password for accessing vrrpd. Make it unique between Keepalived clusters.
 
 The virtual router ID of Keepalived, an arbitrary unique number from 1 to 255 used to differentiate multiple instances of vrrpd running on the same network interface and address family and multicast/unicast (and hence same socket).
 
+## .spec.kubernetes.loadBalancers.selfmanagedRepositories
+
+### Description
+
+Set to true if you manage the HAProxy repositories externally and wish to skip their automatic configuration with furyctl. Default is false (furyctl manages repositories automatically).
+
 ## .spec.kubernetes.loadBalancers.stats
 
 ### Properties
@@ -5282,11 +5513,30 @@ A name to identify the host. This value will be concatenated to `.spec.kubernete
 
 ## .spec.kubernetes.masters.kubeletConfiguration
 
+### Properties
+
+| Property                                                                                                     | Type     | Required |
+|:-------------------------------------------------------------------------------------------------------------|:---------|:---------|
+| [kubeletCertificateAuthorityFile](#speckubernetesmasterskubeletconfigurationkubeletcertificateauthorityfile) | `string` | Optional |
+| [streamingConnectionIdleTimeout](#speckubernetesmasterskubeletconfigurationstreamingconnectionidletimeout)   | `string` | Optional |
+
 ### Description
 
 Advanced configuration for Kubelet. This open field allows users to specify any parameter supported by the `KubeletConfiguration` object. Examples of uses include controlling the maximum number of pods per core (`podsPerCore`), managing container logging (`containerLogMaxSize`), Topology Manager options (`topologyManagerPolicyOptions`). All values must follow the official Kubelet specification: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/.
 
-NOTE: Content will **not** be validated by furyctl. To customize the TLS cipher suites of the Kubelet, set only the `Spec.Kubernetes.Advanced.Encryption.tlsCipherSuites` field - do not configure them under this field.
+NOTE: Content will **not** be validated by furyctl. To customize the TLS cipher suites of the Kubelet, set only the `Spec.Kubernetes.Advanced.Encryption.tlsCipherSuitesKubelet` field - do not configure them under this field.
+
+## .spec.kubernetes.masters.kubeletConfiguration.kubeletCertificateAuthorityFile
+
+### Description
+
+Path to the CA file used to verify the kubelet servers' TLS certificates.
+
+## .spec.kubernetes.masters.kubeletConfiguration.streamingConnectionIdleTimeout
+
+### Description
+
+The maximum time a streaming connection can be idle before it is closed. Example: `5m0s`
 
 ## .spec.kubernetes.masters.labels
 
@@ -5346,11 +5596,30 @@ A name to identify the host. This value will be concatenated to `.spec.kubernete
 
 ## .spec.kubernetes.nodes.kubeletConfiguration
 
+### Properties
+
+| Property                                                                                                   | Type     | Required |
+|:-----------------------------------------------------------------------------------------------------------|:---------|:---------|
+| [kubeletCertificateAuthorityFile](#speckubernetesnodeskubeletconfigurationkubeletcertificateauthorityfile) | `string` | Optional |
+| [streamingConnectionIdleTimeout](#speckubernetesnodeskubeletconfigurationstreamingconnectionidletimeout)   | `string` | Optional |
+
 ### Description
 
 Advanced configuration for Kubelet. This open field allows users to specify any parameter supported by the `KubeletConfiguration` object. Examples of uses include controlling the maximum number of pods per core (`podsPerCore`), managing container logging (`containerLogMaxSize`), Topology Manager options (`topologyManagerPolicyOptions`). All values must follow the official Kubelet specification: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/.
 
-NOTE: Content will **not** be validated by furyctl. To customize the TLS cipher suites of the Kubelet, set only the `Spec.Kubernetes.Advanced.Encryption.tlsCipherSuites` field - do not configure them under this field.
+NOTE: Content will **not** be validated by furyctl. To customize the TLS cipher suites of the Kubelet, set only the `Spec.Kubernetes.Advanced.Encryption.tlsCipherSuitesKubelet` field - do not configure them under this field.
+
+## .spec.kubernetes.nodes.kubeletConfiguration.kubeletCertificateAuthorityFile
+
+### Description
+
+Path to the CA file used to verify the kubelet servers' TLS certificates.
+
+## .spec.kubernetes.nodes.kubeletConfiguration.streamingConnectionIdleTimeout
+
+### Description
+
+The maximum time a streaming connection can be idle before it is closed. Example: `5m0s`
 
 ## .spec.kubernetes.nodes.labels
 

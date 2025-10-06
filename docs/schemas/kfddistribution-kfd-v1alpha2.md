@@ -3597,9 +3597,17 @@ The value of the toleration
 
 ### Properties
 
-| Property                                                               | Type     | Required |
-|:-----------------------------------------------------------------------|:---------|:---------|
-| [overrides](#specdistributionmodulesnetworkingtigeraoperatoroverrides) | `object` | Optional |
+| Property                                                               | Type      | Required |
+|:-----------------------------------------------------------------------|:----------|:---------|
+| [blockSize](#specdistributionmodulesnetworkingtigeraoperatorblocksize) | `integer` | Optional |
+| [overrides](#specdistributionmodulesnetworkingtigeraoperatoroverrides) | `object`  | Optional |
+| [podCidr](#specdistributionmodulesnetworkingtigeraoperatorpodcidr)     | `string`  | Optional |
+
+## .spec.distribution.modules.networking.tigeraOperator.blockSize
+
+### Description
+
+BlockSize specifies the CIDR prefix length to use when allocating per-node IP blocks from the main IP pool CIDR. WARNING: The value for this field cannot be changed once set. Default is 26.
 
 ## .spec.distribution.modules.networking.tigeraOperator.overrides
 
@@ -3665,6 +3673,28 @@ The key of the toleration
 ### Description
 
 The value of the toleration
+
+## .spec.distribution.modules.networking.tigeraOperator.podCidr
+
+### Description
+
+Specifies a custom CIDR for the default Pods IPPool.
+If unset, the Tigera Operator will try to detect it from the cluster:
+- OpenShift -> OpenShift Network config
+- kubeadm -> kubeadm-config ConfigMap
+- EKS -> defaults to 172.16.0.0/16 (VXLAN)
+- otherwise -> defaults to 192.168.0.0/16.
+WARNING: this field cannot be changed once set.
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}\/(3[0-2]|[1-2][0-9]|[0-9])$
+```
+
+[try pattern](https://regexr.com/?expression=^\(\(25[0-5]|\(2[0-4]|1\d|[1-9]|\)\d\)\.?\b\){4}\\/\(3[0-2]|[1-2][0-9]|[0-9]\)$)
 
 ## .spec.distribution.modules.networking.type
 

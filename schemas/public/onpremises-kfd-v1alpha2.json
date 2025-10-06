@@ -190,6 +190,10 @@
         "additionalConfig": {
           "type": "string",
           "description": "Additional configuration to append to HAProxy's configuration file."
+        },
+        "selfmanagedRepositories": {
+          "type": "boolean",
+          "description": "Set to true if you manage the HAProxy repositories externally and wish to skip their automatic configuration with furyctl. Default is false (furyctl manages repositories automatically)."
         }
       },
       "required": [
@@ -489,6 +493,44 @@
         },
         "kubeletConfiguration": {
           "$ref": "#/$defs/Spec.Kubernetes.Advanced.KubeletConfiguration"
+        },
+        "kernelParameters": {
+          "$ref": "#/$defs/Spec.Kubernetes.Advanced.KernelParameters"
+        },
+        "selfmanagedRepositories": {
+          "type": "boolean",
+          "description": "Set to true if you manage the Kubernetes package repositories externally and wish to skip their automatic configuration with furyctl. Default is false (furyctl manages repositories automatically)."
+        },
+        "controllerManager": {
+          "$ref": "#/$defs/Spec.Kubernetes.Advanced.ControllerManager"
+        },
+        "eventRateLimits": {
+          "type": "array",
+          "description": "Configures the limits of the API Server's EventRateLimit plugin. Each item represents a bucket (Server, Namespace, User, etc).",
+          "items": {
+            "type": "object",
+            "required": ["type", "qps", "burst"],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["Server", "Namespace", "User", "SourceAndObject"],
+                "description": "Type of limit to apply (Server, Namespace, User, SourceAndObject)."
+              },
+              "qps": {
+                "type": "integer",
+                "description": "Maximum allowed queries per second (QPS) for this bucket type."
+              },
+              "burst": {
+                "type": "integer",
+                "description": "Maximum allowed burst for this bucket type."
+              },
+              "cacheSize": {
+                "type": "integer",
+                "description": "Maximum number of cached objects for this bucket. Only for certain types like Namespace or User."
+              }
+            },
+            "additionalProperties": false
+          }
         }
       }
     },
@@ -565,6 +607,54 @@
       "properties": {
         "registryConfigs": {
           "$ref": "#/$defs/Spec.Kubernetes.Advanced.Containerd.RegistryConfigs"
+        },
+        "selfmanagedRepositories": {
+          "type": "boolean",
+          "description": "Set to true if you manage the NVIDIA container toolkit's repositories externally and wish to skip their automatic configuration with furyctl. Default is false (furyctl manages repositories automatically).\nNotice that containerd itself is installed from binaries and does not use a repository. See `.spec.kubernetes.advanced.airGap` for other download options for containerd."
+        },
+        "storageDir": {
+          "type": "string",
+          "description": "The Containerd storage directory used in the config.toml file."
+        },
+        "stateDir": {
+          "type": "string",
+          "description": "The Containerd state directory used in the config.toml file."
+        },
+        "systemdDir": {
+          "type": "string",
+          "description": "The Containerd systemd service directory used in the config.toml file."
+        },
+        "oomScore": {
+          "type": "integer",
+          "description": "The Containerd OOM score adjustment used in the config.toml file."
+        },
+        "grpcMaxRecvMessageSize": {
+          "type": "integer",
+          "description": "The Containerd gRPC maximum receive message size in bytes used in the config.toml file."
+        },
+        "grpcMaxSendMessageSize": {
+          "type": "integer",
+          "description": "The Containerd gRPC maximum send message size in bytes used in the config.toml file."
+        },
+        "debugLevel": {
+          "type": "string",
+          "description": "The Containerd debug level used in the config.toml file."
+        },
+        "metricsAddress": {
+          "type": "string",
+          "description": "The Containerd metrics address used in the config.toml file."
+        },
+        "metricsGrpcHistogram": {
+          "type": "boolean",
+          "description": "Enable Containerd metrics gRPC histogram in the config.toml file."
+        },
+        "maxContainerLogLineSize": {
+          "type": "integer",
+          "description": "The maximum container log line size in bytes used in the config.toml file."
+        },
+        "deviceOwnershipFromSecurityContext": {
+          "type": "boolean",
+          "description": "Set to true to apply device ownership from the container runtime's security context instead of the host's defaults, used in the config.toml file."
         }
       }
     },
@@ -611,7 +701,14 @@
           "items": {
             "type": "string"
           },
-          "description": "The TLS cipher suites to use for etcd, kubelet, and kubeadm static pods. Example:\n```yaml\ntlsCipherSuites:\n  - \"TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256\"\n  - \"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256\"\n  - \"TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384\"\n  - \"TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384\"\n  - \"TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256\"\n  - \"TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256\"\n  - \"TLS_AES_128_GCM_SHA256\"\n  - \"TLS_AES_256_GCM_SHA384\"\n  - \"TLS_CHACHA20_POLY1305_SHA256\"\n```\n. NOTE: to customize the TLS cipher suites of the kubelet (as well as on control plane and etcd), set only this field - do not configure them under the `KubeletConfiguration`."
+          "description": "The TLS cipher suites to use for etcd and kubeadm static pods. Example:\n```yaml\ntlsCipherSuites:\n  - \"TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256\"\n  - \"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256\"\n  - \"TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384\"\n  - \"TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384\"\n  - \"TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256\"\n  - \"TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256\"\n  - \"TLS_AES_128_GCM_SHA256\"\n  - \"TLS_AES_256_GCM_SHA384\"\n  - \"TLS_CHACHA20_POLY1305_SHA256\"\n```\n."
+        },
+        "tlsCipherSuitesKubelet": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The TLS cipher suites to use for the kubelet. Example:\n```yaml\ntlsCipherSuitesKubelet:\n  - \"TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256\"\n  - \"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256\"\n  - \"TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384\"\n - \"TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305\"\n  - \"TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305\"\n  - \"TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384\"\n```\n. NOTE: to customize the TLS cipher suites of the kubelet, set only this field - do not configure them under the `KubeletConfiguration`."
         },
         "configuration": {
           "type": "string",
@@ -712,7 +809,49 @@
     "Spec.Kubernetes.Advanced.KubeletConfiguration": {
       "type": "object",
       "additionalProperties": true,
-      "description": "Advanced configuration for Kubelet. This open field allows users to specify any parameter supported by the `KubeletConfiguration` object. Examples of uses include controlling the maximum number of pods per core (`podsPerCore`), managing container logging (`containerLogMaxSize`), Topology Manager options (`topologyManagerPolicyOptions`). All values must follow the official Kubelet specification: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/.\n\nNOTE: Content will **not** be validated by furyctl. To customize the TLS cipher suites of the Kubelet, set only the `Spec.Kubernetes.Advanced.Encryption.tlsCipherSuites` field - do not configure them under this field."
+      "description": "Advanced configuration for Kubelet. This open field allows users to specify any parameter supported by the `KubeletConfiguration` object. Examples of uses include controlling the maximum number of pods per core (`podsPerCore`), managing container logging (`containerLogMaxSize`), Topology Manager options (`topologyManagerPolicyOptions`). All values must follow the official Kubelet specification: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/.\n\nNOTE: Content will **not** be validated by furyctl. To customize the TLS cipher suites of the Kubelet, set only the `Spec.Kubernetes.Advanced.Encryption.tlsCipherSuitesKubelet` field - do not configure them under this field.",
+      "properties": {
+        "streamingConnectionIdleTimeout": {
+          "type": "string",
+          "description": "The maximum time a streaming connection can be idle before it is closed. Example: `5m0s`"
+        },
+        "kubeletCertificateAuthorityFile": {
+          "type": "string",
+          "description": "Path to the CA file used to verify the kubelet servers' TLS certificates."
+        }
+      }
+    },
+    "Spec.Kubernetes.Advanced.KernelParameters": {
+      "type": "array",
+      "description": "Allows customization of kernel parameters with sysctl on all Kubernetes nodes. NOTE: if you remove a parameter from this list, it will not be reset to its default value without a reboot.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The kernel parameter to edit. Example: `kernel.panic`"
+          },
+          "value": {
+            "type": "string",
+            "description": "The value of the kernel parameter to edit. Example: `\"15\"`"
+          }
+        },
+        "required": [
+          "name",
+          "value"
+        ]
+      }
+    },
+    "Spec.Kubernetes.Advanced.ControllerManager": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Advanced configuration for the controller-manager.",
+      "properties": {
+        "gcThreshold": {
+          "type": "integer",
+          "description": "Maximum number of terminated Pods retained by the controller-manager before automatic deletion."
+        }
+      }
     },
     "Spec.Distribution": {
       "type": "object",

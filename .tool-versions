@@ -3,5 +3,4 @@ drone 1.7.0
 golang 1.23.3
 golangci-lint 1.62.0
 yq 4.33.3
-jq 1.6
-make 4.4.1
+jq latest

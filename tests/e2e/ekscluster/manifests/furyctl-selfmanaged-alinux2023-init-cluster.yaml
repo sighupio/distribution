@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/sighupio/fury-distribution/v1.31.0/schemas/public/ekscluster-kfd-v1alpha2.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/sighupio/fury-distribution/v1.32.0/schemas/public/ekscluster-kfd-v1alpha2.json
 # Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
@@ -13,19 +13,19 @@
 apiVersion: kfd.sighup.io/v1alpha2
 kind: EKSCluster
 metadata:
-  name: e2e-eks-upgrades
+  name: e2e-test-eks
 spec:
-  distributionVersion: v1.30.1
+  distributionVersion: v1.31.2
   toolsConfiguration:
     terraform:
       state:
         s3:
-          bucketName: e2e-drone-eks-upgrades
-          keyPrefix: e2e-eks-upgrades
+          bucketName: e2e-drone-eks
+          keyPrefix: e2e-test-eks
           region: eu-west-1
   region: eu-west-1
   tags:
-    env: e2e-eks-upgrades
+    env: e2e-test-eks
   infrastructure:
     vpc:
       network:
@@ -54,7 +54,7 @@ spec:
           - 0.0.0.0/0
   kubernetes:
     nodeAllowedSshPublicKey: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA1xMG9TEH97YhkmoehlMaAMwqi9NOIx2ItXKNv2KVnI
-    nodePoolGlobalAmiType: alinux2
+    nodePoolGlobalAmiType: alinux2023
     nodePoolsLaunchKind: launch_templates
     apiServer:
       privateAccess: true
@@ -65,7 +65,7 @@ spec:
         - 0.0.0.0/0
     nodePools:
       - name: infra
-        type: eks-managed
+        type: self-managed
         size:
           min: 6
           max: 9
@@ -75,8 +75,10 @@ spec:
           volumeSize: 50
           volumeType: gp2
         labels:
-          nodepool: infra
-          node.kubernetes.io/role: infra
+          nodepool: "infra"
+          node.kubernetes.io/role: "infra"
+        taints:
+          - node.kubernetes.io/role=infra:NoSchedule
         tags:
           k8s.io/cluster-autoscaler/node-template/label/nodepool: worker
           k8s.io/cluster-autoscaler/node-template/label/node.kubernetes.io/role: worker
@@ -85,6 +87,13 @@ spec:
       users: []
       roles: []
   distribution:
+    common:
+      nodeSelector:
+        node.kubernetes.io/role: infra
+      tolerations:
+        - effect: NoSchedule
+          key: node.kubernetes.io/role
+          value: infra
     modules:
       ingress:
         baseDomain: internal.e2e.ci.sighup.cc
@@ -146,7 +155,7 @@ spec:
         type: eks
         velero:
           eks:
-            bucketName: e2e-eks-upgrades-velero
+            bucketName: e2e-test-eks
             region: eu-west-1
       auth:
         provider:
