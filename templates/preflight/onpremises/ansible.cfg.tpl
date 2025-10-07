@@ -7,7 +7,7 @@ inventory = hosts.yaml
 host_key_checking = False
 roles_path = ../vendor/installers/onpremises/roles
 timeout = 90
-stdout_callback = yaml
+callback_result_format = yaml
 bin_ansible_callbacks = True
 {{- if and (index .spec.kubernetes "advancedAnsible") (index .spec.kubernetes.advancedAnsible "config") }}
 {{ .spec.kubernetes.advancedAnsible.config }}

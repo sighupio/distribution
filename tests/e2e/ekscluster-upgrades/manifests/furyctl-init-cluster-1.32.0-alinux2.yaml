@@ -1,0 +1,158 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/sighupio/fury-distribution/v1.32.0/schemas/public/ekscluster-kfd-v1alpha2.json
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+
+# This is a sample configuration file to be used as a starting point. For the
+# complete reference of the configuration file schema, please refer to the
+# official documentation:
+# https://docs.kubernetesfury.com/docs/furyctl/providers/ekscluster
+
+---
+apiVersion: kfd.sighup.io/v1alpha2
+kind: EKSCluster
+metadata:
+  name: e2e-eks-upgrades
+spec:
+  distributionVersion: v1.31.2
+  toolsConfiguration:
+    terraform:
+      state:
+        s3:
+          bucketName: e2e-drone-eks-upgrades
+          keyPrefix: e2e-eks-upgrades
+          region: eu-west-1
+  region: eu-west-1
+  tags:
+    env: e2e-eks-upgrades
+  infrastructure:
+    vpc:
+      network:
+        cidr: 10.1.0.0/16
+        subnetsCidrs:
+          private:
+            - 10.1.0.0/20
+            - 10.1.16.0/20
+            - 10.1.32.0/20
+          public:
+            - 10.1.48.0/24
+            - 10.1.49.0/24
+            - 10.1.50.0/24
+    vpn:
+      instances: 0
+      port: 1194
+      instanceType: t3.micro
+      diskSize: 50
+      operatorName: sighup
+      dhParamsBits: 2048
+      vpnClientsSubnetCidr: 172.16.0.0/16
+      ssh:
+        githubUsersName:
+          - Filo01
+        allowedFromCidrs:
+          - 0.0.0.0/0
+  kubernetes:
+    nodeAllowedSshPublicKey: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA1xMG9TEH97YhkmoehlMaAMwqi9NOIx2ItXKNv2KVnI
+    nodePoolGlobalAmiType: alinux2
+    nodePoolsLaunchKind: launch_templates
+    apiServer:
+      privateAccess: true
+      publicAccess: true
+      privateAccessCidrs:
+        - 0.0.0.0/0
+      publicAccessCidrs:
+        - 0.0.0.0/0
+    nodePools:
+      - name: infra
+        type: eks-managed
+        size:
+          min: 6
+          max: 9
+        instance:
+          type: t3.xlarge
+          spot: false
+          volumeSize: 50
+          volumeType: gp2
+        labels:
+          nodepool: infra
+          node.kubernetes.io/role: infra
+          os-type: alinux2
+        tags:
+          k8s.io/cluster-autoscaler/node-template/label/nodepool: infra
+          k8s.io/cluster-autoscaler/node-template/label/node.kubernetes.io/role: infra
+          k8s.io/cluster-autoscaler/node-template/label/os-type: alinux2
+    awsAuth:
+      additionalAccounts: []
+      users: []
+      roles: []
+  distribution:
+    modules:
+      ingress:
+        baseDomain: internal.e2e.ci.sighup.cc
+        nginx:
+          type: dual
+          tls:
+            provider: certManager
+        certManager:
+          clusterIssuer:
+            name: letsencrypt-fury
+            email: test@sighup.io
+            type: http01
+        dns:
+          public:
+            name: e2e.ci.sighup.cc
+            create: true
+          private:
+            name: internal.e2e.ci.sighup.cc
+            create: true
+      logging:
+        type: loki
+        minio:
+          storageSize: 20Gi
+          rootUser:
+            username: sighup
+            password: secretpassword1
+        loki:
+          backend: minio
+          tsdbStartDate: '2024-11-21'
+      monitoring:
+        type: mimir
+        prometheus:
+          resources:
+            requests:
+              cpu: 10m
+            limits:
+              cpu: 2000m
+              memory: 6Gi
+        minio:
+          storageSize: 20Gi
+          rootUser:
+            username: sighup
+            password: secretpassword2
+      tracing:
+        type: tempo
+        minio:
+          storageSize: 20Gi
+          rootUser:
+            username: sighup
+            password: secretpassword3
+      policy:
+        type: kyverno
+        kyverno:
+          additionalExcludedNamespaces:
+            - local-path-storage
+          validationFailureAction: Enforce
+          installDefaultPolicies: true
+      dr:
+        type: eks
+        velero:
+          eks:
+            bucketName: e2e-eks-upgrades-velero
+            region: eu-west-1
+      auth:
+        provider:
+          type: basicAuth
+          basicAuth:
+            username: test
+            password: testpassword

@@ -1,0 +1,151 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+apiVersion: kfd.sighup.io/v1alpha2
+kind: KFDDistribution
+metadata:
+  name: sighup
+spec:
+  distributionVersion: v1.33.0
+  # This section describes how the KFD distribution will be installed
+  distribution:
+    kubeconfig: "{env://KUBECONFIG}"
+    # This common configuration will be applied to all the packages that will be installed in the cluster
+    common:
+      networkPoliciesEnabled: true
+    # This section contains all the configurations for all the KFD core modules
+    modules:
+      networking:
+        type: calico
+      # This section contains all the configurations for the ingress module
+      ingress:
+        baseDomain: fury.sighup.cc
+        nginx:
+          type: single
+          tls:
+            provider: certManager
+        certManager:
+          clusterIssuer:
+            name: letsencrypt-fury
+            email: sighup@sighup.cc
+            type: http01
+      logging:
+        type: none
+        minio:
+          storageSize: 20Gi
+          rootUser:
+            username: sighup
+            password: secretpassword1
+      monitoring:
+        type: none
+        mimir:
+          backend: minio
+        prometheus:
+          resources:
+            requests:
+              cpu: 10m
+            limits:
+              cpu: 2000m
+              memory: 6Gi
+        minio:
+          storageSize: 20Gi
+          rootUser:
+            username: sighup
+            password: secretpassword2
+      tracing:
+        type: none
+        tempo:
+          backend: minio
+        minio:
+          storageSize: 20Gi
+          rootUser:
+            username: sighup
+            password: secretpassword3
+      policy:
+        type: none
+        kyverno:
+          additionalExcludedNamespaces: ["local-path-storage"]
+          installDefaultPolicies: true
+          validationFailureAction: Enforce
+      dr:
+        type: none
+        velero:
+          backend: minio
+      auth:
+        provider:
+          type: none
+    # patches for kind compatibility and resource setting
+    customPatches:
+      patchesStrategicMerge: []
+      #- |
+      #  apiVersion: apps/v1
+      #  kind: StatefulSet
+      #  metadata:
+      #    name: minio-logging
+      #    namespace: logging
+      #  spec:
+      #    template:
+      #      spec:
+      #        containers:
+      #        - name: minio
+      #          resources:
+      #            requests:
+      #              cpu: 10m
+      #              memory: 50Mi
+      #- |
+      #  apiVersion: apps/v1
+      #  kind: StatefulSet
+      #  metadata:
+      #    name: minio-monitoring
+      #    namespace: monitoring
+      #  spec:
+      #    template:
+      #      spec:
+      #        containers:
+      #        - name: minio
+      #          resources:
+      #            requests:
+      #              cpu: 10m
+      #              memory: 50Mi
+      #- |
+      #  apiVersion: apps/v1
+      #  kind: StatefulSet
+      #  metadata:
+      #    name: minio-tracing
+      #    namespace: tracing
+      #  spec:
+      #    template:
+      #      spec:
+      #        containers:
+      #        - name: minio
+      #          resources:
+      #            requests:
+      #              cpu: 10m
+      #              memory: 50Mi
+      #- |
+      #  $patch: delete
+      #  apiVersion: logging-extensions.banzaicloud.io/v1alpha1
+      #  kind: HostTailer
+      #  metadata:
+      #    name: systemd-common
+      #    namespace: logging
+      #- |
+      #  $patch: delete
+      #  apiVersion: logging-extensions.banzaicloud.io/v1alpha1
+      #  kind: HostTailer
+      #  metadata:
+      #    name: systemd-etcd
+      #    namespace: logging
+      #- |
+      #  $patch: delete
+      #  apiVersion: apps/v1
+      #  kind: DaemonSet
+      #  metadata:
+      #    name: x509-certificate-exporter-control-plane
+      #    namespace: monitoring
+  plugins:
+    kustomize:
+      - name: ldap-server
+        folder: ./plugins/ldap-server
