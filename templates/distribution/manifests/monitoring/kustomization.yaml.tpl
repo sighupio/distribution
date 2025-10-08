@@ -4,8 +4,10 @@
 
 {{- $monitoringType := .spec.distribution.modules.monitoring.type }}
 {{- $installEnhancedHPAMetrics := .spec.distribution.modules.monitoring.prometheusAdapter.installEnhancedHPAMetrics }}
+{{/* We consider kubeProxy to be disabled only if explicitly set to false in its configuration section */}}
+{{/* We need to check for disabled instead of enabled because we can't differentiate between the section not being set and a false value  */}}
+{{- $kubeProxyDisabled := and (hasKeyAny .spec "kubernetes") (hasKeyAny .spec.kubernetes "advanced") (hasKeyAny .spec.kubernetes.advanced "kubeProxy") (eq (index .spec.kubernetes.advanced.kubeProxy "enabled") false) }}
 # rendering Kustomization file for monitoring type {{ $monitoringType }}
-
 ---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
@@ -14,7 +16,9 @@ resources:
 {{- /* common components for all the monitoring types */}}
   - kapp-configs/prometheus-operator-crd.yaml
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/monitoring/katalog/prometheus-operator" }}
+  {{- if eq $kubeProxyDisabled false }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/monitoring/katalog/kube-proxy-metrics" }}
+  {{- end }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/monitoring/katalog/kube-state-metrics" }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/monitoring/katalog/node-exporter" }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/monitoring/katalog/x509-exporter" }}
