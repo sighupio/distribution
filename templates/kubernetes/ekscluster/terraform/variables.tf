@@ -225,10 +225,10 @@ variable "workers_iam_role_name_prefix_override" {
 variable "node_pools_global_ami_type" {
   type        = string
   description = "Global default AMI type used for EKS worker nodes. This will apply to all node pools unless overridden by a specific node pool."
-  default     = "alinux2023"
+  default     = "alinux2"
   validation {
-    condition     = contains(["alinux2023"], var.node_pools_global_ami_type)
-    error_message = "The global AMI type must be 'alinux2023'."
+    condition     = contains(["alinux2023", "alinux2"], var.node_pools_global_ami_type)
+    error_message = "The global AMI type must be either 'alinux2023' or 'alinux2'."
   }
 }
 
