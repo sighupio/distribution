@@ -186,7 +186,7 @@ volumes:
     host:
       path: /var/run/docker.sock
 ---
-name: e2e-kfddistribution-1.31.1-to-1.31.2
+name: e2e-kfddistribution-1.30.2-to-1.31.2
 kind: pipeline
 type: docker
 
@@ -875,7 +875,7 @@ type: docker
 
 depends_on:
   - e2e-kfddistribution-1.31.2
-  - e2e-kfddistribution-1.31.1-to-1.31.2
+  - e2e-kfddistribution-1.30.2-to-1.31.2
   - e2e-onpremises
   - e2e-onpremises-upgrades-1.30.2-1.31.2
 
