@@ -537,13 +537,14 @@ The type of the secret
 
 ### Properties
 
-| Property                                             | Type     | Required |
-|:-----------------------------------------------------|:---------|:---------|
-| [baseDomain](#specdistributionmodulesauthbasedomain) | `string` | Optional |
-| [dex](#specdistributionmodulesauthdex)               | `object` | Optional |
-| [overrides](#specdistributionmodulesauthoverrides)   | `object` | Optional |
-| [pomerium](#specdistributionmodulesauthpomerium)     | `object` | Optional |
-| [provider](#specdistributionmodulesauthprovider)     | `object` | Required |
+| Property                                                   | Type     | Required |
+|:-----------------------------------------------------------|:---------|:---------|
+| [baseDomain](#specdistributionmodulesauthbasedomain)       | `string` | Optional |
+| [dex](#specdistributionmodulesauthdex)                     | `object` | Optional |
+| [oidcTrustedCA](#specdistributionmodulesauthoidctrustedca) | `string` | Optional |
+| [overrides](#specdistributionmodulesauthoverrides)         | `object` | Optional |
+| [pomerium](#specdistributionmodulesauthpomerium)           | `object` | Optional |
+| [provider](#specdistributionmodulesauthprovider)           | `object` | Required |
 
 ### Description
 
@@ -678,6 +679,12 @@ The key of the toleration
 ### Description
 
 The value of the toleration
+
+## .spec.distribution.modules.auth.oidcTrustedCA
+
+### Description
+
+The Certificate Authority certificate file's content to trust for self-signed certificates at the OAuth2 URL. You can use the `"{file://<path>}"` notation to get the content from a file.
 
 ## .spec.distribution.modules.auth.overrides
 
@@ -919,7 +926,7 @@ Signing Key is the base64 representation of one or more PEM-encoded private keys
 To generates an P-256 (ES256) signing key:
 
 ```bash
-openssl ecparam  -genkey  -name prime256v1  -noout  -out ec_private.pem
+openssl ecparam -genkey -name prime256v1 -noout -out ec_private.pem
 # careful! this will output your private key in terminal
 cat ec_private.pem | base64
 ```
@@ -5100,6 +5107,7 @@ The network CIDR that will be used to assign IP addresses to the VPN clients whe
 | [nodeAllowedSshPublicKey](#speckubernetesnodeallowedsshpublickey)                   | `object`  | Required |
 | [nodePoolGlobalAmiType](#speckubernetesnodepoolglobalamitype)                       | `string`  | Required |
 | [nodePools](#speckubernetesnodepools)                                               | `array`   | Required |
+| [nodePoolsCommon](#speckubernetesnodepoolscommon)                                   | `object`  | Optional |
 | [nodePoolsLaunchKind](#speckubernetesnodepoolslaunchkind)                           | `string`  | Required |
 | [serviceIpV4Cidr](#speckubernetesserviceipv4cidr)                                   | `string`  | Optional |
 | [subnetIds](#speckubernetessubnetids)                                               | `array`   | Optional |
