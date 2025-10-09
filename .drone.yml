@@ -536,7 +536,7 @@ steps:
     - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-linux-amd64.tar.gz" | tar -xz
     - mv furyctl /usr/local/bin
     - chmod +x /usr/local/bin/furyctl
-    - tests/e2e/ekscluster/furyctl_delete.expect tests/e2e/ekscluster-upgrades/manifests/furyctl-init-cluster-1.32.0.yaml
+    - tests/e2e/ekscluster/furyctl_delete.expect tests/e2e/ekscluster-upgrades/manifests/furyctl-init-cluster-1.31.2-alinux2023.yaml
     - aws s3 rm s3://e2e-drone-eks/$CLUSTER_NAME --recursive
 
 - name: furyctl-delete-force
@@ -559,7 +559,7 @@ steps:
     - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-linux-amd64.tar.gz" | tar -xz
     - mv furyctl /usr/local/bin
     - chmod +x /usr/local/bin/furyctl
-    - tests/e2e/ekscluster/furyctl_delete_force.expect tests/e2e/ekscluster-upgrades/manifests/furyctl-init-cluster-1.32.0.yaml
+    - tests/e2e/ekscluster/furyctl_delete_force.expect tests/e2e/ekscluster-upgrades/manifests/furyctl-init-cluster-1.31.2-alinux2023.yaml
     - aws s3 rm s3://e2e-drone-eks/$CLUSTER_NAME --recursive
   when:
     status:
