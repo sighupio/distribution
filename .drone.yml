@@ -489,8 +489,7 @@ clone:
 
 trigger:
   ref:
-# TODO: WARNING: CHANGE ME BEFORE MERGING!
-#  - refs/tags/e2e-eks-**
+    - refs/tags/e2e-eks-**
     - refs/tags/e2e-full-**
     - refs/tags/v**
 
