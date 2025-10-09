@@ -690,7 +690,7 @@ volumes:
   temp: {}
 ---
 # On-premises upgrade pipeline - v1.31.1 to v1.32.1
-name: e2e-onpremises-upgrades-1.31.1-1.32.1
+name: e2e-onpremises-upgrades-1.31.2-1.32.1
 kind: pipeline
 type: docker
 
@@ -876,10 +876,10 @@ kind: pipeline
 type: docker
 
 depends_on:
-  - e2e-kfddistribution-1.32.1
-  - e2e-kfddistribution-1.31.1-to-1.32.1
+  - e2e-kfddistribution-1.32
+  - e2e-kfddistribution-1.31.2-to-1.32.1
   - e2e-onpremises
-  - e2e-onpremises-upgrades-1.31.1-1.32.1
+  - e2e-onpremises-upgrades-1.31.2-1.32.1
 
 platform:
   os: linux
