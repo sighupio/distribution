@@ -15,8 +15,8 @@ resources:
   - resources/storageclasses.yml
   - resources/snapshotclasses.yml
 
-patchesStrategicMerge:
-  - patches/cluster-autoscaler.yml
-  - patches/infra-nodes.yml
-  - patches/load-balancer-controller.yml
-  - patches/load-balancer-controller-kapp-wait.yml
+patches:
+  - path: patches/cluster-autoscaler.yml
+  - path: patches/infra-nodes.yml
+  - path: patches/load-balancer-controller.yml
+  - path: patches/load-balancer-controller-kapp-wait.yml
