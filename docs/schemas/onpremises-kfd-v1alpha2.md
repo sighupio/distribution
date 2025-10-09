@@ -4920,21 +4920,21 @@ Defines the Kubernetes components configuration and the values needed for the ku
 
 ### Properties
 
-| Property                                                            | Type      | Required |
-|:--------------------------------------------------------------------|:----------|:---------|
-| [airGap](#speckubernetesadvancedairgap)                             | `object`  | Optional |
-| [apiServerCertSANs](#speckubernetesadvancedapiservercertsans)       | `array`   | Optional |
-| [cloud](#speckubernetesadvancedcloud)                               | `object`  | Optional |
-| [containerd](#speckubernetesadvancedcontainerd)                     | `object`  | Optional |
-| [controllerManager](#speckubernetesadvancedcontrollermanager)       | `object`  | Optional |
-| [encryption](#speckubernetesadvancedencryption)                     | `object`  | Optional |
-| [eventRateLimits](#speckubernetesadvancedeventratelimits)           | `array`   | Optional |
-| [kernelParameters](#speckubernetesadvancedkernelparameters)         | `array`   | Optional |
-| [kubeletConfiguration](#speckubernetesadvancedkubeletconfiguration) | `object`  | Optional |
-| [manageRepositories](#speckubernetesadvancedmanagerepositories)     | `boolean` | Optional |
-| [oidc](#speckubernetesadvancedoidc)                                 | `object`  | Optional |
-| [registry](#speckubernetesadvancedregistry)                         | `string`  | Optional |
-| [users](#speckubernetesadvancedusers)                               | `object`  | Optional |
+| Property                                                                  | Type      | Required |
+|:--------------------------------------------------------------------------|:----------|:---------|
+| [airGap](#speckubernetesadvancedairgap)                                   | `object`  | Optional |
+| [apiServerCertSANs](#speckubernetesadvancedapiservercertsans)             | `array`   | Optional |
+| [cloud](#speckubernetesadvancedcloud)                                     | `object`  | Optional |
+| [containerd](#speckubernetesadvancedcontainerd)                           | `object`  | Optional |
+| [controllerManager](#speckubernetesadvancedcontrollermanager)             | `object`  | Optional |
+| [encryption](#speckubernetesadvancedencryption)                           | `object`  | Optional |
+| [eventRateLimits](#speckubernetesadvancedeventratelimits)                 | `array`   | Optional |
+| [kernelParameters](#speckubernetesadvancedkernelparameters)               | `array`   | Optional |
+| [kubeletConfiguration](#speckubernetesadvancedkubeletconfiguration)       | `object`  | Optional |
+| [oidc](#speckubernetesadvancedoidc)                                       | `object`  | Optional |
+| [registry](#speckubernetesadvancedregistry)                               | `string`  | Optional |
+| [selfmanagedRepositories](#speckubernetesadvancedselfmanagedrepositories) | `boolean` | Optional |
+| [users](#speckubernetesadvancedusers)                                     | `object`  | Optional |
 
 ## .spec.kubernetes.advanced.airGap
 
@@ -5099,12 +5099,12 @@ Sets the cloud provider for the Kubelet
 | [deviceOwnershipFromSecurityContext](#speckubernetesadvancedcontainerddeviceownershipfromsecuritycontext) | `boolean` | Optional |
 | [grpcMaxRecvMessageSize](#speckubernetesadvancedcontainerdgrpcmaxrecvmessagesize)                         | `integer` | Optional |
 | [grpcMaxSendMessageSize](#speckubernetesadvancedcontainerdgrpcmaxsendmessagesize)                         | `integer` | Optional |
-| [manageRepositories](#speckubernetesadvancedcontainerdmanagerepositories)                                 | `boolean` | Optional |
 | [maxContainerLogLineSize](#speckubernetesadvancedcontainerdmaxcontainerloglinesize)                       | `integer` | Optional |
 | [metricsAddress](#speckubernetesadvancedcontainerdmetricsaddress)                                         | `string`  | Optional |
 | [metricsGrpcHistogram](#speckubernetesadvancedcontainerdmetricsgrpchistogram)                             | `boolean` | Optional |
 | [oomScore](#speckubernetesadvancedcontainerdoomscore)                                                     | `integer` | Optional |
 | [registryConfigs](#speckubernetesadvancedcontainerdregistryconfigs)                                       | `array`   | Optional |
+| [selfmanagedRepositories](#speckubernetesadvancedcontainerdselfmanagedrepositories)                       | `boolean` | Optional |
 | [stateDir](#speckubernetesadvancedcontainerdstatedir)                                                     | `string`  | Optional |
 | [storageDir](#speckubernetesadvancedcontainerdstoragedir)                                                 | `string`  | Optional |
 | [systemdDir](#speckubernetesadvancedcontainerdsystemddir)                                                 | `string`  | Optional |
@@ -5136,13 +5136,6 @@ The Containerd gRPC maximum receive message size in bytes used in the config.tom
 ### Description
 
 The Containerd gRPC maximum send message size in bytes used in the config.toml file.
-
-## .spec.kubernetes.advanced.containerd.manageRepositories
-
-### Description
-
-Set to false if you manage the NVIDIA container toolkit's repositories externally and wish to skip their configuration with furyctl. Default is true.
-Notice that containerd itself is installed from binaries and does not use a repository. See `.spec.kubernetes.advanced.airGap` for other download options for containerd.
 
 ## .spec.kubernetes.advanced.containerd.maxContainerLogLineSize
 
@@ -5214,6 +5207,13 @@ Registry address on which you would like to configure authentication or mirror(s
 ### Description
 
 The username containerd will use to authenticate against the registry.
+
+## .spec.kubernetes.advanced.containerd.selfmanagedRepositories
+
+### Description
+
+Set to true if you manage the NVIDIA container toolkit's repositories externally and wish to skip their automatic configuration with furyctl. Default is false (furyctl manages repositories automatically).
+Notice that containerd itself is installed from binaries and does not use a repository. See `.spec.kubernetes.advanced.airGap` for other download options for containerd.
 
 ## .spec.kubernetes.advanced.containerd.stateDir
 
@@ -5419,12 +5419,6 @@ Path to the CA file used to verify the kubelet servers' TLS certificates.
 
 The maximum time a streaming connection can be idle before it is closed. Example: `5m0s`
 
-## .spec.kubernetes.advanced.manageRepositories
-
-### Description
-
-Set to false if you manage the Kubernetes package repositories externally and wish to skip their configuration with furyctl. Default is true.
-
 ## .spec.kubernetes.advanced.oidc
 
 ### Properties
@@ -5490,6 +5484,12 @@ Prefix prepended to username claims to prevent clashes with existing names (such
 ### Description
 
 URL of the registry where to pull images from for the Kubernetes phase. (Default is registry.sighup.io/fury/on-premises).
+
+## .spec.kubernetes.advanced.selfmanagedRepositories
+
+### Description
+
+Set to true if you manage the Kubernetes package repositories externally and wish to skip their automatic configuration with furyctl. Default is false (furyctl manages repositories automatically).
 
 ## .spec.kubernetes.advanced.users
 
@@ -5590,14 +5590,14 @@ A name to identify the etcd node. This value will be concatenated to `.spec.kube
 
 ### Properties
 
-| Property                                                             | Type      | Required |
-|:---------------------------------------------------------------------|:----------|:---------|
-| [additionalConfig](#speckubernetesloadbalancersadditionalconfig)     | `string`  | Optional |
-| [enabled](#speckubernetesloadbalancersenabled)                       | `boolean` | Required |
-| [hosts](#speckubernetesloadbalancershosts)                           | `array`   | Optional |
-| [keepalived](#speckubernetesloadbalancerskeepalived)                 | `object`  | Optional |
-| [manageRepositories](#speckubernetesloadbalancersmanagerepositories) | `boolean` | Optional |
-| [stats](#speckubernetesloadbalancersstats)                           | `object`  | Optional |
+| Property                                                                       | Type      | Required |
+|:-------------------------------------------------------------------------------|:----------|:---------|
+| [additionalConfig](#speckubernetesloadbalancersadditionalconfig)               | `string`  | Optional |
+| [enabled](#speckubernetesloadbalancersenabled)                                 | `boolean` | Required |
+| [hosts](#speckubernetesloadbalancershosts)                                     | `array`   | Optional |
+| [keepalived](#speckubernetesloadbalancerskeepalived)                           | `object`  | Optional |
+| [selfmanagedRepositories](#speckubernetesloadbalancersselfmanagedrepositories) | `boolean` | Optional |
+| [stats](#speckubernetesloadbalancersstats)                                     | `object`  | Optional |
 
 ## .spec.kubernetes.loadBalancers.additionalConfig
 
@@ -5678,11 +5678,11 @@ Password for accessing vrrpd. Make it unique between Keepalived clusters.
 
 The virtual router ID of Keepalived, an arbitrary unique number from 1 to 255 used to differentiate multiple instances of vrrpd running on the same network interface and address family and multicast/unicast (and hence same socket).
 
-## .spec.kubernetes.loadBalancers.manageRepositories
+## .spec.kubernetes.loadBalancers.selfmanagedRepositories
 
 ### Description
 
-Set to false if you manage the HAProxy repositories externally and wish to skip their configuration with furyctl. Default is true.
+Set to true if you manage the HAProxy repositories externally and wish to skip their automatic configuration with furyctl. Default is false (furyctl manages repositories automatically).
 
 ## .spec.kubernetes.loadBalancers.stats
 

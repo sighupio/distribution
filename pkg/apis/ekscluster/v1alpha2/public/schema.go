@@ -1273,8 +1273,8 @@ func (j *SpecKubernetesNodePoolsLaunchKind) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// Additional properties in common for all self-managed node pools. Currently only
-// IMDS properties are supported.
+// Default properties to set for all self-managed and eks-managed node pools.
+// Currently only IMDS properties are supported.
 type SpecKubernetesNodePoolsCommon struct {
 	// Specifies whether the instance metadata service (IMDS) is enabled or disabled.
 	// When set to 'disabled', instance metadata is not accessible.

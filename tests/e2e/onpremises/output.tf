@@ -30,6 +30,7 @@ spec:
     svcCidr: 172.30.0.0/16
     loadBalancers:
       enabled: true
+      selfmanagedRepositories: false
       hosts:
         - name: haproxy-10-10-1-2
           ip: 10.10.1.2
@@ -71,7 +72,10 @@ spec:
     #advancedAnsible:
       #config: |
       #  ansible_ssh_common_args='-o ProxyCommand="ssh -W %h:%p -q root@${hcloud_server.haproxy.ipv4_address}"'
-    advanced: 
+    advanced:
+      selfmanagedRepositories: false
+      containerd:
+        selfmanagedRepositories: false
       encryption:
         configuration: "{file://./encrypted-secret-config.yaml}"
   distribution:

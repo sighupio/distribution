@@ -191,9 +191,9 @@
           "type": "string",
           "description": "Additional configuration to append to HAProxy's configuration file."
         },
-        "manageRepositories": {
+        "selfmanagedRepositories": {
           "type": "boolean",
-          "description": "Set to false if you manage the HAProxy repositories externally and wish to skip their configuration with furyctl. Default is true."
+          "description": "Set to true if you manage the HAProxy repositories externally and wish to skip their automatic configuration with furyctl. Default is false (furyctl manages repositories automatically)."
         }
       },
       "required": [
@@ -515,9 +515,9 @@
         "kernelParameters": {
           "$ref": "#/$defs/Spec.Kubernetes.Advanced.KernelParameters"
         },
-        "manageRepositories": {
+        "selfmanagedRepositories": {
           "type": "boolean",
-          "description": "Set to false if you manage the Kubernetes package repositories externally and wish to skip their configuration with furyctl. Default is true."
+          "description": "Set to true if you manage the Kubernetes package repositories externally and wish to skip their automatic configuration with furyctl. Default is false (furyctl manages repositories automatically)."
         },
         "controllerManager": {
           "$ref": "#/$defs/Spec.Kubernetes.Advanced.ControllerManager"
@@ -626,9 +626,9 @@
         "registryConfigs": {
           "$ref": "#/$defs/Spec.Kubernetes.Advanced.Containerd.RegistryConfigs"
         },
-        "manageRepositories": {
+        "selfmanagedRepositories": {
           "type": "boolean",
-          "description": "Set to false if you manage the NVIDIA container toolkit's repositories externally and wish to skip their configuration with furyctl. Default is true.\nNotice that containerd itself is installed from binaries and does not use a repository. See `.spec.kubernetes.advanced.airGap` for other download options for containerd."
+          "description": "Set to true if you manage the NVIDIA container toolkit's repositories externally and wish to skip their automatic configuration with furyctl. Default is false (furyctl manages repositories automatically).\nNotice that containerd itself is installed from binaries and does not use a repository. See `.spec.kubernetes.advanced.airGap` for other download options for containerd."
         },
         "storageDir": {
           "type": "string",

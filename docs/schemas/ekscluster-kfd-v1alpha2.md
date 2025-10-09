@@ -5869,7 +5869,7 @@ The type of Node Pool, can be `self-managed` for using customization like custom
 
 ### Description
 
-Additional properties in common for all self-managed node pools. Currently only IMDS properties are supported.
+Default properties to set for all self-managed and eks-managed node pools. Currently only IMDS properties are supported.
 
 ## .spec.kubernetes.nodePoolsCommon.metadataHttpEndpoint
 

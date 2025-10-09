@@ -1726,16 +1726,17 @@ type SpecKubernetesAdvanced struct {
 	// "kubeletConfiguration".
 	KubeletConfiguration *SpecKubernetesAdvancedKubeletConfiguration `json:"kubeletConfiguration,omitempty" yaml:"kubeletConfiguration,omitempty" mapstructure:"kubeletConfiguration,omitempty"`
 
-	// Set to false if you manage the Kubernetes package repositories externally and
-	// wish to skip their configuration with furyctl. Default is true.
-	ManageRepositories *bool `json:"manageRepositories,omitempty" yaml:"manageRepositories,omitempty" mapstructure:"manageRepositories,omitempty"`
-
 	// Oidc corresponds to the JSON schema field "oidc".
 	Oidc *SpecKubernetesAdvancedOIDC `json:"oidc,omitempty" yaml:"oidc,omitempty" mapstructure:"oidc,omitempty"`
 
 	// URL of the registry where to pull images from for the Kubernetes phase.
 	// (Default is registry.sighup.io/fury/on-premises).
 	Registry *string `json:"registry,omitempty" yaml:"registry,omitempty" mapstructure:"registry,omitempty"`
+
+	// Set to true if you manage the Kubernetes package repositories externally and
+	// wish to skip their automatic configuration with furyctl. Default is false
+	// (furyctl manages repositories automatically).
+	SelfmanagedRepositories *bool `json:"selfmanagedRepositories,omitempty" yaml:"selfmanagedRepositories,omitempty" mapstructure:"selfmanagedRepositories,omitempty"`
 
 	// Users corresponds to the JSON schema field "users".
 	Users *SpecKubernetesAdvancedUsers `json:"users,omitempty" yaml:"users,omitempty" mapstructure:"users,omitempty"`
@@ -1842,13 +1843,6 @@ type SpecKubernetesAdvancedContainerd struct {
 	// file.
 	GrpcMaxSendMessageSize *int `json:"grpcMaxSendMessageSize,omitempty" yaml:"grpcMaxSendMessageSize,omitempty" mapstructure:"grpcMaxSendMessageSize,omitempty"`
 
-	// Set to false if you manage the NVIDIA container toolkit's repositories
-	// externally and wish to skip their configuration with furyctl. Default is true.
-	// Notice that containerd itself is installed from binaries and does not use a
-	// repository. See `.spec.kubernetes.advanced.airGap` for other download options
-	// for containerd.
-	ManageRepositories *bool `json:"manageRepositories,omitempty" yaml:"manageRepositories,omitempty" mapstructure:"manageRepositories,omitempty"`
-
 	// The maximum container log line size in bytes used in the config.toml file.
 	MaxContainerLogLineSize *int `json:"maxContainerLogLineSize,omitempty" yaml:"maxContainerLogLineSize,omitempty" mapstructure:"maxContainerLogLineSize,omitempty"`
 
@@ -1863,6 +1857,14 @@ type SpecKubernetesAdvancedContainerd struct {
 
 	// RegistryConfigs corresponds to the JSON schema field "registryConfigs".
 	RegistryConfigs SpecKubernetesAdvancedContainerdRegistryConfigs `json:"registryConfigs,omitempty" yaml:"registryConfigs,omitempty" mapstructure:"registryConfigs,omitempty"`
+
+	// Set to true if you manage the NVIDIA container toolkit's repositories
+	// externally and wish to skip their automatic configuration with furyctl. Default
+	// is false (furyctl manages repositories automatically).
+	// Notice that containerd itself is installed from binaries and does not use a
+	// repository. See `.spec.kubernetes.advanced.airGap` for other download options
+	// for containerd.
+	SelfmanagedRepositories *bool `json:"selfmanagedRepositories,omitempty" yaml:"selfmanagedRepositories,omitempty" mapstructure:"selfmanagedRepositories,omitempty"`
 
 	// The Containerd state directory used in the config.toml file.
 	StateDir *string `json:"stateDir,omitempty" yaml:"stateDir,omitempty" mapstructure:"stateDir,omitempty"`
@@ -2084,9 +2086,10 @@ type SpecKubernetesLoadBalancers struct {
 	// Keepalived corresponds to the JSON schema field "keepalived".
 	Keepalived *SpecKubernetesLoadBalancersKeepalived `json:"keepalived,omitempty" yaml:"keepalived,omitempty" mapstructure:"keepalived,omitempty"`
 
-	// Set to false if you manage the HAProxy repositories externally and wish to skip
-	// their configuration with furyctl. Default is true.
-	ManageRepositories *bool `json:"manageRepositories,omitempty" yaml:"manageRepositories,omitempty" mapstructure:"manageRepositories,omitempty"`
+	// Set to true if you manage the HAProxy repositories externally and wish to skip
+	// their automatic configuration with furyctl. Default is false (furyctl manages
+	// repositories automatically).
+	SelfmanagedRepositories *bool `json:"selfmanagedRepositories,omitempty" yaml:"selfmanagedRepositories,omitempty" mapstructure:"selfmanagedRepositories,omitempty"`
 
 	// Stats corresponds to the JSON schema field "stats".
 	Stats *SpecKubernetesLoadBalancersStats `json:"stats,omitempty" yaml:"stats,omitempty" mapstructure:"stats,omitempty"`
