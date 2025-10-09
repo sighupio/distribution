@@ -2,7 +2,7 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-version: v1.32.0
+version: v1.32.1
 modules:
   auth: v0.6.0
   aws: v5.1.0

@@ -156,14 +156,14 @@ spec:
 # license that can be found in the LICENSE file.
 ---
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
 ---
 apiVersion: kfd.sighup.io/v1alpha2
 kind: KFDDistribution
 metadata:
   name: sighup
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
   # This section describes how the KFD distribution will be installed
   distribution:
     kubeconfig: "{env://KUBECONFIG}"
@@ -311,14 +311,14 @@ spec:
 # license that can be found in the LICENSE file.
 ---
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
 ---
 apiVersion: kfd.sighup.io/v1alpha2
 kind: KFDDistribution
 metadata:
   name: sighup
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
   # This section describes how the KFD distribution will be installed
   distribution:
     kubeconfig: "{env://KUBECONFIG}"
@@ -466,14 +466,14 @@ spec:
 # license that can be found in the LICENSE file.
 ---
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
 ---
 apiVersion: kfd.sighup.io/v1alpha2
 kind: KFDDistribution
 metadata:
   name: sighup
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
   # This section describes how the KFD distribution will be installed
   distribution:
     kubeconfig: "{env://KUBECONFIG}"
@@ -618,14 +618,14 @@ spec:
 # license that can be found in the LICENSE file.
 ---
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
 ---
 apiVersion: kfd.sighup.io/v1alpha2
 kind: KFDDistribution
 metadata:
   name: sighup
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
   # This section describes how the KFD distribution will be installed
   distribution:
     kubeconfig: "{env://KUBECONFIG}"
@@ -770,14 +770,14 @@ spec:
 # license that can be found in the LICENSE file.
 ---
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
 ---
 apiVersion: kfd.sighup.io/v1alpha2
 kind: KFDDistribution
 metadata:
   name: sighup
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
   # This section describes how the KFD distribution will be installed
   distribution:
     kubeconfig: "{env://KUBECONFIG}"
@@ -955,14 +955,14 @@ spec:
 # license that can be found in the LICENSE file.
 ---
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
 ---
 apiVersion: kfd.sighup.io/v1alpha2
 kind: KFDDistribution
 metadata:
   name: sighup
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
   # This section describes how the KFD distribution will be installed
   distribution:
     kubeconfig: "{env://KUBECONFIG}"
@@ -1108,14 +1108,14 @@ spec:
 # license that can be found in the LICENSE file.
 ---
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
 ---
 apiVersion: kfd.sighup.io/v1alpha2
 kind: KFDDistribution
 metadata:
   name: sighup
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
   # This section describes how the KFD distribution will be installed
   distribution:
     kubeconfig: "{env://KUBECONFIG}"
@@ -1257,14 +1257,14 @@ spec:
 # license that can be found in the LICENSE file.
 ---
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
 ---
 apiVersion: kfd.sighup.io/v1alpha2
 kind: KFDDistribution
 metadata:
   name: sighup
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
   # This section describes how the KFD distribution will be installed
   distribution:
     kubeconfig: "{env://KUBECONFIG}"
@@ -1412,14 +1412,14 @@ spec:
 # license that can be found in the LICENSE file.
 ---
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
 ---
 apiVersion: kfd.sighup.io/v1alpha2
 kind: KFDDistribution
 metadata:
   name: sighup
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
   # This section describes how the KFD distribution will be installed
   distribution:
     kubeconfig: "{env://KUBECONFIG}"
@@ -1567,14 +1567,14 @@ spec:
 # license that can be found in the LICENSE file.
 ---
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
 ---
 apiVersion: kfd.sighup.io/v1alpha2
 kind: KFDDistribution
 metadata:
   name: sighup
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
   # This section describes how the KFD distribution will be installed
   distribution:
     kubeconfig: "{env://KUBECONFIG}"
@@ -1724,14 +1724,14 @@ spec:
 # license that can be found in the LICENSE file.
 ---
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
 ---
 apiVersion: kfd.sighup.io/v1alpha2
 kind: KFDDistribution
 metadata:
   name: sighup
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
   # This section describes how the KFD distribution will be installed
   distribution:
     kubeconfig: "{env://KUBECONFIG}"
@@ -1773,14 +1773,14 @@ spec:
 # license that can be found in the LICENSE file.
 ---
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
 ---
 apiVersion: kfd.sighup.io/v1alpha2
 kind: KFDDistribution
 metadata:
   name: sighup
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
   # This section describes how the KFD distribution will be installed
   distribution:
     kubeconfig: "{env://KUBECONFIG}"
@@ -1923,14 +1923,14 @@ spec:
 # license that can be found in the LICENSE file.
 ---
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
 ---
 apiVersion: kfd.sighup.io/v1alpha2
 kind: KFDDistribution
 metadata:
   name: sighup
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
   # This section describes how the KFD distribution will be installed
   distribution:
     kubeconfig: "{env://KUBECONFIG}"
@@ -2078,14 +2078,14 @@ spec:
 # license that can be found in the LICENSE file.
 ---
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
 ---
 apiVersion: kfd.sighup.io/v1alpha2
 kind: KFDDistribution
 metadata:
   name: sighup
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
   # This section describes how the KFD distribution will be installed
   distribution:
     kubeconfig: "{env://KUBECONFIG}"
@@ -2233,14 +2233,14 @@ spec:
 # license that can be found in the LICENSE file.
 ---
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
 ---
 apiVersion: kfd.sighup.io/v1alpha2
 kind: KFDDistribution
 metadata:
   name: sighup
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
   # This section describes how the KFD distribution will be installed
   distribution:
     kubeconfig: "{env://KUBECONFIG}"
@@ -2385,14 +2385,14 @@ spec:
 # license that can be found in the LICENSE file.
 ---
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
 ---
 apiVersion: kfd.sighup.io/v1alpha2
 kind: KFDDistribution
 metadata:
   name: sighup
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
   # This section describes how the KFD distribution will be installed
   distribution:
     kubeconfig: "{env://KUBECONFIG}"
@@ -2537,14 +2537,14 @@ spec:
 # license that can be found in the LICENSE file.
 ---
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
 ---
 apiVersion: kfd.sighup.io/v1alpha2
 kind: KFDDistribution
 metadata:
   name: sighup
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
   # This section describes how the KFD distribution will be installed
   distribution:
     kubeconfig: "{env://KUBECONFIG}"
@@ -2722,14 +2722,14 @@ spec:
 # license that can be found in the LICENSE file.
 ---
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
 ---
 apiVersion: kfd.sighup.io/v1alpha2
 kind: KFDDistribution
 metadata:
   name: sighup
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
   # This section describes how the KFD distribution will be installed
   distribution:
     kubeconfig: "{env://KUBECONFIG}"
@@ -2875,14 +2875,14 @@ spec:
 # license that can be found in the LICENSE file.
 ---
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
 ---
 apiVersion: kfd.sighup.io/v1alpha2
 kind: KFDDistribution
 metadata:
   name: sighup
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
   # This section describes how the KFD distribution will be installed
   distribution:
     kubeconfig: "{env://KUBECONFIG}"
@@ -3024,14 +3024,14 @@ spec:
 # license that can be found in the LICENSE file.
 ---
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
 ---
 apiVersion: kfd.sighup.io/v1alpha2
 kind: KFDDistribution
 metadata:
   name: sighup
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
   # This section describes how the KFD distribution will be installed
   distribution:
     kubeconfig: "{env://KUBECONFIG}"
@@ -3179,14 +3179,14 @@ spec:
 # license that can be found in the LICENSE file.
 ---
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
 ---
 apiVersion: kfd.sighup.io/v1alpha2
 kind: KFDDistribution
 metadata:
   name: sighup
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
   # This section describes how the KFD distribution will be installed
   distribution:
     kubeconfig: "{env://KUBECONFIG}"
@@ -3334,14 +3334,14 @@ spec:
 # license that can be found in the LICENSE file.
 ---
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
 ---
 apiVersion: kfd.sighup.io/v1alpha2
 kind: KFDDistribution
 metadata:
   name: sighup
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
   # This section describes how the KFD distribution will be installed
   distribution:
     kubeconfig: "{env://KUBECONFIG}"
@@ -3491,14 +3491,14 @@ spec:
 # license that can be found in the LICENSE file.
 ---
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
 ---
 apiVersion: kfd.sighup.io/v1alpha2
 kind: KFDDistribution
 metadata:
   name: sighup
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
   # This section describes how the KFD distribution will be installed
   distribution:
     kubeconfig: "{env://KUBECONFIG}"
@@ -3540,14 +3540,14 @@ spec:
 # license that can be found in the LICENSE file.
 ---
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
 ---
 apiVersion: kfd.sighup.io/v1alpha2
 kind: KFDDistribution
 metadata:
   name: sighup
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
   # This section describes how the KFD distribution will be installed
   distribution:
     kubeconfig: "{env://KUBECONFIG}"
