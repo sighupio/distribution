@@ -67,7 +67,6 @@ load ./helper
     [ "$status" -eq 0 ]
 }
 
-
 @test "Grafana is Running" {
     info
     test() {

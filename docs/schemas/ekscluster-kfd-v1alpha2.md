@@ -5851,6 +5851,56 @@ The type of Node Pool, can be `self-managed` for using customization like custom
 |`"eks-managed"` |
 |`"self-managed"`|
 
+## .spec.kubernetes.nodePoolsCommon
+
+### Properties
+
+| Property                                                                                         | Type      | Required |
+|:-------------------------------------------------------------------------------------------------|:----------|:---------|
+| [metadataHttpEndpoint](#speckubernetesnodepoolscommonmetadatahttpendpoint)                       | `string`  | Optional |
+| [metadataHttpPutResponseHopLimit](#speckubernetesnodepoolscommonmetadatahttpputresponsehoplimit) | `integer` | Optional |
+| [metadataHttpTokens](#speckubernetesnodepoolscommonmetadatahttptokens)                           | `string`  | Optional |
+
+### Description
+
+Default properties to set for all self-managed and eks-managed node pools. Currently only IMDS properties are supported.
+
+## .spec.kubernetes.nodePoolsCommon.metadataHttpEndpoint
+
+### Description
+
+Specifies whether the instance metadata service (IMDS) is enabled or disabled. When set to 'disabled', instance metadata is not accessible.
+
+### Constraints
+
+**enum**: the value of this property must be equal to one of the following string values:
+
+| Value      |
+|:-----------|
+|`"enabled"` |
+|`"disabled"`|
+
+## .spec.kubernetes.nodePoolsCommon.metadataHttpPutResponseHopLimit
+
+### Description
+
+Specifies the maximum number of network hops allowed for instance metadata PUT response packets. This helps control access to instance metadata across different network layers.
+
+## .spec.kubernetes.nodePoolsCommon.metadataHttpTokens
+
+### Description
+
+Defines whether the use of IMDS session tokens is required. When set to 'required', all metadata requests must include a valid session token.
+
+### Constraints
+
+**enum**: the value of this property must be equal to one of the following string values:
+
+| Value      |
+|:-----------|
+|`"optional"`|
+|`"required"`|
+
 ## .spec.kubernetes.nodePoolsLaunchKind
 
 ### Description
@@ -6060,7 +6110,17 @@ The folder of the kustomize plugin
 
 ### Description
 
-The name of the kustomize plugin
+The name of the kustomize plugin. A lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', 'local-storage')
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+```
+
+[try pattern](https://regexr.com/?expression=^[a-z0-9]\([-a-z0-9]*[a-z0-9]\)?\(\.[a-z0-9]\([-a-z0-9]*[a-z0-9]\)?\)*$)
 
 ## .spec.region
 

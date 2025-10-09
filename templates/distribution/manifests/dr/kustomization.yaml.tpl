@@ -112,10 +112,10 @@ configMapGenerator:
 {{- if eq .spec.distribution.common.provider.type "none" }}
 secretGenerator:
 {{- if eq .spec.distribution.modules.dr.velero.backend "externalEndpoint" }}
-- name: cloud-credentials
-  namespace: kube-system
-  files:
-    - cloud=secrets/cloud-credentials.config
+  - name: cloud-credentials
+    namespace: kube-system
+    files:
+      - cloud=secrets/cloud-credentials.config
 {{- end }}
 {{- if eq .spec.distribution.modules.dr.etcdBackup.type "all" "s3" }}
   - name: etcd-backup-s3-rclone-conf

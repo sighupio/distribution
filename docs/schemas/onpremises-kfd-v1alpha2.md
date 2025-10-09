@@ -544,6 +544,7 @@ The type of the secret
 | [baseDomain](#specdistributionmodulesauthbasedomain)                 | `string` | Optional |
 | [dex](#specdistributionmodulesauthdex)                               | `object` | Optional |
 | [oidcKubernetesAuth](#specdistributionmodulesauthoidckubernetesauth) | `object` | Optional |
+| [oidcTrustedCA](#specdistributionmodulesauthoidctrustedca)           | `string` | Optional |
 | [overrides](#specdistributionmodulesauthoverrides)                   | `object` | Optional |
 | [pomerium](#specdistributionmodulesauthpomerium)                     | `object` | Optional |
 | [provider](#specdistributionmodulesauthprovider)                     | `object` | Required |
@@ -751,6 +752,12 @@ The Key to use for the sessions in Gangplank. Must be different between differen
 ### Description
 
 The JWT claim to use as the username. This is used in Gangplank's UI. This is combined with the clusterName for the user portion of the kubeconfig. Defaults to `nickname`.
+
+## .spec.distribution.modules.auth.oidcTrustedCA
+
+### Description
+
+The Certificate Authority certificate file's content to trust for self-signed certificates at the OAuth2 URL. You can use the `"{file://<path>}"` notation to get the content from a file.
 
 ## .spec.distribution.modules.auth.overrides
 
@@ -1041,7 +1048,7 @@ Signing Key is the base64 representation of one or more PEM-encoded private keys
 To generates an P-256 (ES256) signing key:
 
 ```bash
-openssl ecparam  -genkey  -name prime256v1  -noout  -out ec_private.pem
+openssl ecparam -genkey -name prime256v1 -noout -out ec_private.pem
 # careful! this will output your private key in terminal
 cat ec_private.pem | base64
 ```
@@ -2664,11 +2671,146 @@ The type of OpenSearch deployment. One of: `single` for a single replica or `tri
 
 | Property                                                      | Type     | Required |
 |:--------------------------------------------------------------|:---------|:---------|
+| [fluentbit](#specdistributionmodulesloggingoperatorfluentbit) | `object` | Optional |
+| [fluentd](#specdistributionmodulesloggingoperatorfluentd)     | `object` | Optional |
 | [overrides](#specdistributionmodulesloggingoperatoroverrides) | `object` | Optional |
 
 ### Description
 
 Configuration for the Logging Operator.
+
+## .spec.distribution.modules.logging.operator.fluentbit
+
+### Properties
+
+| Property                                                               | Type     | Required |
+|:-----------------------------------------------------------------------|:---------|:---------|
+| [resources](#specdistributionmodulesloggingoperatorfluentbitresources) | `object` | Optional |
+
+### Description
+
+Configuration for Fluent Bit that reads the logs from the workload and forwards them to Fluentd.
+
+## .spec.distribution.modules.logging.operator.fluentbit.resources
+
+### Properties
+
+| Property                                                                      | Type     | Required |
+|:------------------------------------------------------------------------------|:---------|:---------|
+| [limits](#specdistributionmodulesloggingoperatorfluentbitresourceslimits)     | `object` | Optional |
+| [requests](#specdistributionmodulesloggingoperatorfluentbitresourcesrequests) | `object` | Optional |
+
+## .spec.distribution.modules.logging.operator.fluentbit.resources.limits
+
+### Properties
+
+| Property                                                                        | Type     | Required |
+|:--------------------------------------------------------------------------------|:---------|:---------|
+| [cpu](#specdistributionmodulesloggingoperatorfluentbitresourceslimitscpu)       | `string` | Optional |
+| [memory](#specdistributionmodulesloggingoperatorfluentbitresourceslimitsmemory) | `string` | Optional |
+
+## .spec.distribution.modules.logging.operator.fluentbit.resources.limits.cpu
+
+### Description
+
+The CPU limit for the Pod. Example: `1000m`.
+
+## .spec.distribution.modules.logging.operator.fluentbit.resources.limits.memory
+
+### Description
+
+The memory limit for the Pod. Example: `1G`.
+
+## .spec.distribution.modules.logging.operator.fluentbit.resources.requests
+
+### Properties
+
+| Property                                                                          | Type     | Required |
+|:----------------------------------------------------------------------------------|:---------|:---------|
+| [cpu](#specdistributionmodulesloggingoperatorfluentbitresourcesrequestscpu)       | `string` | Optional |
+| [memory](#specdistributionmodulesloggingoperatorfluentbitresourcesrequestsmemory) | `string` | Optional |
+
+## .spec.distribution.modules.logging.operator.fluentbit.resources.requests.cpu
+
+### Description
+
+The CPU request for the Pod, in cores. Example: `500m`.
+
+## .spec.distribution.modules.logging.operator.fluentbit.resources.requests.memory
+
+### Description
+
+The memory request for the Pod. Example: `500M`.
+
+## .spec.distribution.modules.logging.operator.fluentd
+
+### Properties
+
+| Property                                                             | Type      | Required |
+|:---------------------------------------------------------------------|:----------|:---------|
+| [replicas](#specdistributionmodulesloggingoperatorfluentdreplicas)   | `integer` | Optional |
+| [resources](#specdistributionmodulesloggingoperatorfluentdresources) | `object`  | Optional |
+
+### Description
+
+Configuration for Fluentd that collects the logs and forwards them to the outputs.
+
+## .spec.distribution.modules.logging.operator.fluentd.replicas
+
+### Description
+
+The number of Fluentd replicas to run. Default is `2`.
+
+## .spec.distribution.modules.logging.operator.fluentd.resources
+
+### Properties
+
+| Property                                                                    | Type     | Required |
+|:----------------------------------------------------------------------------|:---------|:---------|
+| [limits](#specdistributionmodulesloggingoperatorfluentdresourceslimits)     | `object` | Optional |
+| [requests](#specdistributionmodulesloggingoperatorfluentdresourcesrequests) | `object` | Optional |
+
+## .spec.distribution.modules.logging.operator.fluentd.resources.limits
+
+### Properties
+
+| Property                                                                      | Type     | Required |
+|:------------------------------------------------------------------------------|:---------|:---------|
+| [cpu](#specdistributionmodulesloggingoperatorfluentdresourceslimitscpu)       | `string` | Optional |
+| [memory](#specdistributionmodulesloggingoperatorfluentdresourceslimitsmemory) | `string` | Optional |
+
+## .spec.distribution.modules.logging.operator.fluentd.resources.limits.cpu
+
+### Description
+
+The CPU limit for the Pod. Example: `1000m`.
+
+## .spec.distribution.modules.logging.operator.fluentd.resources.limits.memory
+
+### Description
+
+The memory limit for the Pod. Example: `1G`.
+
+## .spec.distribution.modules.logging.operator.fluentd.resources.requests
+
+### Properties
+
+| Property                                                                        | Type     | Required |
+|:--------------------------------------------------------------------------------|:---------|:---------|
+| [cpu](#specdistributionmodulesloggingoperatorfluentdresourcesrequestscpu)       | `string` | Optional |
+| [memory](#specdistributionmodulesloggingoperatorfluentdresourcesrequestsmemory) | `string` | Optional |
+
+## .spec.distribution.modules.logging.operator.fluentd.resources.requests.cpu
+
+### Description
+
+The CPU request for the Pod, in cores. Example: `500m`.
+
+## .spec.distribution.modules.logging.operator.fluentd.resources.requests.memory
+
+### Description
+
+The memory request for the Pod. Example: `500M`.
 
 ## .spec.distribution.modules.logging.operator.overrides
 
@@ -3955,9 +4097,17 @@ The value of the toleration
 
 ### Properties
 
-| Property                                                               | Type     | Required |
-|:-----------------------------------------------------------------------|:---------|:---------|
-| [overrides](#specdistributionmodulesnetworkingtigeraoperatoroverrides) | `object` | Optional |
+| Property                                                               | Type      | Required |
+|:-----------------------------------------------------------------------|:----------|:---------|
+| [blockSize](#specdistributionmodulesnetworkingtigeraoperatorblocksize) | `integer` | Optional |
+| [overrides](#specdistributionmodulesnetworkingtigeraoperatoroverrides) | `object`  | Optional |
+| [podCidr](#specdistributionmodulesnetworkingtigeraoperatorpodcidr)     | `string`  | Optional |
+
+## .spec.distribution.modules.networking.tigeraOperator.blockSize
+
+### Description
+
+BlockSize specifies the CIDR prefix length to use when allocating per-node IP blocks from the main IP pool CIDR. WARNING: The value for this field cannot be changed once set. Default is 26.
 
 ## .spec.distribution.modules.networking.tigeraOperator.overrides
 
@@ -4023,6 +4173,22 @@ The key of the toleration
 ### Description
 
 The value of the toleration
+
+## .spec.distribution.modules.networking.tigeraOperator.podCidr
+
+### Description
+
+Allows specifing a CIDR for the Pods network different from `.spec.kubernetes.podCidr`. If not set the default is to use `.spec.kubernetes.podCidr`. WARNING: The value for this field cannot be changed once set.
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}\/(3[0-2]|[1-2][0-9]|[0-9])$
+```
+
+[try pattern](https://regexr.com/?expression=^\(\(25[0-5]|\(2[0-4]|1\d|[1-9]|\)\d\)\.?\b\){4}\\/\(3[0-2]|[1-2][0-9]|[0-9]\)$)
 
 ## .spec.distribution.modules.networking.type
 
@@ -4754,17 +4920,21 @@ Defines the Kubernetes components configuration and the values needed for the ku
 
 ### Properties
 
-| Property                                                            | Type     | Required |
-|:--------------------------------------------------------------------|:---------|:---------|
-| [airGap](#speckubernetesadvancedairgap)                             | `object` | Optional |
-| [apiServerCertSANs](#speckubernetesadvancedapiservercertsans)       | `array`  | Optional |
-| [cloud](#speckubernetesadvancedcloud)                               | `object` | Optional |
-| [containerd](#speckubernetesadvancedcontainerd)                     | `object` | Optional |
-| [encryption](#speckubernetesadvancedencryption)                     | `object` | Optional |
-| [kubeletConfiguration](#speckubernetesadvancedkubeletconfiguration) | `object` | Optional |
-| [oidc](#speckubernetesadvancedoidc)                                 | `object` | Optional |
-| [registry](#speckubernetesadvancedregistry)                         | `string` | Optional |
-| [users](#speckubernetesadvancedusers)                               | `object` | Optional |
+| Property                                                                  | Type      | Required |
+|:--------------------------------------------------------------------------|:----------|:---------|
+| [airGap](#speckubernetesadvancedairgap)                                   | `object`  | Optional |
+| [apiServerCertSANs](#speckubernetesadvancedapiservercertsans)             | `array`   | Optional |
+| [cloud](#speckubernetesadvancedcloud)                                     | `object`  | Optional |
+| [containerd](#speckubernetesadvancedcontainerd)                           | `object`  | Optional |
+| [controllerManager](#speckubernetesadvancedcontrollermanager)             | `object`  | Optional |
+| [encryption](#speckubernetesadvancedencryption)                           | `object`  | Optional |
+| [eventRateLimits](#speckubernetesadvancedeventratelimits)                 | `array`   | Optional |
+| [kernelParameters](#speckubernetesadvancedkernelparameters)               | `array`   | Optional |
+| [kubeletConfiguration](#speckubernetesadvancedkubeletconfiguration)       | `object`  | Optional |
+| [oidc](#speckubernetesadvancedoidc)                                       | `object`  | Optional |
+| [registry](#speckubernetesadvancedregistry)                               | `string`  | Optional |
+| [selfmanagedRepositories](#speckubernetesadvancedselfmanagedrepositories) | `boolean` | Optional |
+| [users](#speckubernetesadvancedusers)                                     | `object`  | Optional |
 
 ## .spec.kubernetes.advanced.airGap
 
@@ -4923,13 +5093,73 @@ Sets the cloud provider for the Kubelet
 
 ### Properties
 
-| Property                                                            | Type    | Required |
-|:--------------------------------------------------------------------|:--------|:---------|
-| [registryConfigs](#speckubernetesadvancedcontainerdregistryconfigs) | `array` | Optional |
+| Property                                                                                                  | Type      | Required |
+|:----------------------------------------------------------------------------------------------------------|:----------|:---------|
+| [debugLevel](#speckubernetesadvancedcontainerddebuglevel)                                                 | `string`  | Optional |
+| [deviceOwnershipFromSecurityContext](#speckubernetesadvancedcontainerddeviceownershipfromsecuritycontext) | `boolean` | Optional |
+| [grpcMaxRecvMessageSize](#speckubernetesadvancedcontainerdgrpcmaxrecvmessagesize)                         | `integer` | Optional |
+| [grpcMaxSendMessageSize](#speckubernetesadvancedcontainerdgrpcmaxsendmessagesize)                         | `integer` | Optional |
+| [maxContainerLogLineSize](#speckubernetesadvancedcontainerdmaxcontainerloglinesize)                       | `integer` | Optional |
+| [metricsAddress](#speckubernetesadvancedcontainerdmetricsaddress)                                         | `string`  | Optional |
+| [metricsGrpcHistogram](#speckubernetesadvancedcontainerdmetricsgrpchistogram)                             | `boolean` | Optional |
+| [oomScore](#speckubernetesadvancedcontainerdoomscore)                                                     | `integer` | Optional |
+| [registryConfigs](#speckubernetesadvancedcontainerdregistryconfigs)                                       | `array`   | Optional |
+| [selfmanagedRepositories](#speckubernetesadvancedcontainerdselfmanagedrepositories)                       | `boolean` | Optional |
+| [stateDir](#speckubernetesadvancedcontainerdstatedir)                                                     | `string`  | Optional |
+| [storageDir](#speckubernetesadvancedcontainerdstoragedir)                                                 | `string`  | Optional |
+| [systemdDir](#speckubernetesadvancedcontainerdsystemddir)                                                 | `string`  | Optional |
 
 ### Description
 
 Advanced configuration for containerd
+
+## .spec.kubernetes.advanced.containerd.debugLevel
+
+### Description
+
+The Containerd debug level used in the config.toml file.
+
+## .spec.kubernetes.advanced.containerd.deviceOwnershipFromSecurityContext
+
+### Description
+
+Set to true to apply device ownership from the container runtime's security context instead of the host's defaults, used in the config.toml file.
+
+## .spec.kubernetes.advanced.containerd.grpcMaxRecvMessageSize
+
+### Description
+
+The Containerd gRPC maximum receive message size in bytes used in the config.toml file.
+
+## .spec.kubernetes.advanced.containerd.grpcMaxSendMessageSize
+
+### Description
+
+The Containerd gRPC maximum send message size in bytes used in the config.toml file.
+
+## .spec.kubernetes.advanced.containerd.maxContainerLogLineSize
+
+### Description
+
+The maximum container log line size in bytes used in the config.toml file.
+
+## .spec.kubernetes.advanced.containerd.metricsAddress
+
+### Description
+
+The Containerd metrics address used in the config.toml file.
+
+## .spec.kubernetes.advanced.containerd.metricsGrpcHistogram
+
+### Description
+
+Enable Containerd metrics gRPC histogram in the config.toml file.
+
+## .spec.kubernetes.advanced.containerd.oomScore
+
+### Description
+
+The Containerd OOM score adjustment used in the config.toml file.
 
 ## .spec.kubernetes.advanced.containerd.registryConfigs
 
@@ -4978,14 +5208,58 @@ Registry address on which you would like to configure authentication or mirror(s
 
 The username containerd will use to authenticate against the registry.
 
+## .spec.kubernetes.advanced.containerd.selfmanagedRepositories
+
+### Description
+
+Set to true if you manage the NVIDIA container toolkit's repositories externally and wish to skip their automatic configuration with furyctl. Default is false (furyctl manages repositories automatically).
+Notice that containerd itself is installed from binaries and does not use a repository. See `.spec.kubernetes.advanced.airGap` for other download options for containerd.
+
+## .spec.kubernetes.advanced.containerd.stateDir
+
+### Description
+
+The Containerd state directory used in the config.toml file.
+
+## .spec.kubernetes.advanced.containerd.storageDir
+
+### Description
+
+The Containerd storage directory used in the config.toml file.
+
+## .spec.kubernetes.advanced.containerd.systemdDir
+
+### Description
+
+The Containerd systemd service directory used in the config.toml file.
+
+## .spec.kubernetes.advanced.controllerManager
+
+### Properties
+
+| Property                                                           | Type      | Required |
+|:-------------------------------------------------------------------|:----------|:---------|
+| [gcThreshold](#speckubernetesadvancedcontrollermanagergcthreshold) | `integer` | Optional |
+
+### Description
+
+Advanced configuration for the controller-manager.
+
+## .spec.kubernetes.advanced.controllerManager.gcThreshold
+
+### Description
+
+Maximum number of terminated Pods retained by the controller-manager before automatic deletion.
+
 ## .spec.kubernetes.advanced.encryption
 
 ### Properties
 
-| Property                                                            | Type     | Required |
-|:--------------------------------------------------------------------|:---------|:---------|
-| [configuration](#speckubernetesadvancedencryptionconfiguration)     | `string` | Optional |
-| [tlsCipherSuites](#speckubernetesadvancedencryptiontlsciphersuites) | `array`  | Optional |
+| Property                                                                          | Type     | Required |
+|:----------------------------------------------------------------------------------|:---------|:---------|
+| [configuration](#speckubernetesadvancedencryptionconfiguration)                   | `string` | Optional |
+| [tlsCipherSuites](#speckubernetesadvancedencryptiontlsciphersuites)               | `array`  | Optional |
+| [tlsCipherSuitesKubelet](#speckubernetesadvancedencryptiontlsciphersuiteskubelet) | `array`  | Optional |
 
 ## .spec.kubernetes.advanced.encryption.configuration
 
@@ -5012,7 +5286,7 @@ resources:
 
 ### Description
 
-The TLS cipher suites to use for etcd, kubelet, and kubeadm static pods. Example:
+The TLS cipher suites to use for etcd and kubeadm static pods. Example:
 ```yaml
 tlsCipherSuites:
   - "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256"
@@ -5025,15 +5299,125 @@ tlsCipherSuites:
   - "TLS_AES_256_GCM_SHA384"
   - "TLS_CHACHA20_POLY1305_SHA256"
 ```
-. NOTE: to customize the TLS cipher suites of the kubelet (as well as on control plane and etcd), set only this field - do not configure them under the `KubeletConfiguration`.
+.
+
+## .spec.kubernetes.advanced.encryption.tlsCipherSuitesKubelet
+
+### Description
+
+The TLS cipher suites to use for the kubelet. Example:
+```yaml
+tlsCipherSuitesKubelet:
+  - "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256"
+  - "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"
+  - "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384"
+ - "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305"
+  - "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305"
+  - "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384"
+```
+. NOTE: to customize the TLS cipher suites of the kubelet, set only this field - do not configure them under the `KubeletConfiguration`.
+
+## .spec.kubernetes.advanced.eventRateLimits
+
+### Properties
+
+| Property                                                     | Type      | Required |
+|:-------------------------------------------------------------|:----------|:---------|
+| [burst](#speckubernetesadvancedeventratelimitsburst)         | `integer` | Required |
+| [cacheSize](#speckubernetesadvancedeventratelimitscachesize) | `integer` | Optional |
+| [qps](#speckubernetesadvancedeventratelimitsqps)             | `integer` | Required |
+| [type](#speckubernetesadvancedeventratelimitstype)           | `string`  | Required |
+
+### Description
+
+Configures the limits of the API Server's EventRateLimit plugin. Each item represents a bucket (Server, Namespace, User, etc).
+
+## .spec.kubernetes.advanced.eventRateLimits.burst
+
+### Description
+
+Maximum allowed burst for this bucket type.
+
+## .spec.kubernetes.advanced.eventRateLimits.cacheSize
+
+### Description
+
+Maximum number of cached objects for this bucket. Only for certain types like Namespace or User.
+
+## .spec.kubernetes.advanced.eventRateLimits.qps
+
+### Description
+
+Maximum allowed queries per second (QPS) for this bucket type.
+
+## .spec.kubernetes.advanced.eventRateLimits.type
+
+### Description
+
+Type of limit to apply (Server, Namespace, User, SourceAndObject).
+
+### Constraints
+
+**enum**: the value of this property must be equal to one of the following string values:
+
+| Value             |
+|:------------------|
+|`"Server"`         |
+|`"Namespace"`      |
+|`"User"`           |
+|`"SourceAndObject"`|
+
+## .spec.kubernetes.advanced.kernelParameters
+
+### Properties
+
+| Property                                              | Type     | Required |
+|:------------------------------------------------------|:---------|:---------|
+| [name](#speckubernetesadvancedkernelparametersname)   | `string` | Required |
+| [value](#speckubernetesadvancedkernelparametersvalue) | `string` | Required |
+
+### Description
+
+Allows customization of kernel parameters with sysctl on all Kubernetes nodes. NOTE: if you remove a parameter from this list, it will not be reset to its default value without a reboot.
+
+## .spec.kubernetes.advanced.kernelParameters.name
+
+### Description
+
+The kernel parameter to edit. Example: `kernel.panic`
+
+## .spec.kubernetes.advanced.kernelParameters.value
+
+### Description
+
+The value of the kernel parameter to edit. Example: `"15"`
 
 ## .spec.kubernetes.advanced.kubeletConfiguration
+
+### Properties
+
+| Property                                                                                                      | Type     | Required |
+|:--------------------------------------------------------------------------------------------------------------|:---------|:---------|
+| [kubeletCertificateAuthorityFile](#speckubernetesadvancedkubeletconfigurationkubeletcertificateauthorityfile) | `string` | Optional |
+| [streamingConnectionIdleTimeout](#speckubernetesadvancedkubeletconfigurationstreamingconnectionidletimeout)   | `string` | Optional |
 
 ### Description
 
 Advanced configuration for Kubelet. This open field allows users to specify any parameter supported by the `KubeletConfiguration` object. Examples of uses include controlling the maximum number of pods per core (`podsPerCore`), managing container logging (`containerLogMaxSize`), Topology Manager options (`topologyManagerPolicyOptions`). All values must follow the official Kubelet specification: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/.
 
-NOTE: Content will **not** be validated by furyctl. To customize the TLS cipher suites of the Kubelet, set only the `Spec.Kubernetes.Advanced.Encryption.tlsCipherSuites` field - do not configure them under this field.
+NOTE: Content will **not** be validated by furyctl. To customize the TLS cipher suites of the Kubelet, set only the `Spec.Kubernetes.Advanced.Encryption.tlsCipherSuitesKubelet` field - do not configure them under this field.
+
+## .spec.kubernetes.advanced.kubeletConfiguration.kubeletCertificateAuthorityFile
+
+### Description
+
+Path to the CA file used to verify the kubelet servers' TLS certificates.
+
+## .spec.kubernetes.advanced.kubeletConfiguration.streamingConnectionIdleTimeout
+
+### Description
+
+The maximum time a streaming connection can be idle before it is closed. Example: `5m0s`
 
 ## .spec.kubernetes.advanced.oidc
 
@@ -5100,6 +5484,12 @@ Prefix prepended to username claims to prevent clashes with existing names (such
 ### Description
 
 URL of the registry where to pull images from for the Kubernetes phase. (Default is registry.sighup.io/fury/on-premises).
+
+## .spec.kubernetes.advanced.selfmanagedRepositories
+
+### Description
+
+Set to true if you manage the Kubernetes package repositories externally and wish to skip their automatic configuration with furyctl. Default is false (furyctl manages repositories automatically).
 
 ## .spec.kubernetes.advanced.users
 
@@ -5200,13 +5590,14 @@ A name to identify the etcd node. This value will be concatenated to `.spec.kube
 
 ### Properties
 
-| Property                                                         | Type      | Required |
-|:-----------------------------------------------------------------|:----------|:---------|
-| [additionalConfig](#speckubernetesloadbalancersadditionalconfig) | `string`  | Optional |
-| [enabled](#speckubernetesloadbalancersenabled)                   | `boolean` | Required |
-| [hosts](#speckubernetesloadbalancershosts)                       | `array`   | Optional |
-| [keepalived](#speckubernetesloadbalancerskeepalived)             | `object`  | Optional |
-| [stats](#speckubernetesloadbalancersstats)                       | `object`  | Optional |
+| Property                                                                       | Type      | Required |
+|:-------------------------------------------------------------------------------|:----------|:---------|
+| [additionalConfig](#speckubernetesloadbalancersadditionalconfig)               | `string`  | Optional |
+| [enabled](#speckubernetesloadbalancersenabled)                                 | `boolean` | Required |
+| [hosts](#speckubernetesloadbalancershosts)                                     | `array`   | Optional |
+| [keepalived](#speckubernetesloadbalancerskeepalived)                           | `object`  | Optional |
+| [selfmanagedRepositories](#speckubernetesloadbalancersselfmanagedrepositories) | `boolean` | Optional |
+| [stats](#speckubernetesloadbalancersstats)                                     | `object`  | Optional |
 
 ## .spec.kubernetes.loadBalancers.additionalConfig
 
@@ -5287,6 +5678,12 @@ Password for accessing vrrpd. Make it unique between Keepalived clusters.
 
 The virtual router ID of Keepalived, an arbitrary unique number from 1 to 255 used to differentiate multiple instances of vrrpd running on the same network interface and address family and multicast/unicast (and hence same socket).
 
+## .spec.kubernetes.loadBalancers.selfmanagedRepositories
+
+### Description
+
+Set to true if you manage the HAProxy repositories externally and wish to skip their automatic configuration with furyctl. Default is false (furyctl manages repositories automatically).
+
 ## .spec.kubernetes.loadBalancers.stats
 
 ### Properties
@@ -5320,8 +5717,10 @@ The basic-auth username for HAProxy's stats page
 |:-------------------------------------------------------------------|:---------|:---------|
 | [annotations](#speckubernetesmastersannotations)                   | `object` | Optional |
 | [hosts](#speckubernetesmastershosts)                               | `array`  | Required |
+| [kernelParameters](#speckubernetesmasterskernelparameters)         | `array`  | Optional |
 | [kubeletConfiguration](#speckubernetesmasterskubeletconfiguration) | `object` | Optional |
 | [labels](#speckubernetesmasterslabels)                             | `object` | Optional |
+| [taints](#speckubernetesmasterstaints)                             | `array`  | Optional |
 
 ### Description
 
@@ -5354,13 +5753,57 @@ The IP address of the host
 
 A name to identify the host. This value will be concatenated to `.spec.kubernetes.dnsZone` to calculate the FQDN for the host as `<name>.<dnsZone>`.
 
+## .spec.kubernetes.masters.kernelParameters
+
+### Properties
+
+| Property                                             | Type     | Required |
+|:-----------------------------------------------------|:---------|:---------|
+| [name](#speckubernetesmasterskernelparametersname)   | `string` | Required |
+| [value](#speckubernetesmasterskernelparametersvalue) | `string` | Required |
+
+### Description
+
+Allows customization of kernel parameters with sysctl on all Kubernetes nodes. NOTE: if you remove a parameter from this list, it will not be reset to its default value without a reboot.
+
+## .spec.kubernetes.masters.kernelParameters.name
+
+### Description
+
+The kernel parameter to edit. Example: `kernel.panic`
+
+## .spec.kubernetes.masters.kernelParameters.value
+
+### Description
+
+The value of the kernel parameter to edit. Example: `"15"`
+
 ## .spec.kubernetes.masters.kubeletConfiguration
+
+### Properties
+
+| Property                                                                                                     | Type     | Required |
+|:-------------------------------------------------------------------------------------------------------------|:---------|:---------|
+| [kubeletCertificateAuthorityFile](#speckubernetesmasterskubeletconfigurationkubeletcertificateauthorityfile) | `string` | Optional |
+| [streamingConnectionIdleTimeout](#speckubernetesmasterskubeletconfigurationstreamingconnectionidletimeout)   | `string` | Optional |
 
 ### Description
 
 Advanced configuration for Kubelet. This open field allows users to specify any parameter supported by the `KubeletConfiguration` object. Examples of uses include controlling the maximum number of pods per core (`podsPerCore`), managing container logging (`containerLogMaxSize`), Topology Manager options (`topologyManagerPolicyOptions`). All values must follow the official Kubelet specification: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/.
 
-NOTE: Content will **not** be validated by furyctl. To customize the TLS cipher suites of the Kubelet, set only the `Spec.Kubernetes.Advanced.Encryption.tlsCipherSuites` field - do not configure them under this field.
+NOTE: Content will **not** be validated by furyctl. To customize the TLS cipher suites of the Kubelet, set only the `Spec.Kubernetes.Advanced.Encryption.tlsCipherSuitesKubelet` field - do not configure them under this field.
+
+## .spec.kubernetes.masters.kubeletConfiguration.kubeletCertificateAuthorityFile
+
+### Description
+
+Path to the CA file used to verify the kubelet servers' TLS certificates.
+
+## .spec.kubernetes.masters.kubeletConfiguration.streamingConnectionIdleTimeout
+
+### Description
+
+The maximum time a streaming connection can be idle before it is closed. Example: `5m0s`
 
 ## .spec.kubernetes.masters.labels
 
@@ -5370,6 +5813,48 @@ Optional additional Kubernetes labels that will be added to the control-plane no
 
 Note: **Existing labels with the same key will be overwritten** and the label setting the `control-plane` role cannot be deleted.
 
+## .spec.kubernetes.masters.taints
+
+### Properties
+
+| Property                                     | Type     | Required |
+|:---------------------------------------------|:---------|:---------|
+| [effect](#speckubernetesmasterstaintseffect) | `string` | Required |
+| [key](#speckubernetesmasterstaintskey)       | `string` | Required |
+| [value](#speckubernetesmasterstaintsvalue)   | `string` | Required |
+
+### Description
+
+Kubernetes taints for the control-plane nodes, follows Kubernetes taints format. Default is `node-role.kubernetes.io/control-plane:NoSchedule`.
+
+Example:
+
+```yaml
+- effect: NoSchedule
+  key: node.kubernetes.io/role
+  value: control-plane
+```
+
+NOTE: Setting an empty list will remove the default control-plane taint.
+
+NOTE2: Takes effect only at cluster creation time.
+
+## .spec.kubernetes.masters.taints.effect
+
+### Constraints
+
+**enum**: the value of this property must be equal to one of the following string values:
+
+| Value              |
+|:-------------------|
+|`"NoSchedule"`      |
+|`"PreferNoSchedule"`|
+|`"NoExecute"`       |
+
+## .spec.kubernetes.masters.taints.key
+
+## .spec.kubernetes.masters.taints.value
+
 ## .spec.kubernetes.nodes
 
 ### Properties
@@ -5378,6 +5863,7 @@ Note: **Existing labels with the same key will be overwritten** and the label se
 |:-----------------------------------------------------------------|:---------|:---------|
 | [annotations](#speckubernetesnodesannotations)                   | `object` | Optional |
 | [hosts](#speckubernetesnodeshosts)                               | `array`  | Required |
+| [kernelParameters](#speckubernetesnodeskernelparameters)         | `array`  | Optional |
 | [kubeletConfiguration](#speckubernetesnodeskubeletconfiguration) | `object` | Optional |
 | [labels](#speckubernetesnodeslabels)                             | `object` | Optional |
 | [name](#speckubernetesnodesname)                                 | `string` | Required |
@@ -5418,13 +5904,57 @@ The IP address of the host
 
 A name to identify the host. This value will be concatenated to `.spec.kubernetes.dnsZone` to calculate the FQDN for the host as `<name>.<dnsZone>`.
 
+## .spec.kubernetes.nodes.kernelParameters
+
+### Properties
+
+| Property                                           | Type     | Required |
+|:---------------------------------------------------|:---------|:---------|
+| [name](#speckubernetesnodeskernelparametersname)   | `string` | Required |
+| [value](#speckubernetesnodeskernelparametersvalue) | `string` | Required |
+
+### Description
+
+Allows customization of kernel parameters with sysctl on all Kubernetes nodes. NOTE: if you remove a parameter from this list, it will not be reset to its default value without a reboot.
+
+## .spec.kubernetes.nodes.kernelParameters.name
+
+### Description
+
+The kernel parameter to edit. Example: `kernel.panic`
+
+## .spec.kubernetes.nodes.kernelParameters.value
+
+### Description
+
+The value of the kernel parameter to edit. Example: `"15"`
+
 ## .spec.kubernetes.nodes.kubeletConfiguration
+
+### Properties
+
+| Property                                                                                                   | Type     | Required |
+|:-----------------------------------------------------------------------------------------------------------|:---------|:---------|
+| [kubeletCertificateAuthorityFile](#speckubernetesnodeskubeletconfigurationkubeletcertificateauthorityfile) | `string` | Optional |
+| [streamingConnectionIdleTimeout](#speckubernetesnodeskubeletconfigurationstreamingconnectionidletimeout)   | `string` | Optional |
 
 ### Description
 
 Advanced configuration for Kubelet. This open field allows users to specify any parameter supported by the `KubeletConfiguration` object. Examples of uses include controlling the maximum number of pods per core (`podsPerCore`), managing container logging (`containerLogMaxSize`), Topology Manager options (`topologyManagerPolicyOptions`). All values must follow the official Kubelet specification: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/.
 
-NOTE: Content will **not** be validated by furyctl. To customize the TLS cipher suites of the Kubelet, set only the `Spec.Kubernetes.Advanced.Encryption.tlsCipherSuites` field - do not configure them under this field.
+NOTE: Content will **not** be validated by furyctl. To customize the TLS cipher suites of the Kubelet, set only the `Spec.Kubernetes.Advanced.Encryption.tlsCipherSuitesKubelet` field - do not configure them under this field.
+
+## .spec.kubernetes.nodes.kubeletConfiguration.kubeletCertificateAuthorityFile
+
+### Description
+
+Path to the CA file used to verify the kubelet servers' TLS certificates.
+
+## .spec.kubernetes.nodes.kubeletConfiguration.streamingConnectionIdleTimeout
+
+### Description
+
+The maximum time a streaming connection can be idle before it is closed. Example: `5m0s`
 
 ## .spec.kubernetes.nodes.labels
 
@@ -5707,5 +6237,15 @@ The folder of the kustomize plugin
 
 ### Description
 
-The name of the kustomize plugin
+The name of the kustomize plugin. A lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', 'local-storage')
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+```
+
+[try pattern](https://regexr.com/?expression=^[a-z0-9]\([-a-z0-9]*[a-z0-9]\)?\(\.[a-z0-9]\([-a-z0-9]*[a-z0-9]\)?\)*$)
 

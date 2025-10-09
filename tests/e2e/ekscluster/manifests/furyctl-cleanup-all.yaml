@@ -75,8 +75,10 @@ spec:
           volumeSize: 50
           volumeType: gp2
         labels:
-          nodepool: infra
-          node.kubernetes.io/role: infra
+          nodepool: "infra"
+          node.kubernetes.io/role: "infra"
+        taints:
+          - node.kubernetes.io/role=infra:NoSchedule
         tags:
           k8s.io/cluster-autoscaler/node-template/label/nodepool: worker
           k8s.io/cluster-autoscaler/node-template/label/node.kubernetes.io/role: worker
@@ -85,6 +87,13 @@ spec:
       users: []
       roles: []
   distribution:
+    common:
+      nodeSelector:
+        node.kubernetes.io/role: infra
+      tolerations:
+        - effect: NoSchedule
+          key: node.kubernetes.io/role
+          value: infra
     modules:
       ingress:
         baseDomain: internal.e2e.ci.sighup.cc
