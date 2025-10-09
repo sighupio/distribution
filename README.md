@@ -137,7 +137,7 @@ Current supported versions of SD are:
 |                                  SD Version                               | Kubernetes Version |
 | :-----------------------------------------------------------------------: | :----------------: |
 | [`1.33.0`](https://github.com/sighupio/distribution/releases/tag/v1.33.0) |      `1.33.x`      |
-| [`1.32.0`](https://github.com/sighupio/distribution/releases/tag/v1.32.0) |      `1.32.x`      |
+| [`1.32.1`](https://github.com/sighupio/distribution/releases/tag/v1.32.1) |      `1.32.x`      |
 | [`1.31.2`](https://github.com/sighupio/distribution/releases/tag/v1.31.2) |      `1.31.x`      |
 
 Check the [compatibility matrix][compatibility-matrix] for additional information about previous releases of the Distribution and the compatibility with `furyctl`.
@@ -181,7 +181,7 @@ SD is open-source software and it's released under the following [LICENSE](LICEN
 [policy-module]: https://github.com/sighupio/module-policy
 [auth-module]: https://github.com/sighupio/module-auth
 [networking-version]: https://img.shields.io/badge/release-v3.0.0-blue
-[ingress-version]: https://img.shields.io/badge/release-v4.1.0-blue
+[ingress-version]: https://img.shields.io/badge/release-v4.1.1-blue
 [logging-version]: https://img.shields.io/badge/release-v5.2.0-blue
 [monitoring-version]: https://img.shields.io/badge/release-v4.0.0-blue
 [tracing-version]: https://img.shields.io/badge/release-v1.3.0-blue
