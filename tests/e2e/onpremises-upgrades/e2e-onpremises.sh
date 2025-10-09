@@ -60,7 +60,7 @@ load ./helper
 @test "Fluentd is Running" {
     info
     test() {
-        check_sts_fluentd_ready "infra-fluentd" "logging"
+        kubectl get pods -l app.kubernetes.io/name=fluentd -o json -n logging |jq '.items[].status.containerStatuses[].ready' | uniq | grep -q true
     }
     loop_it test 60 10
     status=${loop_it_result}
