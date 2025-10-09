@@ -218,7 +218,7 @@ steps:
       - name: dockersock
         path: /var/run/docker.sock
     environment:
-      CLUSTER_VERSION: v1.32.2
+      CLUSTER_VERSION: v1.31.2
       CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-upgrades
       # /drone/src is the default workdir for the pipeline
       # using this folder we don't need to mount another
@@ -714,7 +714,7 @@ steps:
   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
   environment:
     FURYCTL_VERSION: "v0.33.0"
-    DISTRIBUTION_VERSION: "v1.32.1"
+    DISTRIBUTION_VERSION: "v1.31.2"
     DEBIAN_FRONTEND: noninteractive
     AWS_ACCESS_KEY_ID:
       from_secret: aws_access_key_id
