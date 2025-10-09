@@ -34,7 +34,7 @@ steps:
       - diff schemas/private/ekscluster-kfd-v1alpha2.json /tmp/schemas-private-ekscluster-kfd-v1alpha2.json
 
   - name: test-schema
-    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.5_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
+    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
     pull: always
     depends_on:
       - license-check
@@ -47,7 +47,7 @@ steps:
       - bats -t tests/e2e/kfddistribution/schema.sh
 
   - name: render
-    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.5_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
+    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
     pull: always
     depends_on:
       - license-check
@@ -139,7 +139,7 @@ steps:
       - kind get kubeconfig --name $${CLUSTER_NAME} > $${KUBECONFIG}
 
   - name: e2e-kfddistribution
-    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.5_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
+    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
     pull: always
     # we need to use host network to access Kind API port that is listening on the worker's loopback
     # beacuse we mount the host's Docker socket to run Kind.
@@ -245,7 +245,7 @@ steps:
       - kind get kubeconfig --name $${CLUSTER_NAME} > $${KUBECONFIG}
 
   - name: e2e-kfddistribution
-    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.5_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
+    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
     pull: always
     # we need to use host network to access Kind API port that is listening on the worker's loopback
     # beacuse we mount the host's Docker socket to run Kind.
@@ -586,7 +586,7 @@ trigger:
 
 steps:
 - name: create-hetzner-infrastructure
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.5_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
+  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
   environment:
     FURYCTL_VERSION: "v0.33.0-rc.0"
     DEBIAN_FRONTEND: noninteractive
@@ -610,7 +610,7 @@ steps:
       path: /cache
 
 - name: install-cluster-with-furyctl
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.5_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
+  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
   environment:
     FURYCTL_VERSION: "v0.33.0-rc.0"
     DEBIAN_FRONTEND: noninteractive
@@ -630,7 +630,7 @@ steps:
     - name: cache
       path: /cache
 - name: kube-bench-security-test
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.5_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
+  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
   environment:
     DEBIAN_FRONTEND: noninteractive
     AWS_ACCESS_KEY_ID:
@@ -649,7 +649,7 @@ steps:
     - name: cache
       path: /cache
 - name: bats-tests
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.5_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
+  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
   environment:
     KUBECONFIG: /cache/kubeconfig
   commands:
@@ -659,7 +659,7 @@ steps:
       path: /cache
 
 - name: delete
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.5_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
+  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
   environment:
     FURYCTL_VERSION: "v0.33.0-rc.0"
     DEBIAN_FRONTEND: noninteractive
@@ -711,7 +711,7 @@ trigger:
 
 steps:
 - name: create-hetzner-infrastructure
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.5_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
+  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
   environment:
     FURYCTL_VERSION: "v0.33.0"
     DISTRIBUTION_VERSION: "v1.32.1"
@@ -736,7 +736,7 @@ steps:
       path: /cache
 
 - name: install-cluster-1.32.1-with-furyctl
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.5_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
+  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
   environment:
     FURYCTL_VERSION: "v0.33.0"
     DISTRIBUTION_VERSION: "v1.32.1" # distribution version is hardcoded in the tofu outputs
@@ -758,7 +758,7 @@ steps:
       path: /cache
 
 - name: bats-tests
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.5_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
+  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
   environment:
     KUBECONFIG: /cache/kubeconfig
   commands:
@@ -768,7 +768,7 @@ steps:
       path: /cache
 
 - name: upgrade-cluster-to-1.32.1-with-furyctl
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.5_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
+  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
   environment:
     FURYCTL_VERSION: "v0.33.0-rc.0"
     DISTRIBUTION_VERSION: "v1.32.1" # distribution version is hardcoded in the tofu outputs
@@ -790,7 +790,7 @@ steps:
       path: /cache
 
 - name: bats-tests-upgrades
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.5_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
+  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
   environment:
     KUBECONFIG: /cache/kubeconfig
   commands:
@@ -800,7 +800,7 @@ steps:
       path: /cache
 
 - name: delete
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.5_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
+  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
   environment:
     FURYCTL_VERSION: "v0.33.0-rc.0"
     DEBIAN_FRONTEND: noninteractive
