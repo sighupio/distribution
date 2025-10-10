@@ -18,7 +18,7 @@ kind: OnPremises
 metadata:
   name: reevo
 spec:
-  distributionVersion: v1.33.0-non-existent # to be sure we are not patching via furyctl patches
+  distributionVersion: v1.33.1-non-existent # to be sure we are not patching via furyctl patches
   kubernetes:
     pkiFolder: ./pki
     ssh:
