@@ -291,280 +291,280 @@ volumes:
   - name: dockersock
     host:
       path: /var/run/docker.sock
----
-# e2e tests are failing on CI: race conditions on the applications of some (apparently) unrelated CRDs. 
-# Manual testing (running the same pipeline locally macOS M1 Pro, with drone exec) results in a successful run.
-name: e2e-ekscluster-1.32.1
-kind: pipeline
-type: docker
+# ---
+# # e2e tests are failing on CI: race conditions on the applications of some (apparently) unrelated CRDs. 
+# # Manual testing (running the same pipeline locally macOS M1 Pro, with drone exec) results in a successful run.
+# name: e2e-ekscluster-1.32.1
+# kind: pipeline
+# type: docker
 
-# node:
-#    performance: low
+# # node:
+# #    performance: low
 
-depends_on:
-  - qa
+# depends_on:
+#   - qa
 
-clone:
-  depth: 1
+# clone:
+#   depth: 1
 
-trigger:
-  ref:
-    - refs/tags/e2e-eks-**
-    - refs/tags/e2e-full-**
-    - refs/tags/v**
+# trigger:
+#   ref:
+#     - refs/tags/e2e-eks-**
+#     - refs/tags/e2e-full-**
+#     - refs/tags/v**
 
-steps:
-- name: run-tests
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
-  environment:
-    FURYCTL_VERSION: "v0.33.1-rc.1"
-    DISTRIBUTION_VERSION: "v1.32.1"
-    DEBIAN_FRONTEND: noninteractive
-    CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}
-    AWS_ACCESS_KEY_ID:
-      from_secret: aws_access_key_id
-    AWS_SECRET_ACCESS_KEY:
-      from_secret: aws_secret_access_key
-    AWS_REGION:
-      from_secret: aws_region
-  commands:
-    - apt update
-    - apt-get install -y expect
-    - echo "Installing the correct furyctl version..."
-    - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-linux-amd64.tar.gz" | tar -xz
-    - mv furyctl /usr/local/bin
-    - chmod +x /usr/local/bin/furyctl
-    - ./tests/e2e/ekscluster/e2e-ekscluster.sh
+# steps:
+# - name: run-tests
+#   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
+#   environment:
+#     FURYCTL_VERSION: "v0.33.1-rc.1"
+#     DISTRIBUTION_VERSION: "v1.32.1"
+#     DEBIAN_FRONTEND: noninteractive
+#     CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}
+#     AWS_ACCESS_KEY_ID:
+#       from_secret: aws_access_key_id
+#     AWS_SECRET_ACCESS_KEY:
+#       from_secret: aws_secret_access_key
+#     AWS_REGION:
+#       from_secret: aws_region
+#   commands:
+#     - apt update
+#     - apt-get install -y expect
+#     - echo "Installing the correct furyctl version..."
+#     - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-linux-amd64.tar.gz" | tar -xz
+#     - mv furyctl /usr/local/bin
+#     - chmod +x /usr/local/bin/furyctl
+#     - ./tests/e2e/ekscluster/e2e-ekscluster.sh
 
-- name: furyctl-delete
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
-  environment:
-    FURYCTL_VERSION: "v0.33.1-rc.1"
-    CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}
-    DEBIAN_FRONTEND: noninteractive
-    DISTRIBUTION_VERSION: "v1.32.1"
-    AWS_ACCESS_KEY_ID:
-      from_secret: aws_access_key_id
-    AWS_SECRET_ACCESS_KEY:
-      from_secret: aws_secret_access_key
-    AWS_REGION:
-      from_secret: aws_region
-  commands:
-    - apt update
-    - apt-get install -y expect
-    - echo "Installing the correct furyctl version..."
-    - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-linux-amd64.tar.gz" | tar -xz
-    - mv furyctl /usr/local/bin
-    - chmod +x /usr/local/bin/furyctl
-    - tests/e2e/ekscluster/furyctl_delete.expect $(cat ./last_furyctl_yaml.txt)
-    - aws s3 rm s3://e2e-drone-eks/$CLUSTER_NAME --recursive
+# - name: furyctl-delete
+#   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
+#   environment:
+#     FURYCTL_VERSION: "v0.33.1-rc.1"
+#     CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}
+#     DEBIAN_FRONTEND: noninteractive
+#     DISTRIBUTION_VERSION: "v1.32.1"
+#     AWS_ACCESS_KEY_ID:
+#       from_secret: aws_access_key_id
+#     AWS_SECRET_ACCESS_KEY:
+#       from_secret: aws_secret_access_key
+#     AWS_REGION:
+#       from_secret: aws_region
+#   commands:
+#     - apt update
+#     - apt-get install -y expect
+#     - echo "Installing the correct furyctl version..."
+#     - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-linux-amd64.tar.gz" | tar -xz
+#     - mv furyctl /usr/local/bin
+#     - chmod +x /usr/local/bin/furyctl
+#     - tests/e2e/ekscluster/furyctl_delete.expect $(cat ./last_furyctl_yaml.txt)
+#     - aws s3 rm s3://e2e-drone-eks/$CLUSTER_NAME --recursive
 
-- name: furyctl-delete-force
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
-  environment:
-    FURYCTL_VERSION: "v0.33.1-rc.1"
-    CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-upgrades
-    DEBIAN_FRONTEND: noninteractive
-    DISTRIBUTION_VERSION: "v1.32.1"
-    AWS_ACCESS_KEY_ID:
-      from_secret: aws_access_key_id
-    AWS_SECRET_ACCESS_KEY:
-      from_secret: aws_secret_access_key
-    AWS_REGION:
-      from_secret: aws_region
-  commands:
-    - apt update
-    - apt-get install -y expect
-    - echo "Installing the correct furyctl version..."
-    - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-linux-amd64.tar.gz" | tar -xz
-    - mv furyctl /usr/local/bin
-    - chmod +x /usr/local/bin/furyctl
-    - tests/e2e/ekscluster/furyctl_delete_force.expect tests/e2e/ekscluster/manifests/furyctl-cleanup-all.yaml
-    - aws s3 rm s3://e2e-drone-eks/$CLUSTER_NAME --recursive
-  when:
-    status:
-    - failure
----
-name: e2e-ekscluster-selfmanaged-alinux2023-nodes-1.32.0
-kind: pipeline
-type: docker
+# - name: furyctl-delete-force
+#   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
+#   environment:
+#     FURYCTL_VERSION: "v0.33.1-rc.1"
+#     CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-upgrades
+#     DEBIAN_FRONTEND: noninteractive
+#     DISTRIBUTION_VERSION: "v1.32.1"
+#     AWS_ACCESS_KEY_ID:
+#       from_secret: aws_access_key_id
+#     AWS_SECRET_ACCESS_KEY:
+#       from_secret: aws_secret_access_key
+#     AWS_REGION:
+#       from_secret: aws_region
+#   commands:
+#     - apt update
+#     - apt-get install -y expect
+#     - echo "Installing the correct furyctl version..."
+#     - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-linux-amd64.tar.gz" | tar -xz
+#     - mv furyctl /usr/local/bin
+#     - chmod +x /usr/local/bin/furyctl
+#     - tests/e2e/ekscluster/furyctl_delete_force.expect tests/e2e/ekscluster/manifests/furyctl-cleanup-all.yaml
+#     - aws s3 rm s3://e2e-drone-eks/$CLUSTER_NAME --recursive
+#   when:
+#     status:
+#     - failure
+# ---
+# name: e2e-ekscluster-selfmanaged-alinux2023-nodes-1.32.0
+# kind: pipeline
+# type: docker
 
-# node:
-#    performance: low
+# # node:
+# #    performance: low
 
-depends_on:
-  - qa
-  - e2e-ekscluster-1.32.1
+# depends_on:
+#   - qa
+#   - e2e-ekscluster-1.32.1
   
-clone:
-  depth: 1
+# clone:
+#   depth: 1
 
-trigger:
-  ref:
-    - refs/tags/e2e-selfmanaged-eks-**
+# trigger:
+#   ref:
+#     - refs/tags/e2e-selfmanaged-eks-**
 
-steps:
-- name: run-tests
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
-  environment:
-    FURYCTL_VERSION: "v0.33.1-rc.1"
-    DISTRIBUTION_VERSION: "v1.32.1"
-    DEBIAN_FRONTEND: noninteractive
-    CLUSTER_NAME: e2e-eks-selfmanaged-alinux2023-${DRONE_BUILD_NUMBER}
-    AWS_ACCESS_KEY_ID:
-      from_secret: aws_access_key_id
-    AWS_SECRET_ACCESS_KEY:
-      from_secret: aws_secret_access_key
-    AWS_REGION:
-      from_secret: aws_region
-  commands:
-    - apt update
-    - apt-get install -y expect
-    - echo "Installing the correct furyctl version..."
-    - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-linux-amd64.tar.gz" | tar -xz
-    - mv furyctl /usr/local/bin
-    - chmod +x /usr/local/bin/furyctl
-    - ./tests/e2e/ekscluster/e2e-ekscluster-selfmanaged-alinux2023.sh
+# steps:
+# - name: run-tests
+#   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
+#   environment:
+#     FURYCTL_VERSION: "v0.33.1-rc.1"
+#     DISTRIBUTION_VERSION: "v1.32.1"
+#     DEBIAN_FRONTEND: noninteractive
+#     CLUSTER_NAME: e2e-eks-selfmanaged-alinux2023-${DRONE_BUILD_NUMBER}
+#     AWS_ACCESS_KEY_ID:
+#       from_secret: aws_access_key_id
+#     AWS_SECRET_ACCESS_KEY:
+#       from_secret: aws_secret_access_key
+#     AWS_REGION:
+#       from_secret: aws_region
+#   commands:
+#     - apt update
+#     - apt-get install -y expect
+#     - echo "Installing the correct furyctl version..."
+#     - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-linux-amd64.tar.gz" | tar -xz
+#     - mv furyctl /usr/local/bin
+#     - chmod +x /usr/local/bin/furyctl
+#     - ./tests/e2e/ekscluster/e2e-ekscluster-selfmanaged-alinux2023.sh
 
-- name: furyctl-delete
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
-  environment:
-    FURYCTL_VERSION: "v0.33.1-rc.1"
-    CLUSTER_NAME: e2e-eks-selfmanaged-alinux2023-${DRONE_BUILD_NUMBER}
-    DEBIAN_FRONTEND: noninteractive
-    DISTRIBUTION_VERSION: "v1.32.1"
-    AWS_ACCESS_KEY_ID:
-      from_secret: aws_access_key_id
-    AWS_SECRET_ACCESS_KEY:
-      from_secret: aws_secret_access_key
-    AWS_REGION:
-      from_secret: aws_region
-  commands:
-    - apt update
-    - apt-get install -y expect
-    - echo "Installing the correct furyctl version..."
-    - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-linux-amd64.tar.gz" | tar -xz
-    - mv furyctl /usr/local/bin
-    - chmod +x /usr/local/bin/furyctl
-    - tests/e2e/ekscluster/furyctl_delete.expect $(cat ./last_furyctl_yaml.txt)
-    - aws s3 rm s3://e2e-drone-eks/$CLUSTER_NAME --recursive
+# - name: furyctl-delete
+#   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
+#   environment:
+#     FURYCTL_VERSION: "v0.33.1-rc.1"
+#     CLUSTER_NAME: e2e-eks-selfmanaged-alinux2023-${DRONE_BUILD_NUMBER}
+#     DEBIAN_FRONTEND: noninteractive
+#     DISTRIBUTION_VERSION: "v1.32.1"
+#     AWS_ACCESS_KEY_ID:
+#       from_secret: aws_access_key_id
+#     AWS_SECRET_ACCESS_KEY:
+#       from_secret: aws_secret_access_key
+#     AWS_REGION:
+#       from_secret: aws_region
+#   commands:
+#     - apt update
+#     - apt-get install -y expect
+#     - echo "Installing the correct furyctl version..."
+#     - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-linux-amd64.tar.gz" | tar -xz
+#     - mv furyctl /usr/local/bin
+#     - chmod +x /usr/local/bin/furyctl
+#     - tests/e2e/ekscluster/furyctl_delete.expect $(cat ./last_furyctl_yaml.txt)
+#     - aws s3 rm s3://e2e-drone-eks/$CLUSTER_NAME --recursive
 
-- name: furyctl-delete-force
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
-  environment:
-    FURYCTL_VERSION: "v0.33.1-rc.1"
-    CLUSTER_NAME: e2e-eks-selfmanaged-alinux2023-${DRONE_BUILD_NUMBER}-upgrades
-    DEBIAN_FRONTEND: noninteractive
-    DISTRIBUTION_VERSION: "v1.32.0"
-    AWS_ACCESS_KEY_ID:
-      from_secret: aws_access_key_id
-    AWS_SECRET_ACCESS_KEY:
-      from_secret: aws_secret_access_key
-    AWS_REGION:
-      from_secret: aws_region
-  commands:
-    - apt update
-    - apt-get install -y expect
-    - echo "Installing the correct furyctl version..."
-    - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-linux-amd64.tar.gz" | tar -xz
-    - mv furyctl /usr/local/bin
-    - chmod +x /usr/local/bin/furyctl
-    - tests/e2e/ekscluster/furyctl_delete_force.expect tests/e2e/ekscluster/manifests/furyctl-selfmanaged-alinux2023-init-cluster.yaml
-    - aws s3 rm s3://e2e-drone-eks/$CLUSTER_NAME --recursive
-  when:
-    status:
-    - failure
----
-name: e2e-ekscluster-upgrades-1.31.2-1.32.1
-kind: pipeline
-type: docker
+# - name: furyctl-delete-force
+#   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
+#   environment:
+#     FURYCTL_VERSION: "v0.33.1-rc.1"
+#     CLUSTER_NAME: e2e-eks-selfmanaged-alinux2023-${DRONE_BUILD_NUMBER}-upgrades
+#     DEBIAN_FRONTEND: noninteractive
+#     DISTRIBUTION_VERSION: "v1.32.0"
+#     AWS_ACCESS_KEY_ID:
+#       from_secret: aws_access_key_id
+#     AWS_SECRET_ACCESS_KEY:
+#       from_secret: aws_secret_access_key
+#     AWS_REGION:
+#       from_secret: aws_region
+#   commands:
+#     - apt update
+#     - apt-get install -y expect
+#     - echo "Installing the correct furyctl version..."
+#     - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-linux-amd64.tar.gz" | tar -xz
+#     - mv furyctl /usr/local/bin
+#     - chmod +x /usr/local/bin/furyctl
+#     - tests/e2e/ekscluster/furyctl_delete_force.expect tests/e2e/ekscluster/manifests/furyctl-selfmanaged-alinux2023-init-cluster.yaml
+#     - aws s3 rm s3://e2e-drone-eks/$CLUSTER_NAME --recursive
+#   when:
+#     status:
+#     - failure
+# ---
+# name: e2e-ekscluster-upgrades-1.31.2-1.32.1
+# kind: pipeline
+# type: docker
 
-# node:
-#    performance: low
+# # node:
+# #    performance: low
 
-depends_on:
-  - qa
+# depends_on:
+#   - qa
 
-clone:
-  depth: 1
+# clone:
+#   depth: 1
 
-trigger:
-  ref:
-    - refs/tags/e2e-eks-**
-    - refs/tags/e2e-full-**
-    - refs/tags/v**
+# trigger:
+#   ref:
+#     - refs/tags/e2e-eks-**
+#     - refs/tags/e2e-full-**
+#     - refs/tags/v**
 
-steps:
-- name: run-tests
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
-  environment:
-    FURYCTL_VERSION: "v0.33.1-rc.1"
-    DISTRIBUTION_VERSION: "v1.31.2-rc.2"
-    CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-upgrades
-    DEBIAN_FRONTEND: noninteractive
-    AWS_ACCESS_KEY_ID:
-      from_secret: aws_access_key_id
-    AWS_SECRET_ACCESS_KEY:
-      from_secret: aws_secret_access_key
-    AWS_REGION:
-      from_secret: aws_region
-  commands:
-    - apt update
-    - apt-get install -y expect
-    - echo "Installing the correct furyctl version..."
-    - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-linux-amd64.tar.gz" | tar -xz
-    - mv furyctl /usr/local/bin
-    - chmod +x /usr/local/bin/furyctl
-    - ./tests/e2e/ekscluster-upgrades/e2e-ekscluster-upgrades.sh
+# steps:
+# - name: run-tests
+#   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
+#   environment:
+#     FURYCTL_VERSION: "v0.33.1-rc.1"
+#     DISTRIBUTION_VERSION: "v1.31.2-rc.2"
+#     CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-upgrades
+#     DEBIAN_FRONTEND: noninteractive
+#     AWS_ACCESS_KEY_ID:
+#       from_secret: aws_access_key_id
+#     AWS_SECRET_ACCESS_KEY:
+#       from_secret: aws_secret_access_key
+#     AWS_REGION:
+#       from_secret: aws_region
+#   commands:
+#     - apt update
+#     - apt-get install -y expect
+#     - echo "Installing the correct furyctl version..."
+#     - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-linux-amd64.tar.gz" | tar -xz
+#     - mv furyctl /usr/local/bin
+#     - chmod +x /usr/local/bin/furyctl
+#     - ./tests/e2e/ekscluster-upgrades/e2e-ekscluster-upgrades.sh
 
-- name: furyctl-delete
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
-  environment:
-    FURYCTL_VERSION: "v0.33.1-rc.1"
-    CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-upgrades
-    DEBIAN_FRONTEND: noninteractive
-    DISTRIBUTION_VERSION: "v1.32.1"
-    AWS_ACCESS_KEY_ID:
-      from_secret: aws_access_key_id
-    AWS_SECRET_ACCESS_KEY:
-      from_secret: aws_secret_access_key
-    AWS_REGION:
-      from_secret: aws_region
-  commands:
-    - apt update
-    - apt-get install -y expect
-    - echo "Installing the correct furyctl version..."
-    - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-linux-amd64.tar.gz" | tar -xz
-    - mv furyctl /usr/local/bin
-    - chmod +x /usr/local/bin/furyctl
-    - tests/e2e/ekscluster/furyctl_delete.expect tests/e2e/ekscluster-upgrades/manifests/furyctl-init-cluster-1.32.1.yaml
-    - aws s3 rm s3://e2e-drone-eks/$CLUSTER_NAME --recursive
+# - name: furyctl-delete
+#   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
+#   environment:
+#     FURYCTL_VERSION: "v0.33.1-rc.1"
+#     CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-upgrades
+#     DEBIAN_FRONTEND: noninteractive
+#     DISTRIBUTION_VERSION: "v1.32.1"
+#     AWS_ACCESS_KEY_ID:
+#       from_secret: aws_access_key_id
+#     AWS_SECRET_ACCESS_KEY:
+#       from_secret: aws_secret_access_key
+#     AWS_REGION:
+#       from_secret: aws_region
+#   commands:
+#     - apt update
+#     - apt-get install -y expect
+#     - echo "Installing the correct furyctl version..."
+#     - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-linux-amd64.tar.gz" | tar -xz
+#     - mv furyctl /usr/local/bin
+#     - chmod +x /usr/local/bin/furyctl
+#     - tests/e2e/ekscluster/furyctl_delete.expect tests/e2e/ekscluster-upgrades/manifests/furyctl-init-cluster-1.32.1.yaml
+#     - aws s3 rm s3://e2e-drone-eks/$CLUSTER_NAME --recursive
 
-- name: furyctl-delete-force
-  image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
-  environment:
-    FURYCTL_VERSION: "v0.33.1-rc.1"
-    CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-upgrades
-    DEBIAN_FRONTEND: noninteractive
-    DISTRIBUTION_VERSION: "v1.32.1"
-    AWS_ACCESS_KEY_ID:
-      from_secret: aws_access_key_id
-    AWS_SECRET_ACCESS_KEY:
-      from_secret: aws_secret_access_key
-    AWS_REGION:
-      from_secret: aws_region
-  commands:
-    - apt update
-    - apt-get install -y expect
-    - echo "Installing the correct furyctl version..."
-    - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-linux-amd64.tar.gz" | tar -xz
-    - mv furyctl /usr/local/bin
-    - chmod +x /usr/local/bin/furyctl
-    - tests/e2e/ekscluster/furyctl_delete_force.expect tests/e2e/ekscluster-upgrades/manifests/furyctl-init-cluster-1.32.1.yaml
-    - aws s3 rm s3://e2e-drone-eks/$CLUSTER_NAME --recursive
-  when:
-    status:
-    - failure
+# - name: furyctl-delete-force
+#   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
+#   environment:
+#     FURYCTL_VERSION: "v0.33.1-rc.1"
+#     CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-upgrades
+#     DEBIAN_FRONTEND: noninteractive
+#     DISTRIBUTION_VERSION: "v1.32.1"
+#     AWS_ACCESS_KEY_ID:
+#       from_secret: aws_access_key_id
+#     AWS_SECRET_ACCESS_KEY:
+#       from_secret: aws_secret_access_key
+#     AWS_REGION:
+#       from_secret: aws_region
+#   commands:
+#     - apt update
+#     - apt-get install -y expect
+#     - echo "Installing the correct furyctl version..."
+#     - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-linux-amd64.tar.gz" | tar -xz
+#     - mv furyctl /usr/local/bin
+#     - chmod +x /usr/local/bin/furyctl
+#     - tests/e2e/ekscluster/furyctl_delete_force.expect tests/e2e/ekscluster-upgrades/manifests/furyctl-init-cluster-1.32.1.yaml
+#     - aws s3 rm s3://e2e-drone-eks/$CLUSTER_NAME --recursive
+#   when:
+#     status:
+#     - failure
 ---
 name: e2e-onpremises
 kind: pipeline
