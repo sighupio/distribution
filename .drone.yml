@@ -317,7 +317,7 @@ steps:
 - name: run-tests
   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
   environment:
-    FURYCTL_VERSION: "v0.33.0-rc.0"
+    FURYCTL_VERSION: "v0.33.0-rc.1"
     DISTRIBUTION_VERSION: "v1.32.1"
     DEBIAN_FRONTEND: noninteractive
     CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}
@@ -339,7 +339,7 @@ steps:
 - name: furyctl-delete
   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
   environment:
-    FURYCTL_VERSION: "v0.33.0-rc.0"
+    FURYCTL_VERSION: "v0.33.0-rc.1"
     CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}
     DEBIAN_FRONTEND: noninteractive
     DISTRIBUTION_VERSION: "v1.32.1"
@@ -362,7 +362,7 @@ steps:
 - name: furyctl-delete-force
   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
   environment:
-    FURYCTL_VERSION: "v0.33.0-rc.0"
+    FURYCTL_VERSION: "v0.33.0-rc.1"
     CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-upgrades
     DEBIAN_FRONTEND: noninteractive
     DISTRIBUTION_VERSION: "v1.32.1"
@@ -407,7 +407,7 @@ steps:
 - name: run-tests
   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
   environment:
-    FURYCTL_VERSION: "v0.33.0-rc.0"
+    FURYCTL_VERSION: "v0.33.0-rc.1"
     DISTRIBUTION_VERSION: "v1.32.1"
     DEBIAN_FRONTEND: noninteractive
     CLUSTER_NAME: e2e-eks-selfmanaged-alinux2023-${DRONE_BUILD_NUMBER}
@@ -429,7 +429,7 @@ steps:
 - name: furyctl-delete
   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
   environment:
-    FURYCTL_VERSION: "v0.33.0-rc.0"
+    FURYCTL_VERSION: "v0.33.0-rc.1"
     CLUSTER_NAME: e2e-eks-selfmanaged-alinux2023-${DRONE_BUILD_NUMBER}
     DEBIAN_FRONTEND: noninteractive
     DISTRIBUTION_VERSION: "v1.32.1"
@@ -452,7 +452,7 @@ steps:
 - name: furyctl-delete-force
   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
   environment:
-    FURYCTL_VERSION: "v0.33.0-rc.0"
+    FURYCTL_VERSION: "v0.33.0-rc.1"
     CLUSTER_NAME: e2e-eks-selfmanaged-alinux2023-${DRONE_BUILD_NUMBER}-upgrades
     DEBIAN_FRONTEND: noninteractive
     DISTRIBUTION_VERSION: "v1.32.0"
@@ -498,7 +498,7 @@ steps:
 - name: run-tests
   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
   environment:
-    FURYCTL_VERSION: "v0.33.0-rc.0"
+    FURYCTL_VERSION: "v0.33.0-rc.1"
     DISTRIBUTION_VERSION: "v1.31.2-rc.2"
     CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-upgrades
     DEBIAN_FRONTEND: noninteractive
@@ -520,7 +520,7 @@ steps:
 - name: furyctl-delete
   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
   environment:
-    FURYCTL_VERSION: "v0.33.0-rc.0"
+    FURYCTL_VERSION: "v0.33.0-rc.1"
     CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-upgrades
     DEBIAN_FRONTEND: noninteractive
     DISTRIBUTION_VERSION: "v1.32.1"
@@ -543,7 +543,7 @@ steps:
 - name: furyctl-delete-force
   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_yq
   environment:
-    FURYCTL_VERSION: "v0.33.0-rc.0"
+    FURYCTL_VERSION: "v0.33.0-rc.1"
     CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-upgrades
     DEBIAN_FRONTEND: noninteractive
     DISTRIBUTION_VERSION: "v1.32.1"
@@ -587,7 +587,7 @@ steps:
 - name: create-hetzner-infrastructure
   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
   environment:
-    FURYCTL_VERSION: "v0.33.0-rc.0"
+    FURYCTL_VERSION: "v0.33.0-rc.1"
     DEBIAN_FRONTEND: noninteractive
     AWS_ACCESS_KEY_ID:
       from_secret: aws_access_key_id
@@ -611,7 +611,7 @@ steps:
 - name: install-cluster-with-furyctl
   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
   environment:
-    FURYCTL_VERSION: "v0.33.0-rc.0"
+    FURYCTL_VERSION: "v0.33.0-rc.1"
     DEBIAN_FRONTEND: noninteractive
     AWS_ACCESS_KEY_ID:
       from_secret: aws_access_key_id
@@ -660,7 +660,7 @@ steps:
 - name: delete
   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
   environment:
-    FURYCTL_VERSION: "v0.33.0-rc.0"
+    FURYCTL_VERSION: "v0.33.0-rc.1"
     DEBIAN_FRONTEND: noninteractive
     AWS_ACCESS_KEY_ID:
       from_secret: aws_access_key_id
@@ -769,7 +769,7 @@ steps:
 - name: upgrade-cluster-to-1.32.1-with-furyctl
   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
   environment:
-    FURYCTL_VERSION: "v0.33.0-rc.0"
+    FURYCTL_VERSION: "v0.33.0-rc.1"
     DISTRIBUTION_VERSION: "v1.32.1" # distribution version is hardcoded in the tofu outputs
     DEBIAN_FRONTEND: noninteractive
     AWS_ACCESS_KEY_ID:
@@ -801,7 +801,7 @@ steps:
 - name: delete
   image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.32.2_5.6.0_1.9.0_4.33.3 # versions: awscli_bats_helm_kubectl_kustomize_tofu_yq
   environment:
-    FURYCTL_VERSION: "v0.33.0-rc.0"
+    FURYCTL_VERSION: "v0.33.0-rc.1"
     DEBIAN_FRONTEND: noninteractive
     DISTRIBUTION_VERSION: "v1.32.1"
     AWS_ACCESS_KEY_ID:
