@@ -294,7 +294,7 @@ volumes:
 ---
 # e2e tests are failing on CI: race conditions on the applications of some (apparently) unrelated CRDs. 
 # Manual testing (running the same pipeline locally macOS M1 Pro, with drone exec) results in a successful run.
-name: e2e-ekscluster-1.32.0
+name: e2e-ekscluster-1.32.1
 kind: pipeline
 type: docker
 
@@ -475,7 +475,7 @@ steps:
     status:
     - failure
 ---
-name: e2e-ekscluster-upgrades-1.31.1-1.32.1
+name: e2e-ekscluster-upgrades-1.31.2-1.32.1
 kind: pipeline
 type: docker
 
@@ -490,8 +490,7 @@ clone:
 
 trigger:
   ref:
-# TODO: WARNING: CHANGE ME BEFORE MERGING!
-#  - refs/tags/e2e-eks-**
+    - refs/tags/e2e-eks-**
     - refs/tags/e2e-full-**
     - refs/tags/v**
 
