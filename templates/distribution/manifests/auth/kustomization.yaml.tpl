@@ -16,15 +16,24 @@ resources:
 {{- if ne .spec.distribution.modules.ingress.nginx.type "none" }}
   - resources/ingress-infra.yml
 {{- end }}
-
+{{- if ne .spec.distribution.modules.auth.oidcTrustedCA "" }}
+  - secrets/oidc-trusted-ca.yml
+  - secrets/overlays/kube-system-ca
+{{- end }}
 {{ if eq .spec.distribution.common.networkPoliciesEnabled true }}
   - policies
 {{- end }}
 
-patchesStrategicMerge:
-  - patches/infra-nodes.yml
-  - patches/pomerium-ingress.yml
-
+patches:
+  - path: patches/infra-nodes.yml
+  - path: patches/pomerium-ingress.yml
+{{- if ne .spec.distribution.modules.auth.oidcTrustedCA "" }}
+  - path: patches/pomerium-trusted-ca.yml
+  - path: patches/dex-trusted-ca.yml
+{{- end }}
+{{- if and .spec.distribution.modules.auth.oidcKubernetesAuth.enabled (ne .spec.distribution.modules.auth.oidcTrustedCA "") }}
+  - path: patches/gangplank-trusted-ca.yml
+{{- end }}
 configMapGenerator:
   - name: pomerium
     behavior: replace
@@ -62,6 +71,9 @@ resources:
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/auth/katalog/dex" }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/auth/katalog/gangplank" }}
   - resources/ingress-infra.yml
+{{- if ne .spec.distribution.modules.auth.oidcTrustedCA "" }}
+  - secrets/overlays/kube-system-ca
+{{- end }}
 {{- end }}
 
 {{- if .spec.distribution.modules.auth.oidcKubernetesAuth.enabled }}
@@ -75,8 +87,12 @@ secretGenerator:
     files:
       - gangplank.yml=secrets/gangplank.yml
 
-patchesStrategicMerge:
-  - patches/infra-nodes.yml
+patches:
+  - path: patches/infra-nodes.yml
+{{- if ne .spec.distribution.modules.auth.oidcTrustedCA "" }}
+  - path: patches/gangplank-trusted-ca.yml
+  - path: patches/dex-trusted-ca.yml
+{{- end }}
 {{- end }}
 
 {{- end }}
@@ -88,6 +104,9 @@ resources:
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/auth/katalog/dex" }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/auth/katalog/gangplank" }}
   - resources/ingress-infra.yml
+{{- if ne .spec.distribution.modules.auth.oidcTrustedCA "" }}
+  - secrets/overlays/kube-system-ca
+{{- end }}
 {{- end }}
 
 {{- if .spec.distribution.modules.auth.oidcKubernetesAuth.enabled }}
@@ -101,8 +120,12 @@ secretGenerator:
     files:
       - gangplank.yml=secrets/gangplank.yml
 
-patchesStrategicMerge:
-  - patches/infra-nodes.yml
+patches:
+  - path: patches/infra-nodes.yml
+{{- if ne .spec.distribution.modules.auth.oidcTrustedCA "" }}
+  - path: patches/gangplank-trusted-ca.yml
+  - path: patches/dex-trusted-ca.yml
+{{- end }}
 {{- end }}
 
 {{- end }}

@@ -32,6 +32,7 @@ spec:
   - Egress
   - Ingress
 ---
+{{- if ne .spec.distribution.modules.ingress.nginx.type "none" }}
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -79,4 +80,5 @@ spec:
       ports:
         - port: 3000
           protocol: TCP
+{{- end }}
 ---

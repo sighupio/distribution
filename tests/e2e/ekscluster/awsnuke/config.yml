@@ -6,11 +6,11 @@
 regions:
   - "eu-west-1"
 
-account-blocklist:
+blocklist:
 - ACCOUNT_ID_PROD_PLACEHOLDER # production
 
 resource-types:
-  targets:
+  includes:
     - EC2Subnet
     - EC2SecurityGroup
     - EC2InternetGateway
@@ -37,4 +37,7 @@ resource-types:
     - Route53ResolverRuleAssociation
 
 accounts:
-  ACCOUNT_ID_PLACEHOLDER: {}
+  ACCOUNT_ID_PLACEHOLDER:
+    filters:
+      CloudWatchLogsLogGroup:
+      - "/aws/lambda/aws-controltower-NotificationForwarder"

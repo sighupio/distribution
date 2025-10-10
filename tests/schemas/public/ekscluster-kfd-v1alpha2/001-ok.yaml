@@ -46,7 +46,7 @@ spec:
       publicAccess: false
     nodeAllowedSshPublicKey: ssh-ed25519 SomethingSomething engineering@sighup.io
     nodePoolsLaunchKind: both
-    nodePoolGlobalAmiType: "alinux2"
+    nodePoolGlobalAmiType: "alinux2023"
     nodePools:
       - ami:
           id: ami-01234567890123456

@@ -31,17 +31,8 @@ resources:
   - policies
 {{- end }}
 
-# We can't move the infra-nodes patch to `patches:` yet because of this bug:
-# https://github.com/kubernetes-sigs/kustomize/issues/5049
-# We'll need to either update to kustomize >= v5.2.1 or split the patch
-# into several files, but splitting would complicate the template logic too much IMO.
-patchesStrategicMerge:
-  - patches/infra-nodes.yml
-{{- if eq .spec.distribution.modules.policy.type "gatekeeper" }}
-  - patches/gatekeeper-kapp-ordering.yml
-{{- end }}
-
 patches:
+  - path: patches/infra-nodes.yml
 {{- if eq .spec.distribution.modules.policy.type "kyverno" }}
   {{- if .spec.distribution.modules.policy.kyverno.additionalExcludedNamespaces }}
   - path: patches/kyverno-whitelist-namespace.yml
@@ -56,6 +47,7 @@ patches:
       {{- end }}
 {{- end }}
 {{- if eq .spec.distribution.modules.policy.type "gatekeeper" }}
+  - path: patches/gatekeeper-kapp-ordering.yml
   {{- if .spec.distribution.modules.policy.gatekeeper.installDefaultPolicies }}
   - patch: |-
       - op: replace

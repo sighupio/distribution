@@ -43,6 +43,17 @@
   tags:
     - reset-etcd-nodes
 
+- name: Reset kernel params
+  hosts: master,etcd,nodes
+  become: true
+  tasks:
+    - name: Delete sysctl dropin file
+      file:
+        path: /etc/sysctl.d/99-sd-onprem-kernel-params.conf
+        state: absent
+  tags:
+    - reset-sysctl-dropin
+
 - name: Reboot
   hosts: master,nodes,etcd
   become: true

@@ -21,10 +21,10 @@ resources:
   - policies
 {{- end }}
 
-patchesStrategicMerge:
-  - patches/infra-nodes.yml
+patches:
+  - path: patches/infra-nodes.yml
 {{- if eq .spec.distribution.modules.tracing.tempo.backend "minio" }}
-  - patches/minio.yml
+  - path: patches/minio.yml
 {{- end }}
 
 configMapGenerator:

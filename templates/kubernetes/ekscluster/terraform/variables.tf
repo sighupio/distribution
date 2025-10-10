@@ -227,7 +227,17 @@ variable "node_pools_global_ami_type" {
   description = "Global default AMI type used for EKS worker nodes. This will apply to all node pools unless overridden by a specific node pool."
   default     = "alinux2"
   validation {
-    condition     = contains(["alinux2", "alinux2023"], var.node_pools_global_ami_type)
-    error_message = "The global AMI type must be either 'alinux2' or 'alinux2023'."
+    condition     = contains(["alinux2023", "alinux2"], var.node_pools_global_ami_type)
+    error_message = "The global AMI type must be either 'alinux2023' or 'alinux2'."
+  }
+}
+
+variable "workers_group_defaults" {
+  type = any
+  description = "Override default values for self-managed eks node pool."  
+  default = {
+    metadata_http_endpoint               = "enabled"
+    metadata_http_tokens                 = "required"
+    metadata_http_put_response_hop_limit = 2 # As recommended by AWS https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-IMDS-new-instances.html#set-imdsv2-account-defaults
   }
 }
