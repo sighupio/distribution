@@ -37,4 +37,7 @@ resource-types:
     - Route53ResolverRuleAssociation
 
 accounts:
-  ACCOUNT_ID_PLACEHOLDER: {}
+  ACCOUNT_ID_PLACEHOLDER:
+    filters:
+      CloudWatchLogsLogGroup:
+      - "/aws/lambda/aws-controltower-NotificationForwarder"

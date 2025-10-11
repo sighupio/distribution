@@ -77,11 +77,6 @@ querier:
         frontend_address: tempo-distributed-query-frontend-discovery:9095
     max_concurrent_queries: 20
     search:
-        external_backend: null
-        external_endpoints: []
-        external_hedge_requests_at: 8s
-        external_hedge_requests_up_to: 2
-        prefer_self: 10
         query_timeout: 30s
     trace_by_id:
         query_timeout: 10s

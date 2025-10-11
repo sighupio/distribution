@@ -5,6 +5,11 @@
  */
 
 cluster_name = {{ .metadata.name | quote }}
+tags = {
+{{- range $key, $value := .spec.tags }}
+  {{ $key }} = "{{ $value }}"
+{{- end }}
+}
 
 {{- if hasKeyAny .spec.kubernetes "logsTypes" }}
 cluster_enabled_log_types = {{ toJson .spec.kubernetes.logsTypes }}
@@ -85,6 +90,32 @@ cluster_iam_role_name_prefix_override = {{ .spec.kubernetes.clusterIAMRoleNamePr
 
 {{- if hasKeyAny .spec.kubernetes "workersIAMRoleNamePrefixOverride" }}
 workers_iam_role_name_prefix_override = {{ .spec.kubernetes.workersIAMRoleNamePrefixOverride | quote }}
+{{- end }}
+
+{{- if hasKeyAny .spec.kubernetes "nodePoolsCommon" }}
+workers_group_defaults = {
+  {{- if hasKeyAny .spec.kubernetes.nodePoolsCommon "metadataHttpEndpoint" }}
+    metadata_http_endpoint = {{ .spec.kubernetes.nodePoolsCommon.metadataHttpEndpoint | quote }}
+  {{- end}}
+  {{- if hasKeyAny .spec.kubernetes.nodePoolsCommon "metadataHttpTokens" }}
+    metadata_http_tokens = {{ .spec.kubernetes.nodePoolsCommon.metadataHttpTokens | quote }}
+  {{- end}}
+  {{- if hasKeyAny .spec.kubernetes.nodePoolsCommon "metadataHttpPutResponseHopLimit" }}
+    metadata_http_put_response_hop_limit = {{ .spec.kubernetes.nodePoolsCommon.metadataHttpPutResponseHopLimit }}
+  {{- end}}
+}
+
+node_groups_defaults = {
+  {{- if hasKeyAny .spec.kubernetes.nodePoolsCommon "metadataHttpEndpoint" }}
+    metadata_http_endpoint = {{ .spec.kubernetes.nodePoolsCommon.metadataHttpEndpoint | quote }}
+  {{- end}}
+  {{- if hasKeyAny .spec.kubernetes.nodePoolsCommon "metadataHttpTokens" }}
+    metadata_http_tokens = {{ .spec.kubernetes.nodePoolsCommon.metadataHttpTokens | quote }}
+  {{- end}}
+  {{- if hasKeyAny .spec.kubernetes.nodePoolsCommon "metadataHttpPutResponseHopLimit" }}
+    metadata_http_put_response_hop_limit = {{ .spec.kubernetes.nodePoolsCommon.metadataHttpPutResponseHopLimit }}
+  {{- end}}
+}
 {{- end }}
 
 {{- if gt (len .spec.kubernetes.nodePools) 0 }}

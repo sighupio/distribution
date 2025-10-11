@@ -545,13 +545,14 @@ The path to the kubeconfig file.
 
 ### Properties
 
-| Property                                             | Type     | Required |
-|:-----------------------------------------------------|:---------|:---------|
-| [baseDomain](#specdistributionmodulesauthbasedomain) | `string` | Optional |
-| [dex](#specdistributionmodulesauthdex)               | `object` | Optional |
-| [overrides](#specdistributionmodulesauthoverrides)   | `object` | Optional |
-| [pomerium](#specdistributionmodulesauthpomerium)     | `object` | Optional |
-| [provider](#specdistributionmodulesauthprovider)     | `object` | Required |
+| Property                                                   | Type     | Required |
+|:-----------------------------------------------------------|:---------|:---------|
+| [baseDomain](#specdistributionmodulesauthbasedomain)       | `string` | Optional |
+| [dex](#specdistributionmodulesauthdex)                     | `object` | Optional |
+| [oidcTrustedCA](#specdistributionmodulesauthoidctrustedca) | `string` | Optional |
+| [overrides](#specdistributionmodulesauthoverrides)         | `object` | Optional |
+| [pomerium](#specdistributionmodulesauthpomerium)           | `object` | Optional |
+| [provider](#specdistributionmodulesauthprovider)           | `object` | Required |
 
 ### Description
 
@@ -686,6 +687,12 @@ The key of the toleration
 ### Description
 
 The value of the toleration
+
+## .spec.distribution.modules.auth.oidcTrustedCA
+
+### Description
+
+The Certificate Authority certificate file's content to trust for self-signed certificates at the OAuth2 URL. You can use the `"{file://<path>}"` notation to get the content from a file.
 
 ## .spec.distribution.modules.auth.overrides
 
@@ -927,7 +934,7 @@ Signing Key is the base64 representation of one or more PEM-encoded private keys
 To generates an P-256 (ES256) signing key:
 
 ```bash
-openssl ecparam  -genkey  -name prime256v1  -noout  -out ec_private.pem
+openssl ecparam -genkey -name prime256v1 -noout -out ec_private.pem
 # careful! this will output your private key in terminal
 cat ec_private.pem | base64
 ```
@@ -3678,9 +3685,17 @@ The value of the toleration
 
 ### Properties
 
-| Property                                                               | Type     | Required |
-|:-----------------------------------------------------------------------|:---------|:---------|
-| [overrides](#specdistributionmodulesnetworkingtigeraoperatoroverrides) | `object` | Optional |
+| Property                                                               | Type      | Required |
+|:-----------------------------------------------------------------------|:----------|:---------|
+| [blockSize](#specdistributionmodulesnetworkingtigeraoperatorblocksize) | `integer` | Optional |
+| [overrides](#specdistributionmodulesnetworkingtigeraoperatoroverrides) | `object`  | Optional |
+| [podCidr](#specdistributionmodulesnetworkingtigeraoperatorpodcidr)     | `string`  | Optional |
+
+## .spec.distribution.modules.networking.tigeraOperator.blockSize
+
+### Description
+
+BlockSize specifies the CIDR prefix length to use when allocating per-node IP blocks from the main IP pool CIDR. WARNING: The value for this field cannot be changed once set. Default is 26.
 
 ## .spec.distribution.modules.networking.tigeraOperator.overrides
 
@@ -3746,6 +3761,28 @@ The key of the toleration
 ### Description
 
 The value of the toleration
+
+## .spec.distribution.modules.networking.tigeraOperator.podCidr
+
+### Description
+
+Specifies a custom CIDR for the default Pods IPPool.
+If unset, the Tigera Operator will try to detect it from the cluster:
+- OpenShift -> OpenShift Network config
+- kubeadm -> kubeadm-config ConfigMap
+- EKS -> defaults to 172.16.0.0/16 (VXLAN)
+- otherwise -> defaults to 192.168.0.0/16.
+WARNING: this field cannot be changed once set.
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}\/(3[0-2]|[1-2][0-9]|[0-9])$
+```
+
+[try pattern](https://regexr.com/?expression=^\(\(25[0-5]|\(2[0-4]|1\d|[1-9]|\)\d\)\.?\b\){4}\\/\(3[0-2]|[1-2][0-9]|[0-9]\)$)
 
 ## .spec.distribution.modules.networking.type
 
@@ -4579,5 +4616,15 @@ The folder of the kustomize plugin
 
 ### Description
 
-The name of the kustomize plugin
+The name of the kustomize plugin. A lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', 'local-storage')
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+```
+
+[try pattern](https://regexr.com/?expression=^[a-z0-9]\([-a-z0-9]*[a-z0-9]\)?\(\.[a-z0-9]\([-a-z0-9]*[a-z0-9]\)?\)*$)
 

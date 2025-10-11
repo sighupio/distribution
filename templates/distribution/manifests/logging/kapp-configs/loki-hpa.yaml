@@ -1,0 +1,38 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# This file is used to tell kapp to ignore the changes in the replica fields of 
+# the Loki components that have an HPA configured.
+# This is needed because the HPA will change the replica count based on the load,
+# and we don't want kapp to consider this as a drift from the desired state.
+
+apiVersion: kapp.k14s.io/v1alpha1
+kind: Config
+metadata:
+  name: dummy # needed so kustomize won't complain
+rebaseRules:
+- path: [spec, replicas]
+  type: copy
+  sources: [existing, new]
+  resourceMatchers:
+  - kindNamespaceNameMatcher:
+      kind: Deployment
+      namespace: logging
+      name: loki-distributed-distributor
+  - kindNamespaceNameMatcher:
+      kind: Deployment
+      namespace: logging
+      name: loki-distributed-gateway
+  - kindNamespaceNameMatcher:
+      kind: StatefulSet
+      namespace: logging
+      name: loki-distributed-ingester
+  - kindNamespaceNameMatcher:
+      kind: Deployment
+      namespace: logging
+      name: loki-distributed-querier
+  - kindNamespaceNameMatcher:
+      kind: Deployment
+      namespace: logging
+      name: loki-distributed-query-frontend

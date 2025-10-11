@@ -9,7 +9,7 @@ metadata:
   namespace: monitoring
 spec:
   # image should be the same as the one used in prometheus-operated
-  image: registry.sighup.io/fury/prometheus/prometheus:v2.46.0
+  image: registry.sighup.io/fury/prometheus/prometheus:v3.5.0
   # version: 2.46.0
   replicas: 2
   externalLabels:

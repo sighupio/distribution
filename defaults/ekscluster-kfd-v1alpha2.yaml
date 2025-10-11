@@ -92,6 +92,9 @@ data:
             disableAuth: false
             host: ""
             ingressClass: ""
+      operator:
+        fluentd: {}
+        fluentbit: {}
       # can be none, opensearch, loki or customOutputs
       type: opensearch
       opensearch:
@@ -211,6 +214,9 @@ data:
             disableAuth: false
             host: ""
             ingressClass: ""
+      tigeraOperator:
+        podCidr: null # not used
+        blockSize: 26 # not used
       cilium:
         podCidr: "dummy" # cilium not used yet on EKS
         maskSize: "dummy" # cilium not used yet on EKS
@@ -310,6 +316,7 @@ data:
         expiry:
           signingKeys: "6h"
           idTokens: "24h"
+      oidcTrustedCA: "" # only needed as default
       oidcKubernetesAuth: # only needed as default
         enabled: false
       baseDomain: ""

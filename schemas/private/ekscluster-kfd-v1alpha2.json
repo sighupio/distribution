@@ -532,6 +532,9 @@
           "minItems": 0,
           "description": "Optional list of Kubernetes Cluster log types to enable. Defaults to all types."
         },
+        "nodePoolsCommon": {
+          "$ref": "#/$defs/Spec.Kubernetes.NodePoolsCommon"
+        },
         "nodePools": {
           "type": "array",
           "items": {
@@ -583,6 +586,33 @@
         "privateAccess",
         "publicAccess"
       ]
+    },
+    "Spec.Kubernetes.NodePoolsCommon": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Default properties to set for all self-managed and eks-managed node pools. Currently only IMDS properties are supported.",
+      "properties": {
+        "metadataHttpEndpoint": {
+          "description": "Specifies whether the instance metadata service (IMDS) is enabled or disabled. When set to 'disabled', instance metadata is not accessible.",
+          "type": "string",
+          "enum": [
+            "enabled",
+            "disabled"
+          ]
+        },
+        "metadataHttpTokens": {
+          "description": "Defines whether the use of IMDS session tokens is required. When set to 'required', all metadata requests must include a valid session token.",
+          "type": "string",
+          "enum": [
+            "optional",
+            "required"
+          ]
+        },
+        "metadataHttpPutResponseHopLimit": {
+          "description": "Specifies the maximum number of network hops allowed for instance metadata PUT response packets. This helps control access to instance metadata across different network layers.",
+          "type": "integer"
+        }
+      }
     },
     "Spec.Kubernetes.NodePool": {
       "type": "object",
@@ -2467,6 +2497,10 @@
         },
         "dex": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Auth.Dex"
+        },
+        "oidcTrustedCA": {
+          "type": "string",
+          "description": "The Certificate Authority certificate file's content to trust for self-signed certificates at the OAuth2 URL. You can use the `\"{file://<path>}\"` notation to get the content from a file."
         }
       },
       "required": [
