@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/sighupio/fury-distribution/v1.32.0/schemas/public/ekscluster-kfd-v1alpha2.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/sighupio/fury-distribution/v1.32.1/schemas/public/ekscluster-kfd-v1alpha2.json
 # Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
@@ -15,7 +15,7 @@ kind: EKSCluster
 metadata:
   name: e2e-test-eks
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
   toolsConfiguration:
     terraform:
       state:
@@ -75,8 +75,10 @@ spec:
           volumeSize: 50
           volumeType: gp2
         labels:
-          nodepool: infra
-          node.kubernetes.io/role: infra
+          nodepool: "infra"
+          node.kubernetes.io/role: "infra"
+        taints:
+          - node.kubernetes.io/role=infra:NoSchedule
         tags:
           k8s.io/cluster-autoscaler/node-template/label/nodepool: worker
           k8s.io/cluster-autoscaler/node-template/label/node.kubernetes.io/role: worker
@@ -85,6 +87,13 @@ spec:
       users: []
       roles: []
   distribution:
+    common:
+      nodeSelector:
+        node.kubernetes.io/role: infra
+      tolerations:
+        - effect: NoSchedule
+          key: node.kubernetes.io/role
+          value: infra
     modules:
       ingress:
         baseDomain: internal.e2e.ci.sighup.cc

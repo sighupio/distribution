@@ -1,14 +1,14 @@
 # Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
-# yaml-language-server: $schema=https://raw.githubusercontent.com/sighupio/fury-distribution/v1.30.0/schemas/public/kfddistribution-kfd-v1alpha2.json
+# yaml-language-server: $schema=../../../schemas/public/kfddistribution-kfd-v1alpha2.json
 ---
 apiVersion: kfd.sighup.io/v1alpha2
 kind: KFDDistribution
 metadata:
   name: sighup
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.31.2-rc.2
   # This section describes how the KFD distribution will be installed
   distribution:
     kubeconfig: "{env://KUBECONFIG}"

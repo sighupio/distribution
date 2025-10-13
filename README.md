@@ -11,8 +11,8 @@
 <p align="center">SIGHUP Distribution (SD) is a certified battle-tested Kubernetes distribution based purely on upstream Kubernetes.</p>
 <!-- markdownlint-enable MD033 MD045 -->
 
-[![Build Status](http://ci.sighup.io/api/badges/sighupio/distribution/status.svg?ref=refs/tags/v1.32.0)](http://ci.sighup.io/sighupio/distribution)
-[![Release](https://img.shields.io/badge/release-v1.32.0-blue?label=DistributionRelease)](https://github.com/sighupio/distribution/releases/latest)
+[![Build Status](http://ci.sighup.io/api/badges/sighupio/distribution/status.svg?ref=refs/tags/v1.32.1)](http://ci.sighup.io/sighupio/distribution)
+[![Release](https://img.shields.io/badge/release-v1.32.1-blue?label=DistributionRelease)](https://github.com/sighupio/distribution/releases/latest)
 [![Slack](https://img.shields.io/badge/slack-@kubernetes/fury-yellow.svg?logo=slack)](https://kubernetes.slack.com/archives/C0154HYTAQH)
 [![License](https://img.shields.io/github/license/sighupio/distribution)](https://github.com/sighupio/distribution/blob/main/LICENSE)
 
@@ -136,14 +136,9 @@ Current supported versions of SD are:
 
 |                                  SD Version                               | Kubernetes Version |
 | :-----------------------------------------------------------------------: | :----------------: |
-| [`1.32.0`](https://github.com/sighupio/distribution/releases/tag/v1.32.0) |      `1.32.x`      |
-| [`1.31.1`](https://github.com/sighupio/distribution/releases/tag/v1.31.1) |      `1.31.x`      |
-| [`1.30.2`](https://github.com/sighupio/distribution/releases/tag/v1.30.2) |      `1.30.x`      |
-| [`1.29.7`](https://github.com/sighupio/distribution/releases/tag/v1.29.7) |      `1.29.x`      |
-
-> [!NOTE]
-> Usually, SD supports 3 versions simultaneously that are compatible with 3 different underlying Kubernetes versions. With SD v1.32.0 the support for SD v1.29.x will be extended for some time, effectively providing support for 4 versions (1.29, 1.30, 1.31 and 1.32).
-> See the [versioning](docs/VERSIONING.md) document for more details on SD's version skew policy.
+| [`1.33.1`](https://github.com/sighupio/distribution/releases/tag/v1.33.1) |      `1.33.x`      |
+| [`1.32.1`](https://github.com/sighupio/distribution/releases/tag/v1.32.1) |      `1.32.x`      |
+| [`1.31.2`](https://github.com/sighupio/distribution/releases/tag/v1.31.2) |      `1.31.x`      |
 
 Check the [compatibility matrix][compatibility-matrix] for additional information about previous releases of the Distribution and the compatibility with `furyctl`.
 
@@ -185,14 +180,14 @@ SD is open-source software and it's released under the following [LICENSE](LICEN
 [dr-module]: https://github.com/sighupio/module-dr
 [policy-module]: https://github.com/sighupio/module-policy
 [auth-module]: https://github.com/sighupio/module-auth
-[networking-version]: https://img.shields.io/badge/release-v2.2.0-blue
-[ingress-version]: https://img.shields.io/badge/release-v4.0.0-blue
-[logging-version]: https://img.shields.io/badge/release-v5.1.0-blue
-[monitoring-version]: https://img.shields.io/badge/release-v3.5.0-blue
-[tracing-version]: https://img.shields.io/badge/release-v1.2.0-blue
-[dr-version]: https://img.shields.io/badge/release-v3.1.0-blue
-[policy-version]: https://img.shields.io/badge/release-v1.14.0-blue
-[auth-version]: https://img.shields.io/badge/release-v0.5.1-blue
+[networking-version]: https://img.shields.io/badge/release-v3.0.0-blue
+[ingress-version]: https://img.shields.io/badge/release-v4.1.1-blue
+[logging-version]: https://img.shields.io/badge/release-v5.2.0-blue
+[monitoring-version]: https://img.shields.io/badge/release-v4.0.1-blue
+[tracing-version]: https://img.shields.io/badge/release-v1.3.0-blue
+[dr-version]: https://img.shields.io/badge/release-v3.2.0-blue
+[policy-version]: https://img.shields.io/badge/release-v1.15.0-blue
+[auth-version]: https://img.shields.io/badge/release-v0.6.0-blue
 
 <!-- Addon Modules -->
 

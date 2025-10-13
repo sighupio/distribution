@@ -85,6 +85,9 @@ data:
             disableAuth: false
             host: ""
             ingressClass: ""
+      operator:
+        fluentd: {}
+        fluentbit: {}
       # can be none, opensearch, loki or customOutputs
       type: opensearch
       opensearch:
@@ -195,6 +198,9 @@ data:
           password: minio123
     # networking module configuration
     networking:
+      tigeraOperator:
+        podCidr: null
+        blockSize: 26
       cilium:
         podCidr: null
         maskSize: "24"
@@ -307,6 +313,7 @@ data:
         expiry:
           signingKeys: "6h"
           idTokens: "24h"
+      oidcTrustedCA: ""
       oidcKubernetesAuth:
         enabled: false
       baseDomain: ""

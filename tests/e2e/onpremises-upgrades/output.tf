@@ -18,7 +18,7 @@ kind: OnPremises
 metadata:
   name: reevo
 spec:
-  distributionVersion: v1.31.1
+  distributionVersion: v1.31.2-rc.2
   kubernetes:
     pkiFolder: ./pki
     ssh:
@@ -168,7 +168,7 @@ kind: OnPremises
 metadata:
   name: reevo
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.2
   kubernetes:
     pkiFolder: ./pki
     ssh:
@@ -306,7 +306,7 @@ spec:
           version: '1.8.1'
           set:
             - name: persistence.defaultClassReplicaCount
-              value: "2"
+              value: "1"
 EOF
 }
 

@@ -16,7 +16,7 @@ spec:
     - Egress
   podSelector:
     matchLabels:
-      app: opensearch-dashboards
+      app.kubernetes.io/name: opensearch-dashboards
   egress:
     - to:
         - namespaceSelector:
@@ -25,6 +25,39 @@ spec:
           podSelector:
             matchLabels:
               app.kubernetes.io/name: opensearch
+      ports:
+        - port: 9200
+          protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: opensearch-ingress-opensearch-dashboards
+  namespace: logging
+  labels:
+    cluster.kfd.sighup.io/module: logging
+    cluster.kfd.sighup.io/logging-type: opensearch
+spec:
+  policyTypes:
+    - Ingress
+  # podSelector:
+  #   matchLabels:
+  #     app.kubernetes.io/name: opensearch
+  ingress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: logging
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: opensearch
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: logging
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: opensearch-dashboards
       ports:
         - port: 9200
           protocol: TCP
@@ -42,8 +75,7 @@ spec:
     - Ingress
   podSelector:
     matchLabels:
-      app: opensearch-dashboards
-      release: opensearch-dashboards
+      app.kubernetes.io/name: opensearch-dashboards
   ingress:
     - from:
         - podSelector:
@@ -67,7 +99,7 @@ spec:
     - Ingress
   podSelector:
     matchLabels:
-      app: opensearch-dashboards
+      app.kubernetes.io/name: opensearch-dashboards
   ingress:
     - from:
       - namespaceSelector:
@@ -110,8 +142,7 @@ spec:
     - to:
         - podSelector:
             matchLabels:
-              app: opensearch-dashboards
-              release: opensearch-dashboards
+              app.kubernetes.io/name: opensearch-dashboards
       ports:
         - port: 5601
           protocol: TCP
