@@ -4,21 +4,21 @@ In this document you can find the steps needed to cook a new release of SD.
 
 Some things to know before starting:
 
-- We maintain the latest 3 "minor" versions of KFD so, when you release a new version, you usually need to actually release 3 new versions. See the [versioning](docs/VERSIONING.md) file for more details if you are not familiar with KFD's versioning.
-- Each release of KFD is tightly coupled with a release of `furyctl`. So you'll need to be able to update furyctl too, or ask for help from somebody that can.
+- We maintain the latest 3 "minor" versions of SD so, when you release a new version, you usually need to actually release 3 new versions. See the [versioning](docs/VERSIONING.md) file for more details if you are not familiar with SD's versioning.
+- Each release of SD is tightly coupled with a release of `furyctl`. So you'll need to be able to update furyctl too, or ask for help from somebody that can.
 
-Usually, a new release of KFD is triggered by one of these events:
+Usually, a new release of SD is triggered by one of these events:
 
 - One or more core modules have been updated (new versions have been released), could be a bug fix or a simple bump of version to add new features.
 - A new version with a bug fix or new features of one or more of the installers (on-premises, EKS, etc.) has been released.
 - A new feature or a bug fix has been introduced into the template files of the distribution.
 - A new release of Kubernetes is out and must be supported (usually triggers all the 3 previous points).
 
-The release is needed to render this updates available to KFD's user base.
+The release is needed to render this updates available to SD's user base.
 
 ## Process
 
-The update process usually involves going back and forward between KFD (this repo) and furyctl.
+The update process usually involves going back and forward between SD (this repo) and furyctl.
 
 > [!NOTE]
 > Some of the following steps may not apply in some specific cases, for example if you are only releasing a patch version that fixes an issue on the templates, maybe you can skip some steps.
@@ -80,11 +80,12 @@ go mod tidy
 
 ### Back to furyctl
 
-21. Once KFD new releases are live and the PR with the update to furyctl has been approved, merge and tag the final release.
+21. Once SD new releases are live and the PR with the update to furyctl has been approved, merge and tag the final release.
 
 ### Other changes
 
 After the release of the distribution and furyctl have been done, there are some other places that need to be updated to reflect the new releases, in no particular order:
 
-1. Update the quick-start guides in https://github.com/sighupio/fury-getting-started/
-2. Update KFD's documentation site with the new versions https://github.com/sighupio/kfd-docs/
+1. Update the quick-start guides in https://github.com/sighupio/getting-started/
+2. Update SD's documentation site with the new versions https://github.com/sighupio/docs/
+3. Run the CVE patching pipeline by adding the newly released SIGHUP versions https://github.com/sighupio/container-image-sync/

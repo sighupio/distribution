@@ -17,6 +17,9 @@ all:
         keepalived_ip: "{{ .spec.kubernetes.loadBalancers.keepalived.ip }}"
         keepalived_virtual_router_id: "{{ .spec.kubernetes.loadBalancers.keepalived.virtualRouterId }}"
         keepalived_passphrase: "{{ .spec.kubernetes.loadBalancers.keepalived.passphrase }}"
+        {{- if hasKeyAny .spec.kubernetes.loadBalancers "selfmanagedRepositories" }}
+        haproxy_self_managed_repositories: {{ .spec.kubernetes.loadBalancers.selfmanagedRepositories }}
+        {{- end }}
     {{- end }}
     master:
       hosts:
@@ -74,6 +77,14 @@ all:
             {{- end }}
           {{- end }}
         {{- end }}
+        {{- if index .spec.kubernetes.masters "kernelParameters" }}
+        kernel_parameters:
+          {{ .spec.kubernetes.masters.kernelParameters | toYaml | indent 10 | trim }}
+        {{- end -}}
+        {{- if hasKeyAny .spec.kubernetes.masters "taints" }}
+        kubernetes_taints:
+          {{ .spec.kubernetes.masters.taints | toYaml | indent 10 | trim }}
+        {{- end }}
         {{- if and (index .spec.kubernetes "advanced") (index .spec.kubernetes.advanced "cloud") }}
         {{- if index .spec.kubernetes.advanced.cloud "provider" }}
         kubernetes_cloud_provider: "{{ .spec.kubernetes.advanced.cloud.provider }}"
@@ -122,6 +133,23 @@ all:
         {{- if and (index .spec.kubernetes.advanced "registry") (ne .spec.kubernetes.advanced.registry "") }}
         kubernetes_image_registry: "{{ .spec.kubernetes.advanced.registry }}"
         {{- end }}
+
+        {{- if index .spec.kubernetes.advanced "eventRateLimits" }}
+        eventratelimits:
+          {{- range .spec.kubernetes.advanced.eventRateLimits }}
+          - type: {{ .type }}
+            qps: {{ .qps }}
+            burst: {{ .burst }}
+            {{- if .cacheSize }}
+            cacheSize: {{ .cacheSize }}
+            {{- end }}
+          {{- end }}
+        {{- end }}
+
+        {{- if and (index .spec.kubernetes.advanced "controllerManager") (index .spec.kubernetes.advanced.controllerManager "gcThreshold") }}
+        terminated_pod_gc_threshold: {{ .spec.kubernetes.advanced.controllerManager.gcThreshold }}
+        {{- end }}
+
         {{- end }}
 
         {{- if and (index .spec.kubernetes "advanced") (index .spec.kubernetes.advanced "apiServerCertSANs") }}
@@ -193,6 +221,11 @@ all:
                 {{- end }}
               {{- end }}
             {{- end }}
+            {{- if index $n "kernelParameters" }}
+            kernel_parameters:
+              {{ $n.kernelParameters | toYaml | indent 14 | trim }}
+            {{- end -}}
+
       {{- end }}
     ungrouped: {}
   vars:
@@ -236,11 +269,51 @@ all:
         {{- end }}
       {{- end }}
     {{- end }}
+    {{- if hasKeyAny .spec.kubernetes.advanced.containerd "selfmanagedRepositories" }}
+    containerd_self_managed_repositories: {{ .spec.kubernetes.advanced.containerd.selfmanagedRepositories }}
+    {{- end }}
+    {{- if hasKeyAny .spec.kubernetes.advanced.containerd "storageDir" }}
+    containerd_storage_dir: "{{ .spec.kubernetes.advanced.containerd.storageDir }}"
+    {{- end }}
+    {{- if hasKeyAny .spec.kubernetes.advanced.containerd "stateDir" }}
+    containerd_state_dir: "{{ .spec.kubernetes.advanced.containerd.stateDir }}"
+    {{- end }}
+    {{- if hasKeyAny .spec.kubernetes.advanced.containerd "systemdDir" }}
+    containerd_systemd_dir: "{{ .spec.kubernetes.advanced.containerd.systemdDir }}"
+    {{- end }}
+    {{- if hasKeyAny .spec.kubernetes.advanced.containerd "oomScore" }}
+    containerd_oom_score: {{ .spec.kubernetes.advanced.containerd.oomScore }}
+    {{- end }}
+    {{- if hasKeyAny .spec.kubernetes.advanced.containerd "grpcMaxRecvMessageSize" }}
+    containerd_grpc_max_recv_message_size: {{ .spec.kubernetes.advanced.containerd.grpcMaxRecvMessageSize }}
+    {{- end }}
+    {{- if hasKeyAny .spec.kubernetes.advanced.containerd "grpcMaxSendMessageSize" }}
+    containerd_grpc_max_send_message_size: {{ .spec.kubernetes.advanced.containerd.grpcMaxSendMessageSize }}
+    {{- end }}
+    {{- if hasKeyAny .spec.kubernetes.advanced.containerd "debugLevel" }}
+    containerd_debug_level: "{{ .spec.kubernetes.advanced.containerd.debugLevel }}"
+    {{- end }}
+    {{- if hasKeyAny .spec.kubernetes.advanced.containerd "metricsAddress" }}
+    containerd_metrics_address: "{{ .spec.kubernetes.advanced.containerd.metricsAddress }}"
+    {{- end }}
+    {{- if hasKeyAny .spec.kubernetes.advanced.containerd "metricsGrpcHistogram" }}
+    containerd_metrics_grpc_histogram: {{ .spec.kubernetes.advanced.containerd.metricsGrpcHistogram }}
+    {{- end }}
+    {{- if hasKeyAny .spec.kubernetes.advanced.containerd "maxContainerLogLineSize" }}
+    containerd_max_container_log_line_size: {{ .spec.kubernetes.advanced.containerd.maxContainerLogLineSize }}
+    {{- end }}
+    {{- if hasKeyAny .spec.kubernetes.advanced.containerd "deviceOwnershipFromSecurityContext" }}
+    containerd_device_ownership_from_security_context: {{ .spec.kubernetes.advanced.containerd.deviceOwnershipFromSecurityContext }}
+    {{- end }}
     {{- end }}
     {{- if (index .spec.kubernetes.advanced "encryption") }}
     {{- if (index .spec.kubernetes.advanced.encryption "tlsCipherSuites") }}
     tls_cipher_suites:
       {{- toYaml .spec.kubernetes.advanced.encryption.tlsCipherSuites | nindent 6 }}
+    {{- end }}
+    {{- if (index .spec.kubernetes.advanced.encryption "tlsCipherSuitesKubelet") }}
+    kubelet_tls_cipher_suites:
+      {{- toYaml .spec.kubernetes.advanced.encryption.tlsCipherSuitesKubelet | nindent 6 }}
     {{- end }}
     {{- if (index .spec.kubernetes.advanced.encryption "configuration") }}
     kubernetes_encryption_config: "./encryption-config.yaml"
@@ -281,6 +354,14 @@ all:
       {{- else }}
     kubelet_config_{{ $keyStr | snakecase }}: {{ $value | quote }}
       {{- end }}
+    {{- end }}
+    {{- if index .spec.kubernetes.advanced "kernelParameters" }}
+    kernel_parameters:
+      {{ .spec.kubernetes.advanced.kernelParameters | toYaml | indent 6 | trim }}
+    {{- end -}}
+
+    {{- if hasKeyAny .spec.kubernetes.advanced "selfmanagedRepositories" }}
+    kubernetes_self_managed_repositories: {{ .spec.kubernetes.advanced.selfmanagedRepositories }}
     {{- end }}
 
     {{- end }}
