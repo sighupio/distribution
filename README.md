@@ -136,7 +136,7 @@ Current supported versions of SD are:
 
 |                                  SD Version                               | Kubernetes Version |
 | :-----------------------------------------------------------------------: | :----------------: |
-| [`1.33.0`](https://github.com/sighupio/distribution/releases/tag/v1.33.0) |      `1.33.x`      |
+| [`1.33.1`](https://github.com/sighupio/distribution/releases/tag/v1.33.1) |      `1.33.x`      |
 | [`1.32.1`](https://github.com/sighupio/distribution/releases/tag/v1.32.1) |      `1.32.x`      |
 | [`1.31.2`](https://github.com/sighupio/distribution/releases/tag/v1.31.2) |      `1.31.x`      |
 
