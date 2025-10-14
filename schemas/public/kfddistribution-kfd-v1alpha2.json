@@ -1335,6 +1335,10 @@
               "type": "string",
               "description": "The bucket name of the external object storage. Valid for both types (gcs and s3)"
             },
+            "prefixName": {
+              "type": "string",
+              "description": "The prefix name to use inside the bucket. Valid for both types (gcs and s3)"
+            },
             "clientEmail": {
               "type": "string",
               "description": "Full client email. Has effect only when type is 'gcs'."

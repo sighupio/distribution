@@ -15,5 +15,6 @@ spec:
   provider: gcp
   objectStorage:
     bucket: {{ .spec.distribution.modules.dr.velero.externalEndpoint.bucketName }}
+    prefix: {{ .spec.distribution.modules.dr.velero.externalEndpoint.prefixName }}
   config:
     serviceAccount: {{ .spec.distribution.modules.dr.velero.externalEndpoint.clientEmail }}
