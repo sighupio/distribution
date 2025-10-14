@@ -255,6 +255,7 @@ data:
           secretAccessKey: example
           accessKeyId: example
           bucketName: velerobucket
+          prefixName: ""
           clientEmail: "velero-service-account@dummy.iam.gserviceaccount.com"
           serviceAccountString: "dummy"
         schedules:
