@@ -34,9 +34,9 @@ With no further ado, the steps to release a new version are:
 2. Create the PRs fixing the issues or adding new features to the templates or other files of fury-distribution, test them and merge them.
 3. Update the `kfd.yaml` and `Furyfile.yaml` files, bumping the distribution version, adjusting the modules and installers versions where needed.
 4. If the distribution schemas have been changed:
-   1. If you haven't already, install the needed tools with `make tools-go`.
-   2. Generate the new docs with `make generate-docs`.
-   3. Generate the go models with `make generate-go-models`
+   1. If you haven't already, install the needed tools with `mise install`.
+   2. Generate the new docs with `mise run generate-docs`.
+   3. Generate the go models with `mise run generate-go-models`
 5. Update the CI and e2e tests to point to the new version:
    1. `.drone.yaml`
    2. `tests/e2e-kfddistribution-*.yaml`

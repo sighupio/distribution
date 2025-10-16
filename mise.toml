@@ -1,0 +1,138 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+[tools]
+# Core tools
+go = "1.23.3"
+golangci-lint = "1.62.0"
+bats = "1.9.0"
+jq = "1.6"
+yq = "4.33.3"
+
+# Go packages (using go: backend)
+"go:github.com/evanphx/json-patch/v5/cmd/json-patch" = "v5.9.0"
+"go:github.com/santhosh-tekuri/jsonschema/cmd/jv" = "v0.4.0"
+"go:github.com/sighupio/go-jsonschema" = "latest"
+"go:github.com/sighupio/md-gen" = "latest"
+"go:golang.org/x/tools/cmd/goimports" = "v0.26.0"
+"go:github.com/daixiang0/gci" = "v0.10.1"
+"go:github.com/momaek/formattag" = "v0.0.9"
+
+# GitHub releases (using ubi: backend)
+"ubi:google/addlicense" = "v1.1.1"
+"ubi:mvdan/gofumpt" = "v0.7.0"
+
+[env]
+CGO_ENABLED = 0
+GOFLAGS = "-mod=mod"
+
+[settings]
+experimental = true
+
+[tasks.license-check]
+description = "check license headers"
+run = """
+addlicense -c "SIGHUP s.r.l" -y 2017-present -v -l bsd \
+  -ignore 'templates/distribution/**' \
+  -ignore 'target/**' \
+  -ignore 'vendor/**' \
+  --check .
+"""
+
+[tasks.license-add]
+description = "add license headers to source files"
+run = """
+addlicense -c "SIGHUP s.r.l" -y 2017-present -v -l bsd \
+  -ignore 'templates/distribution/**' \
+  -ignore 'target/**' \
+  -ignore 'vendor/**' \
+  .
+"""
+
+[tasks.fmt]
+description = "format Go code with gofmt"
+run = """
+find . -name "*.go" -type f -not -path '*/vendor/*' \
+  -exec sh -c 'echo "formatting $1.." && gofmt -w -s "$1"' sh {} \\;
+"""
+
+[tasks.fumpt]
+description = "format Go code with gofumpt"
+run = """
+find . -name "*.go" -type f -not -path '*/vendor/*' \
+  -exec sh -c 'echo "formatting $1.." && gofumpt -w -extra "$1"' sh {} \\;
+"""
+
+[tasks.imports]
+description = "organize Go imports with goimports"
+run = "goimports -v -w -e -local github.com/sighupio pkg/"
+
+[tasks.gci]
+description = "format imports with gci"
+run = """
+find . -name "*.go" -type f -not -path '*/vendor/*' \
+  -exec sh -c 'echo "formatting imports for $1.." && \
+    gci write --skip-generated -s standard -s default -s "Prefix(github.com/sighupio)" "$1"' sh {} \\;
+"""
+
+[tasks.formattag]
+description = "format struct tags with formattag"
+run = """
+find . -name "*.go" -type f -not -path '*/vendor/*' \
+  -exec sh -c 'formattag -file "$1"' sh {} \\;
+"""
+
+[tasks.format-go]
+description = "run complete Go formatting pipeline"
+depends = ["fmt", "fumpt", "imports", "gci", "formattag"]
+
+[tasks.lint-go]
+description = "run linting with golangci-lint"
+run = "golangci-lint -v run --color=always --config=.rules/.golangci.yml ./..."
+
+[tasks.dump-private-schema]
+description = "generate private schema from public schema"
+run = """
+cat schemas/public/ekscluster-kfd-v1alpha2.json | \
+  json-patch -p schemas/private/ekscluster-kfd-v1alpha2.patch.json | \
+  jq -r > schemas/private/ekscluster-kfd-v1alpha2.json
+"""
+
+[tasks._generate-go-models]
+description = "generate Go models from JSON schemas"
+depends = ["dump-private-schema"]
+run = [
+  "go-jsonschema --package public --resolve-extension json --output pkg/apis/ekscluster/v1alpha2/public/schema.go schemas/public/ekscluster-kfd-v1alpha2.json",
+  "go-jsonschema --package private --resolve-extension json --output pkg/apis/ekscluster/v1alpha2/private/schema.go schemas/private/ekscluster-kfd-v1alpha2.json",
+  "go-jsonschema --package public --resolve-extension json --output pkg/apis/kfddistribution/v1alpha2/public/schema.go schemas/public/kfddistribution-kfd-v1alpha2.json",
+  "go-jsonschema --package public --resolve-extension json --output pkg/apis/onpremises/v1alpha2/public/schema.go schemas/public/onpremises-kfd-v1alpha2.json"
+]
+
+[tasks.generate-go-models]
+description = "generate Go models and format them"
+depends = ["_generate-go-models", "format-go"]
+
+[tasks.generate-docs]
+description = "generate documentation from schemas"
+run = [
+  "md-gen gen --input schemas/public/onpremises-kfd-v1alpha2.json --output docs/schemas/onpremises-kfd-v1alpha2.md --overwrite --banner banners/onpremises.md",
+  "md-gen gen --input schemas/public/kfddistribution-kfd-v1alpha2.json --output docs/schemas/kfddistribution-kfd-v1alpha2.md --overwrite --banner banners/kfddistribution.md",
+  "md-gen gen --input schemas/public/ekscluster-kfd-v1alpha2.json --output docs/schemas/ekscluster-kfd-v1alpha2.md --overwrite --banner banners/ekscluster.md"
+]
+
+[tasks.generate-np-diagrams]
+description = "generate network policy diagrams"
+run = [
+  "docker run --rm -v $(PWD)/docs/network-policies:/workdir minlag/mermaid-cli:latest -i \"/workdir/overview.md\" -o \"/workdir/overview.png\" -w 2048 -H 1536 -b white",
+  "docker run --rm -v $(PWD)/docs/network-policies/modules/auth:/workdir minlag/mermaid-cli:latest -i \"/workdir/sso.md\" -o \"/workdir/sso.png\" -w 2048 -H 1536 -b white",
+  "docker run --rm -v $(PWD)/docs/network-policies/modules/ingress:/workdir minlag/mermaid-cli:latest -i \"/workdir/single.md\" -o \"/workdir/single.png\" -w 2048 -H 1536 -b white",
+  "docker run --rm -v $(PWD)/docs/network-policies/modules/ingress:/workdir minlag/mermaid-cli:latest -i \"/workdir/dual.md\" -o \"/workdir/dual.png\" -w 2048 -H 1536 -b white",
+  "docker run --rm -v $(PWD)/docs/network-policies/modules/logging:/workdir minlag/mermaid-cli:latest -i \"/workdir/loki.md\" -o \"/workdir/loki.png\" -w 2048 -H 1536 -b white",
+  "docker run --rm -v $(PWD)/docs/network-policies/modules/logging:/workdir minlag/mermaid-cli:latest -i \"/workdir/opensearch.md\" -o \"/workdir/opensearch.png\" -w 2048 -H 1536 -b white",
+  "docker run --rm -v $(PWD)/docs/network-policies/modules/monitoring:/workdir minlag/mermaid-cli:latest -i \"/workdir/mimir.md\" -o \"/workdir/mimir.png\" -w 2048 -H 1536 -b white",
+  "docker run --rm -v $(PWD)/docs/network-policies/modules/monitoring:/workdir minlag/mermaid-cli:latest -i \"/workdir/prometheus.md\" -o \"/workdir/prometheus.png\" -w 2048 -H 1536 -b white",
+  "docker run --rm -v $(PWD)/docs/network-policies/modules/opa:/workdir minlag/mermaid-cli:latest -i \"/workdir/gatekeeper.md\" -o \"/workdir/gatekeeper.png\" -w 2048 -H 1536 -b white",
+  "docker run --rm -v $(PWD)/docs/network-policies/modules/opa:/workdir minlag/mermaid-cli:latest -i \"/workdir/kyverno.md\" -o \"/workdir/kyverno.png\" -w 2048 -H 1536 -b white",
+  "docker run --rm -v $(PWD)/docs/network-policies/modules/tracing:/workdir minlag/mermaid-cli:latest -i \"/workdir/tempo.md\" -o \"/workdir/tempo.png\" -w 2048 -H 1536 -b white"
+]
