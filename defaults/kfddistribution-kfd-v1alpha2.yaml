@@ -256,6 +256,7 @@ data:
           accessKeyId: example
           bucketName: velerobucket
           prefixName: ""
+          accessMode: ReadWrite
           clientEmail: "velero-service-account@dummy.iam.gserviceaccount.com"
           serviceAccountString: "dummy"
         schedules:

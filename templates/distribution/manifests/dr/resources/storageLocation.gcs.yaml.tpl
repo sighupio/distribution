@@ -18,3 +18,4 @@ spec:
     prefix: {{ .spec.distribution.modules.dr.velero.externalEndpoint.prefixName }}
   config:
     serviceAccount: {{ .spec.distribution.modules.dr.velero.externalEndpoint.clientEmail }}
+  accessMode: {{ .spec.distribution.modules.dr.velero.externalEndpoint.accessMode }}

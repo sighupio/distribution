@@ -527,11 +527,20 @@
           "description": "Configures the limits of the API Server's EventRateLimit plugin. Each item represents a bucket (Server, Namespace, User, etc).",
           "items": {
             "type": "object",
-            "required": ["type", "qps", "burst"],
+            "required": [
+              "type",
+              "qps",
+              "burst"
+            ],
             "properties": {
               "type": {
                 "type": "string",
-                "enum": ["Server", "Namespace", "User", "SourceAndObject"],
+                "enum": [
+                  "Server",
+                  "Namespace",
+                  "User",
+                  "SourceAndObject"
+                ],
                 "description": "Type of limit to apply (Server, Namespace, User, SourceAndObject)."
               },
               "qps": {
@@ -2277,6 +2286,18 @@
             "bucketName": {
               "type": "string",
               "description": "The bucket name of the external object storage. Valid for both types (gcs and s3)"
+            },
+            "prefixName": {
+              "type": "string",
+              "description": "The prefix name to use inside the bucket. Valid for both types (gcs and s3)"
+            },
+            "accessMode": {
+              "type": "string",
+              "description": "How Velero can access the backup storage location. Valid for both types (gcs and s3).",
+              "enum": [
+                "ReadWrite",
+                "ReadOnly"
+              ]
             },
             "clientEmail": {
               "type": "string",

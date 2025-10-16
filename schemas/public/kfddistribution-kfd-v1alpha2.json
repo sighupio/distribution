@@ -1109,10 +1109,14 @@
       "allOf": [
         {
           "if": {
-            "required": ["blockSize"]
+            "required": [
+              "blockSize"
+            ]
           },
           "then": {
-            "required": ["podCidr"]
+            "required": [
+              "podCidr"
+            ]
           }
         }
       ]
@@ -1348,6 +1352,14 @@
             "prefixName": {
               "type": "string",
               "description": "The prefix name to use inside the bucket. Valid for both types (gcs and s3)"
+            },
+            "accessMode": {
+              "type": "string",
+              "description": "How Velero can access the backup storage location. Valid for both types (gcs and s3).",
+              "enum": [
+                "ReadWrite",
+                "ReadOnly"
+              ]
             },
             "clientEmail": {
               "type": "string",
