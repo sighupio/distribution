@@ -2465,6 +2465,18 @@
           "maxLength": 49,
           "description": "The name of the bucket for Velero."
         },
+        "prefixName": {
+          "type": "string",
+          "description": "The prefix name to use inside the bucket. Valid for both types (gcs and s3)"
+        },
+        "accessMode": {
+          "type": "string",
+          "description": "How Velero can access the backup storage location. Valid for both types (gcs and s3).",
+          "enum": [
+            "ReadWrite",
+            "ReadOnly"
+          ]
+        },
         "iamRoleArn": {
           "$ref": "#/$defs/Types.AwsArn"
         }
