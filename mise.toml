@@ -9,6 +9,13 @@ golangci-lint = "1.62.0"
 bats = "1.9.0"
 jq = "1.6"
 yq = "4.33.3"
+kind = "0.29.0"
+kubectl = "1.33.4"
+kustomize = "5.6.0"
+terraform = "1.9.0"
+ansible = "latest"
+awscli = "2.24.17"
+furyctl = "0.33.1-rc.1"
 
 # Go packages (using go: backend)
 "go:github.com/evanphx/json-patch/v5/cmd/json-patch" = "v5.9.0"
