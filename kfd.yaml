@@ -40,6 +40,8 @@ tools:
       version: 5.6.0
     terraform:
       version: 1.4.6
+    opentofu:
+      version: 1.10.0
     yq:
       version: 4.34.1
     helm:
