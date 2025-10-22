@@ -18,8 +18,6 @@ clone:
 
 environment:
   MISE_DATA_DIR: /mise-data
-  GITHUB_TOKEN:
-    from_secret: github_token
 
 volumes:
   - name: mise-cache
@@ -139,8 +137,6 @@ trigger:
 
 environment:
   MISE_DATA_DIR: /mise-data
-  GITHUB_TOKEN:
-    from_secret: github_token
   CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}
   KUBECONFIG: /drone/src/kubeconfig
   CLUSTER_VERSION: v1.33.0
@@ -247,8 +243,6 @@ trigger:
 
 environment:
   MISE_DATA_DIR: /mise-data
-  GITHUB_TOKEN:
-    from_secret: github_token
   CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-upgrades
   KUBECONFIG: /drone/src/kubeconfig-upgrades
   KUBECTL_VERSION: "1.32.2"
@@ -354,15 +348,7 @@ trigger:
 
 environment:
   MISE_DATA_DIR: /mise-data
-  GITHUB_TOKEN:
-    from_secret: github_token
   DISTRIBUTION_VERSION: "v1.33.1"
-  AWS_ACCESS_KEY_ID:
-    from_secret: aws_access_key_id
-  AWS_SECRET_ACCESS_KEY:
-    from_secret: aws_secret_access_key
-  AWS_REGION:
-    from_secret: aws_region
 
 volumes:
   - name: mise-cache
@@ -385,6 +371,12 @@ steps:
     pull: always
     environment:
       CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}
+      AWS_ACCESS_KEY_ID:
+        from_secret: aws_access_key_id
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: aws_secret_access_key
+      AWS_REGION:
+        from_secret: aws_region
     volumes:
       - name: mise-cache
         path: /mise-data
@@ -398,6 +390,12 @@ steps:
     pull: always
     environment:
       CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}
+      AWS_ACCESS_KEY_ID:
+        from_secret: aws_access_key_id
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: aws_secret_access_key
+      AWS_REGION:
+        from_secret: aws_region
     volumes:
       - name: mise-cache
         path: /mise-data
@@ -412,6 +410,12 @@ steps:
     pull: always
     environment:
       CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-upgrades
+      AWS_ACCESS_KEY_ID:
+        from_secret: aws_access_key_id
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: aws_secret_access_key
+      AWS_REGION:
+        from_secret: aws_region
     volumes:
       - name: mise-cache
         path: /mise-data
@@ -444,18 +448,8 @@ trigger:
 
 environment:
   MISE_DATA_DIR: /mise-data
-  GITHUB_TOKEN:
-    from_secret: github_token
   FURYCTL_VERSION: "v0.33.1-rc.1"
-  AWS_ACCESS_KEY_ID:
-    from_secret: aws_access_key_id
-  AWS_SECRET_ACCESS_KEY:
-    from_secret: aws_secret_access_key
-  AWS_REGION:
-    from_secret: aws_region
   TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
-  TF_VAR_hcloud_token:
-    from_secret: hcloud_token
 
 volumes:
   - name: cache
@@ -478,6 +472,15 @@ steps:
   - name: create-hetzner-infrastructure
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
+    environment:
+      AWS_ACCESS_KEY_ID:
+        from_secret: aws_access_key_id
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: aws_secret_access_key
+      AWS_REGION:
+        from_secret: aws_region
+      TF_VAR_hcloud_token:
+        from_secret: hcloud_token
     volumes:
       - name: cache
         path: /cache
@@ -494,6 +497,15 @@ steps:
   - name: install-cluster-with-furyctl
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
+    environment:
+      AWS_ACCESS_KEY_ID:
+        from_secret: aws_access_key_id
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: aws_secret_access_key
+      AWS_REGION:
+        from_secret: aws_region
+      TF_VAR_hcloud_token:
+        from_secret: hcloud_token
     volumes:
       - name: cache
         path: /cache
@@ -507,6 +519,15 @@ steps:
   - name: kube-bench-security-test
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
+    environment:
+      AWS_ACCESS_KEY_ID:
+        from_secret: aws_access_key_id
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: aws_secret_access_key
+      AWS_REGION:
+        from_secret: aws_region
+      TF_VAR_hcloud_token:
+        from_secret: hcloud_token
     volumes:
       - name: cache
         path: /cache
@@ -534,6 +555,15 @@ steps:
   - name: delete
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
+    environment:
+      AWS_ACCESS_KEY_ID:
+        from_secret: aws_access_key_id
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: aws_secret_access_key
+      AWS_REGION:
+        from_secret: aws_region
+      TF_VAR_hcloud_token:
+        from_secret: hcloud_token
     volumes:
       - name: cache
         path: /cache
@@ -573,18 +603,8 @@ trigger:
 
 environment:
   MISE_DATA_DIR: /mise-data
-  GITHUB_TOKEN:
-    from_secret: github_token
   FURYCTL_VERSION: "v0.33.1-rc.1"
-  AWS_ACCESS_KEY_ID:
-    from_secret: aws_access_key_id
-  AWS_SECRET_ACCESS_KEY:
-    from_secret: aws_secret_access_key
-  AWS_REGION:
-    from_secret: aws_region
   TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
-  TF_VAR_hcloud_token:
-    from_secret: hcloud_token
   KUBECONFIG: /cache/kubeconfig
 
 volumes:
@@ -610,6 +630,14 @@ steps:
     pull: always
     environment:
       DISTRIBUTION_VERSION: "v1.32.0"
+      AWS_ACCESS_KEY_ID:
+        from_secret: aws_access_key_id
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: aws_secret_access_key
+      AWS_REGION:
+        from_secret: aws_region
+      TF_VAR_hcloud_token:
+        from_secret: hcloud_token
     volumes:
       - name: cache-upgrades
         path: /cache
@@ -628,6 +656,14 @@ steps:
     pull: always
     environment:
       DISTRIBUTION_VERSION: "v1.32.0" # distribution version is hardcoded in the tofu outputs
+      AWS_ACCESS_KEY_ID:
+        from_secret: aws_access_key_id
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: aws_secret_access_key
+      AWS_REGION:
+        from_secret: aws_region
+      TF_VAR_hcloud_token:
+        from_secret: hcloud_token
     volumes:
       - name: cache-upgrades
         path: /cache
@@ -655,6 +691,14 @@ steps:
     pull: always
     environment:
       DISTRIBUTION_VERSION: "v1.33.1" # distribution version is hardcoded in the tofu outputs
+      AWS_ACCESS_KEY_ID:
+        from_secret: aws_access_key_id
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: aws_secret_access_key
+      AWS_REGION:
+        from_secret: aws_region
+      TF_VAR_hcloud_token:
+        from_secret: hcloud_token
     volumes:
       - name: cache-upgrades
         path: /cache
@@ -682,6 +726,14 @@ steps:
     pull: always
     environment:
       DISTRIBUTION_VERSION: "v1.33.1"
+      AWS_ACCESS_KEY_ID:
+        from_secret: aws_access_key_id
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: aws_secret_access_key
+      AWS_REGION:
+        from_secret: aws_region
+      TF_VAR_hcloud_token:
+        from_secret: hcloud_token
     volumes:
       - name: cache-upgrades
         path: /cache
