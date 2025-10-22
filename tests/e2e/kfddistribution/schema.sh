@@ -32,6 +32,61 @@ assert_error_contains() {
     fi
 }
 
+# Preflight check: verify jv version and error format
+preflight_check() {
+    echo "Running preflight checks..." >&3
+
+    # Check if jv is available
+    if ! command -v jv >/dev/null 2>&1; then
+        echo "ERROR: jv command not found" >&3
+        echo "Make sure mise tools are installed and activated" >&3
+        return 1
+    fi
+
+    # Show which jv is being used
+    local JV_PATH
+    JV_PATH=$(command -v jv)
+    echo "Using jv from: ${JV_PATH}" >&3
+
+    # Create a test to verify error format
+    local TMPDIR_TEST
+    TMPDIR_TEST=$(mktemp -d -t "fury-jv-preflight-XXXXXXXXXX")
+
+    # Create minimal invalid JSON to test error format
+    echo '{"type": "string"}' > "${TMPDIR_TEST}/test-schema.json"
+    echo '123' > "${TMPDIR_TEST}/test-instance.json"
+
+    local TEST_OUTPUT
+    TEST_OUTPUT=$(jv "${TMPDIR_TEST}/test-schema.json" "${TMPDIR_TEST}/test-instance.json" 2>&1 || true)
+
+    rm -rf "${TMPDIR_TEST}"
+
+    # Check if error format matches v0.7.0 expectations
+    if [[ "${TEST_OUTPUT}" == *"expected"*"but got"* ]]; then
+        echo "✓ jv error format verified (v0.7.0+)" >&3
+        return 0
+    elif [[ "${TEST_OUTPUT}" == *"got"*"want"* ]]; then
+        echo "ERROR: jv is using old error format (v6.0.1)" >&3
+        echo "Expected: 'expected X, but got Y'" >&3
+        echo "Got: 'got X, want Y'" >&3
+        echo "This indicates jv v0.7.0 from mise.toml is not being used" >&3
+        echo "Try: mise exec -- jv --version" >&3
+        return 1
+    else
+        echo "WARNING: Could not verify jv error format" >&3
+        echo "Test output: ${TEST_OUTPUT}" >&3
+        return 0  # Don't fail, let tests proceed
+    fi
+}
+
+# Setup function called by bats before all tests
+setup_file() {
+    # Run preflight check once before all tests
+    if ! preflight_check; then
+        exit 1
+    fi
+}
+
 test_schema() {
     local KIND=${1}
     local APIVER=${2}
