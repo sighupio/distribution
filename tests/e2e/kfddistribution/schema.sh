@@ -13,6 +13,25 @@ expect_no() {
     [ "${1}" -eq 1 ]
 }
 
+# Helper function to check if error output contains both path and message
+# This makes tests resilient to jv version format changes
+assert_error_contains() {
+    local path="$1"
+    local message="$2"
+
+    # Check for path (flexible to different formats: "at '/path'" or "[I#/path]")
+    if [[ "${output}" != *"${path}"* ]]; then
+        echo "Expected path '${path}' not found in output" >&3
+        return 2
+    fi
+
+    # Check for error message
+    if [[ "${output}" != *"${message}"* ]]; then
+        echo "Expected message '${message}' not found in output" >&3
+        return 3
+    fi
+}
+
 test_schema() {
     local KIND=${1}
     local APIVER=${2}
@@ -63,16 +82,8 @@ test_schema() {
     expect() {
         expect_no "${1}"
 
-        local EXPECTED_ERROR_1="at '/spec/kubernetes/vpcId': got string, want null"
-        local EXPECTED_ERROR_2="at '/spec/kubernetes/subnetIds': got array, want null"
-
-        if [[ "${output}" != *"${EXPECTED_ERROR_1}"* ]]; then
-            return 2
-        fi
-
-        if [[ "${output}" != *"${EXPECTED_ERROR_2}"* ]]; then
-            return 3
-        fi
+        assert_error_contains "/spec/kubernetes/vpcId" "expected null, but got string" || return $?
+        assert_error_contains "/spec/kubernetes/subnetIds" "expected null, but got array" || return $?
     }
 
     test_schema "private" "ekscluster-kfd-v1alpha2" "001-no" expect
@@ -90,13 +101,12 @@ test_schema() {
     info
 
     expect() {
-        expect_no
+        expect_no "${1}"
 
-        local EXPECTED_ERROR_1="at '/spec/kubernetes': missing properties 'vpcId', 'subnetIds'"
-
-        if [[ "${output}" != *"${EXPECTED_ERROR_1}"* ]]; then
-            return 2
-        fi
+        # Check for missing properties error (jv v0.7.0 format with colon)
+        assert_error_contains "/spec/kubernetes" "missing properties:" || return $?
+        assert_error_contains "/spec/kubernetes" "'vpcId'" || return $?
+        assert_error_contains "/spec/kubernetes" "'subnetIds'" || return $?
     }
 
     test_schema "private" "ekscluster-kfd-v1alpha2" "002-no" expect
@@ -114,18 +124,10 @@ test_schema() {
     info
 
     expect() {
-        expect_no
+        expect_no "${1}"
 
-        local EXPECTED_ERROR_1="at '/spec/distribution/modules/auth/dex': got object, want null"
-        local EXPECTED_ERROR_2="at '/spec/distribution/modules/auth/pomerium': got object, want null"
-
-        if [[ "${output}" != *"${EXPECTED_ERROR_1}"* ]]; then
-            return 2
-        fi
-
-        if [[ "${output}" != *"${EXPECTED_ERROR_2}"* ]]; then
-            return 3
-        fi
+        assert_error_contains "/spec/distribution/modules/auth/dex" "expected null, but got object" || return $?
+        assert_error_contains "/spec/distribution/modules/auth/pomerium" "expected null, but got object" || return $?
     }
 
     test_schema "private" "ekscluster-kfd-v1alpha2" "003-no" expect
@@ -143,13 +145,11 @@ test_schema() {
     info
 
     expect() {
-        expect_no
+        expect_no "${1}"
 
-        local EXPECTED_ERROR_1="at '/spec/distribution/modules/auth/provider': missing property 'basicAuth'"
-
-        if [[ "${output}" != *"${EXPECTED_ERROR_1}"* ]]; then
-            return 2
-        fi
+        # Check for missing properties error (jv v0.7.0 uses plural even for single property)
+        assert_error_contains "/spec/distribution/modules/auth/provider" "missing properties:" || return $?
+        assert_error_contains "/spec/distribution/modules/auth/provider" "'basicAuth'" || return $?
     }
 
     test_schema "private" "ekscluster-kfd-v1alpha2" "004-no" expect
@@ -167,13 +167,9 @@ test_schema() {
     info
 
     expect() {
-        expect_no
+        expect_no "${1}"
 
-        local EXPECTED_ERROR_1="at '/spec/distribution/modules/aws': got object, want null"
-
-        if [[ "${output}" != *"${EXPECTED_ERROR_1}"* ]]; then
-            return 2
-        fi
+        assert_error_contains "/spec/distribution/modules/aws" "expected null, but got object" || return $?
     }
 
     test_schema "private" "ekscluster-kfd-v1alpha2" "005-no" expect
@@ -191,18 +187,13 @@ test_schema() {
     info
 
     expect() {
-        expect_no
+        expect_no "${1}"
 
-        local EXPECTED_ERROR_1="at '/spec/distribution/modules/ingress/nginx/tls': missing property 'secret'"
-        local EXPECTED_ERROR_2="at '/spec/distribution/modules': missing property 'aws'"
-
-        if [[ "${output}" != *"${EXPECTED_ERROR_1}"* ]]; then
-            return 2
-        fi
-
-        if [[ "${output}" != *"${EXPECTED_ERROR_2}"* ]]; then
-            return 2
-        fi
+        # Check for missing properties errors (jv v0.7.0 uses plural even for single property)
+        assert_error_contains "/spec/distribution/modules/ingress/nginx/tls" "missing properties:" || return $?
+        assert_error_contains "/spec/distribution/modules/ingress/nginx/tls" "'secret'" || return $?
+        assert_error_contains "/spec/distribution/modules" "missing properties:" || return $?
+        assert_error_contains "/spec/distribution/modules" "'aws'" || return $?
     }
 
     test_schema "private" "ekscluster-kfd-v1alpha2" "006-no" expect
@@ -220,13 +211,11 @@ test_schema() {
     info
 
     expect() {
-        expect_no
+        expect_no "${1}"
 
-        local EXPECTED_ERROR_1="at '/spec/distribution/modules': missing property 'aws'"
-
-        if [[ "${output}" != *"${EXPECTED_ERROR_1}"* ]]; then
-            return 2
-        fi
+        # Check for missing properties error (jv v0.7.0 uses plural even for single property)
+        assert_error_contains "/spec/distribution/modules" "missing properties:" || return $?
+        assert_error_contains "/spec/distribution/modules" "'aws'" || return $?
     }
 
     test_schema "private" "ekscluster-kfd-v1alpha2" "007-no" expect
@@ -244,13 +233,9 @@ test_schema() {
     info
 
     expect() {
-        expect_no
+        expect_no "${1}"
 
-        local EXPECTED_ERROR_1="at '/spec/distribution/customPatches/patches/0': oneOf failed, subschemas 0, 1 matched"
-
-        if [[ "${output}" != *"${EXPECTED_ERROR_1}"* ]]; then
-            return 2
-        fi
+        assert_error_contains "/spec/distribution/customPatches/patches/0" "oneOf" || return $?
     }
 
     test_schema "private" "ekscluster-kfd-v1alpha2" "008-no" expect
@@ -268,13 +253,10 @@ test_schema() {
     info
 
     expect() {
-        expect_no
+        expect_no "${1}"
 
-        local EXPECTED_ERROR_1="at '/spec/distribution/customPatches/configMapGenerator/0': additional properties 'type' not allowed"
-
-        if [[ "${output}" != *"${EXPECTED_ERROR_1}"* ]]; then
-            return 2
-        fi
+        assert_error_contains "/spec/distribution/customPatches/configMapGenerator/0" "additionalProperties" || return $?
+        assert_error_contains "/spec/distribution/customPatches/configMapGenerator/0" "'type'" || return $?
     }
 
     test_schema "private" "ekscluster-kfd-v1alpha2" "009-no" expect
@@ -292,13 +274,9 @@ test_schema() {
     info
 
     expect() {
-        expect_no
+        expect_no "${1}"
 
-        local EXPECTED_ERROR_1="at '/spec/infrastructure/vpn/vpcId': got string, want null"
-
-        if [[ "${output}" != *"${EXPECTED_ERROR_1}"* ]]; then
-            return 2
-        fi
+        assert_error_contains "/spec/infrastructure/vpn/vpcId" "expected null, but got string" || return $?
     }
 
     test_schema "private" "ekscluster-kfd-v1alpha2" "010-no" expect
@@ -316,13 +294,11 @@ test_schema() {
     info
 
     expect() {
-        expect_no
+        expect_no "${1}"
 
-        local EXPECTED_ERROR_1=" at '/spec/infrastructure/vpn': missing property 'vpcId'"
-
-        if [[ "${output}" != *"${EXPECTED_ERROR_1}"* ]]; then
-            return 2
-        fi
+        # Check for missing properties error (jv v0.7.0 uses plural even for single property)
+        assert_error_contains "/spec/infrastructure/vpn" "missing properties:" || return $?
+        assert_error_contains "/spec/infrastructure/vpn" "'vpcId'" || return $?
     }
 
     test_schema "private" "ekscluster-kfd-v1alpha2" "011-no" expect

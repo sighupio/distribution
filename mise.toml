@@ -21,7 +21,7 @@ furyctl = "0.33.1-rc.1"
 
 # Go packages (using go: backend)
 "go:github.com/evanphx/json-patch/v5/cmd/json-patch" = "v5.9.0"
-"go:github.com/santhosh-tekuri/jsonschema/cmd/jv" = "v0.4.0"
+"go:github.com/santhosh-tekuri/jsonschema/cmd/jv" = "v0.7.0"
 "go:github.com/sighupio/go-jsonschema" = "latest"
 "go:github.com/sighupio/md-gen" = "latest"
 "go:golang.org/x/tools/cmd/goimports" = "v0.26.0"

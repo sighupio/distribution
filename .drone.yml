@@ -69,14 +69,11 @@ steps:
     depends_on:
       - license-check
       - schema-check
-    environment:
-      JV_VERSION: 6.0.1
     volumes:
       - name: mise-cache
         path: /mise-data
     commands:
       - eval "$(mise activate bash --shims)"
-      - curl -L https://github.com/santhosh-tekuri/jsonschema/releases/download/v$${JV_VERSION}/jv-v$${JV_VERSION}-linux-amd64.tar.gz | tar zx --directory /usr/local/bin/
       - bats -t tests/e2e/kfddistribution/schema.sh
 
   - name: render
