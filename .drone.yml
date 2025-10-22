@@ -492,6 +492,7 @@ steps:
       - name: mise-cache
         path: /mise-data
     commands:
+      - apt-get update && apt-get install -y openssh-client
       - eval "$(mise activate bash --shims)"
       - cd tests/e2e/onpremises/
       - ssh-keygen -N '' -t rsa -b 4096 -C "sighup" -f /cache/ci-ssh-key
@@ -517,6 +518,7 @@ steps:
       - name: mise-cache
         path: /mise-data
     commands:
+      - apt-get update && apt-get install -y openssh-client
       - eval "$(mise activate bash --shims)"
       - cd tests/e2e/onpremises/
       - ansible-playbook 1.remote-furyctl-exec.yaml
@@ -539,6 +541,7 @@ steps:
       - name: mise-cache
         path: /mise-data
     commands:
+      - apt-get update && apt-get install -y openssh-client
       - eval "$(mise activate bash --shims)"
       - cd tests/e2e/onpremises/
       - ansible-playbook 2.remote-kube-bench-test.yaml
@@ -575,6 +578,7 @@ steps:
       - name: mise-cache
         path: /mise-data
     commands:
+      - apt-get update && apt-get install -y openssh-client
       - eval "$(mise activate bash --shims)"
       - cd tests/e2e/onpremises/
       - export TF_VAR_public_key=$(cat /cache/ci-ssh-key.pub)
@@ -649,6 +653,7 @@ steps:
       - name: mise-cache
         path: /mise-data
     commands:
+      - apt-get update && apt-get install -y openssh-client
       - eval "$(mise activate bash --shims)"
       - cd tests/e2e/onpremises-upgrades/
       - ssh-keygen -N '' -t rsa -b 4096 -C "sighup" -f /cache/ci-ssh-key
@@ -675,6 +680,7 @@ steps:
       - name: mise-cache
         path: /mise-data
     commands:
+      - apt-get update && apt-get install -y openssh-client
       - eval "$(mise activate bash --shims)"
       - cd tests/e2e/onpremises-upgrades/
       - ansible-playbook 1.remote-furyctl-exec.yaml
@@ -710,6 +716,7 @@ steps:
       - name: mise-cache
         path: /mise-data
     commands:
+      - apt-get update && apt-get install -y openssh-client
       - eval "$(mise activate bash --shims)"
       - cd tests/e2e/onpremises-upgrades/
       - ansible-playbook 2.remote-furyctl-exec-upgrade.yaml
@@ -745,6 +752,7 @@ steps:
       - name: mise-cache
         path: /mise-data
     commands:
+      - apt-get update && apt-get install -y openssh-client
       - eval "$(mise activate bash --shims)"
       - cd tests/e2e/onpremises-upgrades/
       - export TF_VAR_public_key=$(cat /cache/ci-ssh-key.pub)
