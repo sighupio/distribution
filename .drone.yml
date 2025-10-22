@@ -38,6 +38,8 @@ steps:
   - name: license-check
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
+    depends_on:
+      - install-tools
     volumes:
       - name: mise-cache
         path: /mise-data
@@ -48,6 +50,8 @@ steps:
   - name: schema-check
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
+    depends_on:
+      - install-tools
     volumes:
       - name: mise-cache
         path: /mise-data
@@ -163,6 +167,8 @@ steps:
   - name: create Kind cluster
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
+    depends_on:
+      - install-tools
     volumes:
       - name: dockersock
         path: /var/run/docker.sock
@@ -270,6 +276,8 @@ steps:
   - name: create Kind cluster
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
+    depends_on:
+      - install-tools
     volumes:
       - name: dockersock
         path: /var/run/docker.sock
