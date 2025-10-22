@@ -62,15 +62,14 @@ preflight_check() {
     rm -rf "${TMPDIR_TEST}"
 
     # Check if error format matches v0.7.0 expectations
-    if [[ "${TEST_OUTPUT}" == *"expected"*"but got"* ]]; then
-        echo "✓ jv error format verified (v0.7.0+)" >&3
+    if [[ "${TEST_OUTPUT}" == *"got"*"want"* ]]; then
+        echo "✓ jv error format verified (v0.7.0)" >&3
         return 0
-    elif [[ "${TEST_OUTPUT}" == *"got"*"want"* ]]; then
-        echo "ERROR: jv is using old error format (v6.0.1)" >&3
-        echo "Expected: 'expected X, but got Y'" >&3
-        echo "Got: 'got X, want Y'" >&3
-        echo "This indicates jv v0.7.0 from mise.toml is not being used" >&3
-        echo "Try: mise exec -- jv --version" >&3
+    elif [[ "${TEST_OUTPUT}" == *"expected"*"but got"* ]]; then
+        echo "ERROR: jv is using different error format (older v0.4.0)" >&3
+        echo "Expected: 'got X, want Y' (v0.7.0 format)" >&3
+        echo "Got: 'expected X, but got Y' (v0.4.0 format)" >&3
+        echo "Remove old jv binary and use mise-installed version" >&3
         return 1
     else
         echo "WARNING: Could not verify jv error format" >&3
@@ -137,8 +136,8 @@ test_schema() {
     expect() {
         expect_no "${1}"
 
-        assert_error_contains "/spec/kubernetes/vpcId" "expected null, but got string" || return $?
-        assert_error_contains "/spec/kubernetes/subnetIds" "expected null, but got array" || return $?
+        assert_error_contains "/spec/kubernetes/vpcId" "got string, want null" || return $?
+        assert_error_contains "/spec/kubernetes/subnetIds" "got array, want null" || return $?
     }
 
     test_schema "private" "ekscluster-kfd-v1alpha2" "001-no" expect
@@ -158,8 +157,7 @@ test_schema() {
     expect() {
         expect_no "${1}"
 
-        # Check for missing properties error (jv v0.7.0 format with colon)
-        assert_error_contains "/spec/kubernetes" "missing properties:" || return $?
+        assert_error_contains "/spec/kubernetes" "missing properties" || return $?
         assert_error_contains "/spec/kubernetes" "'vpcId'" || return $?
         assert_error_contains "/spec/kubernetes" "'subnetIds'" || return $?
     }
@@ -181,8 +179,8 @@ test_schema() {
     expect() {
         expect_no "${1}"
 
-        assert_error_contains "/spec/distribution/modules/auth/dex" "expected null, but got object" || return $?
-        assert_error_contains "/spec/distribution/modules/auth/pomerium" "expected null, but got object" || return $?
+        assert_error_contains "/spec/distribution/modules/auth/dex" "got object, want null" || return $?
+        assert_error_contains "/spec/distribution/modules/auth/pomerium" "got object, want null" || return $?
     }
 
     test_schema "private" "ekscluster-kfd-v1alpha2" "003-no" expect
@@ -202,8 +200,7 @@ test_schema() {
     expect() {
         expect_no "${1}"
 
-        # Check for missing properties error (jv v0.7.0 uses plural even for single property)
-        assert_error_contains "/spec/distribution/modules/auth/provider" "missing properties:" || return $?
+        assert_error_contains "/spec/distribution/modules/auth/provider" "missing property" || return $?
         assert_error_contains "/spec/distribution/modules/auth/provider" "'basicAuth'" || return $?
     }
 
@@ -224,7 +221,7 @@ test_schema() {
     expect() {
         expect_no "${1}"
 
-        assert_error_contains "/spec/distribution/modules/aws" "expected null, but got object" || return $?
+        assert_error_contains "/spec/distribution/modules/aws" "got object, want null" || return $?
     }
 
     test_schema "private" "ekscluster-kfd-v1alpha2" "005-no" expect
@@ -244,10 +241,9 @@ test_schema() {
     expect() {
         expect_no "${1}"
 
-        # Check for missing properties errors (jv v0.7.0 uses plural even for single property)
-        assert_error_contains "/spec/distribution/modules/ingress/nginx/tls" "missing properties:" || return $?
+        assert_error_contains "/spec/distribution/modules/ingress/nginx/tls" "missing property" || return $?
         assert_error_contains "/spec/distribution/modules/ingress/nginx/tls" "'secret'" || return $?
-        assert_error_contains "/spec/distribution/modules" "missing properties:" || return $?
+        assert_error_contains "/spec/distribution/modules" "missing property" || return $?
         assert_error_contains "/spec/distribution/modules" "'aws'" || return $?
     }
 
@@ -268,8 +264,7 @@ test_schema() {
     expect() {
         expect_no "${1}"
 
-        # Check for missing properties error (jv v0.7.0 uses plural even for single property)
-        assert_error_contains "/spec/distribution/modules" "missing properties:" || return $?
+        assert_error_contains "/spec/distribution/modules" "missing property" || return $?
         assert_error_contains "/spec/distribution/modules" "'aws'" || return $?
     }
 
@@ -310,7 +305,7 @@ test_schema() {
     expect() {
         expect_no "${1}"
 
-        assert_error_contains "/spec/distribution/customPatches/configMapGenerator/0" "additionalProperties" || return $?
+        assert_error_contains "/spec/distribution/customPatches/configMapGenerator/0" "additional properties" || return $?
         assert_error_contains "/spec/distribution/customPatches/configMapGenerator/0" "'type'" || return $?
     }
 
@@ -331,7 +326,7 @@ test_schema() {
     expect() {
         expect_no "${1}"
 
-        assert_error_contains "/spec/infrastructure/vpn/vpcId" "expected null, but got string" || return $?
+        assert_error_contains "/spec/infrastructure/vpn/vpcId" "got string, want null" || return $?
     }
 
     test_schema "private" "ekscluster-kfd-v1alpha2" "010-no" expect
@@ -351,8 +346,7 @@ test_schema() {
     expect() {
         expect_no "${1}"
 
-        # Check for missing properties error (jv v0.7.0 uses plural even for single property)
-        assert_error_contains "/spec/infrastructure/vpn" "missing properties:" || return $?
+        assert_error_contains "/spec/infrastructure/vpn" "missing property" || return $?
         assert_error_contains "/spec/infrastructure/vpn" "'vpcId'" || return $?
     }
 
