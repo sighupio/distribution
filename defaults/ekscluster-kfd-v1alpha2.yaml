@@ -258,6 +258,8 @@ data:
           iamRoleArn: arn:aws:iam::123456789012:role/example-velero
           region: eu-west-1
           bucketName: example-velero
+          prefixName: ""
+          accessMode: ReadWrite
         externalEndpoint:
           endpoint: s3.eu-west-1.amazonaws.com
           insecure: false
