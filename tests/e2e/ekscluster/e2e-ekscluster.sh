@@ -10,7 +10,7 @@ tests/e2e/ekscluster/replace_variables.sh --distribution-version "$DISTRIBUTION_
 echo "----------------------------------------------------------------------------"
 echo "Executing furyctl for the initial setup"
 furyctl apply \
-  --outdir /tmp \
+  --outdir "$PWD" \
   --config "$LAST_FURYCTL_YAML" \
   --disable-analytics \
   --distro-location ./ \
@@ -27,7 +27,7 @@ tests/e2e/ekscluster/replace_variables.sh --distribution-version "$DISTRIBUTION_
 echo "----------------------------------------------------------------------------"
 echo "Executing furyctl cleanup all modules and configurations"
 furyctl apply \
-  --outdir /tmp \
+  --outdir "$PWD" \
   --config "$LAST_FURYCTL_YAML" \
   --disable-analytics \
   --distro-location ./ \

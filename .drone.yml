@@ -433,28 +433,8 @@ steps:
         path: /mise-data
     commands:
       - eval "$(mise activate bash --shims)"
-      - |
-        # Delete kubernetes phase first
-        furyctl delete cluster \
-          --debug \
-          --disable-analytics \
-          --config tests/e2e/ekscluster/manifests/furyctl-cleanup-all.yaml \
-          --distro-location ./ \
-          --phase kubernetes \
-          --force \
-          --skip-vpn-confirmation \
-          --no-tty
-
-        # Then delete infrastructure phase
-        furyctl delete cluster \
-          --debug \
-          --disable-analytics \
-          --config tests/e2e/ekscluster/manifests/furyctl-cleanup-all.yaml \
-          --distro-location ./ \
-          --phase infrastructure \
-          --force \
-          --skip-vpn-confirmation \
-          --no-tty
+      - furyctl delete cluster --outdir "$PWD" --debug --disable-analytics --config tests/e2e/ekscluster/manifests/furyctl-cleanup-all.yaml --distro-location ./ --phase kubernetes --force --skip-vpn-confirmation --no-tty
+      - furyctl delete cluster --outdir "$PWD" --debug --disable-analytics --config tests/e2e/ekscluster/manifests/furyctl-cleanup-all.yaml --distro-location ./ --phase infrastructure --force --skip-vpn-confirmation --no-tty
       - aws s3 rm s3://e2e-drone-eks/$CLUSTER_NAME --recursive
     when:
       status:
