@@ -130,11 +130,11 @@ platform:
 trigger:
   ref:
     include:
-      - refs/tags/**
+      - refs/tags/e2e-kfddistribution-**
+      - refs/tags/e2e-**
+      - refs/tags/v*
     exclude:
       - refs/tags/**-docs*
-      - refs/tags/e2e-eks-**
-      - refs/tags/e2e-onpremises-**
 
 environment:
   MISE_DATA_DIR: /mise-data
@@ -238,11 +238,11 @@ platform:
 trigger:
   ref:
     include:
-      - refs/tags/**
+      - refs/tags/e2e-kfddistribution-**
+      - refs/tags/e2e-**
+      - refs/tags/v*
     exclude:
       - refs/tags/**-docs*
-      - refs/tags/e2e-eks-**
-      - refs/tags/e2e-onpremises-**
 
 environment:
   MISE_DATA_DIR: /mise-data
@@ -347,10 +347,10 @@ clone:
 
 trigger:
   ref:
-    - refs/tags/e2e-eks-**
-    - refs/tags/e2e-full-eks-**
-    - refs/tags/e2e-full-**
-    - refs/tags/v**
+    include:
+      - refs/tags/e2e-eks-**
+      - refs/tags/e2e-**
+      - refs/tags/v*
 
 environment:
   MISE_DATA_DIR: /mise-data
@@ -480,7 +480,11 @@ clone:
 
 trigger:
   ref:
-    - refs/tags/e2e-full-eks-**
+    include:
+      - refs/tags/e2e-eks-**
+      - refs/tags/e2e-**
+    exclude:
+      - refs/tags/v*
 
 environment:
   MISE_DATA_DIR: /mise-data
@@ -610,10 +614,10 @@ clone:
 
 trigger:
   ref:
-    - refs/tags/e2e-eks-**
-    - refs/tags/e2e-full-eks-**
-    - refs/tags/e2e-full-**
-    - refs/tags/v**
+    include:
+      - refs/tags/e2e-eks-**
+      - refs/tags/e2e-**
+      - refs/tags/v*
 
 environment:
   MISE_DATA_DIR: /mise-data
@@ -744,9 +748,10 @@ clone:
 
 trigger:
   ref:
-    - refs/tags/e2e-onpremises-**
-    - refs/tags/e2e-full-**
-    - refs/tags/v**
+    include:
+      - refs/tags/e2e-onpremises-**
+      - refs/tags/e2e-**
+      - refs/tags/v*
 
 environment:
   MISE_DATA_DIR: /mise-data
@@ -899,9 +904,10 @@ clone:
 
 trigger:
   ref:
-    - refs/tags/e2e-onpremises-**
-    - refs/tags/e2e-full-**
-    - refs/tags/v**
+    include:
+      - refs/tags/e2e-onpremises-**
+      - refs/tags/e2e-**
+      - refs/tags/v*
 
 environment:
   MISE_DATA_DIR: /mise-data
@@ -1100,6 +1106,8 @@ type: docker
 depends_on:
   - e2e-kfddistribution-1.33
   - e2e-kfddistribution-1.32.0-to-1.33.1
+  - e2e-ekscluster-1.33.1
+  - e2e-ekscluster-upgrades-1.32.0-1.33.1
   - e2e-onpremises
   - e2e-onpremises-upgrades-1.32.0-1.33.1
 
