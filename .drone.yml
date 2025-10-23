@@ -359,6 +359,8 @@ volumes:
   - name: mise-cache
     host:
       path: /root/mise_data_dir
+  - name: furyctl-outdir
+    temp: {}
 
 steps:
   - name: install-tools
@@ -385,6 +387,8 @@ steps:
     volumes:
       - name: mise-cache
         path: /mise-data
+      - name: furyctl-outdir
+        path: /furyctl-outdir
     commands:
       - eval "$(mise activate bash --shims)"
       - ./tests/e2e/ekscluster/e2e-ekscluster.sh
@@ -403,11 +407,13 @@ steps:
     volumes:
       - name: mise-cache
         path: /mise-data
+      - name: furyctl-outdir
+        path: /furyctl-outdir
     commands:
       - eval "$(mise activate bash --shims)"
       - |
         furyctl delete cluster \
-          --outdir "$PWD" \
+          --outdir /furyctl-outdir \
           --debug \
           --disable-analytics \
           --config "$(cat ./last_furyctl_yaml.txt)" \
@@ -431,10 +437,31 @@ steps:
     volumes:
       - name: mise-cache
         path: /mise-data
+      - name: furyctl-outdir
+        path: /furyctl-outdir
     commands:
       - eval "$(mise activate bash --shims)"
-      - furyctl delete cluster --outdir "$PWD" --debug --disable-analytics --config tests/e2e/ekscluster/manifests/furyctl-cleanup-all.yaml --distro-location ./ --phase kubernetes --force --skip-vpn-confirmation --no-tty
-      - furyctl delete cluster --outdir "$PWD" --debug --disable-analytics --config tests/e2e/ekscluster/manifests/furyctl-cleanup-all.yaml --distro-location ./ --phase infrastructure --force --skip-vpn-confirmation --no-tty
+      - |
+        furyctl delete cluster \
+          --outdir /furyctl-outdir \
+          --debug \
+          --disable-analytics \
+          --config tests/e2e/ekscluster/manifests/furyctl-cleanup-all.yaml \
+          --distro-location ./ \
+          --phase kubernetes \
+          --force \
+          --skip-vpn-confirmation \
+          --no-tty || true
+        furyctl delete cluster \
+          --outdir /furyctl-outdir \
+          --debug \
+          --disable-analytics \
+          --config tests/e2e/ekscluster/manifests/furyctl-cleanup-all.yaml \
+          --distro-location ./ \
+          --phase infrastructure \
+          --force \
+          --skip-vpn-confirmation \
+          --no-tty
       - aws s3 rm s3://e2e-drone-eks/$CLUSTER_NAME --recursive
     when:
       status:
