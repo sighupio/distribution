@@ -131,7 +131,7 @@ trigger:
   ref:
     include:
       - refs/tags/e2e-kfddistribution-**
-      - refs/tags/e2e-**
+      - refs/tags/e2e-all-**
       - refs/tags/v*
     exclude:
       - refs/tags/**-docs*
@@ -239,7 +239,7 @@ trigger:
   ref:
     include:
       - refs/tags/e2e-kfddistribution-**
-      - refs/tags/e2e-**
+      - refs/tags/e2e-all-**
       - refs/tags/v*
     exclude:
       - refs/tags/**-docs*
@@ -349,7 +349,7 @@ trigger:
   ref:
     include:
       - refs/tags/e2e-eks-**
-      - refs/tags/e2e-**
+      - refs/tags/e2e-all-**
       - refs/tags/v*
 
 environment:
@@ -482,7 +482,7 @@ trigger:
   ref:
     include:
       - refs/tags/e2e-eks-**
-      - refs/tags/e2e-**
+      - refs/tags/e2e-all-**
     exclude:
       - refs/tags/v*
 
@@ -616,7 +616,7 @@ trigger:
   ref:
     include:
       - refs/tags/e2e-eks-**
-      - refs/tags/e2e-**
+      - refs/tags/e2e-all-**
       - refs/tags/v*
 
 environment:
@@ -750,7 +750,7 @@ trigger:
   ref:
     include:
       - refs/tags/e2e-onpremises-**
-      - refs/tags/e2e-**
+      - refs/tags/e2e-all-**
       - refs/tags/v*
 
 environment:
@@ -906,7 +906,7 @@ trigger:
   ref:
     include:
       - refs/tags/e2e-onpremises-**
-      - refs/tags/e2e-**
+      - refs/tags/e2e-all-**
       - refs/tags/v*
 
 environment:
