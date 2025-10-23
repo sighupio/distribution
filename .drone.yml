@@ -354,6 +354,7 @@ trigger:
 environment:
   MISE_DATA_DIR: /mise-data
   DISTRIBUTION_VERSION: "v1.33.1"
+  CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}
 
 volumes:
   - name: mise-cache
@@ -377,7 +378,6 @@ steps:
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
     environment:
-      CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}
       AWS_ACCESS_KEY_ID:
         from_secret: aws_access_key_id
       AWS_SECRET_ACCESS_KEY:
@@ -397,7 +397,6 @@ steps:
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
     environment:
-      CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}
       AWS_ACCESS_KEY_ID:
         from_secret: aws_access_key_id
       AWS_SECRET_ACCESS_KEY:
@@ -427,7 +426,6 @@ steps:
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
     environment:
-      CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-upgrades
       AWS_ACCESS_KEY_ID:
         from_secret: aws_access_key_id
       AWS_SECRET_ACCESS_KEY:
@@ -441,6 +439,7 @@ steps:
         path: /furyctl-outdir
     commands:
       - eval "$(mise activate bash --shims)"
+      - tests/e2e/ekscluster/replace_variables.sh --cluster-name "$CLUSTER_NAME" --furyctl-yaml tests/e2e/ekscluster/manifests/furyctl-cleanup-all.yaml
       - |
         furyctl delete cluster \
           --outdir /furyctl-outdir \
