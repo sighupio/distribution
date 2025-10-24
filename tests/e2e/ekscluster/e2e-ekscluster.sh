@@ -49,7 +49,23 @@ if ! furyctl apply \
     --no-tty
 fi
 echo "$LAST_FURYCTL_YAML" > last_furyctl_yaml.txt
+
+echo ""
+echo "============================================================================"
+echo "Cluster state after successful furyctl apply:"
+echo "============================================================================"
+echo ""
+echo "--- Nodes ---"
+kubectl --kubeconfig=./kubeconfig get nodes -o wide
+echo ""
+echo "--- All Pods ---"
+kubectl --kubeconfig=./kubeconfig get pods -A -o wide
+echo ""
+echo "============================================================================"
 echo "Testing that the components are running"
+echo "============================================================================"
+echo ""
+
 bats -t tests/e2e/ekscluster/e2e-ekscluster-init-cluster.sh
 
 
