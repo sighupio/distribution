@@ -2,14 +2,21 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
+{{- $stateConfig := dict }}
+{{- if index .spec.toolsConfiguration "opentofu" }}
+  {{- $stateConfig = .spec.toolsConfiguration.opentofu.state.s3 }}
+{{- else }}
+  {{- $stateConfig = .spec.toolsConfiguration.terraform.state.s3 }}
+{{- end }}
+
 terraform {
   backend "s3" {
-    bucket = "{{ .spec.toolsConfiguration.terraform.state.s3.bucketName }}"
-    key    = "{{ .spec.toolsConfiguration.terraform.state.s3.keyPrefix }}/distribution.json"
-    region = "{{ .spec.toolsConfiguration.terraform.state.s3.region }}"
+    bucket = "{{ $stateConfig.bucketName }}"
+    key    = "{{ $stateConfig.keyPrefix }}/distribution.json"
+    region = "{{ $stateConfig.region }}"
 
-    {{- if index .spec.toolsConfiguration.terraform.state.s3 "skipRegionValidation" }}
-      skip_region_validation = {{ default false .spec.toolsConfiguration.terraform.state.s3.skipRegionValidation }}
+    {{- if index $stateConfig "skipRegionValidation" }}
+      skip_region_validation = {{ default false $stateConfig.skipRegionValidation }}
     {{- end }}
   }
 }
