@@ -22,44 +22,64 @@ fi
 echo "Ingresses deleted"
 
 {{- if eq .spec.distribution.modules.ingress.dns.public.create true }}
-publicHostedZones="$(aws route53 list-hosted-zones --query "HostedZones[*].[Id,Name]" --output text | grep '\t{{.spec.distribution.modules.ingress.dns.public.name}}.$' | awk '{print $1}' | cut -d'/' -f3)"
+publicHostedZones="$(aws route53 list-hosted-zones-by-name \
+  --dns-name "{{.spec.distribution.modules.ingress.dns.public.name}}." \
+  --max-items 1 \
+  --query "HostedZones[0].Id" \
+  --output text 2>/dev/null | cut -d'/' -f3)"
 {{- else -}}
 publicHostedZones=""
 {{- end }}
 
 {{- if eq .spec.distribution.modules.ingress.dns.private.create true }}
-privateHostedZones="$(aws route53 list-hosted-zones --query "HostedZones[*].[Id,Name]" --output text | grep '\t{{.spec.distribution.modules.ingress.dns.private.name}}.$' | awk '{print $1}' | cut -d'/' -f3)"
+privateHostedZones="$(aws route53 list-hosted-zones-by-name \
+  --dns-name "{{.spec.distribution.modules.ingress.dns.private.name}}." \
+  --max-items 1 \
+  --query "HostedZones[0].Id" \
+  --output text 2>/dev/null | cut -d'/' -f3)"
 {{- else -}}
 privateHostedZones=""
 {{- end }}
 
-hostedZones="${publicHostedZones} ${privateHostedZones}" | tr -s ' ' | sed 's/ *$//g'
+hostedZones=$(echo "${publicHostedZones} ${privateHostedZones}" | tr -s ' ' | sed 's/ *$//g')
 
-retryCounter=0
+# Give external-dns time to clean up records after Ingress deletion
+echo "Waiting 60 seconds for external-dns to clean up DNS records..."
+sleep 60
 
-while [ "${retryCounter}" -le 10 ]; do
-  if [ -z "${hostedZones}" ]; then
-    break
-  fi
+echo "Cleaning up remaining Route53 records..."
+echo "${hostedZones}" | tr ' ' '\n' | while read -r line; do
+  if [ -n "${line}" ]; then
+    echo "Processing hosted zone: ${line}"
 
-  echo "${hostedZones}" | tr ' ' '\n' | while read -r line; do
-    if [ -n "${line}" ]; then
-      records="$(aws route53 list-resource-record-sets --hosted-zone-id "${line}" --query "ResourceRecordSets[?Type != 'NS' && Type != 'SOA'].Type" --output text)"
+    # Fetch all non-NS/SOA records as JSON
+    records_json=$(aws route53 list-resource-record-sets \
+      --hosted-zone-id "${line}" \
+      --query "ResourceRecordSets[?Type != 'NS' && Type != 'SOA']" \
+      --output json)
 
-      if [ -n "${records}" ]; then
-        echo "Waiting for DNS records to be deleted..."
+    # Count records using yq
+    num_records=$(echo "$records_json" | $yqbin -p json 'length')
 
-        sleep 20
-      fi
+    if [ "$num_records" -eq 0 ]; then
+      echo "No records to delete in zone ${line}"
+      continue
     fi
-  done
 
-  if [ "${retryCounter}" -eq 10 ]; then
-    echo "Timeout waiting for DNS records to be deleted."
-    exit 1
+    echo "Deleting ${num_records} records from zone ${line}..."
+
+    # Transform JSON array into ChangeBatch format using yq
+    # Input: [{"Name": "...", "Type": "A", ...}, ...]
+    # Output: {"Changes": [{"Action": "DELETE", "ResourceRecordSet": {...}}, ...]}
+    change_batch=$(echo "$records_json" | $yqbin -p json -o json '[.[] | {"Action": "DELETE", "ResourceRecordSet": .}] | {"Changes": .}')
+
+    echo "Submitting deletion request..."
+    echo "$change_batch" | aws route53 change-resource-record-sets \
+      --hosted-zone-id "${line}" \
+      --change-batch file:///dev/stdin || echo "Warning: Failed to delete some records in zone ${line}"
+
+    echo "Completed deletion for zone ${line}"
   fi
-
-  retryCounter=$((retryCounter+1))
 done
 
 echo "Route53 records deleted"
