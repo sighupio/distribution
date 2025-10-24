@@ -63,6 +63,8 @@ while [ "${retryCounter}" -le 10 ]; do
 done
 
 echo "Route53 records deleted"
+# Capture LoadBalancer ARNs for cleanup verification
+aws resourcegroupstaggingapi get-resources --region {{ .spec.region }} --resource-type-filters elasticloadbalancing:loadbalancer --tag-filters "Key=elbv2.k8s.aws/cluster,Values={{ .metadata.name }}" --query 'ResourceTagMappingList[].ResourceARN' --output text 2>/dev/null > ./lb_arns.txt || true
 {{- end }}
 
 < out.yaml $yqbin 'select(.apiVersion == "acme.cert-manager.io/*" or .apiVersion == "cert-manager.io/*" or .apiVersion == "config.gatekeeper.sh/*" or .apiVersion == "expansion.gatekeeper.sh/*" or .apiVersion == "externaldata.gatekeeper.sh/*" or .apiVersion == "forecastle.stakater.com/*" or .apiVersion == "logging-extensions.banzaicloud.io/*" or .apiVersion == "logging.banzaicloud.io/*" or .apiVersion == "monitoring.coreos.com/*" or .apiVersion == "mutations.gatekeeper.sh/*" or .apiVersion == "status.gatekeeper.sh/*" or .apiVersion == "templates.gatekeeper.sh/*" or .apiVersion == "velero.io/*")' | $kubectlbin delete --ignore-not-found --wait --timeout=180s -f -
@@ -89,8 +91,19 @@ sleep 180
 < out.yaml $yqbin 'select(.kind == "Service" and .spec.type == "LoadBalancer")' | $kubectlbin delete --ignore-not-found --wait --timeout=180s -f - || true
 echo "LoadBalancer Services deleted"
 
-< out.yaml $yqbin 'select(.kind != "CustomResourceDefinition")' | $kubectlbin delete --ignore-not-found --wait --timeout=180s -f - || true
+< out.yaml $yqbin 'select(.kind != "CustomResourceDefinition" and .apiVersion != "kapp.k14s.io/v1alpha1")' | $kubectlbin delete --ignore-not-found --wait --timeout=180s -f - || true
 echo "Resources deleted"
 
 < out.yaml $yqbin 'select(.kind == "CustomResourceDefinition")' | $kubectlbin delete --ignore-not-found --wait --timeout=180s -f - || true
 echo "CRDs deleted"
+
+{{- if eq .spec.distribution.common.provider.type "eks" }}
+# Force delete any remaining LoadBalancers
+if [ -f ./lb_arns.txt ]; then
+  for arn in $(cat ./lb_arns.txt); do
+    aws elbv2 describe-load-balancers --region {{ .spec.region }} --load-balancer-arns "$arn" >/dev/null 2>&1 && \
+      aws elbv2 delete-load-balancer --region {{ .spec.region }} --load-balancer-arn "$arn" || true
+  done
+  rm -f ./lb_arns.txt
+fi
+{{- end }}
