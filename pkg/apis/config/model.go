@@ -67,8 +67,8 @@ type KFDToolsCommon struct {
 	Furyagent KFDTool `yaml:"furyagent" validate:"required"`
 	Kubectl   KFDTool `yaml:"kubectl"   validate:"required"`
 	Kustomize KFDTool `yaml:"kustomize" validate:"required"`
-	Terraform KFDTool `yaml:"terraform" validate:"required"`
-	OpenTofu  KFDTool `yaml:"opentofu"`
+	Terraform KFDTool `yaml:"terraform"`
+	OpenTofu  KFDTool `yaml:"opentofu"  validate:"required"`
 	Yq        KFDTool `yaml:"yq"        validate:"required"`
 	Kapp      KFDTool `yaml:"kapp"`
 	Helm      KFDTool `yaml:"helm"`
