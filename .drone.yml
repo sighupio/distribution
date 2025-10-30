@@ -599,8 +599,10 @@ steps: # e2e-ekscluster-selfmanaged-alinux2023-1.33.1
           --distro-location ./ \
           --force \
           --skip-vpn-confirmation \
-          --no-tty
-      - aws s3 rm s3://e2e-drone-eks/$CLUSTER_NAME --recursive
+          --no-tty || true
+    when:
+      status:
+        - success
 
   - name: furyctl-delete-force
     image: quay.io/sighup/mise:v2025.4.4
@@ -640,11 +642,32 @@ steps: # e2e-ekscluster-selfmanaged-alinux2023-1.33.1
           --phase infrastructure \
           --force \
           --skip-vpn-confirmation \
-          --no-tty
+          --no-tty || true
+    when:
+      status:
+        - success
+  
+  - name: delete-aws-bucket
+    image: quay.io/sighup/mise:v2025.4.4
+    pull: always
+    environment:
+      AWS_ACCESS_KEY_ID:
+        from_secret: aws_access_key_id
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: aws_secret_access_key
+      AWS_REGION:
+        from_secret: aws_region
+    volumes:
+      - name: mise-cache
+        path: /mise-data
+      - name: furyctl-outdir-eks
+        path: /furyctl-outdir
+    commands:
+      - eval "$(mise activate bash --shims)"
       - aws s3 rm s3://e2e-drone-eks/$CLUSTER_NAME --recursive
     when:
       status:
-        - failure
+        - success
 
 ---
 name: e2e-ekscluster-upgrades-1.32.0-1.33.1
@@ -732,8 +755,7 @@ steps: #e2e-eks-upgrades
           --distro-location ./ \
           --force \
           --skip-vpn-confirmation \
-          --no-tty
-      - aws s3 rm s3://e2e-drone-eks/$CLUSTER_NAME --recursive
+          --no-tty || true
 
   - name: furyctl-delete-force
     image: quay.io/sighup/mise:v2025.4.4
@@ -773,11 +795,32 @@ steps: #e2e-eks-upgrades
           --phase infrastructure \
           --force \
           --skip-vpn-confirmation \
-          --no-tty
+          --no-tty || true
+    when:
+      status:
+        - success
+  
+  - name: delete-aws-bucket
+    image: quay.io/sighup/mise:v2025.4.4
+    pull: always
+    environment:
+      AWS_ACCESS_KEY_ID:
+        from_secret: aws_access_key_id
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: aws_secret_access_key
+      AWS_REGION:
+        from_secret: aws_region
+    volumes:
+      - name: mise-cache
+        path: /mise-data
+      - name: furyctl-outdir-eks
+        path: /furyctl-outdir
+    commands:
+      - eval "$(mise activate bash --shims)"
       - aws s3 rm s3://e2e-drone-eks/$CLUSTER_NAME --recursive
     when:
       status:
-        - failure
+        - success
 
 ---
 name: e2e-onpremises
