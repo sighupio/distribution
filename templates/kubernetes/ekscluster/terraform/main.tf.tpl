@@ -6,19 +6,19 @@
 
 {{- $stateConfig := dict }}
 {{- if index .spec.toolsConfiguration "opentofu" }}
-  {{- $stateConfig = .spec.toolsConfiguration.opentofu.state.s3 }}
+  {{- $stateConfig = .spec.toolsConfiguration.opentofu.state }}
 {{- else }}
-  {{- $stateConfig = .spec.toolsConfiguration.terraform.state.s3 }}
+  {{- $stateConfig = .spec.toolsConfiguration.terraform.state }}
 {{- end }}
 
 terraform {
   backend "s3" {
-    bucket = "{{ $stateConfig.bucketName }}"
-    key    = "{{ $stateConfig.keyPrefix }}/cluster.json"
-    region = "{{ $stateConfig.region }}"
+    bucket = "{{ $stateConfig.s3.bucketName }}"
+    key    = "{{ $stateConfig.s3.keyPrefix }}/cluster.json"
+    region = "{{ $stateConfig.s3.region }}"
 
-    {{- if index $stateConfig "skipRegionValidation" }}
-      skip_region_validation = {{ default false $stateConfig.skipRegionValidation }}
+    {{- if index $stateConfig.s3 "skipRegionValidation" }}
+      skip_region_validation = {{ default false $stateConfig.s3.skipRegionValidation }}
     {{- end }}
   }
 
