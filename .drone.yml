@@ -24,7 +24,7 @@ volumes:
     host:
       path: /root/mise_data_dir
 
-steps:
+steps: # qa
   - name: install-tools
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
@@ -130,11 +130,11 @@ platform:
 trigger:
   ref:
     include:
-      - refs/tags/**
+      - refs/tags/e2e-kfddistribution-**
+      - refs/tags/e2e-all-**
+      - refs/tags/v*
     exclude:
       - refs/tags/**-docs*
-      - refs/tags/e2e-eks-**
-      - refs/tags/e2e-onpremises-**
 
 environment:
   MISE_DATA_DIR: /mise-data
@@ -150,7 +150,7 @@ volumes:
     host:
       path: /root/mise_data_dir
 
-steps:
+steps: # e2e-kfddistribution-1.33
   - name: install-tools
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
@@ -238,11 +238,11 @@ platform:
 trigger:
   ref:
     include:
-      - refs/tags/**
+      - refs/tags/e2e-kfddistribution-**
+      - refs/tags/e2e-all-**
+      - refs/tags/v*
     exclude:
       - refs/tags/**-docs*
-      - refs/tags/e2e-eks-**
-      - refs/tags/e2e-onpremises-**
 
 environment:
   MISE_DATA_DIR: /mise-data
@@ -259,7 +259,7 @@ volumes:
     host:
       path: /root/mise_data_dir
 
-steps:
+steps: # e2e-kfddistribution-1.32.0-to-1.33.1
   - name: install-tools
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
@@ -347,20 +347,24 @@ clone:
 
 trigger:
   ref:
-    - refs/tags/e2e-eks-**
-    - refs/tags/e2e-full-**
-    - refs/tags/v**
+    include:
+      - refs/tags/e2e-eks-**
+      - refs/tags/e2e-all-**
+      - refs/tags/v*
 
 environment:
   MISE_DATA_DIR: /mise-data
   DISTRIBUTION_VERSION: "v1.33.1"
+  CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}
 
 volumes:
   - name: mise-cache
     host:
       path: /root/mise_data_dir
+  - name: furyctl-outdir-eks
+    temp: {}
 
-steps:
+steps: # e2e-ekscluster-1.33.1
   - name: install-tools
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
@@ -375,7 +379,6 @@ steps:
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
     environment:
-      CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}
       AWS_ACCESS_KEY_ID:
         from_secret: aws_access_key_id
       AWS_SECRET_ACCESS_KEY:
@@ -385,16 +388,38 @@ steps:
     volumes:
       - name: mise-cache
         path: /mise-data
+      - name: furyctl-outdir-eks
+        path: /furyctl-outdir
     commands:
       - eval "$(mise activate bash --shims)"
-      - apt-get update && apt-get install -y --no-install-recommends expect && rm -rf /var/lib/apt/lists/*
       - ./tests/e2e/ekscluster/e2e-ekscluster.sh
+  
+  - name: print-kubeconfig
+    image: quay.io/sighup/mise:v2025.4.4
+    pull: always
+    environment:
+      AWS_ACCESS_KEY_ID:
+        from_secret: aws_access_key_id
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: aws_secret_access_key
+      AWS_REGION:
+        from_secret: aws_region
+    volumes:
+      - name: mise-cache
+        path: /mise-data
+      - name: furyctl-outdir-eks
+        path: /furyctl-outdir
+    commands:
+      - echo "Tests failed, kubeconfig for investigation:"
+      - cat /drone/src/kubeconfig
+    when:
+      status:
+        - failure
 
   - name: furyctl-delete
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
     environment:
-      CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}
       AWS_ACCESS_KEY_ID:
         from_secret: aws_access_key_id
       AWS_SECRET_ACCESS_KEY:
@@ -404,17 +429,28 @@ steps:
     volumes:
       - name: mise-cache
         path: /mise-data
+      - name: furyctl-outdir-eks
+        path: /furyctl-outdir
     commands:
       - eval "$(mise activate bash --shims)"
-      - apt-get update && apt-get install -y --no-install-recommends expect && rm -rf /var/lib/apt/lists/*
-      - tests/e2e/ekscluster/furyctl_delete.expect $(cat ./last_furyctl_yaml.txt)
-      - aws s3 rm s3://e2e-drone-eks/$CLUSTER_NAME --recursive
+      - |
+        furyctl delete cluster \
+          --outdir /furyctl-outdir \
+          --debug \
+          --disable-analytics \
+          --config "$(cat ./last_furyctl_yaml.txt)" \
+          --distro-location ./ \
+          --force \
+          --skip-vpn-confirmation \
+          --no-tty || true
+    when:
+      status:
+        - success
 
   - name: furyctl-delete-force
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
     environment:
-      CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-upgrades
       AWS_ACCESS_KEY_ID:
         from_secret: aws_access_key_id
       AWS_SECRET_ACCESS_KEY:
@@ -424,14 +460,367 @@ steps:
     volumes:
       - name: mise-cache
         path: /mise-data
+      - name: furyctl-outdir-eks
+        path: /furyctl-outdir
     commands:
       - eval "$(mise activate bash --shims)"
-      - apt-get update && apt-get install -y --no-install-recommends expect && rm -rf /var/lib/apt/lists/*
-      - tests/e2e/ekscluster/furyctl_delete_force.expect tests/e2e/ekscluster/manifests/furyctl-cleanup-all.yaml
+      - tests/e2e/ekscluster/replace_variables.sh --cluster-name "$CLUSTER_NAME" --furyctl-yaml tests/e2e/ekscluster/manifests/furyctl-cleanup-all.yaml
+      - |
+        furyctl delete cluster \
+          --outdir /furyctl-outdir \
+          --debug \
+          --disable-analytics \
+          --config tests/e2e/ekscluster/manifests/furyctl-cleanup-all.yaml \
+          --distro-location ./ \
+          --phase kubernetes \
+          --force \
+          --skip-vpn-confirmation \
+          --no-tty || true
+        furyctl delete cluster \
+          --outdir /furyctl-outdir \
+          --debug \
+          --disable-analytics \
+          --config tests/e2e/ekscluster/manifests/furyctl-cleanup-all.yaml \
+          --distro-location ./ \
+          --phase infrastructure \
+          --force \
+          --skip-vpn-confirmation \
+          --no-tty || true
+    when:
+      status:
+        - success
+
+  - name: delete-aws-bucket
+    image: quay.io/sighup/mise:v2025.4.4
+    pull: always
+    environment:
+      AWS_ACCESS_KEY_ID:
+        from_secret: aws_access_key_id
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: aws_secret_access_key
+      AWS_REGION:
+        from_secret: aws_region
+    volumes:
+      - name: mise-cache
+        path: /mise-data
+      - name: furyctl-outdir-eks
+        path: /furyctl-outdir
+    commands:
+      - eval "$(mise activate bash --shims)"
       - aws s3 rm s3://e2e-drone-eks/$CLUSTER_NAME --recursive
     when:
       status:
-        - failure
+        - success
+
+---
+name: e2e-ekscluster-selfmanaged-alinux2023-1.33.1
+kind: pipeline
+type: docker
+
+depends_on:
+  - qa
+
+clone:
+  depth: 1
+
+trigger:
+  ref:
+    include:
+      - refs/tags/e2e-eks-**
+      - refs/tags/e2e-all-**
+    exclude:
+      - refs/tags/v*
+
+environment:
+  MISE_DATA_DIR: /mise-data
+  DISTRIBUTION_VERSION: "v1.33.1"
+  CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-selfmanaged
+
+volumes:
+  - name: mise-cache
+    host:
+      path: /root/mise_data_dir
+  - name: furyctl-outdir-eks-selfmanaged
+    temp: {}
+
+steps: # e2e-ekscluster-selfmanaged-alinux2023-1.33.1
+  - name: install-tools
+    image: quay.io/sighup/mise:v2025.4.4
+    pull: always
+    volumes:
+      - name: mise-cache
+        path: /mise-data
+    commands:
+      - mise install
+      - eval "$(mise activate bash --shims)"
+
+  - name: run-tests
+    image: quay.io/sighup/mise:v2025.4.4
+    pull: always
+    environment:
+      AWS_ACCESS_KEY_ID:
+        from_secret: aws_access_key_id
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: aws_secret_access_key
+      AWS_REGION:
+        from_secret: aws_region
+    volumes:
+      - name: mise-cache
+        path: /mise-data
+      - name: furyctl-outdir-eks-selfmanaged
+        path: /furyctl-outdir
+    commands:
+      - eval "$(mise activate bash --shims)"
+      - ./tests/e2e/ekscluster/e2e-ekscluster-selfmanaged-alinux2023.sh
+
+  - name: furyctl-delete
+    image: quay.io/sighup/mise:v2025.4.4
+    pull: always
+    environment:
+      AWS_ACCESS_KEY_ID:
+        from_secret: aws_access_key_id
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: aws_secret_access_key
+      AWS_REGION:
+        from_secret: aws_region
+    volumes:
+      - name: mise-cache
+        path: /mise-data
+      - name: furyctl-outdir-eks-selfmanaged
+        path: /furyctl-outdir
+    commands:
+      - eval "$(mise activate bash --shims)"
+      - |
+        furyctl delete cluster \
+          --outdir /furyctl-outdir \
+          --debug \
+          --disable-analytics \
+          --config "$(cat ./last_furyctl_yaml.txt)" \
+          --distro-location ./ \
+          --force \
+          --skip-vpn-confirmation \
+          --no-tty || true
+    when:
+      status:
+        - success
+
+  - name: furyctl-delete-force
+    image: quay.io/sighup/mise:v2025.4.4
+    pull: always
+    environment:
+      AWS_ACCESS_KEY_ID:
+        from_secret: aws_access_key_id
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: aws_secret_access_key
+      AWS_REGION:
+        from_secret: aws_region
+    volumes:
+      - name: mise-cache
+        path: /mise-data
+      - name: furyctl-outdir-eks-selfmanaged
+        path: /furyctl-outdir
+    commands:
+      - eval "$(mise activate bash --shims)"
+      - tests/e2e/ekscluster/replace_variables.sh --cluster-name "$CLUSTER_NAME" --furyctl-yaml tests/e2e/ekscluster/manifests/furyctl-selfmanaged-alinux2023-init-cluster.yaml
+      - |
+        furyctl delete cluster \
+          --outdir /furyctl-outdir \
+          --debug \
+          --disable-analytics \
+          --config tests/e2e/ekscluster/manifests/furyctl-selfmanaged-alinux2023-init-cluster.yaml \
+          --distro-location ./ \
+          --phase kubernetes \
+          --force \
+          --skip-vpn-confirmation \
+          --no-tty || true
+        furyctl delete cluster \
+          --outdir /furyctl-outdir \
+          --debug \
+          --disable-analytics \
+          --config tests/e2e/ekscluster/manifests/furyctl-selfmanaged-alinux2023-init-cluster.yaml \
+          --distro-location ./ \
+          --phase infrastructure \
+          --force \
+          --skip-vpn-confirmation \
+          --no-tty || true
+    when:
+      status:
+        - success
+  
+  - name: delete-aws-bucket
+    image: quay.io/sighup/mise:v2025.4.4
+    pull: always
+    environment:
+      AWS_ACCESS_KEY_ID:
+        from_secret: aws_access_key_id
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: aws_secret_access_key
+      AWS_REGION:
+        from_secret: aws_region
+    volumes:
+      - name: mise-cache
+        path: /mise-data
+      - name: furyctl-outdir-eks
+        path: /furyctl-outdir
+    commands:
+      - eval "$(mise activate bash --shims)"
+      - aws s3 rm s3://e2e-drone-eks/$CLUSTER_NAME --recursive
+    when:
+      status:
+        - success
+
+---
+name: e2e-ekscluster-upgrades-1.32.0-1.33.1
+kind: pipeline
+type: docker
+
+depends_on:
+  - qa
+
+clone:
+  depth: 1
+
+trigger:
+  ref:
+    include:
+      - refs/tags/e2e-eks-**
+      - refs/tags/e2e-all-**
+      - refs/tags/v*
+
+environment:
+  MISE_DATA_DIR: /mise-data
+  DISTRIBUTION_VERSION: "v1.33.1"
+  CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-upgrades
+
+volumes:
+  - name: mise-cache
+    host:
+      path: /root/mise_data_dir
+  - name: furyctl-outdir-eks-upgrades
+    temp: {}
+
+steps: #e2e-eks-upgrades
+  - name: install-tools
+    image: quay.io/sighup/mise:v2025.4.4
+    pull: always
+    volumes:
+      - name: mise-cache
+        path: /mise-data
+    commands:
+      - mise install
+      - eval "$(mise activate bash --shims)"
+
+  - name: run-tests
+    image: quay.io/sighup/mise:v2025.4.4
+    pull: always
+    environment:
+      AWS_ACCESS_KEY_ID:
+        from_secret: aws_access_key_id
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: aws_secret_access_key
+      AWS_REGION:
+        from_secret: aws_region
+    volumes:
+      - name: mise-cache
+        path: /mise-data
+      - name: furyctl-outdir-eks-upgrades
+        path: /furyctl-outdir
+    commands:
+      - eval "$(mise activate bash --shims)"
+      - ./tests/e2e/ekscluster-upgrades/e2e-ekscluster-upgrades.sh
+
+  - name: furyctl-delete
+    image: quay.io/sighup/mise:v2025.4.4
+    pull: always
+    environment:
+      AWS_ACCESS_KEY_ID:
+        from_secret: aws_access_key_id
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: aws_secret_access_key
+      AWS_REGION:
+        from_secret: aws_region
+    volumes:
+      - name: mise-cache
+        path: /mise-data
+      - name: furyctl-outdir-eks-upgrades
+        path: /furyctl-outdir
+    commands:
+      - eval "$(mise activate bash --shims)"
+      - |
+        furyctl delete cluster \
+          --outdir /furyctl-outdir \
+          --debug \
+          --disable-analytics \
+          --config "$(cat ./last_furyctl_yaml.txt)" \
+          --distro-location ./ \
+          --force \
+          --skip-vpn-confirmation \
+          --no-tty || true
+
+  - name: furyctl-delete-force
+    image: quay.io/sighup/mise:v2025.4.4
+    pull: always
+    environment:
+      AWS_ACCESS_KEY_ID:
+        from_secret: aws_access_key_id
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: aws_secret_access_key
+      AWS_REGION:
+        from_secret: aws_region
+    volumes:
+      - name: mise-cache
+        path: /mise-data
+      - name: furyctl-outdir-eks-upgrades
+        path: /furyctl-outdir
+    commands:
+      - eval "$(mise activate bash --shims)"
+      - tests/e2e/ekscluster/replace_variables.sh --cluster-name "$CLUSTER_NAME" --furyctl-yaml tests/e2e/ekscluster-upgrades/manifests/furyctl-upgrade-version-1.33.1.yaml
+      - |
+        furyctl delete cluster \
+          --outdir /furyctl-outdir \
+          --debug \
+          --disable-analytics \
+          --config tests/e2e/ekscluster-upgrades/manifests/furyctl-upgrade-version-1.33.1.yaml \
+          --distro-location ./ \
+          --phase kubernetes \
+          --force \
+          --skip-vpn-confirmation \
+          --no-tty || true
+        furyctl delete cluster \
+          --outdir /furyctl-outdir \
+          --debug \
+          --disable-analytics \
+          --config tests/e2e/ekscluster-upgrades/manifests/furyctl-upgrade-version-1.33.1.yaml \
+          --distro-location ./ \
+          --phase infrastructure \
+          --force \
+          --skip-vpn-confirmation \
+          --no-tty || true
+    when:
+      status:
+        - success
+  
+  - name: delete-aws-bucket
+    image: quay.io/sighup/mise:v2025.4.4
+    pull: always
+    environment:
+      AWS_ACCESS_KEY_ID:
+        from_secret: aws_access_key_id
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: aws_secret_access_key
+      AWS_REGION:
+        from_secret: aws_region
+    volumes:
+      - name: mise-cache
+        path: /mise-data
+      - name: furyctl-outdir-eks
+        path: /furyctl-outdir
+    commands:
+      - eval "$(mise activate bash --shims)"
+      - aws s3 rm s3://e2e-drone-eks/$CLUSTER_NAME --recursive
+    when:
+      status:
+        - success
 
 ---
 name: e2e-onpremises
@@ -447,9 +836,10 @@ clone:
 
 trigger:
   ref:
-    - refs/tags/e2e-onpremises-**
-    - refs/tags/e2e-full-**
-    - refs/tags/v**
+    include:
+      - refs/tags/e2e-onpremises-**
+      - refs/tags/e2e-all-**
+      - refs/tags/v*
 
 environment:
   MISE_DATA_DIR: /mise-data
@@ -463,7 +853,7 @@ volumes:
     host:
       path: /root/mise_data_dir
 
-steps:
+steps: # e2e-onpremises
   - name: install-tools
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
@@ -602,9 +992,10 @@ clone:
 
 trigger:
   ref:
-    - refs/tags/e2e-onpremises-**
-    - refs/tags/e2e-full-**
-    - refs/tags/v**
+    include:
+      - refs/tags/e2e-onpremises-**
+      - refs/tags/e2e-all-**
+      - refs/tags/v*
 
 environment:
   MISE_DATA_DIR: /mise-data
@@ -619,7 +1010,7 @@ volumes:
     host:
       path: /root/mise_data_dir
 
-steps:
+steps: # e2e-onpremises-upgrades-1.32.0-1.33.1
   - name: install-tools
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
@@ -767,7 +1158,7 @@ trigger:
 clone:
   depth: 1
 
-steps:
+steps: # scheduled-aws-nuke
   - name: run-aws-nuke
     image: amazon/aws-cli:latest
     environment:
@@ -803,6 +1194,8 @@ type: docker
 depends_on:
   - e2e-kfddistribution-1.33
   - e2e-kfddistribution-1.32.0-to-1.33.1
+  - e2e-ekscluster-1.33.1
+  - e2e-ekscluster-upgrades-1.32.0-1.33.1
   - e2e-onpremises
   - e2e-onpremises-upgrades-1.32.0-1.33.1
 

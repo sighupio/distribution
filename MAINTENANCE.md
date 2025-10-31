@@ -16,6 +16,20 @@ Usually, a new release of SD is triggered by one of these events:
 
 The release is needed to render this updates available to SD's user base.
 
+## CI/CD Pipeline Triggers
+
+Different tag patterns trigger specific combinations of test pipelines to optimize CI resource usage and testing coverage:
+
+| Tag Pattern                 | Pipelines Triggered                                                           |
+| --------------------------- | ----------------------------------------------------------------------------- |
+| **Any push**                | QA only                                                                       |
+| **`e2e-all-*`**             | QA + ALL e2e tests (kfddistro, eks, eks-selfmanaged, onpremises) - NO release |
+| **`e2e-eks-*`**             | QA + ALL EKS e2e only (standard + selfmanaged + upgrades)                     |
+| **`e2e-kfddistribution-*`** | QA + kfddistro e2e only                                                       |
+| **`e2e-onpremises-*`**      | QA + onpremises e2e only                                                      |
+| **`v1.XX.X`**               | QA + ALL e2e EXCEPT selfmanaged → release (stable)                            |
+| **`v1.XX.X-rc.X`**          | QA + ALL e2e EXCEPT selfmanaged → release (prerelease)                        |
+
 ## Process
 
 The update process usually involves going back and forward between SD (this repo) and furyctl.

@@ -14,7 +14,7 @@ export KUBECONFIG=./kubeconfig
     test() {
         kubectl get pods -l app.kubernetes.io/name=calico-kube-controllers -o json -n calico-system |jq '.items[].status.containerStatuses[].ready' | uniq | grep -q true
     }
-    loop_it test 60 10
+    loop_it test 20 10
     status=${loop_it_result}
     [ "$status" -eq 0 ]
 }
@@ -24,7 +24,7 @@ export KUBECONFIG=./kubeconfig
     test() {
         kubectl get pods -l app.kubernetes.io/name=calico-node -o json -n calico-system |jq '.items[].status.containerStatuses[].ready' | uniq | grep -q true
     }
-    loop_it test 60 10
+    loop_it test 20 10
     status=${loop_it_result}
     [ "$status" -eq 0 ]
 }
@@ -34,7 +34,7 @@ export KUBECONFIG=./kubeconfig
     test() {
         kubectl get pods -l k8s-app=velero -o json -n kube-system |jq '.items[].status.containerStatuses[].ready' | uniq | grep -q true
     }
-    loop_it test 60 10
+    loop_it test 20 10
     status=${loop_it_result}
     [ "$status" -eq 0 ]
 }
@@ -44,7 +44,7 @@ export KUBECONFIG=./kubeconfig
 #     test() {
 #         kubectl get pods -l k8s-app=velero-node-agent -o json -n kube-system |jq '.items[].status.containerStatuses[].ready' | uniq | grep -q true
 #     }
-#     loop_it test 60 10
+#     loop_it test 20 10
 #     status=${loop_it_result}
 #     [ "$status" -eq 0 ]
 # }
@@ -54,7 +54,7 @@ export KUBECONFIG=./kubeconfig
     test() {
         kubectl get pods -l app=cert-manager -o json -n cert-manager |jq '.items[].status.containerStatuses[].ready' | uniq | grep -q true
     }
-    loop_it test 60 10
+    loop_it test 20 10
     status=${loop_it_result}
     [ "$status" -eq 0 ]
 }
@@ -64,7 +64,7 @@ export KUBECONFIG=./kubeconfig
     test() {
         kubectl get pods -l app=ingress -o json -n ingress-nginx |jq '.items[].status.containerStatuses[].ready' | uniq | grep -q true
     }
-    loop_it test 60 10
+    loop_it test 20 10
     status=${loop_it_result}
     [ "$status" -eq 0 ]
 }
@@ -74,7 +74,7 @@ export KUBECONFIG=./kubeconfig
     test() {
         kubectl get pods -l app=forecastle -o json -n ingress-nginx |jq '.items[].status.containerStatuses[].ready' | uniq | grep -q true
     }
-    loop_it test 60 10
+    loop_it test 20 10
     status=${loop_it_result}
     [ "$status" -eq 0 ]
 }
@@ -84,7 +84,7 @@ export KUBECONFIG=./kubeconfig
     test() {
         kubectl get pods -l app.kubernetes.io/name=fluentd -o json -n logging |jq '.items[].status.containerStatuses[].ready' | uniq | grep -q true
     }
-    loop_it test 60 10
+    loop_it test 20 10
     status=${loop_it_result}
     [ "$status" -eq 0 ]
 }
@@ -95,7 +95,7 @@ export KUBECONFIG=./kubeconfig
     test() {
         kubectl get pods -l app.kubernetes.io/name=grafana -o json -n monitoring |jq '.items[].status.containerStatuses[].ready' | uniq | grep -q true
     }
-    loop_it test 60 10
+    loop_it test 20 10
     status=${loop_it_result}
     [ "$status" -eq 0 ]
 }
@@ -105,7 +105,7 @@ export KUBECONFIG=./kubeconfig
     test() {
         kubectl get pods -l app.kubernetes.io/name=prometheus-operator -o json -n monitoring |jq '.items[].status.containerStatuses[].ready' | uniq | grep -q true
     }
-    loop_it test 60 10
+    loop_it test 20 10
     status=${loop_it_result}
     [ "$status" -eq 0 ]
 }
@@ -115,7 +115,7 @@ export KUBECONFIG=./kubeconfig
     test() {
         kubectl get pods -l app.kubernetes.io/name=kube-state-metrics -o json -n monitoring |jq '.items[].status.containerStatuses[].ready' | uniq | grep -q true
     }
-    loop_it test 60 10
+    loop_it test 20 10
     status=${loop_it_result}
     [ "$status" -eq 0 ]
 }
@@ -125,7 +125,7 @@ export KUBECONFIG=./kubeconfig
     test() {
         kubectl get pods -l app.kubernetes.io/name=node-exporter -o json -n monitoring |jq '.items[].status.containerStatuses[].ready' | uniq | grep -q true
     }
-    loop_it test 60 10
+    loop_it test 20 10
     status=${loop_it_result}
     [ "$status" -eq 0 ]
 }
@@ -146,7 +146,7 @@ export KUBECONFIG=./kubeconfig
     test() {
         kubectl get pods -l k8s-app=kube-proxy-metrics -o json -n monitoring | jq '.items[].status.containerStatuses[].ready' | uniq | grep -q true
     }
-    loop_it test 60 10
+    loop_it test 20 10
     status=${loop_it_result}
     [ "$status" -eq 0 ]
 }
@@ -157,7 +157,7 @@ export KUBECONFIG=./kubeconfig
         data=$(kubectl get sts -n tracing -l app.kubernetes.io/component=ingester -o json | jq '.items[] | select(.metadata.name == "tempo-distributed-ingester" and .status.replicas == .status.readyReplicas)')
         if [ "${data}" == "" ]; then return 1; fi
     }
-    loop_it test 60 10
+    loop_it test 20 10
     status=${loop_it_result}
     [[ "$status" -eq 0 ]]
 }
@@ -168,7 +168,7 @@ export KUBECONFIG=./kubeconfig
         readyReplicas=$(kubectl get deploy kyverno-admission-controller -n kyverno -o jsonpath="{.status.readyReplicas}")
         if [ "${readyReplicas}" != "3" ]; then return 1; fi
     }
-    loop_it test 60 10
+    loop_it test 20 10
     status=${loop_it_result}
     [[ "$status" -eq 0 ]]
 }
