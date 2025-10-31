@@ -2,6 +2,7 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
+{{- $kubeProxyDisabled := and (hasKeyAny .spec "kubernetes") (hasKeyAny .spec.kubernetes "advanced") (hasKeyAny .spec.kubernetes.advanced "kubeProxy") (not (index .spec.kubernetes.advanced.kubeProxy "enabled")) }}
 ---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
@@ -48,6 +49,9 @@ patches:
       name: cilium-operator
       namespace: kube-system
     path: patches/cilium/cilium-operator-tolerations.yaml
+    {{- if $kubeProxyDisabled }}
+  - path: patches/cilium/kube-proxy-replacement.yaml
+    {{- end }}
   {{- end }}
 {{- end }}
 
