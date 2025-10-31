@@ -47,11 +47,18 @@ if [ -z "$CLUSTER_NAME" ] || [ -z "$FURYCTL_YAML" ]; then
     exit 1
 fi
 
-if [[ -v $DISTRIBUTION_VERSION ]]; then
+if [[ -n $DISTRIBUTION_VERSION ]]; then
   yq -ei ".spec.distributionVersion = \"$DISTRIBUTION_VERSION\"" "$FURYCTL_YAML"
 fi
 yq -ei ".metadata.name = \"$CLUSTER_NAME\"" "$FURYCTL_YAML"
-yq -ei ".spec.toolsConfiguration.terraform.state.s3.keyPrefix = \"$CLUSTER_NAME\"" "$FURYCTL_YAML"
+if [[ $(yq '.spec.toolsConfiguration | has("opentofu")' "$FURYCTL_YAML") == "true" ]]; then
+  yq -ei ".spec.toolsConfiguration.opentofu.state.s3.keyPrefix = \"$CLUSTER_NAME\"" "$FURYCTL_YAML"
+  if [[ $(yq '.spec.toolsConfiguration | has("terraform")' "$FURYCTL_YAML") == "true" ]]; then
+    yq -ei 'del(.spec.toolsConfiguration.terraform)' "$FURYCTL_YAML"
+  fi
+elif [[ $(yq '.spec.toolsConfiguration | has("terraform")' "$FURYCTL_YAML") == "true" ]]; then
+  yq -ei ".spec.toolsConfiguration.terraform.state.s3.keyPrefix = \"$CLUSTER_NAME\"" "$FURYCTL_YAML"
+fi
 yq -ei ".spec.tags.env = \"$CLUSTER_NAME\"" "$FURYCTL_YAML"
 if [[ $(yq '.spec.distribution.modules.dr.velero.eks | has("bucketName")' "$FURYCTL_YAML") == "true" ]]; then
   yq -ei ".spec.distribution.modules.dr.velero.eks.bucketName = \"$CLUSTER_NAME-velero\"" "$FURYCTL_YAML"
@@ -71,5 +78,3 @@ fi
 if [[ $(yq '.spec.distribution.modules.auth | has("baseDomain")' "$FURYCTL_YAML") == "true" ]]; then
   yq -ei ".spec.distribution.modules.auth.baseDomain = \"$CLUSTER_NAME.e2e.ci.sighup.cc\"" "$FURYCTL_YAML"
 fi
-
-
