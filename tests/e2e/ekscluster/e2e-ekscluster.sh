@@ -16,6 +16,7 @@ if ! furyctl apply \
   --distro-location ./ \
   --force all \
   --skip-vpn-confirmation \
+  -D \
   --no-tty; then
 
   echo "============================================================================"
@@ -46,6 +47,7 @@ if ! furyctl apply \
     --distro-location ./ \
     --force all \
     --skip-vpn-confirmation \
+    -D \
     --no-tty
 fi
 echo "$LAST_FURYCTL_YAML" > last_furyctl_yaml.txt
@@ -80,6 +82,7 @@ furyctl apply \
   --distro-location ./ \
   --force all \
   --skip-vpn-confirmation \
+  -D \
   --no-tty
 echo "$LAST_FURYCTL_YAML" > last_furyctl_yaml.txt
 bats -t tests/e2e/ekscluster/e2e-ekscluster-cleanup-all.sh

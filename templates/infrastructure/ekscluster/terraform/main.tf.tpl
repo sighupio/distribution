@@ -4,14 +4,21 @@
  * license that can be found in the LICENSE file.
  */
 
+{{- $stateConfig := dict }}
+{{- if index .spec.toolsConfiguration "opentofu" }}
+  {{- $stateConfig = .spec.toolsConfiguration.opentofu.state }}
+{{- else }}
+  {{- $stateConfig = .spec.toolsConfiguration.terraform.state }}
+{{- end }}
+
 terraform {
   backend "s3" {
-    bucket = "{{ .spec.toolsConfiguration.terraform.state.s3.bucketName }}"
-    key    = "{{ .spec.toolsConfiguration.terraform.state.s3.keyPrefix }}/infrastructure.json"
-    region = "{{ .spec.toolsConfiguration.terraform.state.s3.region }}"
+    bucket = "{{ $stateConfig.s3.bucketName }}"
+    key    = "{{ $stateConfig.s3.keyPrefix }}/infrastructure.json"
+    region = "{{ $stateConfig.s3.region }}"
 
-    {{- if index .spec.toolsConfiguration.terraform.state.s3 "skipRegionValidation" }}
-      skip_region_validation = {{ default false .spec.toolsConfiguration.terraform.state.s3.skipRegionValidation }}
+    {{- if index $stateConfig.s3 "skipRegionValidation" }}
+      skip_region_validation = {{ default false $stateConfig.s3.skipRegionValidation }}
     {{- end }}
   }
 
