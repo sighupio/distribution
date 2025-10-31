@@ -53,9 +53,7 @@ fi
 yq -ei ".metadata.name = \"$CLUSTER_NAME\"" "$FURYCTL_YAML"
 if [[ $(yq '.spec.toolsConfiguration | has("opentofu")' "$FURYCTL_YAML") == "true" ]]; then
   yq -ei ".spec.toolsConfiguration.opentofu.state.s3.keyPrefix = \"$CLUSTER_NAME\"" "$FURYCTL_YAML"
-  if [[ $(yq '.spec.toolsConfiguration | has("terraform")' "$FURYCTL_YAML") == "true" ]]; then
-    yq -ei 'del(.spec.toolsConfiguration.terraform)' "$FURYCTL_YAML"
-  fi
+  yq -ei ".spec.toolsConfiguration.terraform = .spec.toolsConfiguration.opentofu" "$FURYCTL_YAML"
 elif [[ $(yq '.spec.toolsConfiguration | has("terraform")' "$FURYCTL_YAML") == "true" ]]; then
   yq -ei ".spec.toolsConfiguration.terraform.state.s3.keyPrefix = \"$CLUSTER_NAME\"" "$FURYCTL_YAML"
 fi
