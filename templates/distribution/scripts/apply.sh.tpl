@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-set -euo pipefail
+set -e
 
 
 kustomizebin="{{ .paths.kustomize }}"
