@@ -1,0 +1,17 @@
+[env]
+KUBECONFIG = '{{config_root}}/kubeconfig'
+SSH_USER = "ubuntu"
+SSH_KEY = "/path/to/ssh-key"
+
+# CHANGE THIS! i.e.: "head -c16 /dev/urandom | base64"
+ETCD_ENCRYPTION_KEY = "dmVyeXNlY3JldGtleQ=="
+
+[tasks]
+[tasks.burn]
+description = 'Run kubelet density heavy benchmark'
+dir = '{{config_root}}/kubelet-density-heavy'
+run = ['kube-burner init -c kubelet-density-heavy.yml']
+
+[tools]
+'ubi:kube-burner/kube-burner' = '1.17.7'
+furyctl = "0.33.1"

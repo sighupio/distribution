@@ -1,0 +1,42 @@
+---
+metricsEndpoints:
+  - endpoint: https://prometheus.internal.example.com
+    metrics:
+      - ./metrics-profiles/metrics-aggregated.yaml
+    indexer:
+      esServers: [http://localhost:9200]
+      insecureSkipVerify: true
+      defaultIndex: kube-burner
+      type: elastic
+
+global:
+  gc: true
+  measurements:
+    - name: podLatency
+
+jobs:
+  - name: kubelet-density-heavy
+    jobIterations: 60
+    qps: 50
+    burst: 100
+    namespacedIterations: false
+    namespace: kubelet-density-heavy
+    waitWhenFinished: true
+    preLoadImages: false
+    podWait: false
+    objects:
+      - objectTemplate: templates/postgres-deployment.yml
+        replicas: 15
+        # # uncomment to run on a single node
+        # inputVars:
+        #   nodeSelector: node01.example.com
+
+      - objectTemplate: templates/app-deployment.yml
+        replicas: 15
+        inputVars:
+          readinessPeriod: 10
+          # # uncomment to run on a single node
+          # nodeSelector: node01.example.com
+
+      - objectTemplate: templates/postgres-service.yml
+        replicas: 15

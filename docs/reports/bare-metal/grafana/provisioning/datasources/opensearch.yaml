@@ -1,0 +1,12 @@
+apiVersion: 1
+
+datasources:
+  - name: kube-burner
+    type: elasticsearch
+    access: proxy
+    url: http://opensearch-node1:9200
+    basicAuth: false
+    jsonData:
+      index: "kube-burner"
+      timeField: "timestamp"
+      tlsSkipVerify: true

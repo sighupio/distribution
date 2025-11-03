@@ -1,0 +1,17 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: postgresql-{{.Replica}}-{{.Iteration}}
+spec:
+  selector:
+    name: postgres-{{.Replica}}-{{.Iteration}}
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+  # I think this is OpenShift specific
+  # portalIP: ''
+  type: ClusterIP
+  sessionAffinity: None
+status:
+  loadBalancer: {}
