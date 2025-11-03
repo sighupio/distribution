@@ -393,28 +393,6 @@ steps: # e2e-ekscluster-1.33.1
     commands:
       - eval "$(mise activate bash --shims)"
       - ./tests/e2e/ekscluster/e2e-ekscluster.sh
-  
-  - name: print-kubeconfig
-    image: quay.io/sighup/mise:v2025.4.4
-    pull: always
-    environment:
-      AWS_ACCESS_KEY_ID:
-        from_secret: aws_access_key_id
-      AWS_SECRET_ACCESS_KEY:
-        from_secret: aws_secret_access_key
-      AWS_REGION:
-        from_secret: aws_region
-    volumes:
-      - name: mise-cache
-        path: /mise-data
-      - name: furyctl-outdir-eks
-        path: /furyctl-outdir
-    commands:
-      - echo "Tests failed, kubeconfig for investigation:"
-      - cat /drone/src/kubeconfig
-    when:
-      status:
-        - failure
 
   - name: furyctl-delete
     image: quay.io/sighup/mise:v2025.4.4
