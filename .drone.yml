@@ -333,8 +333,6 @@ steps: # e2e-kfddistribution-1.32.0-to-1.33.1
         - failure
 
 ---
-# e2e tests are failing on CI: race conditions on the applications of some (apparently) unrelated CRDs.
-# Manual testing (running the same pipeline locally macOS M1 Pro, with drone exec) results in a successful run.
 name: e2e-ekscluster-1.33.1
 kind: pipeline
 type: docker
