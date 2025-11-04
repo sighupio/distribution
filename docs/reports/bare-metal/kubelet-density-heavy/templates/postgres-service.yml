@@ -13,7 +13,6 @@ spec:
     - protocol: TCP
       port: 5432
       targetPort: 5432
-  # I think this is OpenShift specific
   # portalIP: ''
   type: ClusterIP
   sessionAffinity: None
