@@ -333,8 +333,6 @@ steps: # e2e-kfddistribution-1.32.0-to-1.33.1
         - failure
 
 ---
-# e2e tests are failing on CI: race conditions on the applications of some (apparently) unrelated CRDs.
-# Manual testing (running the same pipeline locally macOS M1 Pro, with drone exec) results in a successful run.
 name: e2e-ekscluster-1.33.1
 kind: pipeline
 type: docker
@@ -393,28 +391,6 @@ steps: # e2e-ekscluster-1.33.1
     commands:
       - eval "$(mise activate bash --shims)"
       - ./tests/e2e/ekscluster/e2e-ekscluster.sh
-  
-  - name: print-kubeconfig
-    image: quay.io/sighup/mise:v2025.4.4
-    pull: always
-    environment:
-      AWS_ACCESS_KEY_ID:
-        from_secret: aws_access_key_id
-      AWS_SECRET_ACCESS_KEY:
-        from_secret: aws_secret_access_key
-      AWS_REGION:
-        from_secret: aws_region
-    volumes:
-      - name: mise-cache
-        path: /mise-data
-      - name: furyctl-outdir-eks
-        path: /furyctl-outdir
-    commands:
-      - echo "Tests failed, kubeconfig for investigation:"
-      - cat /drone/src/kubeconfig
-    when:
-      status:
-        - failure
 
   - name: furyctl-delete
     image: quay.io/sighup/mise:v2025.4.4
@@ -843,7 +819,7 @@ trigger:
 
 environment:
   MISE_DATA_DIR: /mise-data
-  FURYCTL_VERSION: "v0.33.1-rc.1"
+  FURYCTL_VERSION: "v0.33.2-rc.1"
   TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
 
 volumes:
@@ -999,7 +975,7 @@ trigger:
 
 environment:
   MISE_DATA_DIR: /mise-data
-  FURYCTL_VERSION: "v0.33.1-rc.1"
+  FURYCTL_VERSION: "v0.33.2-rc.1"
   TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
   KUBECONFIG: /cache/kubeconfig
 
