@@ -36,14 +36,21 @@ resources:
   - tracing
 {{- end }}
 
-{{- if .spec.distribution.customPatches.patchesStrategicMerge }}
-patchesStrategicMerge:
-  {{ .spec.distribution.customPatches.patchesStrategicMerge | toYaml | indent 2 | trim -}}
-{{- end }}
-
-{{- if .spec.distribution.customPatches.patches }}
+{{- if or .spec.distribution.customPatches.patches .spec.distribution.customPatches.patchesStrategicMerge }}
 patches:
-  {{ .spec.distribution.customPatches.patches | toYaml | indent 2 | trim -}}
+{{- if .spec.distribution.customPatches.patches }}
+  {{ .spec.distribution.customPatches.patches | toYaml | indent 2 | trim }}
+{{- end }}
+{{- if .spec.distribution.customPatches.patchesStrategicMerge }}
+{{- range .spec.distribution.customPatches.patchesStrategicMerge }}
+  {{- if contains "\n" . }}
+  - patch: |-
+{{ . | indent 6 }}
+  {{- else }}
+  - path: {{ . }}
+  {{- end }}
+{{- end }}
+{{- end }}
 {{- end }}
 
 {{- if .spec.distribution.customPatches.secretGenerator }}

@@ -78,23 +78,34 @@ spec:
             username: test
             password: testpassword
     # patches for kind compatibility and resource setting
+    # Tests both modern (patches) and legacy (patchesStrategicMerge) formats
     customPatches:
-      patchesStrategicMerge:
-        - |
-          apiVersion: apps/v1
-          kind: StatefulSet
-          metadata:
+      # Modern patches format - these pass through template as-is
+      patches:
+        - target:
+            kind: StatefulSet
             name: minio-logging
             namespace: logging
-          spec:
-            template:
-              spec:
-                containers:
-                - name: minio
-                  resources:
-                    requests:
-                      cpu: 10m
-                      memory: 50Mi
+          patch: |-
+            spec:
+              template:
+                spec:
+                  containers:
+                  - name: minio
+                    resources:
+                      requests:
+                        cpu: 10m
+                        memory: 50Mi
+        - patch: |-
+            $patch: delete
+            apiVersion: logging-extensions.banzaicloud.io/v1alpha1
+            kind: HostTailer
+            metadata:
+              name: systemd-common
+              namespace: logging
+
+      # Legacy format - template converts these to modern patches format
+      patchesStrategicMerge:
         - |
           apiVersion: apps/v1
           kind: StatefulSet
@@ -125,13 +136,6 @@ spec:
                     requests:
                       cpu: 10m
                       memory: 50Mi
-        - |
-          $patch: delete
-          apiVersion: logging-extensions.banzaicloud.io/v1alpha1
-          kind: HostTailer
-          metadata:
-            name: systemd-common
-            namespace: logging
         - |
           $patch: delete
           apiVersion: logging-extensions.banzaicloud.io/v1alpha1
