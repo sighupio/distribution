@@ -1,0 +1,14 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: minio-tracing
+  namespace: tracing
+spec:
+  template:
+    spec:
+      containers:
+      - name: minio
+        resources:
+          requests:
+            cpu: 10m
+            memory: 50Mi

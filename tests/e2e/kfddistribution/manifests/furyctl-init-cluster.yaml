@@ -82,11 +82,13 @@ spec:
     customPatches:
       # Modern patches format - these pass through template as-is
       patches:
-        - target:
+        # Inline patch (patch:) - tests inline YAML
+        - patch: |-
+            apiVersion: apps/v1
             kind: StatefulSet
-            name: minio-logging
-            namespace: logging
-          patch: |-
+            metadata:
+              name: minio-logging
+              namespace: logging
             spec:
               template:
                 spec:
@@ -96,6 +98,11 @@ spec:
                       requests:
                         cpu: 10m
                         memory: 50Mi
+
+        # File-based patch (path:) - tests external file reference
+        - path: tests/e2e/kfddistribution/manifests/patches/minio-tracing-resources.yaml
+
+        # Delete patch - tests deletion
         - patch: |-
             $patch: delete
             apiVersion: logging-extensions.banzaicloud.io/v1alpha1
@@ -112,21 +119,6 @@ spec:
           metadata:
             name: minio-monitoring
             namespace: monitoring
-          spec:
-            template:
-              spec:
-                containers:
-                - name: minio
-                  resources:
-                    requests:
-                      cpu: 10m
-                      memory: 50Mi
-        - |
-          apiVersion: apps/v1
-          kind: StatefulSet
-          metadata:
-            name: minio-tracing
-            namespace: tracing
           spec:
             template:
               spec:
