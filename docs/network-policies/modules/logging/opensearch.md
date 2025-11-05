@@ -7,7 +7,7 @@ graph TD
         fb[Fluentbit<br/>app.kubernetes.io/name: fluentbit]
         fd[Fluentd<br/>app.kubernetes.io/name: fluentd]
         os[OpenSearch<br/>app.kubernetes.io/name: opensearch]
-        osd[OpenSearch Dashboards<br/>app: opensearch-dashboards]
+        osd[OpenSearch Dashboards<br/>app.kubernetes.io/name: opensearch-dashboards]
         minio[MinIO<br/>app: minio]
         bucket[MinIO Bucket Setup<br/>app: minio-logging-buckets-setup]
         op[Logging Operator<br/>app.kubernetes.io/name: logging-operator]

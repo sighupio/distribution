@@ -24,7 +24,7 @@ spec:
               kubernetes.io/metadata.name: logging
           podSelector:
             matchLabels:
-              app: opensearch-dashboards
+              app.kubernetes.io/name: opensearch-dashboards
       ports:
         - port: 9200
           protocol: TCP
