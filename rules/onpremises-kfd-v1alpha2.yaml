@@ -18,6 +18,10 @@ kubernetes:
     immutable: true
   - path: .spec.kubernetes.masters.hosts.*
     immutable: true
+  # kubeProxy can be disabled and reenabled in a live cluster, but requires manual intervention
+  # to reconfigure the kube-proxy DaemonSet. We could automate this in the future.
+  - path: .spec.kubernetes.advanced.kubeProxy.enabled
+    immutable: true
 distribution:
   - path: .spec.distribution.common.networkPoliciesEnabled
     immutable: false
@@ -46,14 +50,14 @@ distribution:
     description: "changes to Loki's TSDB start date have been detected. This parameter cannot be changed once set."
     safe:
       - fromNodes:
-        - path: ".spec.distribution.modules.logging.type"
-          from: "none"
-        - path: ".spec.distribution.modules.logging.type"
-          to: "none"
-        - path: ".spec.distribution.modules.logging.type"
-          from: "opensearch"
-        - path: ".spec.distribution.modules.logging.type"
-          to: "opensearch"
+          - path: ".spec.distribution.modules.logging.type"
+            from: "none"
+          - path: ".spec.distribution.modules.logging.type"
+            to: "none"
+          - path: ".spec.distribution.modules.logging.type"
+            from: "opensearch"
+          - path: ".spec.distribution.modules.logging.type"
+            to: "opensearch"
     unsupported:
       - to: opensearch
         from: loki
