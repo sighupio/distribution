@@ -21,11 +21,9 @@ resources:
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/monitoring/katalog/blackbox-exporter" }}
 {{- if eq .spec.distribution.common.provider.type "none" }}{{/* none === on-premises and kfddistribution */}}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/monitoring/katalog/kubeadm-sm" }}
-  {{- if hasKeyAny .spec "kubernetes" }}
-    {{- if .spec.kubernetes.loadBalancers.enabled }}
+  {{- if getFieldOrDefault . "spec.kubernetes.loadBalancers.enabled" false }}
   - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/monitoring/katalog/haproxy" }}
   - resources/haproxy-scrapeConfig.yaml
-    {{- end }}
   {{- end }}
 {{- end }}
 {{- if eq .spec.distribution.common.provider.type "eks" }}

@@ -12,11 +12,11 @@ spec:
   externalLabels:
     k8s_cluster: {{ .metadata.name }}
   externalUrl: https://{{ template "prometheusUrl" .spec }}
-  {{- if hasKeyAny .spec.distribution.modules.monitoring.prometheus "resources" }}
+  {{- if hasField . "spec.distribution.modules.monitoring.prometheus.resources" }}
   resources:
     {{ .spec.distribution.modules.monitoring.prometheus.resources | toYaml | indent 4 | trim }}
   {{- end }}
-  {{- if hasKeyAny .spec.distribution.modules.monitoring.prometheus "remoteWrite" }}
+  {{- if hasField . "spec.distribution.modules.monitoring.prometheus.remoteWrite" }}
   remoteWrite:
     {{ .spec.distribution.modules.monitoring.prometheus.remoteWrite | toYaml | indent 4 | trim }}
   {{- end }}

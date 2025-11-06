@@ -14,7 +14,7 @@ routes:
   - from: https://{{ template "prometheusUrl" .spec }}
     to: http://prometheus-k8s.monitoring.svc.cluster.local:9090
     policy:
-      {{- if and (index .spec.distribution.modules.auth.pomerium "defaultRoutesPolicy") (index .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy "monitoringPrometheus") }}
+      {{- if hasField . "spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.monitoringPrometheus" }}
       {{- .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.monitoringPrometheus | toYaml | nindent 6 }}
       {{- else }}
       - allow:
@@ -24,7 +24,7 @@ routes:
   - from: https://{{ template "alertmanagerUrl" .spec }}
     to: http://alertmanager-main.monitoring.svc.cluster.local:9093
     policy:
-      {{- if and (index .spec.distribution.modules.auth.pomerium "defaultRoutesPolicy") (index .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy "monitoringAlertmanager") }}
+      {{- if hasField . "spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.monitoringAlertmanager" }}
       {{- .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.monitoringAlertmanager | toYaml | nindent 6 }}
       {{- else }}
       - allow:
@@ -38,7 +38,7 @@ routes:
     preserve_host_header: true
     pass_identity_headers: true
     policy:
-      {{- if and (index .spec.distribution.modules.auth.pomerium "defaultRoutesPolicy") (index .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy "monitoringGrafana") }}
+      {{- if hasField . "spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.monitoringGrafana" }}
       {{- .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.monitoringGrafana | toYaml | nindent 6 }}
       {{- else }}
       - allow:
@@ -51,7 +51,7 @@ routes:
     allow_websockets: true
     preserve_host_header: true
     policy:
-      {{- if and (index .spec.distribution.modules.auth.pomerium "defaultRoutesPolicy") (index .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy "monitoringMinioConsole") }}
+      {{- if hasField . "spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.monitoringMinioConsole" }}
       {{- .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.monitoringMinioConsole | toYaml | nindent 6 }}
       {{- else }}
       - allow:
@@ -65,7 +65,7 @@ routes:
   - from: https://{{ template "forecastleUrl" .spec }}
     to: http://forecastle.ingress-nginx.svc.cluster.local
     policy:
-      {{- if and (index .spec.distribution.modules.auth.pomerium "defaultRoutesPolicy") (index .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy "ingressNgnixForecastle") }}
+      {{- if hasField . "spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.ingressNgnixForecastle" }}
       {{- .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.ingressNgnixForecastle | toYaml | nindent 6 }}
       {{- else }}
       - allow:
@@ -79,7 +79,7 @@ routes:
   - from: https://{{ template "opensearchDashboardsUrl" .spec }}
     to: http://opensearch-dashboards.logging.svc.cluster.local:5601
     policy:
-      {{- if and (index .spec.distribution.modules.auth.pomerium "defaultRoutesPolicy") (index .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy "loggingOpensearchDashboards") }}
+      {{- if hasField . "spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.loggingOpensearchDashboards" }}
       {{- .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.loggingOpensearchDashboards | toYaml | nindent 6 }}
       {{- else }}
       - allow:
@@ -92,7 +92,7 @@ routes:
     allow_websockets: true
     preserve_host_header: true
     policy:
-      {{- if and (index .spec.distribution.modules.auth.pomerium "defaultRoutesPolicy") (index .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy "loggingMinioConsole") }}
+      {{- if hasField . "spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.loggingMinioConsole" }}
       {{- .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.loggingMinioConsole | toYaml | nindent 6 }}
       {{- else }}
       - allow:
@@ -106,7 +106,7 @@ routes:
     allow_websockets: true
     preserve_host_header: true
     policy:
-      {{- if and (index .spec.distribution.modules.auth.pomerium "defaultRoutesPolicy") (index .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy "tracingMinioConsole") }}
+      {{- if hasField . "spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.tracingMinioConsole" }}
       {{- .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.tracingMinioConsole | toYaml | nindent 6 }}
       {{- else }}
       - allow:
@@ -119,7 +119,7 @@ routes:
   - from: https://{{ template "gpmUrl" .spec }}
     to: http://gatekeeper-policy-manager.gatekeeper-system.svc.cluster.local
     policy:
-      {{- if and (index .spec.distribution.modules.auth.pomerium "defaultRoutesPolicy") (index .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy "gatekeeperPolicyManager") }}
+      {{- if hasField . "spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.gatekeeperPolicyManager" }}
       {{- .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.gatekeeperPolicyManager | toYaml | nindent 6 }}
       {{- else }}
       - allow:
@@ -132,7 +132,7 @@ routes:
   - from: https://{{ template "hubbleUrl" .spec }}
     to: http://hubble-ui.kube-system.svc.cluster.local
     policy:
-      {{- if and (index .spec.distribution.modules.auth.pomerium "defaultRoutesPolicy") (index .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy "hubbleUi") }}
+      {{- if hasField . "spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.hubbleUi" }}
       {{- .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.hubbleUi | toYaml | nindent 6 }}
       {{- else }}
       - allow:

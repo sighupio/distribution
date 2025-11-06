@@ -185,8 +185,7 @@ spec:
 {{- end }}
 {{- end }}
 
-{{- if and (index .spec.distribution.modules.monitoring "grafana") (index .spec.distribution.modules.monitoring.grafana "basicAuthIngress") }}
-{{- if .spec.distribution.modules.monitoring.grafana.basicAuthIngress }}
+{{- if getFieldOrDefault . "spec.distribution.modules.monitoring.grafana.basicAuthIngress" false }}
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -209,5 +208,4 @@ spec:
                 port:
                   name: http
 {{- template "ingressTls" (dict "module" "monitoring" "package" "grafanaBasicAuth" "prefix" "grafana-basic-auth." "spec" .spec) }}
-{{- end }}
 {{- end }}

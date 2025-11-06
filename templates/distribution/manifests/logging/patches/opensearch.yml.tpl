@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: opensearch
-      {{- if hasKeyAny .spec.distribution.modules.logging.opensearch "resources" }}
+      {{- if hasField . "spec.distribution.modules.logging.opensearch.resources" }}
         resources:
           {{ .spec.distribution.modules.logging.opensearch.resources | toYaml | indent 10 | trim }}
       {{- end }}

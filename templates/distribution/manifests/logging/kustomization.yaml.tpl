@@ -67,7 +67,7 @@ patches:
   {{- if eq $loggingType "opensearch" }}
   - path: patches/opensearch.yml
   {{- /* The patch file below can be empty when loki resources is not defined but kustomize 5.6.0 (our current version) fails when a patch file is empty, so we need to apply it conditionally. */ -}}
-  {{- else if hasKeyAny $loki "resources" }}
+  {{- else if hasField . "spec.distribution.modules.logging.loki.resources" }}
   - path: patches/loki-resources.yml
   {{- end }}
 {{- end }}

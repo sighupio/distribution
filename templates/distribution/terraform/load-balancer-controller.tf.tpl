@@ -5,10 +5,7 @@
 module "load_balancer_controller_iam_role" {
   source       = "{{ print .spec.distribution.common.relativeVendorPath "/modules/aws/modules/iam-for-load-balancer-controller" }}"
   cluster_name = "{{ .metadata.name }}"
-  {{- if and (hasKeyAny .spec.distribution.modules "aws")
-   (hasKeyAny .spec.distribution.modules.aws "loadBalancerController")
-   (hasKeyAny .spec.distribution.modules.aws.loadBalancerController "overrides")
-   (hasKeyAny .spec.distribution.modules.aws.loadBalancerController.overrides "iamRoleName") }}
+  {{- if hasField . "spec.distribution.modules.aws.loadBalancerController.overrides.iamRoleName" }}
   lb_iam_role_name_override = "{{ .spec.distribution.modules.aws.loadBalancerController.overrides.iamRoleName }}"
   {{- end }}
 }

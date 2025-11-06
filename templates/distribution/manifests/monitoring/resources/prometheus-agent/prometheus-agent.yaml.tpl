@@ -14,12 +14,12 @@ spec:
   replicas: 2
   externalLabels:
     k8s_cluster: {{ .metadata.name }}
-  {{- if hasKeyAny .spec.distribution.modules.monitoring.prometheusAgent "resources" }}
+  {{- if hasField . "spec.distribution.modules.monitoring.prometheusAgent.resources" }}
   resources:
     {{ .spec.distribution.modules.monitoring.prometheusAgent.resources | toYaml | indent 4 | trim }}
   {{- end }}
 
-  {{- if hasKeyAny .spec.distribution.modules.monitoring.prometheusAgent "remoteWrite" }}
+  {{- if hasField . "spec.distribution.modules.monitoring.prometheusAgent.remoteWrite" }}
   remoteWrite:
     {{ .spec.distribution.modules.monitoring.prometheusAgent.remoteWrite | toYaml | indent 4 | trim }}
   {{- end }}
