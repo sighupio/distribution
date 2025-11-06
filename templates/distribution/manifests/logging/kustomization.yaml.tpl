@@ -6,6 +6,7 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
+{{- $vendorPrefix := print "../" .spec.distribution.common.relativeVendorPath }}
 {{- $loggingType := .spec.distribution.modules.logging.type }}
 {{- $customOutputs := .spec.distribution.modules.logging.customOutputs }}
 {{- $loki := index .spec.distribution.modules.logging "loki" }}
@@ -14,42 +15,42 @@ kind: Kustomization
 {{- $fluentbitResources := index .spec.distribution.modules.logging.operator.fluentbit "resources" }}
 
 resources:
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/logging-operator" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/logging-operated" }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/logging-operator" }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/logging-operated" }}
   - kapp-configs/logging-operator-crd.yaml
 {{- if eq $loggingType "loki" "opensearch" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/minio-ha" }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/minio-ha" }}
   {{- if ne .spec.distribution.modules.ingress.nginx.type "none" }}
   - resources/ingress-infra.yml
   {{- end }}
 {{- end }}
 {{- if eq $loggingType "opensearch" "customOutputs" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/configs/audit" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/configs/events" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/configs/infra" }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/configs/audit" }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/configs/events" }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/configs/infra" }}
   {{- if ne .spec.distribution.modules.ingress.nginx.type "none" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/configs/ingress-nginx" }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/configs/ingress-nginx" }}
   {{- end }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/configs/kubernetes" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/configs/systemd" }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/configs/kubernetes" }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/configs/systemd" }}
   {{- if eq $loggingType "opensearch" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/opensearch-dashboards" }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/opensearch-dashboards" }}
     {{- if eq .spec.distribution.modules.logging.opensearch.type "single" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/opensearch-single" }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/opensearch-single" }}
     {{- else if eq .spec.distribution.modules.logging.opensearch.type "triple" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/opensearch-triple" }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/opensearch-triple" }}
     {{- end }}
   {{- end }}
 {{- else if eq $loggingType "loki" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/loki-configs/audit" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/loki-configs/events" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/loki-configs/infra" }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/loki-configs/audit" }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/loki-configs/events" }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/loki-configs/infra" }}
   {{- if ne .spec.distribution.modules.ingress.nginx.type "none" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/loki-configs/ingress-nginx" }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/loki-configs/ingress-nginx" }}
   {{- end }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/loki-configs/kubernetes" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/loki-configs/systemd" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/loki-distributed" }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/loki-configs/kubernetes" }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/loki-configs/systemd" }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/loki-distributed" }}
   - kapp-configs/loki-hpa.yaml
 {{- end }}
 
