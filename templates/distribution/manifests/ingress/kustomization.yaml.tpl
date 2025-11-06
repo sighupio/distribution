@@ -2,23 +2,25 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
+{{- $vendorPrefix := print "../" .spec.distribution.common.relativeVendorPath }}
+
 ---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
 {{- if eq .spec.distribution.modules.ingress.nginx.type "dual" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/ingress/katalog/dual-nginx" }}
+  - {{ print $vendorPrefix "/modules/ingress/katalog/dual-nginx" }}
 {{- else if eq .spec.distribution.modules.ingress.nginx.type "single" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/ingress/katalog/nginx" }}
+  - {{ print $vendorPrefix "/modules/ingress/katalog/nginx" }}
 {{- end }}
 
 {{- if eq .spec.distribution.common.provider.type "eks" }}
   {{- if eq .spec.distribution.modules.ingress.nginx.type "dual" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/ingress/katalog/external-dns/private" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/ingress/katalog/external-dns/public" }}
+  - {{ print $vendorPrefix "/modules/ingress/katalog/external-dns/private" }}
+  - {{ print $vendorPrefix "/modules/ingress/katalog/external-dns/public" }}
   {{- else if eq .spec.distribution.modules.ingress.nginx.type "single" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/ingress/katalog/external-dns/public" }}
+  - {{ print $vendorPrefix "/modules/ingress/katalog/external-dns/public" }}
   {{- end }}
 {{- end }}
 
@@ -27,9 +29,9 @@ resources:
 {{- end }}
 
 {{- if ne .spec.distribution.modules.ingress.nginx.type "none" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/ingress/katalog/forecastle" }}
+  - {{ print $vendorPrefix "/modules/ingress/katalog/forecastle" }}
 {{- end }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/ingress/katalog/cert-manager" }}
+  - {{ print $vendorPrefix "/modules/ingress/katalog/cert-manager" }}
 
 {{- if eq .spec.distribution.modules.ingress.nginx.tls.provider "certManager" }}
   - resources/cert-manager-clusterissuer.yml

@@ -2,16 +2,18 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
+{{- $vendorPrefix := print "../" .spec.distribution.common.relativeVendorPath }}
+
 ---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 {{- if eq .spec.distribution.modules.auth.provider.type "sso" }}
 resources:
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/auth/katalog/dex" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/auth/katalog/pomerium" }}
+  - {{ print $vendorPrefix "/modules/auth/katalog/dex" }}
+  - {{ print $vendorPrefix "/modules/auth/katalog/pomerium" }}
 {{- if .spec.distribution.modules.auth.oidcKubernetesAuth.enabled }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/auth/katalog/gangplank" }}
+  - {{ print $vendorPrefix "/modules/auth/katalog/gangplank" }}
 {{- end }}
 {{- if ne .spec.distribution.modules.ingress.nginx.type "none" }}
   - resources/ingress-infra.yml
@@ -68,8 +70,8 @@ secretGenerator:
 resources:
   - secrets/basic-auth.yml
 {{- if .spec.distribution.modules.auth.oidcKubernetesAuth.enabled }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/auth/katalog/dex" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/auth/katalog/gangplank" }}
+  - {{ print $vendorPrefix "/modules/auth/katalog/dex" }}
+  - {{ print $vendorPrefix "/modules/auth/katalog/gangplank" }}
   - resources/ingress-infra.yml
 {{- if ne .spec.distribution.modules.auth.oidcTrustedCA "" }}
   - secrets/overlays/kube-system-ca
@@ -101,8 +103,8 @@ patches:
 
 {{- if .spec.distribution.modules.auth.oidcKubernetesAuth.enabled }}
 resources:
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/auth/katalog/dex" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/auth/katalog/gangplank" }}
+  - {{ print $vendorPrefix "/modules/auth/katalog/dex" }}
+  - {{ print $vendorPrefix "/modules/auth/katalog/gangplank" }}
   - resources/ingress-infra.yml
 {{- if ne .spec.distribution.modules.auth.oidcTrustedCA "" }}
   - secrets/overlays/kube-system-ca

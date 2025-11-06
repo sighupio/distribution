@@ -2,22 +2,24 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
+{{- $vendorPrefix := print "../" .spec.distribution.common.relativeVendorPath }}
+
 ---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
 {{- if eq .spec.distribution.common.provider.type "eks" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/networking/katalog/tigera/eks-policy-only" }}
+  - {{ print $vendorPrefix "/modules/networking/katalog/tigera/eks-policy-only" }}
 {{- end }}
 
 {{- if eq .spec.distribution.common.provider.type "none" }}{{/* none == on-prem, kfddistribution */}}
     {{- if eq .spec.distribution.modules.networking.type "calico" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/networking/katalog/tigera/on-prem" }}
+  - {{ print $vendorPrefix "/modules/networking/katalog/tigera/on-prem" }}
   - resources/calico-ns.yml
     {{- end }}
     {{- if eq .spec.distribution.modules.networking.type "cilium" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/networking/katalog/cilium" }}
+  - {{ print $vendorPrefix "/modules/networking/katalog/cilium" }}
       {{- if ne .spec.distribution.modules.ingress.nginx.type "none" }}
   - resources/ingress-infra.yml
       {{- end }}
