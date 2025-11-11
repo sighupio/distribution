@@ -20,6 +20,9 @@ kubernetes:
   onpremises:
     version: 1.33.4
     installer: v1.33.4-rev.1
+  immutable:
+    version: 1.33.4
+    installer: v1.33.4-rev.1
 furyctlSchemas:
   eks:
     - apiVersion: kfd.sighup.io/v1alpha2
@@ -30,6 +33,9 @@ furyctlSchemas:
   onpremises:
     - apiVersion: kfd.sighup.io/v1alpha2
       kind: OnPremises
+  immutable:
+    - apiVersion: kfd.sighup.io/v1alpha2
+      kind: Immutable
 tools:
   common:
     furyagent:

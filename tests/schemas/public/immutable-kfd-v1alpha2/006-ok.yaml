@@ -1,0 +1,76 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# Tests the following cases:
+
+# Given a valid Immutable provider configuration
+# With OS updates customization and PKI folder configuration
+# When I validate the config against the schema
+# Then no errors are returned
+
+---
+apiVersion: kfd.sighup.io/v1alpha2
+kind: Immutable
+metadata:
+  name: test-cluster-full-config
+spec:
+  distributionVersion: v1.33.1
+
+  infrastructure:
+    matchbox:
+      url: https://matchbox.prod.example.com:8080
+
+    nodes:
+      controlPlanes:
+        - hostname: master1.prod.example.com
+          macAddress: "52:54:00:aa:bb:10"
+          installDisk: /dev/sda
+          partitioning: auto
+          networkInterfaces:
+            - name: ens3
+              dhcp: false
+              addresses: ["10.0.1.20/24"]
+              gateway: 10.0.1.1
+              dns: ["10.0.1.53"]
+
+      workers:
+        - hostname: worker1.prod.example.com
+          macAddress: "52:54:00:aa:bb:20"
+          installDisk: /dev/sda
+          partitioning: auto
+          networkInterfaces:
+            - name: ens3
+              dhcp: false
+              addresses: ["10.0.1.30/24"]
+              gateway: 10.0.1.1
+              dns: ["10.0.1.53"]
+
+    # OS Updates with custom server
+    osUpdates:
+      enabled: true
+      server: https://nebraska.internal.example.com
+      updateStrategy: automatic
+      allowDuringClusterUpdate: true
+
+    # Custom PKI folder
+    pki:
+      folder: /opt/pki/cluster
+
+    # Custom SSH configuration
+    ssh:
+      username: automation
+      keyPath: ~/.ssh/id_ed25519_cluster
+      port: 2222
+
+  kubernetes:
+    controlPlaneAddress: k8s-api.prod.example.com
+    controlPlanePort: 6443
+
+    controlPlanes:
+      - hostname: master1.prod.example.com
+        ip: 10.0.1.20
+
+    workers:
+      - hostname: worker1.prod.example.com
+        ip: 10.0.1.30

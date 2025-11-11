@@ -1,0 +1,70 @@
+apiVersion: kfd.sighup.io/v1alpha2
+kind: Immutable
+metadata:
+  name: test-cluster
+
+spec:
+  distributionVersion: v1.33.1
+
+  infrastructure:
+    matchbox:
+      url: https://matchbox.internal.example.com:8080
+
+    # Physical infrastructure for Matchbox/Ignition provisioning
+    nodes:
+      controlPlanes:
+        - hostname: master1.test-cluster.example.com
+          macAddress: "52:54:00:aa:bb:10"
+          installDisk: /dev/sda
+          networkInterfaces:
+            - name: ens3
+              dhcp: false
+              addresses: ["10.0.1.20/24"]
+              gateway: 10.0.1.1
+              dns: ["10.0.1.53"]
+
+      workers:
+        - hostname: worker1.test-cluster.example.com
+          macAddress: "52:54:00:aa:bb:20"
+          installDisk: /dev/sda
+          networkInterfaces:
+            - name: ens3
+              dhcp: false
+              addresses: ["10.0.1.30/24"]
+              gateway: 10.0.1.1
+              dns: ["10.0.1.53"]
+
+    ssh:
+      keyPath: ~/.ssh/id_ed25519
+
+  kubernetes:
+    controlPlaneAddress: k8s-api.test-cluster.example.com
+    controlPlanePort: 6443
+
+    controlPlanes:
+      - hostname: master1.test-cluster.example.com
+        ip: 10.0.1.20
+
+    workers:
+      - hostname: worker1.test-cluster.example.com
+        ip: 10.0.1.30
+
+  distribution:
+    common:
+      registry: registry.sighup.io/fury
+    modules:
+      networking:
+        type: calico
+      ingress:
+        baseDomain: test-cluster.example.com
+        nginx:
+          type: single
+        certManager:
+          clusterIssuer:
+            name: letsencrypt-prod
+            email: admin@example.com
+            type: http01
+      monitoring:
+        type: prometheus
+      logging:
+        type: loki

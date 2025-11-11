@@ -1,0 +1,564 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "A KFD Cluster deployed on Flatcar Container Linux using the Immutable provider with Matchbox-based provisioning.",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "type": "string",
+      "pattern": "^kfd\\.sighup\\.io/v\\d+((alpha|beta)\\d+)?$"
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "Immutable"
+      ]
+    },
+    "metadata": {
+      "$ref": "#/$defs/Metadata"
+    },
+    "spec": {
+      "$ref": "#/$defs/Spec"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "apiVersion",
+    "kind",
+    "metadata",
+    "spec"
+  ],
+  "$defs": {
+    "Metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the cluster. It will also be used as a prefix for all the other resources created.",
+          "minLength": 1,
+          "maxLength": 56
+        }
+      },
+      "required": [
+        "name"
+      ]
+    },
+    "Spec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "distributionVersion": {
+          "type": "string",
+          "description": "Defines which KFD version will be installed and, in consequence, the Kubernetes version used to create the cluster. It supports git tags and branches. Example: `v1.33.1`.",
+          "minLength": 1
+        },
+        "infrastructure": {
+          "$ref": "#/$defs/Spec.Infrastructure"
+        },
+        "kubernetes": {
+          "$ref": "#/$defs/Spec.Kubernetes"
+        },
+        "distribution": {
+          "$ref": "#/$defs/Spec.Distribution"
+        },
+        "plugins": {
+          "$ref": "./spec-plugins.json"
+        }
+      },
+      "required": [
+        "distributionVersion",
+        "infrastructure",
+        "kubernetes"
+      ]
+    },
+    "Spec.Infrastructure": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Defines the infrastructure layer configuration for the Immutable provider. This section defines infrastructure concerns (Matchbox, OS updates, PKI, SSH access, node inventory) separate from Kubernetes concerns.",
+      "properties": {
+        "matchbox": {
+          "$ref": "#/$defs/Spec.Infrastructure.Matchbox"
+        },
+        "nodes": {
+          "$ref": "#/$defs/Spec.Infrastructure.Nodes"
+        },
+        "osUpdates": {
+          "$ref": "#/$defs/Spec.Infrastructure.OSUpdates"
+        },
+        "pki": {
+          "$ref": "#/$defs/Spec.Infrastructure.PKI"
+        },
+        "ssh": {
+          "$ref": "#/$defs/Spec.Infrastructure.SSH"
+        }
+      },
+      "required": [
+        "matchbox",
+        "nodes",
+        "ssh"
+      ]
+    },
+    "Spec.Infrastructure.Matchbox": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Matchbox server configuration for PXE/iPXE provisioning.",
+      "properties": {
+        "url": {
+          "type": "string",
+          "description": "Internal HTTPS URL that target nodes will contact during PXE boot. Must be accessible from all nodes during boot. Must resolve to the Matchbox server IP (can be furyctl serve matchbox or remote Matchbox). Example: https://matchbox.internal.example:8080",
+          "format": "uri",
+          "pattern": "^https://",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "url"
+      ]
+    },
+    "Spec.Infrastructure.Nodes": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Node inventory organized by role. Supported roles: controlPlanes (Kubernetes control-plane with stacked etcd by default), workers (Kubernetes worker nodes), loadBalancers (HAProxy load balancers), etcds (optional dedicated etcd nodes, triggers external etcd).",
+      "properties": {
+        "controlPlanes": {
+          "type": "array",
+          "description": "Kubernetes control-plane nodes. By default, etcd runs stacked on these nodes unless dedicated etcd nodes are specified.",
+          "items": {
+            "$ref": "#/$defs/Spec.Infrastructure.Node"
+          },
+          "minItems": 1
+        },
+        "workers": {
+          "type": "array",
+          "description": "Kubernetes worker nodes. Run workload pods.",
+          "items": {
+            "$ref": "#/$defs/Spec.Infrastructure.Node"
+          },
+          "minItems": 1
+        },
+        "loadBalancers": {
+          "type": "array",
+          "description": "HAProxy load balancer nodes with keepalived for high availability. Optional. If omitted, clients connect directly to control plane.",
+          "items": {
+            "$ref": "#/$defs/Spec.Infrastructure.Node"
+          },
+          "minItems": 1
+        },
+        "etcds": {
+          "type": "array",
+          "description": "Optional dedicated etcd nodes. If provided, triggers external etcd configuration. If omitted, etcd runs stacked on control-plane nodes.",
+          "items": {
+            "$ref": "#/$defs/Spec.Infrastructure.Node"
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "controlPlanes",
+        "workers"
+      ]
+    },
+    "Spec.Infrastructure.Node": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Node definition with network configuration. Applies to all roles: controlPlanes, workers, etcds, loadBalancers.",
+      "properties": {
+        "hostname": {
+          "type": "string",
+          "description": "FQDN hostname. Applied by Ignition at first boot. Must be a fully qualified domain name. Example: master1.prod.example.com",
+          "minLength": 1,
+          "pattern": "^([a-zA-Z0-9]([a-zA-Z0-9\\-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z]{2,}$"
+        },
+        "macAddress": {
+          "type": "string",
+          "description": "Primary MAC address. Used by Matchbox for group selection and node-to-profile mapping. Format: 52:54:00:aa:bb:01",
+          "pattern": "^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$"
+        },
+        "installDisk": {
+          "type": "string",
+          "description": "Disk device for Flatcar Container Linux installation. Example: /dev/sda, /dev/nvme0n1",
+          "minLength": 1
+        },
+        "partitioning": {
+          "type": "string",
+          "description": "Partitioning strategy. Default: auto",
+          "default": "auto",
+          "enum": [
+            "auto"
+          ]
+        },
+        "networkInterfaces": {
+          "type": "array",
+          "description": "Network interface configuration. At least one interface is required.",
+          "items": {
+            "$ref": "#/$defs/Spec.Infrastructure.NetworkInterface"
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "hostname",
+        "macAddress",
+        "installDisk",
+        "networkInterfaces"
+      ]
+    },
+    "Spec.Infrastructure.NetworkInterface": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Network interface configuration for a node.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Interface name. Examples: eno1, ens3, eth0",
+          "minLength": 1
+        },
+        "dhcp": {
+          "type": "boolean",
+          "description": "Use DHCP (true) or static IP configuration (false)."
+        },
+        "addresses": {
+          "type": "array",
+          "description": "IP addresses in CIDR notation. Required if dhcp is false. Example: ['10.0.1.10/24']",
+          "items": {
+            "type": "string",
+            "pattern": "^([0-9]{1,3}\\.){3}[0-9]{1,3}/[0-9]{1,2}$"
+          },
+          "minItems": 1
+        },
+        "gateway": {
+          "type": "string",
+          "description": "Default gateway IP address. Required if dhcp is false.",
+          "pattern": "^([0-9]{1,3}\\.){3}[0-9]{1,3}$"
+        },
+        "dns": {
+          "type": "array",
+          "description": "DNS server IP addresses. Optional. Example: ['10.0.1.53', '1.1.1.1']",
+          "items": {
+            "type": "string",
+            "pattern": "^([0-9]{1,3}\\.){3}[0-9]{1,3}$"
+          }
+        }
+      },
+      "required": [
+        "name",
+        "dhcp"
+      ],
+      "if": {
+        "properties": {
+          "dhcp": {
+            "const": false
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "addresses",
+          "gateway"
+        ]
+      }
+    },
+    "Spec.Infrastructure.OSUpdates": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Controls how Flatcar Container Linux nodes receive OS updates via Nebraska (Omaha protocol).",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable OS update management. Default: true",
+          "default": true
+        },
+        "server": {
+          "type": "string",
+          "description": "Nebraska server endpoint for OS updates. If omitted, uses SIGHUP-managed Nebraska server. Provide custom URL for your own Nebraska server (e.g., https://nebraska.internal.example.com). Examples: 'default' (SIGHUP-managed), custom URL",
+          "minLength": 1
+        },
+        "updateStrategy": {
+          "type": "string",
+          "description": "Update strategy. 'manual': updates require approval. 'automatic': updates apply automatically during cluster maintenance. Default: manual",
+          "enum": [
+            "manual",
+            "automatic"
+          ],
+          "default": "manual"
+        },
+        "allowDuringClusterUpdate": {
+          "type": "boolean",
+          "description": "Allow OS updates to run during 'furyctl apply' cluster updates. If enabled, OS updates can occur while cluster components are being updated. Default: false",
+          "default": false
+        }
+      }
+    },
+    "Spec.Infrastructure.PKI": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "PKI (Public Key Infrastructure) configuration for certificates.",
+      "properties": {
+        "folder": {
+          "type": "string",
+          "description": "Path to folder containing certificates generated by 'furyctl generate pki'. Default: ./pki",
+          "default": "./pki"
+        }
+      }
+    },
+    "Spec.Infrastructure.SSH": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "SSH configuration for accessing cluster nodes.",
+      "properties": {
+        "username": {
+          "type": "string",
+          "description": "SSH user with sudo NOPASSWD access. Default: core (Flatcar default user)",
+          "minLength": 1,
+          "default": "core"
+        },
+        "keyPath": {
+          "type": "string",
+          "description": "Path to SSH private key for authentication. Example: ~/.ssh/id_ed25519_cluster",
+          "minLength": 1
+        },
+        "port": {
+          "type": "integer",
+          "description": "SSH port on target nodes. Default: 22",
+          "default": 22,
+          "minimum": 1,
+          "maximum": 65535
+        }
+      },
+      "required": [
+        "keyPath"
+      ]
+    },
+    "Spec.Kubernetes": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Kubernetes cluster configuration for Ansible. References nodes from spec.infrastructure.nodes with hostname and management IP (must be one of the IPs from networkInterfaces).",
+      "properties": {
+        "controlPlaneAddress": {
+          "type": "string",
+          "description": "FQDN or IP address for the Kubernetes API Server endpoint. Points to the load balancer VIP (if using HAProxy) or a single control-plane node. Example: k8s-api.prod.example.com",
+          "minLength": 1
+        },
+        "controlPlanePort": {
+          "type": "integer",
+          "description": "API server port. Default: 6443",
+          "default": 6443,
+          "minimum": 1,
+          "maximum": 65535
+        },
+        "controlPlanes": {
+          "type": "array",
+          "description": "Control plane nodes for Ansible configuration. Must reference nodes from spec.infrastructure.nodes.controlPlanes.",
+          "items": {
+            "$ref": "#/$defs/Spec.Kubernetes.Node"
+          },
+          "minItems": 1
+        },
+        "workers": {
+          "type": "array",
+          "description": "Worker nodes for Ansible configuration. Must reference nodes from spec.infrastructure.nodes.workers.",
+          "items": {
+            "$ref": "#/$defs/Spec.Kubernetes.Node"
+          },
+          "minItems": 1
+        },
+        "etcds": {
+          "type": "array",
+          "description": "External etcd nodes for Ansible configuration. Must reference nodes from spec.infrastructure.nodes.etcds.",
+          "items": {
+            "$ref": "#/$defs/Spec.Kubernetes.Node"
+          },
+          "minItems": 1
+        },
+        "loadBalancers": {
+          "$ref": "#/$defs/Spec.Kubernetes.LoadBalancers"
+        },
+        "networking": {
+          "$ref": "#/$defs/Spec.Kubernetes.Networking"
+        },
+        "advanced": {
+          "$ref": "#/$defs/Spec.Kubernetes.Advanced"
+        }
+      },
+      "required": [
+        "controlPlaneAddress",
+        "controlPlanes",
+        "workers"
+      ]
+    },
+    "Spec.Kubernetes.Node": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Kubernetes node reference for Ansible configuration. Hostname must match a node from spec.infrastructure.nodes, and IP must be one of the IPs from that node's networkInterfaces.",
+      "properties": {
+        "hostname": {
+          "type": "string",
+          "description": "FQDN hostname. Must match one of the hostnames from spec.infrastructure.nodes. Example: master1.prod.example.com",
+          "minLength": 1,
+          "pattern": "^([a-zA-Z0-9]([a-zA-Z0-9\\-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z]{2,}$"
+        },
+        "ip": {
+          "type": "string",
+          "description": "Management IP address for Ansible configuration. Must be one of the IPs configured in the corresponding node's networkInterfaces in spec.infrastructure.nodes.",
+          "minLength": 1,
+          "pattern": "^([0-9]{1,3}\\.){3}[0-9]{1,3}$"
+        }
+      },
+      "required": [
+        "hostname",
+        "ip"
+      ]
+    },
+    "Spec.Kubernetes.LoadBalancers": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "HAProxy load balancers with keepalived for high availability. If disabled, cluster can use external load balancer or direct DNS to a control plane node.",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable HAProxy load balancers. If false, controlPlaneAddress must point to an external load balancer or directly to a control plane node. Default: false",
+          "default": false
+        },
+        "hosts": {
+          "type": "array",
+          "description": "Load balancer host nodes. Required when enabled is true. Each must reference a node from spec.infrastructure.nodes.loadBalancers.",
+          "items": {
+            "$ref": "#/$defs/Spec.Kubernetes.LoadBalancerHost"
+          },
+          "minItems": 1
+        },
+        "vrrp": {
+          "$ref": "#/$defs/Spec.Kubernetes.VRRP"
+        }
+      }
+    },
+    "Spec.Kubernetes.LoadBalancerHost": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Load balancer host reference for Ansible configuration. Hostname must match a node from spec.infrastructure.nodes.loadBalancers, and IP must be one of the IPs from that node's networkInterfaces.",
+      "properties": {
+        "hostname": {
+          "type": "string",
+          "description": "FQDN hostname of the load balancer. Must match one of the hostnames from spec.infrastructure.nodes.loadBalancers. Example: lb1.prod.example.com",
+          "minLength": 1,
+          "pattern": "^([a-zA-Z0-9]([a-zA-Z0-9\\-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z]{2,}$"
+        },
+        "ip": {
+          "type": "string",
+          "description": "Management IP address for Ansible configuration. Must be one of the IPs configured in the corresponding node's networkInterfaces in spec.infrastructure.nodes.",
+          "minLength": 1,
+          "pattern": "^([0-9]{1,3}\\.){3}[0-9]{1,3}$"
+        }
+      },
+      "required": [
+        "hostname",
+        "ip"
+      ]
+    },
+    "Spec.Kubernetes.VRRP": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "VRRP (Virtual Router Redundancy Protocol) configuration for keepalived. If disabled, load balancers work without high availability (single active LB).",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable VRRP for load balancer high availability. If false, only the first load balancer will be active. Default: false",
+          "default": false
+        },
+        "interface": {
+          "type": "string",
+          "description": "Network interface where the VIP will be configured. Required when enabled is true. Must exist on ALL load balancer nodes. Examples: ens3, eth0, eno1",
+          "minLength": 1
+        },
+        "virtualIP": {
+          "type": "string",
+          "description": "Virtual IP (VIP) shared between load balancers in CIDR format. Required when enabled is true. Must be in the same subnet as load balancer nodes. Must NOT be assigned to any physical interface. Must be the IP that controlPlaneAddress resolves to. Example: 10.0.1.100/24",
+          "pattern": "^([0-9]{1,3}\\.){3}[0-9]{1,3}/[0-9]{1,2}$"
+        },
+        "virtualRouterID": {
+          "type": "integer",
+          "description": "Unique identifier for the VRRP router. Required when enabled is true. Must be unique in the network segment. Range: 1-255",
+          "minimum": 1,
+          "maximum": 255
+        },
+        "authPassword": {
+          "type": "string",
+          "description": "Password for VRRP authentication. Required when enabled is true. Prevents rogue VRRP instances. Best practice: use environment variable substitution (e.g., $VRRP_PASSWORD). Maximum length: 8 characters",
+          "minLength": 1,
+          "maxLength": 8
+        }
+      }
+    },
+    "Spec.Kubernetes.Networking": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Kubernetes network configuration.",
+      "properties": {
+        "podCIDR": {
+          "type": "string",
+          "description": "The subnet CIDR to use for the Pods network. Example: 172.16.128.0/17",
+          "pattern": "^([0-9]{1,3}\\.){3}[0-9]{1,3}/[0-9]{1,2}$"
+        },
+        "serviceCIDR": {
+          "type": "string",
+          "description": "The subnet CIDR to use for the Services network. Example: 172.16.0.0/17",
+          "pattern": "^([0-9]{1,3}\\.){3}[0-9]{1,3}/[0-9]{1,2}$"
+        },
+        "dnsServiceIP": {
+          "type": "string",
+          "description": "CoreDNS service IP address. Must be within serviceCIDR. Example: 172.16.0.10",
+          "pattern": "^([0-9]{1,3}\\.){3}[0-9]{1,3}$"
+        }
+      }
+    },
+    "Spec.Kubernetes.Advanced": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Advanced Kubernetes configuration options. Most fields use sensible defaults and only need to be specified if you need to override them.",
+      "properties": {
+        "registry": {
+          "type": "string",
+          "description": "Container registry for Kubernetes components. Example: registry.sighup.io/fury"
+        },
+        "apiServer": {
+          "$ref": "#/$defs/Spec.Kubernetes.Advanced.APIServer"
+        }
+      }
+    },
+    "Spec.Kubernetes.Advanced.APIServer": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Kubernetes API Server advanced configuration.",
+      "properties": {
+        "extraArgs": {
+          "type": "object",
+          "description": "Extra arguments to pass to the API server. Key-value pairs. Example: {'audit-log-path': '/var/log/kubernetes/audit.log'}",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "Spec.Distribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "SIGHUP Distribution modules configuration. This section is compatible with the existing Distribution schema and follows the same structure as other providers.",
+      "properties": {
+        "common": {
+          "type": "object",
+          "properties": {
+            "registry": {
+              "type": "string",
+              "description": "Container registry for Distribution modules. Example: registry.sighup.io/fury"
+            }
+          }
+        },
+        "modules": {
+          "type": "object",
+          "description": "Distribution modules (networking, ingress, logging, monitoring, dr, policy, etc.). Follows the standard SIGHUP Distribution modules schema.",
+          "additionalProperties": true
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,411 @@
+#===============================================================================
+# IMMUTABLE PROVIDER - COMPLETE CONFIGURATION EXAMPLE
+#===============================================================================
+# This configuration demonstrates the complete schema for the Immutable provider
+# targeting Flatcar Container Linux with Matchbox-based provisioning.
+#
+# Version: kfd.sighup.io/v1alpha2
+# Target OS: Flatcar Container Linux 3815.2.0+
+# Kubernetes: 1.33.4
+# Provisioning: Matchbox + Ignition/Butane
+# Configuration: Ansible (configure-only)
+#===============================================================================
+
+apiVersion: kfd.sighup.io/v1alpha2
+kind: Immutable
+metadata:
+  name: my-cluster
+
+spec:
+  #=============================================================================
+  # PHASE 1: INFRASTRUCTURE
+  #=============================================================================
+  # Defines infrastructure layer: Matchbox, OS updates, node inventory
+  #=============================================================================
+  distributionVersion: v1.33.1
+
+  infrastructure:
+
+    # -------------------------------------------------------------------------
+    # Matchbox Server Configuration
+    # -------------------------------------------------------------------------
+    matchbox:
+      url: https://matchbox.prod.example.com:8080  # Matchbox server URL
+
+    # -------------------------------------------------------------------------
+    # Node Inventory by Role
+    # -------------------------------------------------------------------------
+    nodes:
+      # Control-plane nodes (stacked etcd)
+      controlPlanes:
+        - name: master1
+          hostname: master1.prod.example.com
+          macAddress: "52:54:00:aa:bb:10"
+          ip: 10.0.1.20
+          installDisk: /dev/sda
+          partitioning: auto
+          networkInterfaces:
+            - name: ens3
+              dhcp: false
+              addresses: ["10.0.1.20/24"]
+              gateway: 10.0.1.1
+              dns: ["10.0.1.53"]
+          managementIP: 10.0.1.20
+
+        - name: master2
+          hostname: master2.prod.example.com
+          macAddress: "52:54:00:aa:bb:11"
+          ip: 10.0.1.21
+          installDisk: /dev/sda
+          partitioning: auto
+          networkInterfaces:
+            - name: ens3
+              dhcp: false
+              addresses: ["10.0.1.21/24"]
+              gateway: 10.0.1.1
+              dns: ["10.0.1.53"]
+          managementIP: 10.0.1.21
+
+        - name: master3
+          hostname: master3.prod.example.com
+          macAddress: "52:54:00:aa:bb:12"
+          ip: 10.0.1.22
+          installDisk: /dev/sda
+          partitioning: auto
+          networkInterfaces:
+            - name: ens3
+              dhcp: false
+              addresses: ["10.0.1.22/24"]
+              gateway: 10.0.1.1
+              dns: ["10.0.1.53"]
+          managementIP: 10.0.1.22
+
+      # Worker nodes
+      workers:
+        - name: worker1
+          hostname: worker1.prod.example.com
+          macAddress: "52:54:00:aa:bb:20"
+          ip: 10.0.1.30
+          installDisk: /dev/sda
+          partitioning: auto
+          networkInterfaces:
+            - name: ens3
+              dhcp: false
+              addresses: ["10.0.1.30/24"]
+              gateway: 10.0.1.1
+              dns: ["10.0.1.53"]
+          managementIP: 10.0.1.30
+
+        - name: worker2
+          hostname: worker2.prod.example.com
+          macAddress: "52:54:00:aa:bb:21"
+          ip: 10.0.1.31
+          installDisk: /dev/sda
+          partitioning: auto
+          networkInterfaces:
+            - name: ens3
+              dhcp: false
+              addresses: ["10.0.1.31/24"]
+              gateway: 10.0.1.1
+              dns: ["10.0.1.53"]
+          managementIP: 10.0.1.31
+
+        - name: worker3
+          hostname: worker3.prod.example.com
+          macAddress: "52:54:00:aa:bb:22"
+          ip: 10.0.1.32
+          installDisk: /dev/sda
+          partitioning: auto
+          networkInterfaces:
+            - name: ens3
+              dhcp: false
+              addresses: ["10.0.1.32/24"]
+              gateway: 10.0.1.1
+              dns: ["10.0.1.53"]
+          managementIP: 10.0.1.32
+
+      # Dedicated etcd nodes (OPTIONAL)
+      # Uncomment to use external etcd instead of stacked etcd
+      # etcds:
+      #   - name: etcd1
+      #     hostname: etcd1.prod.example.com
+      #     macAddress: "52:54:00:aa:bb:30"
+      #     ip: 10.0.1.40
+      #     installDisk: /dev/sdb
+      #     partitioning: auto
+      #     networkInterfaces:
+      #       - name: ens3
+      #         dhcp: false
+      #         addresses: ["10.0.1.40/24"]
+      #         gateway: 10.0.1.1
+      #         dns: ["10.0.1.53"]
+      #     managementIP: 10.0.1.40
+
+    # -------------------------------------------------------------------------
+    # OS Update Management (Nebraska)
+    # -------------------------------------------------------------------------
+    osUpdates:
+      enabled: true                           # Enable OS update management
+      server: https://nebraska.sighup.io      # SIGHUP-managed (default) or custom URL
+      updateStrategy: manual                  # 'manual' (require approval) or 'automatic'
+      allowDuringClusterUpdate: false         # Don't update OS during cluster updates
+
+    # -------------------------------------------------------------------------
+    # PKI Configuration
+    # -------------------------------------------------------------------------
+    pki:
+      folder: ./pki
+
+    # -------------------------------------------------------------------------
+    # SSH Configuration
+    # -------------------------------------------------------------------------
+    ssh:
+      username: core
+      keyPath: ~/.ssh/id_ed25519_cluster
+      port: 22
+
+  #=============================================================================
+  # PHASE 2: KUBERNETES
+  #=============================================================================
+  # Kubernetes cluster configuration (kept minimal - KISS)
+  #
+  # IMPORTANT: Kubernetes version is determined by the apiVersion field at the
+  # top of this file (e.g., kfd.sighup.io/v1alpha2 corresponds to a specific
+  # distribution version with a tested Kubernetes version and module versions).
+  # This ensures you get a certified, tested bundle - the core value of SIGHUP
+  # Distribution.
+  #
+  # This section contains only Kubernetes CONFIGURATION, not version selection.
+  #=============================================================================
+  kubernetes:
+    # -------------------------------------------------------------------------
+    # Control Plane Endpoint Configuration (REQUIRED)
+    # -------------------------------------------------------------------------
+    controlPlaneAddress: k8s-api.prod.example.com  # FQDN for Kubernetes API (points to VIP)
+    controlPlanePort: 6443                         # API server port
+
+    # -------------------------------------------------------------------------
+    # Load Balancer Configuration (HAProxy + keepalived)
+    # -------------------------------------------------------------------------
+    loadBalancers:
+      - name: lb1
+        hostname: lb1.prod.example.com
+        macAddress: "52:54:00:aa:bb:01"
+        ip: 10.0.1.10
+        installDisk: /dev/sda
+        partitioning: auto
+        networkInterfaces:
+          - name: ens3
+            dhcp: false
+            addresses: ["10.0.1.10/24"]
+            gateway: 10.0.1.1
+            dns: ["10.0.1.53", "1.1.1.1"]
+        managementIP: 10.0.1.10
+        vrrp:
+          interface: ens3                     # Network interface for VIP
+          virtualIP: 10.0.1.100/24           # Virtual IP (VIP) - what k8s-api resolves to
+          virtualRouterID: 1                  # VRRP router ID (1-255, unique in network)
+          authPassword: "vrrppass"            # VRRP authentication (max 8 chars)
+
+      - name: lb2
+        hostname: lb2.prod.example.com
+        macAddress: "52:54:00:aa:bb:02"
+        ip: 10.0.1.11
+        installDisk: /dev/sda
+        partitioning: auto
+        networkInterfaces:
+          - name: ens3
+            dhcp: false
+            addresses: ["10.0.1.11/24"]
+            gateway: 10.0.1.1
+            dns: ["10.0.1.53", "1.1.1.1"]
+        managementIP: 10.0.1.11
+        vrrp:
+          interface: ens3
+          virtualIP: 10.0.1.100/24
+          virtualRouterID: 1
+          authPassword: "vrrppass"
+
+    # Network configuration (required)
+    networking:
+      podCIDR: 172.16.128.0/17                # Pod network CIDR
+      serviceCIDR: 172.16.0.0/17              # Service network CIDR
+      dnsServiceIP: 172.16.0.10               # CoreDNS service IP
+
+    # Advanced configuration (optional - most fields use sensible defaults)
+    # advanced:
+    #   # Only specify if you need to override defaults
+    #   registry: registry.sighup.io/fury     # Container registry for k8s components
+    #
+    #   # API server extra arguments (optional)
+    #   apiServer:
+    #     extraArgs:
+    #       audit-log-path: /var/log/kubernetes/audit.log
+
+  #=============================================================================
+  # PHASE 3: DISTRIBUTION
+  #=============================================================================
+  # Defines SIGHUP Distribution modules
+  #=============================================================================
+  distribution:
+    # Common configuration for all modules
+    common:
+      registry: registry.sighup.io/fury
+
+    # Distribution modules
+    modules:
+      # ----------------------------------------------------------------------
+      # Networking Module (CNI) - REQUIRED
+      # ----------------------------------------------------------------------
+      networking:
+        type: calico                          # calico | cilium
+        overrides:
+          nodeSelector:
+            node-role.kubernetes.io/control-plane: ""
+          tolerations:
+            - key: node-role.kubernetes.io/control-plane
+              effect: NoSchedule
+
+      # ----------------------------------------------------------------------
+      # Ingress Module (NGINX + cert-manager) - REQUIRED
+      # ----------------------------------------------------------------------
+      ingress:
+        baseDomain: prod.example.com
+
+        nginx:
+          type: single                        # single | dual
+          overrides: {}
+
+        certManager:
+          clusterIssuer:
+            name: letsencrypt-prod
+            email: devops@example.com
+            type: dns01                       # http01 | dns01
+            solvers:
+              - dns01:
+                  route53:
+                    region: us-east-1
+                    accessKeyID: "$AWS_ACCESS_KEY_ID"
+                    secretAccessKeySecretRef:
+                      name: route53-credentials
+                      key: secret-access-key
+
+      # ----------------------------------------------------------------------
+      # Logging Module (Loki + MinIO)
+      # ----------------------------------------------------------------------
+      logging:
+        type: loki
+        overrides: {}
+        loki:
+          retentionPeriod: 720h               # 30 days
+          storage:
+            size: 100Gi
+
+      # ----------------------------------------------------------------------
+      # Monitoring Module (Prometheus + Grafana + AlertManager)
+      # ----------------------------------------------------------------------
+      monitoring:
+        type: prometheus
+        overrides: {}
+        prometheus:
+          retentionTime: 30d
+          retentionSize: 100GB
+          resources:
+            requests:
+              memory: 2Gi
+              cpu: 1000m
+
+      # ----------------------------------------------------------------------
+      # Disaster Recovery Module (Velero)
+      # ----------------------------------------------------------------------
+      dr:
+        type: on-premises
+        velero:
+          backend: s3
+          s3:
+            bucketName: prod-cluster-backups
+            region: us-east-1
+            credentialsSecretRef:
+              name: aws-credentials
+              key: credentials
+          schedules:
+            - name: daily-backup
+              schedule: "0 2 * * *"
+              ttl: 720h                       # 30 days
+            - name: weekly-backup
+              schedule: "0 3 * * 0"           # Sunday
+              ttl: 2160h                      # 90 days
+
+      # ----------------------------------------------------------------------
+      # Policy Module (Gatekeeper) - OPTIONAL
+      # ----------------------------------------------------------------------
+      policy:
+        type: gatekeeper                      # none | gatekeeper | kyverno
+        gatekeeper:
+          enforcementAction: deny             # deny | dryrun | warn
+          audit:
+            enabled: true
+            interval: 60s
+
+  #=============================================================================
+  # PHASE 4: PLUGINS (OPTIONAL)
+  #=============================================================================
+  # Additional plugins via Kustomize or Helm
+  # Note: This section is optional and follows the standard Distribution schema
+  #=============================================================================
+  # plugins:
+  #   kustomize:
+  #     - name: storage-class
+  #       folder: plugins/storage
+
+#===============================================================================
+# DEPLOYMENT NOTES
+#===============================================================================
+#
+# Prerequisites:
+# 1. Bare metal servers or VMs ready for PXE boot
+# 2. DNS records configured:
+#    - k8s-api.prod.example.com → 10.0.1.100 (VIP)
+#    - matchbox.prod.example.com → Matchbox server IP
+#    - *.prod.example.com → Worker nodes (for ingress)
+# 3. Matchbox server deployed and accessible
+# 4. SSH key generated: ~/.ssh/id_ed25519_cluster
+# 5. Environment variables set:
+#    - AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY (for cert-manager)
+#
+# Deployment Steps:
+#
+# 1. Generate PKI certificates for Matchbox:
+#    furyctl generate pki -c furyctl.yaml
+#
+# 2. Generate Ignition configs and Matchbox profiles:
+#    furyctl dump -c furyctl.yaml --outdir $PWD
+#
+# 3. Start Matchbox server (if using furyctl):
+#    furyctl serve matchbox -c furyctl.yaml
+#
+# 4. Boot nodes via PXE/iPXE
+#    - Nodes will fetch Ignition configs from Matchbox
+#    - Flatcar will be installed with system extensions
+#
+# 5. Deploy Kubernetes and Distribution:
+#    furyctl apply -c furyctl.yaml --outdir $PWD
+#
+# 6. Create required secrets (after cluster is up):
+#    kubectl create secret generic route53-credentials \
+#      --from-literal=secret-access-key=$AWS_SECRET_ACCESS_KEY \
+#      -n cert-manager
+#
+#    kubectl create secret generic aws-credentials \
+#      --from-file=credentials=$HOME/.aws/credentials \
+#      -n kube-system
+#
+# 7. Verify cluster:
+#    export KUBECONFIG=$PWD/kubeconfig
+#    kubectl get nodes
+#    kubectl get pods -A
+#
+# 8. Access services:
+#    kubectl get ingress -A
+#
+#===============================================================================

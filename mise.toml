@@ -115,7 +115,8 @@ run = [
   "go-jsonschema --package public --resolve-extension json --output pkg/apis/ekscluster/v1alpha2/public/schema.go schemas/public/ekscluster-kfd-v1alpha2.json",
   "go-jsonschema --package private --resolve-extension json --output pkg/apis/ekscluster/v1alpha2/private/schema.go schemas/private/ekscluster-kfd-v1alpha2.json",
   "go-jsonschema --package public --resolve-extension json --output pkg/apis/kfddistribution/v1alpha2/public/schema.go schemas/public/kfddistribution-kfd-v1alpha2.json",
-  "go-jsonschema --package public --resolve-extension json --output pkg/apis/onpremises/v1alpha2/public/schema.go schemas/public/onpremises-kfd-v1alpha2.json"
+  "go-jsonschema --package public --resolve-extension json --output pkg/apis/onpremises/v1alpha2/public/schema.go schemas/public/onpremises-kfd-v1alpha2.json",
+  "go-jsonschema --package public --resolve-extension json --output pkg/apis/immutable/v1alpha2/public/schema.go schemas/public/immutable-kfd-v1alpha2.json"
 ]
 
 [tasks.generate-go-models]
@@ -127,7 +128,8 @@ description = "generate documentation from schemas"
 run = [
   "md-gen gen --input schemas/public/onpremises-kfd-v1alpha2.json --output docs/schemas/onpremises-kfd-v1alpha2.md --overwrite --banner banners/onpremises.md",
   "md-gen gen --input schemas/public/kfddistribution-kfd-v1alpha2.json --output docs/schemas/kfddistribution-kfd-v1alpha2.md --overwrite --banner banners/kfddistribution.md",
-  "md-gen gen --input schemas/public/ekscluster-kfd-v1alpha2.json --output docs/schemas/ekscluster-kfd-v1alpha2.md --overwrite --banner banners/ekscluster.md"
+  "md-gen gen --input schemas/public/ekscluster-kfd-v1alpha2.json --output docs/schemas/ekscluster-kfd-v1alpha2.md --overwrite --banner banners/ekscluster.md",
+  "md-gen gen --input schemas/public/immutable-kfd-v1alpha2.json --output docs/schemas/immutable-kfd-v1alpha2.md --overwrite --banner banners/immutable.md"
 ]
 
 [tasks.generate-np-diagrams]

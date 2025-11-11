@@ -1,0 +1,274 @@
+---
+apiVersion: kfd.sighup.io/v1alpha2
+kind: Immutable
+metadata:
+  name: production-cluster
+spec:
+  distributionVersion: v1.33.1
+
+  # Infrastructure
+  infrastructure:
+    # Matchbox provisioning server
+    matchbox:
+      url: https://matchbox.internal.example.com:8080
+
+    # Cluster nodes
+    # Physical infrastructure for Matchbox/Ignition provisioning
+    nodes:
+      controlPlanes:
+        - hostname: ctrl01.k8s.example.com
+          macAddress: 52:54:00:10:00:01
+          installDisk: /dev/sda
+          networkInterfaces:
+            - name: ens3
+              dhcp: false
+              addresses:
+                - 192.168.100.10/24
+              gateway: 192.168.100.1
+              dns:
+                - 192.168.100.53
+                - 8.8.8.8
+        - hostname: ctrl02.k8s.example.com
+          macAddress: 52:54:00:10:00:02
+          installDisk: /dev/sda
+          networkInterfaces:
+            - name: ens3
+              dhcp: false
+              addresses:
+                - 192.168.100.11/24
+              gateway: 192.168.100.1
+              dns:
+                - 192.168.100.53
+                - 8.8.8.8
+        - hostname: ctrl03.k8s.example.com
+          macAddress: 52:54:00:10:00:03
+          installDisk: /dev/sda
+          networkInterfaces:
+            - name: ens3
+              dhcp: false
+              addresses:
+                - 192.168.100.12/24
+              gateway: 192.168.100.1
+              dns:
+                - 192.168.100.53
+                - 8.8.8.8
+      workers:
+        - hostname: worker01.k8s.example.com
+          macAddress: 52:54:00:20:00:01
+          installDisk: /dev/sda
+          networkInterfaces:
+            - name: ens3
+              dhcp: false
+              addresses:
+                - 192.168.100.20/24
+              gateway: 192.168.100.1
+              dns:
+                - 192.168.100.53
+        - hostname: worker02.k8s.example.com
+          macAddress: 52:54:00:20:00:02
+          installDisk: /dev/sda
+          networkInterfaces:
+            - name: ens3
+              dhcp: false
+              addresses:
+                - 192.168.100.21/24
+              gateway: 192.168.100.1
+              dns:
+                - 192.168.100.53
+        - hostname: worker03.k8s.example.com
+          macAddress: 52:54:00:20:00:03
+          installDisk: /dev/sda
+          networkInterfaces:
+            - name: ens3
+              dhcp: false
+              addresses:
+                - 192.168.100.22/24
+              gateway: 192.168.100.1
+              dns:
+                - 192.168.100.53
+      loadBalancers:
+        - hostname: lb01.k8s.example.com
+          macAddress: 52:54:00:30:00:01
+          installDisk: /dev/sda
+          networkInterfaces:
+            - name: ens3
+              dhcp: false
+              addresses:
+                - 192.168.100.30/24
+              gateway: 192.168.100.1
+              dns:
+                - 192.168.100.53
+        - hostname: lb02.k8s.example.com
+          macAddress: 52:54:00:30:00:02
+          installDisk: /dev/sda
+          networkInterfaces:
+            - name: ens3
+              dhcp: false
+              addresses:
+                - 192.168.100.31/24
+              gateway: 192.168.100.1
+              dns:
+                - 192.168.100.53
+
+    # OS updates
+    osUpdates:
+      enabled: true
+      updateStrategy: manual
+      allowDuringClusterUpdate: false
+
+    # SSH access
+    ssh:
+      username: core
+      keyPath: ~/.ssh/id_ed25519_production
+      port: 22
+
+  # Kubernetes
+  # References nodes from infrastructure with management IPs (from networkInterfaces)
+  kubernetes:
+    controlPlaneAddress: k8s-api.example.com
+    controlPlanePort: 6443
+
+    # Control plane nodes for Ansible configuration
+    controlPlanes:
+      - hostname: ctrl01.k8s.example.com
+        ip: 192.168.100.10
+      - hostname: ctrl02.k8s.example.com
+        ip: 192.168.100.11
+      - hostname: ctrl03.k8s.example.com
+        ip: 192.168.100.12
+
+    # Worker nodes for Ansible configuration
+    workers:
+      - hostname: worker01.k8s.example.com
+        ip: 192.168.100.20
+      - hostname: worker02.k8s.example.com
+        ip: 192.168.100.21
+      - hostname: worker03.k8s.example.com
+        ip: 192.168.100.22
+
+    # Load balancers with VRRP (shared configuration)
+    loadBalancers:
+      enabled: true
+      hosts:
+        - hostname: lb01.k8s.example.com
+          ip: 192.168.100.30
+        - hostname: lb02.k8s.example.com
+          ip: 192.168.100.31
+      vrrp:
+        enabled: true
+        interface: ens3
+        virtualIP: 192.168.100.100/24
+        virtualRouterID: 51
+        authPassword: prod2024
+
+    # Network configuration
+    networking:
+      podCIDR: 10.244.0.0/16
+      serviceCIDR: 10.96.0.0/12
+      dnsServiceIP: 10.96.0.10
+
+  # Distribution modules
+  distribution:
+    common:
+      registry: registry.sighup.io/fury
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Equal
+    modules:
+      networking:
+        type: calico
+      ingress:
+        baseDomain: example.com
+        nginx:
+          type: dual
+          tls:
+            provider: certManager
+        certManager:
+          clusterIssuer:
+            name: letsencrypt-prod
+            email: devops@example.com
+            type: http01
+      logging:
+        type: loki
+        loki:
+          retentionPeriod: 720h
+          storage:
+            size: 50Gi
+        minio:
+          storageSize: 20Gi
+      monitoring:
+        type: prometheus
+        prometheusAdapter:
+          installEnhancedHPAMetrics: true
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+        prometheus:
+          retentionTime: 15d
+          retentionSize: 50GB
+          storageSize: 60Gi
+        alertmanager:
+          installDefaultRules: true
+          deadMansSwitch:
+            enabled: false
+      tracing:
+        type: tempo
+        tempo:
+          retentionTime: 720h
+      policy:
+        type: kyverno
+        kyverno:
+          validationFailureAction: Audit
+          installDefaultPolicies: true
+      dr:
+        type: on-premises
+        velero:
+          backend: s3
+          s3:
+            bucketName: production-cluster-backups
+            region: eu-west-1
+            endpoint: https://s3.eu-west-1.amazonaws.com
+          schedules:
+            - name: daily-backup
+              schedule: 0 3 * * *
+              ttl: 720h
+            - name: weekly-backup
+              schedule: 0 3 * * 0
+              ttl: 2160h
+      auth:
+        provider:
+          type: none
+
+  # Plugins
+  plugins:
+    kustomize:
+      - name: csi-operator
+        folder: ./plugins/kustomize/csi/operator
+      - name: csi-backend
+        folder: ./plugins/kustomize/csi/backend
+      - name: storageclass
+        folder: ./plugins/kustomize/csi/storageclass
+      - name: network-policies
+        folder: ./plugins/kustomize/network-policies
+      - name: custom-resources
+        folder: ./plugins/kustomize/custom-resources
+    helm:
+      repositories:
+        - name: bitnami
+          url: https://charts.bitnami.com/bitnami
+        - name: prometheus-community
+          url: https://prometheus-community.github.io/helm-charts
+      releases:
+        - name: metrics-server
+          namespace: kube-system
+          chart: bitnami/metrics-server
+          version: 6.5.3
+          values:
+            - ./plugins/helm/metrics-server/values.yaml
+        - name: node-local-dns
+          namespace: kube-system
+          chart: ./plugins/helm/node-local-dns
+          values:
+            - ./plugins/helm/node-local-dns/values.yaml

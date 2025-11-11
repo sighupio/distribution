@@ -1,0 +1,85 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# Tests the following cases:
+
+# Given a valid Immutable provider configuration
+# Without load balancers
+# And OS updates enabled with custom server
+# When I validate the config against the schema
+# Then no errors are returned
+
+---
+apiVersion: kfd.sighup.io/v1alpha2
+kind: Immutable
+metadata:
+  name: test-cluster-no-lb
+spec:
+  distributionVersion: v1.33.1
+
+  infrastructure:
+    matchbox:
+      url: https://matchbox.prod.example.com:8080
+
+    osUpdates:
+      enabled: true
+      server: https://nebraska.internal.example.com
+      updateStrategy: automatic
+      allowDuringClusterUpdate: true
+
+    nodes:
+      controlPlanes:
+        - hostname: master1.prod.example.com
+          macAddress: "52:54:00:aa:bb:10"
+          installDisk: /dev/sda
+          partitioning: auto
+          networkInterfaces:
+            - name: ens3
+              dhcp: false
+              addresses: ["10.0.1.20/24"]
+              gateway: 10.0.1.1
+              dns: ["10.0.1.53", "1.1.1.1"]
+
+      workers:
+        - hostname: worker1.prod.example.com
+          macAddress: "52:54:00:aa:bb:20"
+          installDisk: /dev/sda
+          networkInterfaces:
+            - name: ens3
+              dhcp: false
+              addresses: ["10.0.1.30/24"]
+              gateway: 10.0.1.1
+              dns: ["10.0.1.53"]
+
+        - hostname: worker2.prod.example.com
+          macAddress: "52:54:00:aa:bb:21"
+          installDisk: /dev/sda
+          networkInterfaces:
+            - name: ens3
+              dhcp: false
+              addresses: ["10.0.1.31/24"]
+              gateway: 10.0.1.1
+              dns: ["10.0.1.53"]
+
+    pki:
+      folder: ./pki
+
+    ssh:
+      username: automation
+      keyPath: ~/.ssh/id_ed25519_cluster
+      port: 22
+
+  kubernetes:
+    controlPlaneAddress: master1.prod.example.com
+    controlPlanePort: 6443
+
+    controlPlanes:
+      - hostname: master1.prod.example.com
+        ip: 10.0.1.20
+
+    workers:
+      - hostname: worker1.prod.example.com
+        ip: 10.0.1.30
+      - hostname: worker2.prod.example.com
+        ip: 10.0.1.31

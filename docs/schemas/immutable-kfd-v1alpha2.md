@@ -1,0 +1,1408 @@
+# Immutable - SD Immutable Cluster Schema
+
+This document explains the full schema for the `kind: Immutable` for the `furyctl.yaml` file used by `furyctl`. This configuration file will be used to deploy the SIGHUP Distribution on Flatcar Container Linux using Matchbox-based provisioning.
+
+An example configuration file can be created by running the following command:
+
+```bash
+furyctl create config --kind Immutable --version v1.33.1 --name example-cluster
+```
+
+> [!NOTE]
+> Replace the version with your desired version of KFD.
+## Properties
+
+| Property                  | Type     | Required |
+|:--------------------------|:---------|:---------|
+| [apiVersion](#apiversion) | `string` | Required |
+| [kind](#kind)             | `string` | Required |
+| [metadata](#metadata)     | `object` | Required |
+| [spec](#spec)             | `object` | Required |
+
+### Description
+
+A KFD Cluster deployed on Flatcar Container Linux using the Immutable provider with Matchbox-based provisioning.
+
+## .apiVersion
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^kfd\.sighup\.io/v\d+((alpha|beta)\d+)?$
+```
+
+[try pattern](https://regexr.com/?expression=^kfd\.sighup\.io\/v\d%2B\(\(alpha|beta\)\d%2B\)?$)
+
+## .kind
+
+### Constraints
+
+**enum**: the value of this property must be equal to one of the following string values:
+
+| Value       |
+|:------------|
+|`"Immutable"`|
+
+## .metadata
+
+### Properties
+
+| Property              | Type     | Required |
+|:----------------------|:---------|:---------|
+| [name](#metadataname) | `string` | Required |
+
+## .metadata.name
+
+### Description
+
+The name of the cluster. It will also be used as a prefix for all the other resources created.
+
+### Constraints
+
+**maximum length**: the maximum number of characters for this string is: `56`
+
+**minimum length**: the minimum number of characters for this string is: `1`
+
+## .spec
+
+### Properties
+
+| Property                                        | Type     | Required |
+|:------------------------------------------------|:---------|:---------|
+| [distribution](#specdistribution)               | `object` | Optional |
+| [distributionVersion](#specdistributionversion) | `string` | Required |
+| [infrastructure](#specinfrastructure)           | `object` | Required |
+| [kubernetes](#speckubernetes)                   | `object` | Required |
+| [plugins](#specplugins)                         | `object` | Optional |
+
+## .spec.distribution
+
+### Properties
+
+| Property                            | Type     | Required |
+|:------------------------------------|:---------|:---------|
+| [common](#specdistributioncommon)   | `object` | Optional |
+| [modules](#specdistributionmodules) | `object` | Optional |
+
+### Description
+
+SIGHUP Distribution modules configuration. This section is compatible with the existing Distribution schema and follows the same structure as other providers.
+
+## .spec.distribution.common
+
+### Properties
+
+| Property                                    | Type     | Required |
+|:--------------------------------------------|:---------|:---------|
+| [registry](#specdistributioncommonregistry) | `string` | Optional |
+
+## .spec.distribution.common.registry
+
+### Description
+
+Container registry for Distribution modules. Example: registry.sighup.io/fury
+
+## .spec.distribution.modules
+
+### Description
+
+Distribution modules (networking, ingress, logging, monitoring, dr, policy, etc.). Follows the standard SIGHUP Distribution modules schema.
+
+## .spec.distributionVersion
+
+### Description
+
+Defines which KFD version will be installed and, in consequence, the Kubernetes version used to create the cluster. It supports git tags and branches. Example: `v1.33.1`.
+
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
+
+## .spec.infrastructure
+
+### Properties
+
+| Property                                  | Type     | Required |
+|:------------------------------------------|:---------|:---------|
+| [matchbox](#specinfrastructurematchbox)   | `object` | Required |
+| [nodes](#specinfrastructurenodes)         | `object` | Required |
+| [osUpdates](#specinfrastructureosupdates) | `object` | Optional |
+| [pki](#specinfrastructurepki)             | `object` | Optional |
+| [ssh](#specinfrastructuressh)             | `object` | Required |
+
+### Description
+
+Defines the infrastructure layer configuration for the Immutable provider. This section defines infrastructure concerns (Matchbox, OS updates, PKI, SSH access, node inventory) separate from Kubernetes concerns.
+
+## .spec.infrastructure.matchbox
+
+### Properties
+
+| Property                              | Type     | Required |
+|:--------------------------------------|:---------|:---------|
+| [url](#specinfrastructurematchboxurl) | `string` | Required |
+
+### Description
+
+Matchbox server configuration for PXE/iPXE provisioning.
+
+## .spec.infrastructure.matchbox.url
+
+### Description
+
+Internal HTTPS URL that target nodes will contact during PXE boot. Must be accessible from all nodes during boot. Must resolve to the Matchbox server IP (can be furyctl serve matchbox or remote Matchbox). Example: https://matchbox.internal.example:8080
+
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^https://
+```
+
+[try pattern](https://regexr.com/?expression=^https:\/\/)
+
+## .spec.infrastructure.nodes
+
+### Properties
+
+| Property                                               | Type    | Required |
+|:-------------------------------------------------------|:--------|:---------|
+| [controlPlanes](#specinfrastructurenodescontrolplanes) | `array` | Required |
+| [etcds](#specinfrastructurenodesetcds)                 | `array` | Optional |
+| [workers](#specinfrastructurenodesworkers)             | `array` | Required |
+
+### Description
+
+Node inventory organized by role. Supported roles: controlPlanes (Kubernetes control-plane with stacked etcd by default), workers (Kubernetes worker nodes), etcds (optional dedicated etcd nodes, triggers external etcd).
+
+## .spec.infrastructure.nodes.controlPlanes
+
+### Properties
+
+| Property                                                                    | Type     | Required |
+|:----------------------------------------------------------------------------|:---------|:---------|
+| [hostname](#specinfrastructurenodescontrolplaneshostname)                   | `string` | Required |
+| [installDisk](#specinfrastructurenodescontrolplanesinstalldisk)             | `string` | Required |
+| [ip](#specinfrastructurenodescontrolplanesip)                               | `string` | Optional |
+| [macAddress](#specinfrastructurenodescontrolplanesmacaddress)               | `string` | Required |
+| [managementIP](#specinfrastructurenodescontrolplanesmanagementip)           | `string` | Optional |
+| [name](#specinfrastructurenodescontrolplanesname)                           | `string` | Required |
+| [networkInterfaces](#specinfrastructurenodescontrolplanesnetworkinterfaces) | `array`  | Required |
+| [partitioning](#specinfrastructurenodescontrolplanespartitioning)           | `string` | Optional |
+
+### Description
+
+Node definition with network configuration. Applies to all roles: controlPlanes, workers, etcds, loadBalancers.
+
+### Constraints
+
+**minimum number of items**: the minimum number of items for this array is: `1`
+
+## .spec.infrastructure.nodes.controlPlanes.hostname
+
+### Description
+
+FQDN hostname. Applied by Ignition at first boot. Must be a fully qualified domain name. Example: master1.prod.example.com
+
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$
+```
+
+[try pattern](https://regexr.com/?expression=^\([a-zA-Z0-9]\([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9]\)?\.\)%2B[a-zA-Z]{2,}$)
+
+## .spec.infrastructure.nodes.controlPlanes.installDisk
+
+### Description
+
+Disk device for Flatcar Container Linux installation. Example: /dev/sda, /dev/nvme0n1
+
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
+
+## .spec.infrastructure.nodes.controlPlanes.ip
+
+### Description
+
+IP address of the node. Used for node identification and management.
+
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
+
+## .spec.infrastructure.nodes.controlPlanes.macAddress
+
+### Description
+
+Primary MAC address. Used by Matchbox for group selection and node-to-profile mapping. Format: 52:54:00:aa:bb:01
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$
+```
+
+[try pattern](https://regexr.com/?expression=^\([0-9A-Fa-f]{2}:\){5}[0-9A-Fa-f]{2}$)
+
+## .spec.infrastructure.nodes.controlPlanes.managementIP
+
+### Description
+
+IP address for readiness probes and management operations. Defaults to the first static IP from networkInterfaces if not specified.
+
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
+
+## .spec.infrastructure.nodes.controlPlanes.name
+
+### Description
+
+Logical node name. Used in assets, configs, and Matchbox group identifiers.
+
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
+
+## .spec.infrastructure.nodes.controlPlanes.networkInterfaces
+
+### Properties
+
+| Property                                                                     | Type      | Required |
+|:-----------------------------------------------------------------------------|:----------|:---------|
+| [addresses](#specinfrastructurenodescontrolplanesnetworkinterfacesaddresses) | `array`   | Optional |
+| [dhcp](#specinfrastructurenodescontrolplanesnetworkinterfacesdhcp)           | `boolean` | Required |
+| [dns](#specinfrastructurenodescontrolplanesnetworkinterfacesdns)             | `array`   | Optional |
+| [gateway](#specinfrastructurenodescontrolplanesnetworkinterfacesgateway)     | `string`  | Optional |
+| [name](#specinfrastructurenodescontrolplanesnetworkinterfacesname)           | `string`  | Required |
+
+### Description
+
+Network interface configuration for a node.
+
+### Constraints
+
+**minimum number of items**: the minimum number of items for this array is: `1`
+
+## .spec.infrastructure.nodes.controlPlanes.networkInterfaces.addresses
+
+### Description
+
+IP addresses in CIDR notation. Required if dhcp is false. Example: ['10.0.1.10/24']
+
+### Constraints
+
+**minimum number of items**: the minimum number of items for this array is: `1`
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^([0-9]{1,3}\.){3}[0-9]{1,3}/[0-9]{1,2}$
+```
+
+[try pattern](https://regexr.com/?expression=^\([0-9]{1,3}\.\){3}[0-9]{1,3}\/[0-9]{1,2}$)
+
+## .spec.infrastructure.nodes.controlPlanes.networkInterfaces.dhcp
+
+### Description
+
+Use DHCP (true) or static IP configuration (false).
+
+## .spec.infrastructure.nodes.controlPlanes.networkInterfaces.dns
+
+### Description
+
+DNS server IP addresses. Optional. Example: ['10.0.1.53', '1.1.1.1']
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^([0-9]{1,3}\.){3}[0-9]{1,3}$
+```
+
+[try pattern](https://regexr.com/?expression=^\([0-9]{1,3}\.\){3}[0-9]{1,3}$)
+
+## .spec.infrastructure.nodes.controlPlanes.networkInterfaces.gateway
+
+### Description
+
+Default gateway IP address. Required if dhcp is false.
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^([0-9]{1,3}\.){3}[0-9]{1,3}$
+```
+
+[try pattern](https://regexr.com/?expression=^\([0-9]{1,3}\.\){3}[0-9]{1,3}$)
+
+## .spec.infrastructure.nodes.controlPlanes.networkInterfaces.name
+
+### Description
+
+Interface name. Examples: eno1, ens3, eth0
+
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
+
+## .spec.infrastructure.nodes.controlPlanes.partitioning
+
+### Description
+
+Partitioning strategy. Default: auto
+
+### Constraints
+
+**enum**: the value of this property must be equal to one of the following string values:
+
+| Value  |
+|:-------|
+|`"auto"`|
+
+## .spec.infrastructure.nodes.etcds
+
+### Properties
+
+| Property                                                            | Type     | Required |
+|:--------------------------------------------------------------------|:---------|:---------|
+| [hostname](#specinfrastructurenodesetcdshostname)                   | `string` | Required |
+| [installDisk](#specinfrastructurenodesetcdsinstalldisk)             | `string` | Required |
+| [ip](#specinfrastructurenodesetcdsip)                               | `string` | Optional |
+| [macAddress](#specinfrastructurenodesetcdsmacaddress)               | `string` | Required |
+| [managementIP](#specinfrastructurenodesetcdsmanagementip)           | `string` | Optional |
+| [name](#specinfrastructurenodesetcdsname)                           | `string` | Required |
+| [networkInterfaces](#specinfrastructurenodesetcdsnetworkinterfaces) | `array`  | Required |
+| [partitioning](#specinfrastructurenodesetcdspartitioning)           | `string` | Optional |
+
+### Description
+
+Node definition with network configuration. Applies to all roles: controlPlanes, workers, etcds, loadBalancers.
+
+### Constraints
+
+**minimum number of items**: the minimum number of items for this array is: `1`
+
+## .spec.infrastructure.nodes.etcds.hostname
+
+### Description
+
+FQDN hostname. Applied by Ignition at first boot. Must be a fully qualified domain name. Example: master1.prod.example.com
+
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$
+```
+
+[try pattern](https://regexr.com/?expression=^\([a-zA-Z0-9]\([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9]\)?\.\)%2B[a-zA-Z]{2,}$)
+
+## .spec.infrastructure.nodes.etcds.installDisk
+
+### Description
+
+Disk device for Flatcar Container Linux installation. Example: /dev/sda, /dev/nvme0n1
+
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
+
+## .spec.infrastructure.nodes.etcds.ip
+
+### Description
+
+IP address of the node. Used for node identification and management.
+
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
+
+## .spec.infrastructure.nodes.etcds.macAddress
+
+### Description
+
+Primary MAC address. Used by Matchbox for group selection and node-to-profile mapping. Format: 52:54:00:aa:bb:01
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$
+```
+
+[try pattern](https://regexr.com/?expression=^\([0-9A-Fa-f]{2}:\){5}[0-9A-Fa-f]{2}$)
+
+## .spec.infrastructure.nodes.etcds.managementIP
+
+### Description
+
+IP address for readiness probes and management operations. Defaults to the first static IP from networkInterfaces if not specified.
+
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
+
+## .spec.infrastructure.nodes.etcds.name
+
+### Description
+
+Logical node name. Used in assets, configs, and Matchbox group identifiers.
+
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
+
+## .spec.infrastructure.nodes.etcds.networkInterfaces
+
+### Properties
+
+| Property                                                             | Type      | Required |
+|:---------------------------------------------------------------------|:----------|:---------|
+| [addresses](#specinfrastructurenodesetcdsnetworkinterfacesaddresses) | `array`   | Optional |
+| [dhcp](#specinfrastructurenodesetcdsnetworkinterfacesdhcp)           | `boolean` | Required |
+| [dns](#specinfrastructurenodesetcdsnetworkinterfacesdns)             | `array`   | Optional |
+| [gateway](#specinfrastructurenodesetcdsnetworkinterfacesgateway)     | `string`  | Optional |
+| [name](#specinfrastructurenodesetcdsnetworkinterfacesname)           | `string`  | Required |
+
+### Description
+
+Network interface configuration for a node.
+
+### Constraints
+
+**minimum number of items**: the minimum number of items for this array is: `1`
+
+## .spec.infrastructure.nodes.etcds.networkInterfaces.addresses
+
+### Description
+
+IP addresses in CIDR notation. Required if dhcp is false. Example: ['10.0.1.10/24']
+
+### Constraints
+
+**minimum number of items**: the minimum number of items for this array is: `1`
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^([0-9]{1,3}\.){3}[0-9]{1,3}/[0-9]{1,2}$
+```
+
+[try pattern](https://regexr.com/?expression=^\([0-9]{1,3}\.\){3}[0-9]{1,3}\/[0-9]{1,2}$)
+
+## .spec.infrastructure.nodes.etcds.networkInterfaces.dhcp
+
+### Description
+
+Use DHCP (true) or static IP configuration (false).
+
+## .spec.infrastructure.nodes.etcds.networkInterfaces.dns
+
+### Description
+
+DNS server IP addresses. Optional. Example: ['10.0.1.53', '1.1.1.1']
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^([0-9]{1,3}\.){3}[0-9]{1,3}$
+```
+
+[try pattern](https://regexr.com/?expression=^\([0-9]{1,3}\.\){3}[0-9]{1,3}$)
+
+## .spec.infrastructure.nodes.etcds.networkInterfaces.gateway
+
+### Description
+
+Default gateway IP address. Required if dhcp is false.
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^([0-9]{1,3}\.){3}[0-9]{1,3}$
+```
+
+[try pattern](https://regexr.com/?expression=^\([0-9]{1,3}\.\){3}[0-9]{1,3}$)
+
+## .spec.infrastructure.nodes.etcds.networkInterfaces.name
+
+### Description
+
+Interface name. Examples: eno1, ens3, eth0
+
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
+
+## .spec.infrastructure.nodes.etcds.partitioning
+
+### Description
+
+Partitioning strategy. Default: auto
+
+### Constraints
+
+**enum**: the value of this property must be equal to one of the following string values:
+
+| Value  |
+|:-------|
+|`"auto"`|
+
+## .spec.infrastructure.nodes.workers
+
+### Properties
+
+| Property                                                              | Type     | Required |
+|:----------------------------------------------------------------------|:---------|:---------|
+| [hostname](#specinfrastructurenodesworkershostname)                   | `string` | Required |
+| [installDisk](#specinfrastructurenodesworkersinstalldisk)             | `string` | Required |
+| [ip](#specinfrastructurenodesworkersip)                               | `string` | Optional |
+| [macAddress](#specinfrastructurenodesworkersmacaddress)               | `string` | Required |
+| [managementIP](#specinfrastructurenodesworkersmanagementip)           | `string` | Optional |
+| [name](#specinfrastructurenodesworkersname)                           | `string` | Required |
+| [networkInterfaces](#specinfrastructurenodesworkersnetworkinterfaces) | `array`  | Required |
+| [partitioning](#specinfrastructurenodesworkerspartitioning)           | `string` | Optional |
+
+### Description
+
+Node definition with network configuration. Applies to all roles: controlPlanes, workers, etcds, loadBalancers.
+
+### Constraints
+
+**minimum number of items**: the minimum number of items for this array is: `1`
+
+## .spec.infrastructure.nodes.workers.hostname
+
+### Description
+
+FQDN hostname. Applied by Ignition at first boot. Must be a fully qualified domain name. Example: master1.prod.example.com
+
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$
+```
+
+[try pattern](https://regexr.com/?expression=^\([a-zA-Z0-9]\([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9]\)?\.\)%2B[a-zA-Z]{2,}$)
+
+## .spec.infrastructure.nodes.workers.installDisk
+
+### Description
+
+Disk device for Flatcar Container Linux installation. Example: /dev/sda, /dev/nvme0n1
+
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
+
+## .spec.infrastructure.nodes.workers.ip
+
+### Description
+
+IP address of the node. Used for node identification and management.
+
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
+
+## .spec.infrastructure.nodes.workers.macAddress
+
+### Description
+
+Primary MAC address. Used by Matchbox for group selection and node-to-profile mapping. Format: 52:54:00:aa:bb:01
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$
+```
+
+[try pattern](https://regexr.com/?expression=^\([0-9A-Fa-f]{2}:\){5}[0-9A-Fa-f]{2}$)
+
+## .spec.infrastructure.nodes.workers.managementIP
+
+### Description
+
+IP address for readiness probes and management operations. Defaults to the first static IP from networkInterfaces if not specified.
+
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
+
+## .spec.infrastructure.nodes.workers.name
+
+### Description
+
+Logical node name. Used in assets, configs, and Matchbox group identifiers.
+
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
+
+## .spec.infrastructure.nodes.workers.networkInterfaces
+
+### Properties
+
+| Property                                                               | Type      | Required |
+|:-----------------------------------------------------------------------|:----------|:---------|
+| [addresses](#specinfrastructurenodesworkersnetworkinterfacesaddresses) | `array`   | Optional |
+| [dhcp](#specinfrastructurenodesworkersnetworkinterfacesdhcp)           | `boolean` | Required |
+| [dns](#specinfrastructurenodesworkersnetworkinterfacesdns)             | `array`   | Optional |
+| [gateway](#specinfrastructurenodesworkersnetworkinterfacesgateway)     | `string`  | Optional |
+| [name](#specinfrastructurenodesworkersnetworkinterfacesname)           | `string`  | Required |
+
+### Description
+
+Network interface configuration for a node.
+
+### Constraints
+
+**minimum number of items**: the minimum number of items for this array is: `1`
+
+## .spec.infrastructure.nodes.workers.networkInterfaces.addresses
+
+### Description
+
+IP addresses in CIDR notation. Required if dhcp is false. Example: ['10.0.1.10/24']
+
+### Constraints
+
+**minimum number of items**: the minimum number of items for this array is: `1`
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^([0-9]{1,3}\.){3}[0-9]{1,3}/[0-9]{1,2}$
+```
+
+[try pattern](https://regexr.com/?expression=^\([0-9]{1,3}\.\){3}[0-9]{1,3}\/[0-9]{1,2}$)
+
+## .spec.infrastructure.nodes.workers.networkInterfaces.dhcp
+
+### Description
+
+Use DHCP (true) or static IP configuration (false).
+
+## .spec.infrastructure.nodes.workers.networkInterfaces.dns
+
+### Description
+
+DNS server IP addresses. Optional. Example: ['10.0.1.53', '1.1.1.1']
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^([0-9]{1,3}\.){3}[0-9]{1,3}$
+```
+
+[try pattern](https://regexr.com/?expression=^\([0-9]{1,3}\.\){3}[0-9]{1,3}$)
+
+## .spec.infrastructure.nodes.workers.networkInterfaces.gateway
+
+### Description
+
+Default gateway IP address. Required if dhcp is false.
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^([0-9]{1,3}\.){3}[0-9]{1,3}$
+```
+
+[try pattern](https://regexr.com/?expression=^\([0-9]{1,3}\.\){3}[0-9]{1,3}$)
+
+## .spec.infrastructure.nodes.workers.networkInterfaces.name
+
+### Description
+
+Interface name. Examples: eno1, ens3, eth0
+
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
+
+## .spec.infrastructure.nodes.workers.partitioning
+
+### Description
+
+Partitioning strategy. Default: auto
+
+### Constraints
+
+**enum**: the value of this property must be equal to one of the following string values:
+
+| Value  |
+|:-------|
+|`"auto"`|
+
+## .spec.infrastructure.osUpdates
+
+### Properties
+
+| Property                                                                         | Type      | Required |
+|:---------------------------------------------------------------------------------|:----------|:---------|
+| [allowDuringClusterUpdate](#specinfrastructureosupdatesallowduringclusterupdate) | `boolean` | Optional |
+| [enabled](#specinfrastructureosupdatesenabled)                                   | `boolean` | Optional |
+| [server](#specinfrastructureosupdatesserver)                                     | `string`  | Optional |
+| [updateStrategy](#specinfrastructureosupdatesupdatestrategy)                     | `string`  | Optional |
+
+### Description
+
+Controls how Flatcar Container Linux nodes receive OS updates via Nebraska (Omaha protocol).
+
+## .spec.infrastructure.osUpdates.allowDuringClusterUpdate
+
+### Description
+
+Allow OS updates to run during 'furyctl apply' cluster updates. If enabled, OS updates can occur while cluster components are being updated. Default: false
+
+## .spec.infrastructure.osUpdates.enabled
+
+### Description
+
+Enable OS update management. Default: true
+
+## .spec.infrastructure.osUpdates.server
+
+### Description
+
+Nebraska server endpoint for OS updates. If omitted, uses SIGHUP-managed Nebraska server. Provide custom URL for your own Nebraska server (e.g., https://nebraska.internal.example.com). Examples: 'default' (SIGHUP-managed), custom URL
+
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
+
+## .spec.infrastructure.osUpdates.updateStrategy
+
+### Description
+
+Update strategy. 'manual': updates require approval. 'automatic': updates apply automatically during cluster maintenance. Default: manual
+
+### Constraints
+
+**enum**: the value of this property must be equal to one of the following string values:
+
+| Value       |
+|:------------|
+|`"manual"`   |
+|`"automatic"`|
+
+## .spec.infrastructure.pki
+
+### Properties
+
+| Property                               | Type     | Required |
+|:---------------------------------------|:---------|:---------|
+| [folder](#specinfrastructurepkifolder) | `string` | Optional |
+
+### Description
+
+PKI (Public Key Infrastructure) configuration for certificates.
+
+## .spec.infrastructure.pki.folder
+
+### Description
+
+Path to folder containing certificates generated by 'furyctl generate pki'. Default: ./pki
+
+## .spec.infrastructure.ssh
+
+### Properties
+
+| Property                                   | Type      | Required |
+|:-------------------------------------------|:----------|:---------|
+| [keyPath](#specinfrastructuresshkeypath)   | `string`  | Required |
+| [port](#specinfrastructuresshport)         | `integer` | Optional |
+| [username](#specinfrastructuresshusername) | `string`  | Optional |
+
+### Description
+
+SSH configuration for accessing cluster nodes.
+
+## .spec.infrastructure.ssh.keyPath
+
+### Description
+
+Path to SSH private key for authentication. Example: ~/.ssh/id_ed25519_cluster
+
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
+
+## .spec.infrastructure.ssh.port
+
+### Description
+
+SSH port on target nodes. Default: 22
+
+## .spec.infrastructure.ssh.username
+
+### Description
+
+SSH user with sudo NOPASSWD access. Default: core (Flatcar default user)
+
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
+
+## .spec.kubernetes
+
+### Properties
+
+| Property                                                  | Type      | Required |
+|:----------------------------------------------------------|:----------|:---------|
+| [advanced](#speckubernetesadvanced)                       | `object`  | Optional |
+| [controlPlaneAddress](#speckubernetescontrolplaneaddress) | `string`  | Required |
+| [controlPlanePort](#speckubernetescontrolplaneport)       | `integer` | Optional |
+| [loadBalancers](#speckubernetesloadbalancers)             | `array`   | Optional |
+| [networking](#speckubernetesnetworking)                   | `object`  | Optional |
+
+### Description
+
+Kubernetes cluster configuration. This section contains Kubernetes CONFIGURATION including load balancing, networking, and advanced settings. The Kubernetes version is determined by the apiVersion field at the top of the file.
+
+## .spec.kubernetes.advanced
+
+### Properties
+
+| Property                                      | Type     | Required |
+|:----------------------------------------------|:---------|:---------|
+| [apiServer](#speckubernetesadvancedapiserver) | `object` | Optional |
+| [registry](#speckubernetesadvancedregistry)   | `string` | Optional |
+
+### Description
+
+Advanced Kubernetes configuration options. Most fields use sensible defaults and only need to be specified if you need to override them.
+
+## .spec.kubernetes.advanced.apiServer
+
+### Properties
+
+| Property                                               | Type     | Required |
+|:-------------------------------------------------------|:---------|:---------|
+| [extraArgs](#speckubernetesadvancedapiserverextraargs) | `object` | Optional |
+
+### Description
+
+Kubernetes API Server advanced configuration.
+
+## .spec.kubernetes.advanced.apiServer.extraArgs
+
+### Description
+
+Extra arguments to pass to the API server. Key-value pairs. Example: {'audit-log-path': '/var/log/kubernetes/audit.log'}
+
+## .spec.kubernetes.advanced.registry
+
+### Description
+
+Container registry for Kubernetes components. Example: registry.sighup.io/fury
+
+## .spec.kubernetes.controlPlaneAddress
+
+### Description
+
+FQDN or IP address for the Kubernetes API Server endpoint. Points to the load balancer VIP (if using HAProxy) or a single control-plane node. Example: k8s-api.prod.example.com
+
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
+
+## .spec.kubernetes.controlPlanePort
+
+### Description
+
+API server port. Default: 6443
+
+## .spec.kubernetes.loadBalancers
+
+### Properties
+
+| Property                                                           | Type     | Required |
+|:-------------------------------------------------------------------|:---------|:---------|
+| [hostname](#speckubernetesloadbalancershostname)                   | `string` | Required |
+| [installDisk](#speckubernetesloadbalancersinstalldisk)             | `string` | Required |
+| [ip](#speckubernetesloadbalancersip)                               | `string` | Optional |
+| [macAddress](#speckubernetesloadbalancersmacaddress)               | `string` | Required |
+| [managementIP](#speckubernetesloadbalancersmanagementip)           | `string` | Optional |
+| [name](#speckubernetesloadbalancersname)                           | `string` | Required |
+| [networkInterfaces](#speckubernetesloadbalancersnetworkinterfaces) | `array`  | Required |
+| [partitioning](#speckubernetesloadbalancerspartitioning)           | `string` | Optional |
+| [vrrp](#speckubernetesloadbalancersvrrp)                           | `object` | Optional |
+
+### Description
+
+HAProxy load balancer node with keepalived for high availability.
+
+## .spec.kubernetes.loadBalancers.hostname
+
+### Description
+
+FQDN hostname. Applied by Ignition at first boot. Must be a fully qualified domain name. Example: lb1.prod.example.com
+
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$
+```
+
+[try pattern](https://regexr.com/?expression=^\([a-zA-Z0-9]\([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9]\)?\.\)%2B[a-zA-Z]{2,}$)
+
+## .spec.kubernetes.loadBalancers.installDisk
+
+### Description
+
+Disk device for Flatcar Container Linux installation. Example: /dev/sda, /dev/nvme0n1
+
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
+
+## .spec.kubernetes.loadBalancers.ip
+
+### Description
+
+IP address of the node. Used for node identification and management.
+
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
+
+## .spec.kubernetes.loadBalancers.macAddress
+
+### Description
+
+Primary MAC address. Used by Matchbox for group selection and node-to-profile mapping. Format: 52:54:00:aa:bb:01
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$
+```
+
+[try pattern](https://regexr.com/?expression=^\([0-9A-Fa-f]{2}:\){5}[0-9A-Fa-f]{2}$)
+
+## .spec.kubernetes.loadBalancers.managementIP
+
+### Description
+
+IP address for readiness probes and management operations. Defaults to the first static IP from networkInterfaces if not specified.
+
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
+
+## .spec.kubernetes.loadBalancers.name
+
+### Description
+
+Logical node name. Used in assets, configs, and Matchbox group identifiers.
+
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
+
+## .spec.kubernetes.loadBalancers.networkInterfaces
+
+### Properties
+
+| Property                                                            | Type      | Required |
+|:--------------------------------------------------------------------|:----------|:---------|
+| [addresses](#speckubernetesloadbalancersnetworkinterfacesaddresses) | `array`   | Optional |
+| [dhcp](#speckubernetesloadbalancersnetworkinterfacesdhcp)           | `boolean` | Required |
+| [dns](#speckubernetesloadbalancersnetworkinterfacesdns)             | `array`   | Optional |
+| [gateway](#speckubernetesloadbalancersnetworkinterfacesgateway)     | `string`  | Optional |
+| [name](#speckubernetesloadbalancersnetworkinterfacesname)           | `string`  | Required |
+
+### Description
+
+Network interface configuration for a node.
+
+### Constraints
+
+**minimum number of items**: the minimum number of items for this array is: `1`
+
+## .spec.kubernetes.loadBalancers.networkInterfaces.addresses
+
+### Description
+
+IP addresses in CIDR notation. Required if dhcp is false. Example: ['10.0.1.10/24']
+
+### Constraints
+
+**minimum number of items**: the minimum number of items for this array is: `1`
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^([0-9]{1,3}\.){3}[0-9]{1,3}/[0-9]{1,2}$
+```
+
+[try pattern](https://regexr.com/?expression=^\([0-9]{1,3}\.\){3}[0-9]{1,3}\/[0-9]{1,2}$)
+
+## .spec.kubernetes.loadBalancers.networkInterfaces.dhcp
+
+### Description
+
+Use DHCP (true) or static IP configuration (false).
+
+## .spec.kubernetes.loadBalancers.networkInterfaces.dns
+
+### Description
+
+DNS server IP addresses. Optional. Example: ['10.0.1.53', '1.1.1.1']
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^([0-9]{1,3}\.){3}[0-9]{1,3}$
+```
+
+[try pattern](https://regexr.com/?expression=^\([0-9]{1,3}\.\){3}[0-9]{1,3}$)
+
+## .spec.kubernetes.loadBalancers.networkInterfaces.gateway
+
+### Description
+
+Default gateway IP address. Required if dhcp is false.
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^([0-9]{1,3}\.){3}[0-9]{1,3}$
+```
+
+[try pattern](https://regexr.com/?expression=^\([0-9]{1,3}\.\){3}[0-9]{1,3}$)
+
+## .spec.kubernetes.loadBalancers.networkInterfaces.name
+
+### Description
+
+Interface name. Examples: eno1, ens3, eth0
+
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
+
+## .spec.kubernetes.loadBalancers.partitioning
+
+### Description
+
+Partitioning strategy. Default: auto
+
+### Constraints
+
+**enum**: the value of this property must be equal to one of the following string values:
+
+| Value  |
+|:-------|
+|`"auto"`|
+
+## .spec.kubernetes.loadBalancers.vrrp
+
+### Properties
+
+| Property                                                           | Type      | Required |
+|:-------------------------------------------------------------------|:----------|:---------|
+| [authPassword](#speckubernetesloadbalancersvrrpauthpassword)       | `string`  | Required |
+| [interface](#speckubernetesloadbalancersvrrpinterface)             | `string`  | Required |
+| [virtualIP](#speckubernetesloadbalancersvrrpvirtualip)             | `string`  | Required |
+| [virtualRouterID](#speckubernetesloadbalancersvrrpvirtualrouterid) | `integer` | Required |
+
+### Description
+
+VRRP (Virtual Router Redundancy Protocol) configuration for keepalived. Used when multiple load balancers are configured for high availability.
+
+## .spec.kubernetes.loadBalancers.vrrp.authPassword
+
+### Description
+
+Password for VRRP authentication. Prevents rogue VRRP instances. Best practice: use environment variable substitution (e.g., $VRRP_PASSWORD). Maximum length: 8 characters
+
+### Constraints
+
+**maximum length**: the maximum number of characters for this string is: `8`
+
+**minimum length**: the minimum number of characters for this string is: `1`
+
+## .spec.kubernetes.loadBalancers.vrrp.interface
+
+### Description
+
+Network interface where the VIP will be configured. Must exist on ALL load balancer nodes. Examples: ens3, eth0, eno1
+
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
+
+## .spec.kubernetes.loadBalancers.vrrp.virtualIP
+
+### Description
+
+Virtual IP (VIP) shared between load balancers in CIDR format. Must be in the same subnet as load balancer nodes. Must NOT be assigned to any physical interface. Must be the IP that controlPlaneAddress resolves to. Example: 10.0.1.100/24
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^([0-9]{1,3}\.){3}[0-9]{1,3}/[0-9]{1,2}$
+```
+
+[try pattern](https://regexr.com/?expression=^\([0-9]{1,3}\.\){3}[0-9]{1,3}\/[0-9]{1,2}$)
+
+## .spec.kubernetes.loadBalancers.vrrp.virtualRouterID
+
+### Description
+
+Unique identifier for the VRRP router. Must be unique in the network segment. Range: 1-255
+
+## .spec.kubernetes.networking
+
+### Properties
+
+| Property                                              | Type     | Required |
+|:------------------------------------------------------|:---------|:---------|
+| [dnsServiceIP](#speckubernetesnetworkingdnsserviceip) | `string` | Optional |
+| [podCIDR](#speckubernetesnetworkingpodcidr)           | `string` | Optional |
+| [serviceCIDR](#speckubernetesnetworkingservicecidr)   | `string` | Optional |
+
+### Description
+
+Kubernetes network configuration.
+
+## .spec.kubernetes.networking.dnsServiceIP
+
+### Description
+
+CoreDNS service IP address. Must be within serviceCIDR. Example: 172.16.0.10
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^([0-9]{1,3}\.){3}[0-9]{1,3}$
+```
+
+[try pattern](https://regexr.com/?expression=^\([0-9]{1,3}\.\){3}[0-9]{1,3}$)
+
+## .spec.kubernetes.networking.podCIDR
+
+### Description
+
+The subnet CIDR to use for the Pods network. Example: 172.16.128.0/17
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^([0-9]{1,3}\.){3}[0-9]{1,3}/[0-9]{1,2}$
+```
+
+[try pattern](https://regexr.com/?expression=^\([0-9]{1,3}\.\){3}[0-9]{1,3}\/[0-9]{1,2}$)
+
+## .spec.kubernetes.networking.serviceCIDR
+
+### Description
+
+The subnet CIDR to use for the Services network. Example: 172.16.0.0/17
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^([0-9]{1,3}\.){3}[0-9]{1,3}/[0-9]{1,2}$
+```
+
+[try pattern](https://regexr.com/?expression=^\([0-9]{1,3}\.\){3}[0-9]{1,3}\/[0-9]{1,2}$)
+
+## .spec.plugins
+
+### Properties
+
+| Property                           | Type     | Required |
+|:-----------------------------------|:---------|:---------|
+| [helm](#specpluginshelm)           | `object` | Optional |
+| [kustomize](#specpluginskustomize) | `array`  | Optional |
+
+## .spec.plugins.helm
+
+### Properties
+
+| Property                                     | Type    | Required |
+|:---------------------------------------------|:--------|:---------|
+| [releases](#specpluginshelmreleases)         | `array` | Optional |
+| [repositories](#specpluginshelmrepositories) | `array` | Optional |
+
+## .spec.plugins.helm.releases
+
+### Properties
+
+| Property                                                                         | Type      | Required |
+|:---------------------------------------------------------------------------------|:----------|:---------|
+| [chart](#specpluginshelmreleaseschart)                                           | `string`  | Required |
+| [disableValidationOnInstall](#specpluginshelmreleasesdisablevalidationoninstall) | `boolean` | Optional |
+| [name](#specpluginshelmreleasesname)                                             | `string`  | Required |
+| [namespace](#specpluginshelmreleasesnamespace)                                   | `string`  | Required |
+| [set](#specpluginshelmreleasesset)                                               | `array`   | Optional |
+| [values](#specpluginshelmreleasesvalues)                                         | `array`   | Optional |
+| [version](#specpluginshelmreleasesversion)                                       | `string`  | Optional |
+
+## .spec.plugins.helm.releases.chart
+
+### Description
+
+The chart of the release
+
+## .spec.plugins.helm.releases.disableValidationOnInstall
+
+### Description
+
+Disable running `helm diff` validation when installing the plugin, it will still be done when upgrading.
+
+## .spec.plugins.helm.releases.name
+
+### Description
+
+The name of the release
+
+## .spec.plugins.helm.releases.namespace
+
+### Description
+
+The namespace of the release
+
+## .spec.plugins.helm.releases.set
+
+### Properties
+
+| Property                                  | Type     | Required |
+|:------------------------------------------|:---------|:---------|
+| [name](#specpluginshelmreleasessetname)   | `string` | Required |
+| [value](#specpluginshelmreleasessetvalue) | `string` | Required |
+
+## .spec.plugins.helm.releases.set.name
+
+### Description
+
+The name of the set
+
+## .spec.plugins.helm.releases.set.value
+
+### Description
+
+The value of the set
+
+## .spec.plugins.helm.releases.values
+
+### Description
+
+The values of the release
+
+## .spec.plugins.helm.releases.version
+
+### Description
+
+The version of the release
+
+## .spec.plugins.helm.repositories
+
+### Properties
+
+| Property                                 | Type     | Required |
+|:-----------------------------------------|:---------|:---------|
+| [name](#specpluginshelmrepositoriesname) | `string` | Required |
+| [url](#specpluginshelmrepositoriesurl)   | `string` | Required |
+
+## .spec.plugins.helm.repositories.name
+
+### Description
+
+The name of the repository
+
+## .spec.plugins.helm.repositories.url
+
+### Description
+
+The url of the repository
+
+## .spec.plugins.kustomize
+
+### Properties
+
+| Property                              | Type     | Required |
+|:--------------------------------------|:---------|:---------|
+| [folder](#specpluginskustomizefolder) | `string` | Required |
+| [name](#specpluginskustomizename)     | `string` | Required |
+
+## .spec.plugins.kustomize.folder
+
+### Description
+
+The folder of the kustomize plugin
+
+## .spec.plugins.kustomize.name
+
+### Description
+
+The name of the kustomize plugin. A lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', 'local-storage')
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+```
+
+[try pattern](https://regexr.com/?expression=^[a-z0-9]\([-a-z0-9]*[a-z0-9]\)?\(\.[a-z0-9]\([-a-z0-9]*[a-z0-9]\)?\)*$)
+

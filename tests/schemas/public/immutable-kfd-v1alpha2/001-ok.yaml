@@ -1,0 +1,122 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# Tests the following cases:
+
+# Given a valid minimal Immutable provider configuration
+# With all required fields specified
+# And load balancers configured with VRRP
+# When I validate the config against the schema
+# Then no errors are returned
+
+---
+apiVersion: kfd.sighup.io/v1alpha2
+kind: Immutable
+metadata:
+  name: test-cluster
+spec:
+  distributionVersion: v1.33.1
+
+  infrastructure:
+    matchbox:
+      url: https://matchbox.prod.example.com:8080
+
+    nodes:
+      controlPlanes:
+        - hostname: master1.prod.example.com
+          macAddress: "52:54:00:aa:bb:10"
+          installDisk: /dev/sda
+          networkInterfaces:
+            - name: ens3
+              dhcp: false
+              addresses: ["10.0.1.20/24"]
+              gateway: 10.0.1.1
+              dns: ["10.0.1.53"]
+
+        - hostname: master2.prod.example.com
+          macAddress: "52:54:00:aa:bb:11"
+          installDisk: /dev/sda
+          networkInterfaces:
+            - name: ens3
+              dhcp: false
+              addresses: ["10.0.1.21/24"]
+              gateway: 10.0.1.1
+              dns: ["10.0.1.53"]
+
+        - hostname: master3.prod.example.com
+          macAddress: "52:54:00:aa:bb:12"
+          installDisk: /dev/sda
+          networkInterfaces:
+            - name: ens3
+              dhcp: false
+              addresses: ["10.0.1.22/24"]
+              gateway: 10.0.1.1
+              dns: ["10.0.1.53"]
+
+      workers:
+        - hostname: worker1.prod.example.com
+          macAddress: "52:54:00:aa:bb:20"
+          installDisk: /dev/sda
+          networkInterfaces:
+            - name: ens3
+              dhcp: false
+              addresses: ["10.0.1.30/24"]
+              gateway: 10.0.1.1
+              dns: ["10.0.1.53"]
+
+      loadBalancers:
+        - hostname: lb1.prod.example.com
+          macAddress: "52:54:00:aa:bb:01"
+          installDisk: /dev/sda
+          networkInterfaces:
+            - name: ens3
+              dhcp: false
+              addresses: ["10.0.1.10/24"]
+              gateway: 10.0.1.1
+              dns: ["10.0.1.53"]
+
+        - hostname: lb2.prod.example.com
+          macAddress: "52:54:00:aa:bb:02"
+          installDisk: /dev/sda
+          networkInterfaces:
+            - name: ens3
+              dhcp: false
+              addresses: ["10.0.1.11/24"]
+              gateway: 10.0.1.1
+              dns: ["10.0.1.53"]
+
+    ssh:
+      username: core
+      keyPath: ~/.ssh/id_ed25519
+      port: 22
+
+  kubernetes:
+    controlPlaneAddress: k8s-api.prod.example.com
+    controlPlanePort: 6443
+
+    controlPlanes:
+      - hostname: master1.prod.example.com
+        ip: 10.0.1.20
+      - hostname: master2.prod.example.com
+        ip: 10.0.1.21
+      - hostname: master3.prod.example.com
+        ip: 10.0.1.22
+
+    workers:
+      - hostname: worker1.prod.example.com
+        ip: 10.0.1.30
+
+    loadBalancers:
+      enabled: true
+      hosts:
+        - hostname: lb1.prod.example.com
+          ip: 10.0.1.10
+        - hostname: lb2.prod.example.com
+          ip: 10.0.1.11
+      vrrp:
+        enabled: true
+        interface: ens3
+        virtualIP: 10.0.1.100/24
+        virtualRouterID: 1
+        authPassword: "vrrppass"

@@ -1,0 +1,74 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# Tests the following cases:
+
+# Given a valid Immutable provider configuration
+# With custom networking configuration and advanced Kubernetes settings
+# When I validate the config against the schema
+# Then no errors are returned
+
+---
+apiVersion: kfd.sighup.io/v1alpha2
+kind: Immutable
+metadata:
+  name: test-cluster-advanced
+spec:
+  distributionVersion: v1.33.1
+
+  infrastructure:
+    matchbox:
+      url: https://matchbox.prod.example.com:8080
+
+    nodes:
+      controlPlanes:
+        - hostname: master1.prod.example.com
+          macAddress: "52:54:00:aa:bb:10"
+          installDisk: /dev/sda
+          networkInterfaces:
+            - name: ens3
+              dhcp: false
+              addresses: ["10.0.1.20/24"]
+              gateway: 10.0.1.1
+              dns: ["10.0.1.53", "1.1.1.1"]
+
+      workers:
+        - hostname: worker1.prod.example.com
+          macAddress: "52:54:00:aa:bb:20"
+          installDisk: /dev/sda
+          networkInterfaces:
+            - name: ens3
+              dhcp: false
+              addresses: ["10.0.1.30/24"]
+              gateway: 10.0.1.1
+              dns: ["10.0.1.53"]
+
+    ssh:
+      keyPath: ~/.ssh/id_ed25519
+
+  kubernetes:
+    controlPlaneAddress: k8s-api.prod.example.com
+    controlPlanePort: 6443
+
+    controlPlanes:
+      - hostname: master1.prod.example.com
+        ip: 10.0.1.20
+
+    workers:
+      - hostname: worker1.prod.example.com
+        ip: 10.0.1.30
+
+    # Custom networking
+    networking:
+      podCIDR: 192.168.0.0/16
+      serviceCIDR: 10.96.0.0/12
+      dnsServiceIP: 10.96.0.10
+
+    # Advanced configuration
+    advanced:
+      registry: registry.sighup.io/fury
+      apiServer:
+        extraArgs:
+          audit-log-path: /var/log/kubernetes/audit.log
+          audit-log-maxage: "30"
