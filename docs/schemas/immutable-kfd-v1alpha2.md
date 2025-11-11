@@ -152,7 +152,7 @@ Matchbox server configuration for PXE/iPXE provisioning.
 
 ### Description
 
-Internal HTTPS URL that target nodes will contact during PXE boot. Must be accessible from all nodes during boot. Must resolve to the Matchbox server IP (can be furyctl serve matchbox or remote Matchbox). Example: https://matchbox.internal.example:8080
+Uniform Resource Identifier (URI). Must be a valid URL with scheme. Example: https://example.com:8080
 
 ### Constraints
 
@@ -161,10 +161,10 @@ Internal HTTPS URL that target nodes will contact during PXE boot. Must be acces
 **pattern**: the string must match the following regular expression:
 
 ```regexp
-^https://
+^https?://[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?)*(:[0-9]{1,5})?(/.*)?$
 ```
 
-[try pattern](https://regexr.com/?expression=^https:\/\/)
+[try pattern](https://regexr.com/?expression=^https?:\/\/[a-zA-Z0-9]\([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9]\)?\(\.[a-zA-Z0-9]\([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9]\)?\)*\(:[0-9]{1,5}\)?\(\/.*\)?$)
 
 ## .spec.infrastructure.nodes
 
@@ -174,11 +174,12 @@ Internal HTTPS URL that target nodes will contact during PXE boot. Must be acces
 |:-------------------------------------------------------|:--------|:---------|
 | [controlPlanes](#specinfrastructurenodescontrolplanes) | `array` | Required |
 | [etcds](#specinfrastructurenodesetcds)                 | `array` | Optional |
+| [loadBalancers](#specinfrastructurenodesloadbalancers) | `array` | Optional |
 | [workers](#specinfrastructurenodesworkers)             | `array` | Required |
 
 ### Description
 
-Node inventory organized by role. Supported roles: controlPlanes (Kubernetes control-plane with stacked etcd by default), workers (Kubernetes worker nodes), etcds (optional dedicated etcd nodes, triggers external etcd).
+Node inventory organized by role. Supported roles: controlPlanes (Kubernetes control-plane with stacked etcd by default), workers (Kubernetes worker nodes), loadBalancers (HAProxy load balancers), etcds (optional dedicated etcd nodes, triggers external etcd).
 
 ## .spec.infrastructure.nodes.controlPlanes
 
@@ -188,10 +189,7 @@ Node inventory organized by role. Supported roles: controlPlanes (Kubernetes con
 |:----------------------------------------------------------------------------|:---------|:---------|
 | [hostname](#specinfrastructurenodescontrolplaneshostname)                   | `string` | Required |
 | [installDisk](#specinfrastructurenodescontrolplanesinstalldisk)             | `string` | Required |
-| [ip](#specinfrastructurenodescontrolplanesip)                               | `string` | Optional |
 | [macAddress](#specinfrastructurenodescontrolplanesmacaddress)               | `string` | Required |
-| [managementIP](#specinfrastructurenodescontrolplanesmanagementip)           | `string` | Optional |
-| [name](#specinfrastructurenodescontrolplanesname)                           | `string` | Required |
 | [networkInterfaces](#specinfrastructurenodescontrolplanesnetworkinterfaces) | `array`  | Required |
 | [partitioning](#specinfrastructurenodescontrolplanespartitioning)           | `string` | Optional |
 
@@ -207,7 +205,7 @@ Node definition with network configuration. Applies to all roles: controlPlanes,
 
 ### Description
 
-FQDN hostname. Applied by Ignition at first boot. Must be a fully qualified domain name. Example: master1.prod.example.com
+Fully Qualified Domain Name (FQDN). Must include domain suffix. Example: server.example.com
 
 ### Constraints
 
@@ -231,21 +229,11 @@ Disk device for Flatcar Container Linux installation. Example: /dev/sda, /dev/nv
 
 **minimum length**: the minimum number of characters for this string is: `1`
 
-## .spec.infrastructure.nodes.controlPlanes.ip
-
-### Description
-
-IP address of the node. Used for node identification and management.
-
-### Constraints
-
-**minimum length**: the minimum number of characters for this string is: `1`
-
 ## .spec.infrastructure.nodes.controlPlanes.macAddress
 
 ### Description
 
-Primary MAC address. Used by Matchbox for group selection and node-to-profile mapping. Format: 52:54:00:aa:bb:01
+MAC address in colon-separated hexadecimal format. Example: 52:54:00:12:34:56
 
 ### Constraints
 
@@ -256,26 +244,6 @@ Primary MAC address. Used by Matchbox for group selection and node-to-profile ma
 ```
 
 [try pattern](https://regexr.com/?expression=^\([0-9A-Fa-f]{2}:\){5}[0-9A-Fa-f]{2}$)
-
-## .spec.infrastructure.nodes.controlPlanes.managementIP
-
-### Description
-
-IP address for readiness probes and management operations. Defaults to the first static IP from networkInterfaces if not specified.
-
-### Constraints
-
-**minimum length**: the minimum number of characters for this string is: `1`
-
-## .spec.infrastructure.nodes.controlPlanes.name
-
-### Description
-
-Logical node name. Used in assets, configs, and Matchbox group identifiers.
-
-### Constraints
-
-**minimum length**: the minimum number of characters for this string is: `1`
 
 ## .spec.infrastructure.nodes.controlPlanes.networkInterfaces
 
@@ -301,7 +269,7 @@ Network interface configuration for a node.
 
 ### Description
 
-IP addresses in CIDR notation. Required if dhcp is false. Example: ['10.0.1.10/24']
+IPv4 CIDR notation (IP address with subnet mask /0-32). Example: 192.168.1.0/24
 
 ### Constraints
 
@@ -310,10 +278,10 @@ IP addresses in CIDR notation. Required if dhcp is false. Example: ['10.0.1.10/2
 **pattern**: the string must match the following regular expression:
 
 ```regexp
-^([0-9]{1,3}\.){3}[0-9]{1,3}/[0-9]{1,2}$
+^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}/(3[0-2]|[12]?[0-9])$
 ```
 
-[try pattern](https://regexr.com/?expression=^\([0-9]{1,3}\.\){3}[0-9]{1,3}\/[0-9]{1,2}$)
+[try pattern](https://regexr.com/?expression=^\(\(25[0-5]|\(2[0-4]|1\d|[1-9]|\)\d\)\.?\b\){4}\/\(3[0-2]|[12]?[0-9]\)$)
 
 ## .spec.infrastructure.nodes.controlPlanes.networkInterfaces.dhcp
 
@@ -325,33 +293,33 @@ Use DHCP (true) or static IP configuration (false).
 
 ### Description
 
-DNS server IP addresses. Optional. Example: ['10.0.1.53', '1.1.1.1']
+IPv4 address in dotted decimal notation (0.0.0.0 to 255.255.255.255). Example: 192.168.1.100
 
 ### Constraints
 
 **pattern**: the string must match the following regular expression:
 
 ```regexp
-^([0-9]{1,3}\.){3}[0-9]{1,3}$
+^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$
 ```
 
-[try pattern](https://regexr.com/?expression=^\([0-9]{1,3}\.\){3}[0-9]{1,3}$)
+[try pattern](https://regexr.com/?expression=^\(\(25[0-5]|\(2[0-4]|1\d|[1-9]|\)\d\)\.?\b\){4}$)
 
 ## .spec.infrastructure.nodes.controlPlanes.networkInterfaces.gateway
 
 ### Description
 
-Default gateway IP address. Required if dhcp is false.
+IPv4 address in dotted decimal notation (0.0.0.0 to 255.255.255.255). Example: 192.168.1.100
 
 ### Constraints
 
 **pattern**: the string must match the following regular expression:
 
 ```regexp
-^([0-9]{1,3}\.){3}[0-9]{1,3}$
+^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$
 ```
 
-[try pattern](https://regexr.com/?expression=^\([0-9]{1,3}\.\){3}[0-9]{1,3}$)
+[try pattern](https://regexr.com/?expression=^\(\(25[0-5]|\(2[0-4]|1\d|[1-9]|\)\d\)\.?\b\){4}$)
 
 ## .spec.infrastructure.nodes.controlPlanes.networkInterfaces.name
 
@@ -385,10 +353,7 @@ Partitioning strategy. Default: auto
 |:--------------------------------------------------------------------|:---------|:---------|
 | [hostname](#specinfrastructurenodesetcdshostname)                   | `string` | Required |
 | [installDisk](#specinfrastructurenodesetcdsinstalldisk)             | `string` | Required |
-| [ip](#specinfrastructurenodesetcdsip)                               | `string` | Optional |
 | [macAddress](#specinfrastructurenodesetcdsmacaddress)               | `string` | Required |
-| [managementIP](#specinfrastructurenodesetcdsmanagementip)           | `string` | Optional |
-| [name](#specinfrastructurenodesetcdsname)                           | `string` | Required |
 | [networkInterfaces](#specinfrastructurenodesetcdsnetworkinterfaces) | `array`  | Required |
 | [partitioning](#specinfrastructurenodesetcdspartitioning)           | `string` | Optional |
 
@@ -404,7 +369,7 @@ Node definition with network configuration. Applies to all roles: controlPlanes,
 
 ### Description
 
-FQDN hostname. Applied by Ignition at first boot. Must be a fully qualified domain name. Example: master1.prod.example.com
+Fully Qualified Domain Name (FQDN). Must include domain suffix. Example: server.example.com
 
 ### Constraints
 
@@ -428,21 +393,11 @@ Disk device for Flatcar Container Linux installation. Example: /dev/sda, /dev/nv
 
 **minimum length**: the minimum number of characters for this string is: `1`
 
-## .spec.infrastructure.nodes.etcds.ip
-
-### Description
-
-IP address of the node. Used for node identification and management.
-
-### Constraints
-
-**minimum length**: the minimum number of characters for this string is: `1`
-
 ## .spec.infrastructure.nodes.etcds.macAddress
 
 ### Description
 
-Primary MAC address. Used by Matchbox for group selection and node-to-profile mapping. Format: 52:54:00:aa:bb:01
+MAC address in colon-separated hexadecimal format. Example: 52:54:00:12:34:56
 
 ### Constraints
 
@@ -453,26 +408,6 @@ Primary MAC address. Used by Matchbox for group selection and node-to-profile ma
 ```
 
 [try pattern](https://regexr.com/?expression=^\([0-9A-Fa-f]{2}:\){5}[0-9A-Fa-f]{2}$)
-
-## .spec.infrastructure.nodes.etcds.managementIP
-
-### Description
-
-IP address for readiness probes and management operations. Defaults to the first static IP from networkInterfaces if not specified.
-
-### Constraints
-
-**minimum length**: the minimum number of characters for this string is: `1`
-
-## .spec.infrastructure.nodes.etcds.name
-
-### Description
-
-Logical node name. Used in assets, configs, and Matchbox group identifiers.
-
-### Constraints
-
-**minimum length**: the minimum number of characters for this string is: `1`
 
 ## .spec.infrastructure.nodes.etcds.networkInterfaces
 
@@ -498,7 +433,7 @@ Network interface configuration for a node.
 
 ### Description
 
-IP addresses in CIDR notation. Required if dhcp is false. Example: ['10.0.1.10/24']
+IPv4 CIDR notation (IP address with subnet mask /0-32). Example: 192.168.1.0/24
 
 ### Constraints
 
@@ -507,10 +442,10 @@ IP addresses in CIDR notation. Required if dhcp is false. Example: ['10.0.1.10/2
 **pattern**: the string must match the following regular expression:
 
 ```regexp
-^([0-9]{1,3}\.){3}[0-9]{1,3}/[0-9]{1,2}$
+^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}/(3[0-2]|[12]?[0-9])$
 ```
 
-[try pattern](https://regexr.com/?expression=^\([0-9]{1,3}\.\){3}[0-9]{1,3}\/[0-9]{1,2}$)
+[try pattern](https://regexr.com/?expression=^\(\(25[0-5]|\(2[0-4]|1\d|[1-9]|\)\d\)\.?\b\){4}\/\(3[0-2]|[12]?[0-9]\)$)
 
 ## .spec.infrastructure.nodes.etcds.networkInterfaces.dhcp
 
@@ -522,33 +457,33 @@ Use DHCP (true) or static IP configuration (false).
 
 ### Description
 
-DNS server IP addresses. Optional. Example: ['10.0.1.53', '1.1.1.1']
+IPv4 address in dotted decimal notation (0.0.0.0 to 255.255.255.255). Example: 192.168.1.100
 
 ### Constraints
 
 **pattern**: the string must match the following regular expression:
 
 ```regexp
-^([0-9]{1,3}\.){3}[0-9]{1,3}$
+^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$
 ```
 
-[try pattern](https://regexr.com/?expression=^\([0-9]{1,3}\.\){3}[0-9]{1,3}$)
+[try pattern](https://regexr.com/?expression=^\(\(25[0-5]|\(2[0-4]|1\d|[1-9]|\)\d\)\.?\b\){4}$)
 
 ## .spec.infrastructure.nodes.etcds.networkInterfaces.gateway
 
 ### Description
 
-Default gateway IP address. Required if dhcp is false.
+IPv4 address in dotted decimal notation (0.0.0.0 to 255.255.255.255). Example: 192.168.1.100
 
 ### Constraints
 
 **pattern**: the string must match the following regular expression:
 
 ```regexp
-^([0-9]{1,3}\.){3}[0-9]{1,3}$
+^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$
 ```
 
-[try pattern](https://regexr.com/?expression=^\([0-9]{1,3}\.\){3}[0-9]{1,3}$)
+[try pattern](https://regexr.com/?expression=^\(\(25[0-5]|\(2[0-4]|1\d|[1-9]|\)\d\)\.?\b\){4}$)
 
 ## .spec.infrastructure.nodes.etcds.networkInterfaces.name
 
@@ -574,6 +509,170 @@ Partitioning strategy. Default: auto
 |:-------|
 |`"auto"`|
 
+## .spec.infrastructure.nodes.loadBalancers
+
+### Properties
+
+| Property                                                                    | Type     | Required |
+|:----------------------------------------------------------------------------|:---------|:---------|
+| [hostname](#specinfrastructurenodesloadbalancershostname)                   | `string` | Required |
+| [installDisk](#specinfrastructurenodesloadbalancersinstalldisk)             | `string` | Required |
+| [macAddress](#specinfrastructurenodesloadbalancersmacaddress)               | `string` | Required |
+| [networkInterfaces](#specinfrastructurenodesloadbalancersnetworkinterfaces) | `array`  | Required |
+| [partitioning](#specinfrastructurenodesloadbalancerspartitioning)           | `string` | Optional |
+
+### Description
+
+Node definition with network configuration. Applies to all roles: controlPlanes, workers, etcds, loadBalancers.
+
+### Constraints
+
+**minimum number of items**: the minimum number of items for this array is: `1`
+
+## .spec.infrastructure.nodes.loadBalancers.hostname
+
+### Description
+
+Fully Qualified Domain Name (FQDN). Must include domain suffix. Example: server.example.com
+
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$
+```
+
+[try pattern](https://regexr.com/?expression=^\([a-zA-Z0-9]\([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9]\)?\.\)%2B[a-zA-Z]{2,}$)
+
+## .spec.infrastructure.nodes.loadBalancers.installDisk
+
+### Description
+
+Disk device for Flatcar Container Linux installation. Example: /dev/sda, /dev/nvme0n1
+
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
+
+## .spec.infrastructure.nodes.loadBalancers.macAddress
+
+### Description
+
+MAC address in colon-separated hexadecimal format. Example: 52:54:00:12:34:56
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$
+```
+
+[try pattern](https://regexr.com/?expression=^\([0-9A-Fa-f]{2}:\){5}[0-9A-Fa-f]{2}$)
+
+## .spec.infrastructure.nodes.loadBalancers.networkInterfaces
+
+### Properties
+
+| Property                                                                     | Type      | Required |
+|:-----------------------------------------------------------------------------|:----------|:---------|
+| [addresses](#specinfrastructurenodesloadbalancersnetworkinterfacesaddresses) | `array`   | Optional |
+| [dhcp](#specinfrastructurenodesloadbalancersnetworkinterfacesdhcp)           | `boolean` | Required |
+| [dns](#specinfrastructurenodesloadbalancersnetworkinterfacesdns)             | `array`   | Optional |
+| [gateway](#specinfrastructurenodesloadbalancersnetworkinterfacesgateway)     | `string`  | Optional |
+| [name](#specinfrastructurenodesloadbalancersnetworkinterfacesname)           | `string`  | Required |
+
+### Description
+
+Network interface configuration for a node.
+
+### Constraints
+
+**minimum number of items**: the minimum number of items for this array is: `1`
+
+## .spec.infrastructure.nodes.loadBalancers.networkInterfaces.addresses
+
+### Description
+
+IPv4 CIDR notation (IP address with subnet mask /0-32). Example: 192.168.1.0/24
+
+### Constraints
+
+**minimum number of items**: the minimum number of items for this array is: `1`
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}/(3[0-2]|[12]?[0-9])$
+```
+
+[try pattern](https://regexr.com/?expression=^\(\(25[0-5]|\(2[0-4]|1\d|[1-9]|\)\d\)\.?\b\){4}\/\(3[0-2]|[12]?[0-9]\)$)
+
+## .spec.infrastructure.nodes.loadBalancers.networkInterfaces.dhcp
+
+### Description
+
+Use DHCP (true) or static IP configuration (false).
+
+## .spec.infrastructure.nodes.loadBalancers.networkInterfaces.dns
+
+### Description
+
+IPv4 address in dotted decimal notation (0.0.0.0 to 255.255.255.255). Example: 192.168.1.100
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$
+```
+
+[try pattern](https://regexr.com/?expression=^\(\(25[0-5]|\(2[0-4]|1\d|[1-9]|\)\d\)\.?\b\){4}$)
+
+## .spec.infrastructure.nodes.loadBalancers.networkInterfaces.gateway
+
+### Description
+
+IPv4 address in dotted decimal notation (0.0.0.0 to 255.255.255.255). Example: 192.168.1.100
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$
+```
+
+[try pattern](https://regexr.com/?expression=^\(\(25[0-5]|\(2[0-4]|1\d|[1-9]|\)\d\)\.?\b\){4}$)
+
+## .spec.infrastructure.nodes.loadBalancers.networkInterfaces.name
+
+### Description
+
+Interface name. Examples: eno1, ens3, eth0
+
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
+
+## .spec.infrastructure.nodes.loadBalancers.partitioning
+
+### Description
+
+Partitioning strategy. Default: auto
+
+### Constraints
+
+**enum**: the value of this property must be equal to one of the following string values:
+
+| Value  |
+|:-------|
+|`"auto"`|
+
 ## .spec.infrastructure.nodes.workers
 
 ### Properties
@@ -582,10 +681,7 @@ Partitioning strategy. Default: auto
 |:----------------------------------------------------------------------|:---------|:---------|
 | [hostname](#specinfrastructurenodesworkershostname)                   | `string` | Required |
 | [installDisk](#specinfrastructurenodesworkersinstalldisk)             | `string` | Required |
-| [ip](#specinfrastructurenodesworkersip)                               | `string` | Optional |
 | [macAddress](#specinfrastructurenodesworkersmacaddress)               | `string` | Required |
-| [managementIP](#specinfrastructurenodesworkersmanagementip)           | `string` | Optional |
-| [name](#specinfrastructurenodesworkersname)                           | `string` | Required |
 | [networkInterfaces](#specinfrastructurenodesworkersnetworkinterfaces) | `array`  | Required |
 | [partitioning](#specinfrastructurenodesworkerspartitioning)           | `string` | Optional |
 
@@ -601,7 +697,7 @@ Node definition with network configuration. Applies to all roles: controlPlanes,
 
 ### Description
 
-FQDN hostname. Applied by Ignition at first boot. Must be a fully qualified domain name. Example: master1.prod.example.com
+Fully Qualified Domain Name (FQDN). Must include domain suffix. Example: server.example.com
 
 ### Constraints
 
@@ -625,21 +721,11 @@ Disk device for Flatcar Container Linux installation. Example: /dev/sda, /dev/nv
 
 **minimum length**: the minimum number of characters for this string is: `1`
 
-## .spec.infrastructure.nodes.workers.ip
-
-### Description
-
-IP address of the node. Used for node identification and management.
-
-### Constraints
-
-**minimum length**: the minimum number of characters for this string is: `1`
-
 ## .spec.infrastructure.nodes.workers.macAddress
 
 ### Description
 
-Primary MAC address. Used by Matchbox for group selection and node-to-profile mapping. Format: 52:54:00:aa:bb:01
+MAC address in colon-separated hexadecimal format. Example: 52:54:00:12:34:56
 
 ### Constraints
 
@@ -650,26 +736,6 @@ Primary MAC address. Used by Matchbox for group selection and node-to-profile ma
 ```
 
 [try pattern](https://regexr.com/?expression=^\([0-9A-Fa-f]{2}:\){5}[0-9A-Fa-f]{2}$)
-
-## .spec.infrastructure.nodes.workers.managementIP
-
-### Description
-
-IP address for readiness probes and management operations. Defaults to the first static IP from networkInterfaces if not specified.
-
-### Constraints
-
-**minimum length**: the minimum number of characters for this string is: `1`
-
-## .spec.infrastructure.nodes.workers.name
-
-### Description
-
-Logical node name. Used in assets, configs, and Matchbox group identifiers.
-
-### Constraints
-
-**minimum length**: the minimum number of characters for this string is: `1`
 
 ## .spec.infrastructure.nodes.workers.networkInterfaces
 
@@ -695,7 +761,7 @@ Network interface configuration for a node.
 
 ### Description
 
-IP addresses in CIDR notation. Required if dhcp is false. Example: ['10.0.1.10/24']
+IPv4 CIDR notation (IP address with subnet mask /0-32). Example: 192.168.1.0/24
 
 ### Constraints
 
@@ -704,10 +770,10 @@ IP addresses in CIDR notation. Required if dhcp is false. Example: ['10.0.1.10/2
 **pattern**: the string must match the following regular expression:
 
 ```regexp
-^([0-9]{1,3}\.){3}[0-9]{1,3}/[0-9]{1,2}$
+^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}/(3[0-2]|[12]?[0-9])$
 ```
 
-[try pattern](https://regexr.com/?expression=^\([0-9]{1,3}\.\){3}[0-9]{1,3}\/[0-9]{1,2}$)
+[try pattern](https://regexr.com/?expression=^\(\(25[0-5]|\(2[0-4]|1\d|[1-9]|\)\d\)\.?\b\){4}\/\(3[0-2]|[12]?[0-9]\)$)
 
 ## .spec.infrastructure.nodes.workers.networkInterfaces.dhcp
 
@@ -719,33 +785,33 @@ Use DHCP (true) or static IP configuration (false).
 
 ### Description
 
-DNS server IP addresses. Optional. Example: ['10.0.1.53', '1.1.1.1']
+IPv4 address in dotted decimal notation (0.0.0.0 to 255.255.255.255). Example: 192.168.1.100
 
 ### Constraints
 
 **pattern**: the string must match the following regular expression:
 
 ```regexp
-^([0-9]{1,3}\.){3}[0-9]{1,3}$
+^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$
 ```
 
-[try pattern](https://regexr.com/?expression=^\([0-9]{1,3}\.\){3}[0-9]{1,3}$)
+[try pattern](https://regexr.com/?expression=^\(\(25[0-5]|\(2[0-4]|1\d|[1-9]|\)\d\)\.?\b\){4}$)
 
 ## .spec.infrastructure.nodes.workers.networkInterfaces.gateway
 
 ### Description
 
-Default gateway IP address. Required if dhcp is false.
+IPv4 address in dotted decimal notation (0.0.0.0 to 255.255.255.255). Example: 192.168.1.100
 
 ### Constraints
 
 **pattern**: the string must match the following regular expression:
 
 ```regexp
-^([0-9]{1,3}\.){3}[0-9]{1,3}$
+^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$
 ```
 
-[try pattern](https://regexr.com/?expression=^\([0-9]{1,3}\.\){3}[0-9]{1,3}$)
+[try pattern](https://regexr.com/?expression=^\(\(25[0-5]|\(2[0-4]|1\d|[1-9]|\)\d\)\.?\b\){4}$)
 
 ## .spec.infrastructure.nodes.workers.networkInterfaces.name
 
@@ -869,7 +935,7 @@ Path to SSH private key for authentication. Example: ~/.ssh/id_ed25519_cluster
 
 ### Description
 
-SSH port on target nodes. Default: 22
+TCP/UDP port number (1-65535)
 
 ## .spec.infrastructure.ssh.username
 
@@ -890,12 +956,15 @@ SSH user with sudo NOPASSWD access. Default: core (Flatcar default user)
 | [advanced](#speckubernetesadvanced)                       | `object`  | Optional |
 | [controlPlaneAddress](#speckubernetescontrolplaneaddress) | `string`  | Required |
 | [controlPlanePort](#speckubernetescontrolplaneport)       | `integer` | Optional |
-| [loadBalancers](#speckubernetesloadbalancers)             | `array`   | Optional |
+| [controlPlanes](#speckubernetescontrolplanes)             | `array`   | Required |
+| [etcds](#speckubernetesetcds)                             | `array`   | Optional |
+| [loadBalancers](#speckubernetesloadbalancers)             | `object`  | Optional |
 | [networking](#speckubernetesnetworking)                   | `object`  | Optional |
+| [workers](#speckubernetesworkers)                         | `array`   | Required |
 
 ### Description
 
-Kubernetes cluster configuration. This section contains Kubernetes CONFIGURATION including load balancing, networking, and advanced settings. The Kubernetes version is determined by the apiVersion field at the top of the file.
+Kubernetes cluster configuration for Ansible. References nodes from spec.infrastructure.nodes with hostname and management IP (must be one of the IPs from networkInterfaces).
 
 ## .spec.kubernetes.advanced
 
@@ -948,33 +1017,30 @@ FQDN or IP address for the Kubernetes API Server endpoint. Points to the load ba
 
 ### Description
 
-API server port. Default: 6443
+TCP/UDP port number (1-65535)
 
-## .spec.kubernetes.loadBalancers
+## .spec.kubernetes.controlPlanes
 
 ### Properties
 
-| Property                                                           | Type     | Required |
-|:-------------------------------------------------------------------|:---------|:---------|
-| [hostname](#speckubernetesloadbalancershostname)                   | `string` | Required |
-| [installDisk](#speckubernetesloadbalancersinstalldisk)             | `string` | Required |
-| [ip](#speckubernetesloadbalancersip)                               | `string` | Optional |
-| [macAddress](#speckubernetesloadbalancersmacaddress)               | `string` | Required |
-| [managementIP](#speckubernetesloadbalancersmanagementip)           | `string` | Optional |
-| [name](#speckubernetesloadbalancersname)                           | `string` | Required |
-| [networkInterfaces](#speckubernetesloadbalancersnetworkinterfaces) | `array`  | Required |
-| [partitioning](#speckubernetesloadbalancerspartitioning)           | `string` | Optional |
-| [vrrp](#speckubernetesloadbalancersvrrp)                           | `object` | Optional |
+| Property                                         | Type     | Required |
+|:-------------------------------------------------|:---------|:---------|
+| [hostname](#speckubernetescontrolplaneshostname) | `string` | Required |
+| [ip](#speckubernetescontrolplanesip)             | `string` | Required |
 
 ### Description
 
-HAProxy load balancer node with keepalived for high availability.
+Kubernetes node reference for Ansible configuration. Hostname must match a node from spec.infrastructure.nodes, and IP must be one of the IPs from that node's networkInterfaces.
 
-## .spec.kubernetes.loadBalancers.hostname
+### Constraints
+
+**minimum number of items**: the minimum number of items for this array is: `1`
+
+## .spec.kubernetes.controlPlanes.hostname
 
 ### Description
 
-FQDN hostname. Applied by Ignition at first boot. Must be a fully qualified domain name. Example: lb1.prod.example.com
+Fully Qualified Domain Name (FQDN). Must include domain suffix. Example: server.example.com
 
 ### Constraints
 
@@ -988,161 +1054,143 @@ FQDN hostname. Applied by Ignition at first boot. Must be a fully qualified doma
 
 [try pattern](https://regexr.com/?expression=^\([a-zA-Z0-9]\([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9]\)?\.\)%2B[a-zA-Z]{2,}$)
 
-## .spec.kubernetes.loadBalancers.installDisk
+## .spec.kubernetes.controlPlanes.ip
 
 ### Description
 
-Disk device for Flatcar Container Linux installation. Example: /dev/sda, /dev/nvme0n1
-
-### Constraints
-
-**minimum length**: the minimum number of characters for this string is: `1`
-
-## .spec.kubernetes.loadBalancers.ip
-
-### Description
-
-IP address of the node. Used for node identification and management.
-
-### Constraints
-
-**minimum length**: the minimum number of characters for this string is: `1`
-
-## .spec.kubernetes.loadBalancers.macAddress
-
-### Description
-
-Primary MAC address. Used by Matchbox for group selection and node-to-profile mapping. Format: 52:54:00:aa:bb:01
+IPv4 address in dotted decimal notation (0.0.0.0 to 255.255.255.255). Example: 192.168.1.100
 
 ### Constraints
 
 **pattern**: the string must match the following regular expression:
 
 ```regexp
-^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$
+^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$
 ```
 
-[try pattern](https://regexr.com/?expression=^\([0-9A-Fa-f]{2}:\){5}[0-9A-Fa-f]{2}$)
+[try pattern](https://regexr.com/?expression=^\(\(25[0-5]|\(2[0-4]|1\d|[1-9]|\)\d\)\.?\b\){4}$)
 
-## .spec.kubernetes.loadBalancers.managementIP
-
-### Description
-
-IP address for readiness probes and management operations. Defaults to the first static IP from networkInterfaces if not specified.
-
-### Constraints
-
-**minimum length**: the minimum number of characters for this string is: `1`
-
-## .spec.kubernetes.loadBalancers.name
-
-### Description
-
-Logical node name. Used in assets, configs, and Matchbox group identifiers.
-
-### Constraints
-
-**minimum length**: the minimum number of characters for this string is: `1`
-
-## .spec.kubernetes.loadBalancers.networkInterfaces
+## .spec.kubernetes.etcds
 
 ### Properties
 
-| Property                                                            | Type      | Required |
-|:--------------------------------------------------------------------|:----------|:---------|
-| [addresses](#speckubernetesloadbalancersnetworkinterfacesaddresses) | `array`   | Optional |
-| [dhcp](#speckubernetesloadbalancersnetworkinterfacesdhcp)           | `boolean` | Required |
-| [dns](#speckubernetesloadbalancersnetworkinterfacesdns)             | `array`   | Optional |
-| [gateway](#speckubernetesloadbalancersnetworkinterfacesgateway)     | `string`  | Optional |
-| [name](#speckubernetesloadbalancersnetworkinterfacesname)           | `string`  | Required |
+| Property                                 | Type     | Required |
+|:-----------------------------------------|:---------|:---------|
+| [hostname](#speckubernetesetcdshostname) | `string` | Required |
+| [ip](#speckubernetesetcdsip)             | `string` | Required |
 
 ### Description
 
-Network interface configuration for a node.
+Kubernetes node reference for Ansible configuration. Hostname must match a node from spec.infrastructure.nodes, and IP must be one of the IPs from that node's networkInterfaces.
 
 ### Constraints
 
 **minimum number of items**: the minimum number of items for this array is: `1`
 
-## .spec.kubernetes.loadBalancers.networkInterfaces.addresses
+## .spec.kubernetes.etcds.hostname
 
 ### Description
 
-IP addresses in CIDR notation. Required if dhcp is false. Example: ['10.0.1.10/24']
-
-### Constraints
-
-**minimum number of items**: the minimum number of items for this array is: `1`
-
-**pattern**: the string must match the following regular expression:
-
-```regexp
-^([0-9]{1,3}\.){3}[0-9]{1,3}/[0-9]{1,2}$
-```
-
-[try pattern](https://regexr.com/?expression=^\([0-9]{1,3}\.\){3}[0-9]{1,3}\/[0-9]{1,2}$)
-
-## .spec.kubernetes.loadBalancers.networkInterfaces.dhcp
-
-### Description
-
-Use DHCP (true) or static IP configuration (false).
-
-## .spec.kubernetes.loadBalancers.networkInterfaces.dns
-
-### Description
-
-DNS server IP addresses. Optional. Example: ['10.0.1.53', '1.1.1.1']
-
-### Constraints
-
-**pattern**: the string must match the following regular expression:
-
-```regexp
-^([0-9]{1,3}\.){3}[0-9]{1,3}$
-```
-
-[try pattern](https://regexr.com/?expression=^\([0-9]{1,3}\.\){3}[0-9]{1,3}$)
-
-## .spec.kubernetes.loadBalancers.networkInterfaces.gateway
-
-### Description
-
-Default gateway IP address. Required if dhcp is false.
-
-### Constraints
-
-**pattern**: the string must match the following regular expression:
-
-```regexp
-^([0-9]{1,3}\.){3}[0-9]{1,3}$
-```
-
-[try pattern](https://regexr.com/?expression=^\([0-9]{1,3}\.\){3}[0-9]{1,3}$)
-
-## .spec.kubernetes.loadBalancers.networkInterfaces.name
-
-### Description
-
-Interface name. Examples: eno1, ens3, eth0
+Fully Qualified Domain Name (FQDN). Must include domain suffix. Example: server.example.com
 
 ### Constraints
 
 **minimum length**: the minimum number of characters for this string is: `1`
 
-## .spec.kubernetes.loadBalancers.partitioning
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$
+```
+
+[try pattern](https://regexr.com/?expression=^\([a-zA-Z0-9]\([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9]\)?\.\)%2B[a-zA-Z]{2,}$)
+
+## .spec.kubernetes.etcds.ip
 
 ### Description
 
-Partitioning strategy. Default: auto
+IPv4 address in dotted decimal notation (0.0.0.0 to 255.255.255.255). Example: 192.168.1.100
 
 ### Constraints
 
-**enum**: the value of this property must be equal to one of the following string values:
+**pattern**: the string must match the following regular expression:
 
-| Value  |
-|:-------|
-|`"auto"`|
+```regexp
+^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$
+```
+
+[try pattern](https://regexr.com/?expression=^\(\(25[0-5]|\(2[0-4]|1\d|[1-9]|\)\d\)\.?\b\){4}$)
+
+## .spec.kubernetes.loadBalancers
+
+### Properties
+
+| Property                                       | Type      | Required |
+|:-----------------------------------------------|:----------|:---------|
+| [enabled](#speckubernetesloadbalancersenabled) | `boolean` | Optional |
+| [hosts](#speckubernetesloadbalancershosts)     | `array`   | Optional |
+| [vrrp](#speckubernetesloadbalancersvrrp)       | `object`  | Optional |
+
+### Description
+
+HAProxy load balancers with keepalived for high availability. If disabled, cluster can use external load balancer or direct DNS to a control plane node.
+
+## .spec.kubernetes.loadBalancers.enabled
+
+### Description
+
+Enable HAProxy load balancers. If false, controlPlaneAddress must point to an external load balancer or directly to a control plane node. Default: false
+
+## .spec.kubernetes.loadBalancers.hosts
+
+### Properties
+
+| Property                                              | Type     | Required |
+|:------------------------------------------------------|:---------|:---------|
+| [hostname](#speckubernetesloadbalancershostshostname) | `string` | Required |
+| [ip](#speckubernetesloadbalancershostsip)             | `string` | Required |
+
+### Description
+
+Load balancer host reference for Ansible configuration. Hostname must match a node from spec.infrastructure.nodes.loadBalancers, and IP must be one of the IPs from that node's networkInterfaces.
+
+### Constraints
+
+**minimum number of items**: the minimum number of items for this array is: `1`
+
+## .spec.kubernetes.loadBalancers.hosts.hostname
+
+### Description
+
+Fully Qualified Domain Name (FQDN). Must include domain suffix. Example: server.example.com
+
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$
+```
+
+[try pattern](https://regexr.com/?expression=^\([a-zA-Z0-9]\([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9]\)?\.\)%2B[a-zA-Z]{2,}$)
+
+## .spec.kubernetes.loadBalancers.hosts.ip
+
+### Description
+
+IPv4 address in dotted decimal notation (0.0.0.0 to 255.255.255.255). Example: 192.168.1.100
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$
+```
+
+[try pattern](https://regexr.com/?expression=^\(\(25[0-5]|\(2[0-4]|1\d|[1-9]|\)\d\)\.?\b\){4}$)
 
 ## .spec.kubernetes.loadBalancers.vrrp
 
@@ -1150,20 +1198,21 @@ Partitioning strategy. Default: auto
 
 | Property                                                           | Type      | Required |
 |:-------------------------------------------------------------------|:----------|:---------|
-| [authPassword](#speckubernetesloadbalancersvrrpauthpassword)       | `string`  | Required |
-| [interface](#speckubernetesloadbalancersvrrpinterface)             | `string`  | Required |
-| [virtualIP](#speckubernetesloadbalancersvrrpvirtualip)             | `string`  | Required |
-| [virtualRouterID](#speckubernetesloadbalancersvrrpvirtualrouterid) | `integer` | Required |
+| [authPassword](#speckubernetesloadbalancersvrrpauthpassword)       | `string`  | Optional |
+| [enabled](#speckubernetesloadbalancersvrrpenabled)                 | `boolean` | Optional |
+| [interface](#speckubernetesloadbalancersvrrpinterface)             | `string`  | Optional |
+| [virtualIP](#speckubernetesloadbalancersvrrpvirtualip)             | `string`  | Optional |
+| [virtualRouterID](#speckubernetesloadbalancersvrrpvirtualrouterid) | `integer` | Optional |
 
 ### Description
 
-VRRP (Virtual Router Redundancy Protocol) configuration for keepalived. Used when multiple load balancers are configured for high availability.
+VRRP (Virtual Router Redundancy Protocol) configuration for keepalived. If disabled, load balancers work without high availability (single active LB).
 
 ## .spec.kubernetes.loadBalancers.vrrp.authPassword
 
 ### Description
 
-Password for VRRP authentication. Prevents rogue VRRP instances. Best practice: use environment variable substitution (e.g., $VRRP_PASSWORD). Maximum length: 8 characters
+Password for VRRP authentication. Required when enabled is true. Prevents rogue VRRP instances. Best practice: use environment variable substitution (e.g., $VRRP_PASSWORD). Maximum length: 8 characters
 
 ### Constraints
 
@@ -1171,11 +1220,17 @@ Password for VRRP authentication. Prevents rogue VRRP instances. Best practice: 
 
 **minimum length**: the minimum number of characters for this string is: `1`
 
+## .spec.kubernetes.loadBalancers.vrrp.enabled
+
+### Description
+
+Enable VRRP for load balancer high availability. If false, only the first load balancer will be active. Default: false
+
 ## .spec.kubernetes.loadBalancers.vrrp.interface
 
 ### Description
 
-Network interface where the VIP will be configured. Must exist on ALL load balancer nodes. Examples: ens3, eth0, eno1
+Network interface where the VIP will be configured. Required when enabled is true. Must exist on ALL load balancer nodes. Examples: ens3, eth0, eno1
 
 ### Constraints
 
@@ -1185,23 +1240,23 @@ Network interface where the VIP will be configured. Must exist on ALL load balan
 
 ### Description
 
-Virtual IP (VIP) shared between load balancers in CIDR format. Must be in the same subnet as load balancer nodes. Must NOT be assigned to any physical interface. Must be the IP that controlPlaneAddress resolves to. Example: 10.0.1.100/24
+IPv4 CIDR notation (IP address with subnet mask /0-32). Example: 192.168.1.0/24
 
 ### Constraints
 
 **pattern**: the string must match the following regular expression:
 
 ```regexp
-^([0-9]{1,3}\.){3}[0-9]{1,3}/[0-9]{1,2}$
+^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}/(3[0-2]|[12]?[0-9])$
 ```
 
-[try pattern](https://regexr.com/?expression=^\([0-9]{1,3}\.\){3}[0-9]{1,3}\/[0-9]{1,2}$)
+[try pattern](https://regexr.com/?expression=^\(\(25[0-5]|\(2[0-4]|1\d|[1-9]|\)\d\)\.?\b\){4}\/\(3[0-2]|[12]?[0-9]\)$)
 
 ## .spec.kubernetes.loadBalancers.vrrp.virtualRouterID
 
 ### Description
 
-Unique identifier for the VRRP router. Must be unique in the network segment. Range: 1-255
+Unique identifier for the VRRP router. Required when enabled is true. Must be unique in the network segment. Range: 1-255
 
 ## .spec.kubernetes.networking
 
@@ -1221,49 +1276,100 @@ Kubernetes network configuration.
 
 ### Description
 
-CoreDNS service IP address. Must be within serviceCIDR. Example: 172.16.0.10
+IPv4 address in dotted decimal notation (0.0.0.0 to 255.255.255.255). Example: 192.168.1.100
 
 ### Constraints
 
 **pattern**: the string must match the following regular expression:
 
 ```regexp
-^([0-9]{1,3}\.){3}[0-9]{1,3}$
+^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$
 ```
 
-[try pattern](https://regexr.com/?expression=^\([0-9]{1,3}\.\){3}[0-9]{1,3}$)
+[try pattern](https://regexr.com/?expression=^\(\(25[0-5]|\(2[0-4]|1\d|[1-9]|\)\d\)\.?\b\){4}$)
 
 ## .spec.kubernetes.networking.podCIDR
 
 ### Description
 
-The subnet CIDR to use for the Pods network. Example: 172.16.128.0/17
+IPv4 CIDR notation (IP address with subnet mask /0-32). Example: 192.168.1.0/24
 
 ### Constraints
 
 **pattern**: the string must match the following regular expression:
 
 ```regexp
-^([0-9]{1,3}\.){3}[0-9]{1,3}/[0-9]{1,2}$
+^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}/(3[0-2]|[12]?[0-9])$
 ```
 
-[try pattern](https://regexr.com/?expression=^\([0-9]{1,3}\.\){3}[0-9]{1,3}\/[0-9]{1,2}$)
+[try pattern](https://regexr.com/?expression=^\(\(25[0-5]|\(2[0-4]|1\d|[1-9]|\)\d\)\.?\b\){4}\/\(3[0-2]|[12]?[0-9]\)$)
 
 ## .spec.kubernetes.networking.serviceCIDR
 
 ### Description
 
-The subnet CIDR to use for the Services network. Example: 172.16.0.0/17
+IPv4 CIDR notation (IP address with subnet mask /0-32). Example: 192.168.1.0/24
 
 ### Constraints
 
 **pattern**: the string must match the following regular expression:
 
 ```regexp
-^([0-9]{1,3}\.){3}[0-9]{1,3}/[0-9]{1,2}$
+^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}/(3[0-2]|[12]?[0-9])$
 ```
 
-[try pattern](https://regexr.com/?expression=^\([0-9]{1,3}\.\){3}[0-9]{1,3}\/[0-9]{1,2}$)
+[try pattern](https://regexr.com/?expression=^\(\(25[0-5]|\(2[0-4]|1\d|[1-9]|\)\d\)\.?\b\){4}\/\(3[0-2]|[12]?[0-9]\)$)
+
+## .spec.kubernetes.workers
+
+### Properties
+
+| Property                                   | Type     | Required |
+|:-------------------------------------------|:---------|:---------|
+| [hostname](#speckubernetesworkershostname) | `string` | Required |
+| [ip](#speckubernetesworkersip)             | `string` | Required |
+
+### Description
+
+Kubernetes node reference for Ansible configuration. Hostname must match a node from spec.infrastructure.nodes, and IP must be one of the IPs from that node's networkInterfaces.
+
+### Constraints
+
+**minimum number of items**: the minimum number of items for this array is: `1`
+
+## .spec.kubernetes.workers.hostname
+
+### Description
+
+Fully Qualified Domain Name (FQDN). Must include domain suffix. Example: server.example.com
+
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$
+```
+
+[try pattern](https://regexr.com/?expression=^\([a-zA-Z0-9]\([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9]\)?\.\)%2B[a-zA-Z]{2,}$)
+
+## .spec.kubernetes.workers.ip
+
+### Description
+
+IPv4 address in dotted decimal notation (0.0.0.0 to 255.255.255.255). Example: 192.168.1.100
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$
+```
+
+[try pattern](https://regexr.com/?expression=^\(\(25[0-5]|\(2[0-4]|1\d|[1-9]|\)\d\)\.?\b\){4}$)
 
 ## .spec.plugins
 

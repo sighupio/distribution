@@ -1,0 +1,116 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://schemas.sighup.io/types-common.json",
+  "title": "Common Type Definitions",
+  "description": "Reusable type definitions for SIGHUP Kubernetes Fury Distribution schemas",
+  "$defs": {
+    "Types.IpAddress": {
+      "type": "string",
+      "description": "IPv4 address in dotted decimal notation (0.0.0.0 to 255.255.255.255). Example: 192.168.1.100",
+      "pattern": "^((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)\\.?\\b){4}$",
+      "examples": [
+        "192.168.1.100",
+        "10.0.0.1",
+        "172.16.0.50"
+      ]
+    },
+    "Types.Cidr": {
+      "type": "string",
+      "description": "IPv4 CIDR notation (IP address with subnet mask /0-32). Example: 192.168.1.0/24",
+      "pattern": "^((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)\\.?\\b){4}/(3[0-2]|[12]?[0-9])$",
+      "examples": [
+        "192.168.1.0/24",
+        "10.0.0.0/8",
+        "172.16.0.0/16"
+      ]
+    },
+    "Types.TcpPort": {
+      "type": "integer",
+      "description": "TCP/UDP port number (1-65535)",
+      "minimum": 1,
+      "maximum": 65535,
+      "examples": [22, 443, 6443, 8080]
+    },
+    "Types.Uri": {
+      "type": "string",
+      "description": "Uniform Resource Identifier (URI). Must be a valid URL with scheme. Example: https://example.com:8080",
+      "pattern": "^https?://[a-zA-Z0-9]([a-zA-Z0-9\\-]{0,61}[a-zA-Z0-9])?(\\.[a-zA-Z0-9]([a-zA-Z0-9\\-]{0,61}[a-zA-Z0-9])?)*:\\d+$",
+      "minLength": 1,
+      "examples": [
+        "https://matchbox.internal.example.com:8080",
+        "http://registry.example.com:5000"
+      ]
+    },
+    "Types.Fqdn": {
+      "type": "string",
+      "description": "Fully Qualified Domain Name (FQDN). Must include domain suffix. Example: server.example.com",
+      "pattern": "^([a-zA-Z0-9]([a-zA-Z0-9\\-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z]{2,}$",
+      "minLength": 1,
+      "examples": [
+        "master1.k8s.example.com",
+        "api.production.company.io"
+      ]
+    },
+    "Types.MacAddress": {
+      "type": "string",
+      "description": "MAC address in colon-separated hexadecimal format. Example: 52:54:00:12:34:56",
+      "pattern": "^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$",
+      "examples": [
+        "52:54:00:12:34:56",
+        "AA:BB:CC:DD:EE:FF"
+      ]
+    },
+    "Types.SshPublicKey": {
+      "type": "string",
+      "description": "SSH public key in authorized_keys format. Supports RSA, ECDSA, Ed25519 key types.",
+      "pattern": "^(ssh-rsa|ssh-ed25519|ecdsa-sha2-nistp256|ecdsa-sha2-nistp384|ecdsa-sha2-nistp521) [A-Za-z0-9+/]+[=]{0,3}( .*)?$",
+      "minLength": 80,
+      "examples": [
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG... user@host",
+        "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAB... admin@company"
+      ]
+    },
+    "Types.FilePath": {
+      "type": "string",
+      "description": "File system path (absolute or relative). Example: /path/to/file or ./relative/path",
+      "minLength": 1,
+      "pattern": "^[\\w\\-\\./~]+$",
+      "examples": [
+        "~/.ssh/id_ed25519",
+        "/opt/pki/cluster",
+        "./configs/cluster.yaml"
+      ]
+    },
+    "Types.Email": {
+      "type": "string",
+      "description": "Email address in standard format. Example: admin@example.com",
+      "format": "email",
+      "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+      "examples": [
+        "devops@example.com",
+        "cluster-admin@company.io"
+      ]
+    },
+    "Types.Duration": {
+      "type": "string",
+      "description": "Duration in Go format (e.g., 1h30m, 24h, 720h). Valid units: h (hours), m (minutes), s (seconds)",
+      "pattern": "^([0-9]+(\\.[0-9]+)?(h|m|s))+$",
+      "examples": [
+        "1h",
+        "30m",
+        "720h",
+        "1h30m"
+      ]
+    },
+    "Types.StorageSize": {
+      "type": "string",
+      "description": "Storage size in Kubernetes format. Valid units: Gi, Mi, Ki, Ti. Example: 50Gi",
+      "pattern": "^[0-9]+(\\.[0-9]+)?(Gi|Mi|Ki|Ti)$",
+      "examples": [
+        "50Gi",
+        "100Mi",
+        "1Ti"
+      ]
+    }
+  }
+}

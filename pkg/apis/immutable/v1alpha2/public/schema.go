@@ -96,24 +96,24 @@ type SpecInfrastructureMatchbox struct {
 	// Internal HTTPS URL that target nodes will contact during PXE boot. Must be
 	// accessible from all nodes during boot. Must resolve to the Matchbox server IP
 	// (can be furyctl serve matchbox or remote Matchbox). Example:
-	// https://matchbox.internal.example:8080
-	Url string `json:"url" yaml:"url" mapstructure:"url"`
+	// https://matchbox.internal.example.com:8080
+	Url TypesUri `json:"url" yaml:"url" mapstructure:"url"`
 }
 
 // Network interface configuration for a node.
 type SpecInfrastructureNetworkInterface struct {
 	// IP addresses in CIDR notation. Required if dhcp is false. Example:
 	// ['10.0.1.10/24']
-	Addresses []string `json:"addresses,omitempty" yaml:"addresses,omitempty" mapstructure:"addresses,omitempty"`
+	Addresses []TypesCidr `json:"addresses,omitempty" yaml:"addresses,omitempty" mapstructure:"addresses,omitempty"`
 
 	// Use DHCP (true) or static IP configuration (false).
 	Dhcp bool `json:"dhcp" yaml:"dhcp" mapstructure:"dhcp"`
 
 	// DNS server IP addresses. Optional. Example: ['10.0.1.53', '1.1.1.1']
-	Dns []string `json:"dns,omitempty" yaml:"dns,omitempty" mapstructure:"dns,omitempty"`
+	Dns []TypesIpAddress `json:"dns,omitempty" yaml:"dns,omitempty" mapstructure:"dns,omitempty"`
 
 	// Default gateway IP address. Required if dhcp is false.
-	Gateway *string `json:"gateway,omitempty" yaml:"gateway,omitempty" mapstructure:"gateway,omitempty"`
+	Gateway *TypesIpAddress `json:"gateway,omitempty" yaml:"gateway,omitempty" mapstructure:"gateway,omitempty"`
 
 	// Interface name. Examples: eno1, ens3, eth0
 	Name string `json:"name" yaml:"name" mapstructure:"name"`
@@ -124,7 +124,7 @@ type SpecInfrastructureNetworkInterface struct {
 type SpecInfrastructureNode struct {
 	// FQDN hostname. Applied by Ignition at first boot. Must be a fully qualified
 	// domain name. Example: master1.prod.example.com
-	Hostname string `json:"hostname" yaml:"hostname" mapstructure:"hostname"`
+	Hostname TypesFqdn `json:"hostname" yaml:"hostname" mapstructure:"hostname"`
 
 	// Disk device for Flatcar Container Linux installation. Example: /dev/sda,
 	// /dev/nvme0n1
@@ -132,7 +132,7 @@ type SpecInfrastructureNode struct {
 
 	// Primary MAC address. Used by Matchbox for group selection and node-to-profile
 	// mapping. Format: 52:54:00:aa:bb:01
-	MacAddress string `json:"macAddress" yaml:"macAddress" mapstructure:"macAddress"`
+	MacAddress TypesMacAddress `json:"macAddress" yaml:"macAddress" mapstructure:"macAddress"`
 
 	// Network interface configuration. At least one interface is required.
 	NetworkInterfaces []SpecInfrastructureNetworkInterface `json:"networkInterfaces" yaml:"networkInterfaces" mapstructure:"networkInterfaces"`
@@ -205,7 +205,7 @@ type SpecInfrastructureSSH struct {
 	KeyPath string `json:"keyPath" yaml:"keyPath" mapstructure:"keyPath"`
 
 	// SSH port on target nodes. Default: 22
-	Port int `json:"port,omitempty" yaml:"port,omitempty" mapstructure:"port,omitempty"`
+	Port TypesTcpPort `json:"port,omitempty" yaml:"port,omitempty" mapstructure:"port,omitempty"`
 
 	// SSH user with sudo NOPASSWD access. Default: core (Flatcar default user)
 	Username string `json:"username,omitempty" yaml:"username,omitempty" mapstructure:"username,omitempty"`
@@ -224,7 +224,7 @@ type SpecKubernetes struct {
 	ControlPlaneAddress string `json:"controlPlaneAddress" yaml:"controlPlaneAddress" mapstructure:"controlPlaneAddress"`
 
 	// API server port. Default: 6443
-	ControlPlanePort int `json:"controlPlanePort,omitempty" yaml:"controlPlanePort,omitempty" mapstructure:"controlPlanePort,omitempty"`
+	ControlPlanePort TypesTcpPort `json:"controlPlanePort,omitempty" yaml:"controlPlanePort,omitempty" mapstructure:"controlPlanePort,omitempty"`
 
 	// Control plane nodes for Ansible configuration. Must reference nodes from
 	// spec.infrastructure.nodes.controlPlanes.
@@ -272,12 +272,12 @@ type SpecKubernetesAdvancedAPIServerExtraArgs map[string]string
 type SpecKubernetesLoadBalancerHost struct {
 	// FQDN hostname of the load balancer. Must match one of the hostnames from
 	// spec.infrastructure.nodes.loadBalancers. Example: lb1.prod.example.com
-	Hostname string `json:"hostname" yaml:"hostname" mapstructure:"hostname"`
+	Hostname TypesFqdn `json:"hostname" yaml:"hostname" mapstructure:"hostname"`
 
 	// Management IP address for Ansible configuration. Must be one of the IPs
 	// configured in the corresponding node's networkInterfaces in
 	// spec.infrastructure.nodes.
-	Ip string `json:"ip" yaml:"ip" mapstructure:"ip"`
+	Ip TypesIpAddress `json:"ip" yaml:"ip" mapstructure:"ip"`
 }
 
 // HAProxy load balancers with keepalived for high availability. If disabled,
@@ -297,14 +297,15 @@ type SpecKubernetesLoadBalancers struct {
 
 // Kubernetes network configuration.
 type SpecKubernetesNetworking struct {
-	// CoreDNS service IP address. Must be within serviceCIDR. Example: 172.16.0.10
-	DnsServiceIP *string `json:"dnsServiceIP,omitempty" yaml:"dnsServiceIP,omitempty" mapstructure:"dnsServiceIP,omitempty"`
+	// CoreDNS service IP address. Must be within serviceCIDR. Default: 10.96.0.10
+	DnsServiceIP TypesIpAddress `json:"dnsServiceIP,omitempty" yaml:"dnsServiceIP,omitempty" mapstructure:"dnsServiceIP,omitempty"`
 
-	// The subnet CIDR to use for the Pods network. Example: 172.16.128.0/17
-	PodCIDR *string `json:"podCIDR,omitempty" yaml:"podCIDR,omitempty" mapstructure:"podCIDR,omitempty"`
+	// The subnet CIDR to use for the Pods network. Default: 10.244.0.0/16
+	PodCIDR TypesCidr `json:"podCIDR,omitempty" yaml:"podCIDR,omitempty" mapstructure:"podCIDR,omitempty"`
 
-	// The subnet CIDR to use for the Services network. Example: 172.16.0.0/17
-	ServiceCIDR *string `json:"serviceCIDR,omitempty" yaml:"serviceCIDR,omitempty" mapstructure:"serviceCIDR,omitempty"`
+	// The subnet CIDR to use for the Services network. Must not overlap with podCIDR.
+	// Default: 10.96.0.0/12
+	ServiceCIDR TypesCidr `json:"serviceCIDR,omitempty" yaml:"serviceCIDR,omitempty" mapstructure:"serviceCIDR,omitempty"`
 }
 
 // Kubernetes node reference for Ansible configuration. Hostname must match a node
@@ -313,12 +314,335 @@ type SpecKubernetesNetworking struct {
 type SpecKubernetesNode struct {
 	// FQDN hostname. Must match one of the hostnames from spec.infrastructure.nodes.
 	// Example: master1.prod.example.com
-	Hostname string `json:"hostname" yaml:"hostname" mapstructure:"hostname"`
+	Hostname TypesFqdn `json:"hostname" yaml:"hostname" mapstructure:"hostname"`
 
 	// Management IP address for Ansible configuration. Must be one of the IPs
 	// configured in the corresponding node's networkInterfaces in
 	// spec.infrastructure.nodes.
-	Ip string `json:"ip" yaml:"ip" mapstructure:"ip"`
+	Ip TypesIpAddress `json:"ip" yaml:"ip" mapstructure:"ip"`
+}
+
+// VRRP (Virtual Router Redundancy Protocol) configuration for keepalived. If
+// disabled, load balancers work without high availability (single active LB).
+type SpecKubernetesVRRP struct {
+	// Password for VRRP authentication. Required when enabled is true. Prevents rogue
+	// VRRP instances. Best practice: use environment variable substitution (e.g.,
+	// $VRRP_PASSWORD). Maximum length: 8 characters
+	AuthPassword *string `json:"authPassword,omitempty" yaml:"authPassword,omitempty" mapstructure:"authPassword,omitempty"`
+
+	// Enable VRRP for load balancer high availability. If false, only the first load
+	// balancer will be active. Default: false
+	Enabled bool `json:"enabled,omitempty" yaml:"enabled,omitempty" mapstructure:"enabled,omitempty"`
+
+	// Network interface where the VIP will be configured. Required when enabled is
+	// true. Must exist on ALL load balancer nodes. Examples: ens3, eth0, eno1
+	Interface *string `json:"interface,omitempty" yaml:"interface,omitempty" mapstructure:"interface,omitempty"`
+
+	// Virtual IP (VIP) shared between load balancers in CIDR format. Required when
+	// enabled is true. Must be in the same subnet as load balancer nodes. Must NOT be
+	// assigned to any physical interface. Must be the IP that controlPlaneAddress
+	// resolves to. Example: 10.0.1.100/24
+	VirtualIP *TypesCidr `json:"virtualIP,omitempty" yaml:"virtualIP,omitempty" mapstructure:"virtualIP,omitempty"`
+
+	// Unique identifier for the VRRP router. Required when enabled is true. Must be
+	// unique in the network segment. Range: 1-255
+	VirtualRouterID *int `json:"virtualRouterID,omitempty" yaml:"virtualRouterID,omitempty" mapstructure:"virtualRouterID,omitempty"`
+}
+
+type SpecPlugins struct {
+	// Helm corresponds to the JSON schema field "helm".
+	Helm *SpecPluginsHelm `json:"helm,omitempty" yaml:"helm,omitempty" mapstructure:"helm,omitempty"`
+
+	// Kustomize corresponds to the JSON schema field "kustomize".
+	Kustomize SpecPluginsKustomize `json:"kustomize,omitempty" yaml:"kustomize,omitempty" mapstructure:"kustomize,omitempty"`
+}
+
+type SpecPluginsHelm struct {
+	// Releases corresponds to the JSON schema field "releases".
+	Releases SpecPluginsHelmReleases `json:"releases,omitempty" yaml:"releases,omitempty" mapstructure:"releases,omitempty"`
+
+	// Repositories corresponds to the JSON schema field "repositories".
+	Repositories SpecPluginsHelmRepositories `json:"repositories,omitempty" yaml:"repositories,omitempty" mapstructure:"repositories,omitempty"`
+}
+
+type SpecPluginsHelmReleases []struct {
+	// The chart of the release
+	Chart string `json:"chart" yaml:"chart" mapstructure:"chart"`
+
+	// Disable running `helm diff` validation when installing the plugin, it will
+	// still be done when upgrading.
+	DisableValidationOnInstall *bool `json:"disableValidationOnInstall,omitempty" yaml:"disableValidationOnInstall,omitempty" mapstructure:"disableValidationOnInstall,omitempty"`
+
+	// The name of the release
+	Name string `json:"name" yaml:"name" mapstructure:"name"`
+
+	// The namespace of the release
+	Namespace string `json:"namespace" yaml:"namespace" mapstructure:"namespace"`
+
+	// Set corresponds to the JSON schema field "set".
+	Set []SpecPluginsHelmReleasesElemSetElem `json:"set,omitempty" yaml:"set,omitempty" mapstructure:"set,omitempty"`
+
+	// The values of the release
+	Values []string `json:"values,omitempty" yaml:"values,omitempty" mapstructure:"values,omitempty"`
+
+	// The version of the release
+	Version *string `json:"version,omitempty" yaml:"version,omitempty" mapstructure:"version,omitempty"`
+}
+
+type SpecPluginsHelmReleasesElemSetElem struct {
+	// The name of the set
+	Name string `json:"name" yaml:"name" mapstructure:"name"`
+
+	// The value of the set
+	Value string `json:"value" yaml:"value" mapstructure:"value"`
+}
+
+type SpecPluginsHelmRepositories []struct {
+	// The name of the repository
+	Name string `json:"name" yaml:"name" mapstructure:"name"`
+
+	// The url of the repository
+	Url string `json:"url" yaml:"url" mapstructure:"url"`
+}
+
+type SpecPluginsKustomize []struct {
+	// The folder of the kustomize plugin
+	Folder string `json:"folder" yaml:"folder" mapstructure:"folder"`
+
+	// The name of the kustomize plugin. A lowercase RFC 1123 subdomain must consist
+	// of lower case alphanumeric characters, '-' or '.', and must start and end with
+	// an alphanumeric character (e.g. 'example.com', 'local-storage')
+	Name string `json:"name" yaml:"name" mapstructure:"name"`
+}
+
+// IPv4 CIDR notation (IP address with subnet mask /0-32). Example: 192.168.1.0/24
+type TypesCidr string
+
+// Fully Qualified Domain Name (FQDN). Must include domain suffix. Example:
+// server.example.com
+type TypesFqdn string
+
+// IPv4 address in dotted decimal notation (0.0.0.0 to 255.255.255.255). Example:
+// 192.168.1.100
+type TypesIpAddress string
+
+// MAC address in colon-separated hexadecimal format. Example: 52:54:00:12:34:56
+type TypesMacAddress string
+
+// TCP/UDP port number (1-65535)
+type TypesTcpPort int
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecKubernetesNode) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	if v, ok := raw["hostname"]; !ok || v == nil {
+		return fmt.Errorf("field hostname in SpecKubernetesNode: required")
+	}
+	if v, ok := raw["ip"]; !ok || v == nil {
+		return fmt.Errorf("field ip in SpecKubernetesNode: required")
+	}
+	type Plain SpecKubernetesNode
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	*j = SpecKubernetesNode(plain)
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecKubernetesLoadBalancerHost) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	if v, ok := raw["hostname"]; !ok || v == nil {
+		return fmt.Errorf("field hostname in SpecKubernetesLoadBalancerHost: required")
+	}
+	if v, ok := raw["ip"]; !ok || v == nil {
+		return fmt.Errorf("field ip in SpecKubernetesLoadBalancerHost: required")
+	}
+	type Plain SpecKubernetesLoadBalancerHost
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	*j = SpecKubernetesLoadBalancerHost(plain)
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecInfrastructure) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	if v, ok := raw["matchbox"]; !ok || v == nil {
+		return fmt.Errorf("field matchbox in SpecInfrastructure: required")
+	}
+	if v, ok := raw["nodes"]; !ok || v == nil {
+		return fmt.Errorf("field nodes in SpecInfrastructure: required")
+	}
+	if v, ok := raw["ssh"]; !ok || v == nil {
+		return fmt.Errorf("field ssh in SpecInfrastructure: required")
+	}
+	type Plain SpecInfrastructure
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	*j = SpecInfrastructure(plain)
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecKubernetesVRRP) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	type Plain SpecKubernetesVRRP
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	if plain.AuthPassword != nil && len(*plain.AuthPassword) < 1 {
+		return fmt.Errorf("field %s length: must be >= %d", "authPassword", 1)
+	}
+	if plain.AuthPassword != nil && len(*plain.AuthPassword) > 8 {
+		return fmt.Errorf("field %s length: must be <= %d", "authPassword", 8)
+	}
+	if v, ok := raw["enabled"]; !ok || v == nil {
+		plain.Enabled = false
+	}
+	if plain.Interface != nil && len(*plain.Interface) < 1 {
+		return fmt.Errorf("field %s length: must be >= %d", "interface", 1)
+	}
+	*j = SpecKubernetesVRRP(plain)
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecInfrastructureSSH) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	if v, ok := raw["keyPath"]; !ok || v == nil {
+		return fmt.Errorf("field keyPath in SpecInfrastructureSSH: required")
+	}
+	type Plain SpecInfrastructureSSH
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	if len(plain.KeyPath) < 1 {
+		return fmt.Errorf("field %s length: must be >= %d", "keyPath", 1)
+	}
+	if v, ok := raw["port"]; !ok || v == nil {
+		plain.Port = 22.0
+	}
+	if v, ok := raw["username"]; !ok || v == nil {
+		plain.Username = "core"
+	}
+	if len(plain.Username) < 1 {
+		return fmt.Errorf("field %s length: must be >= %d", "username", 1)
+	}
+	*j = SpecInfrastructureSSH(plain)
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecKubernetesLoadBalancers) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	type Plain SpecKubernetesLoadBalancers
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	if v, ok := raw["enabled"]; !ok || v == nil {
+		plain.Enabled = false
+	}
+	if plain.Hosts != nil && len(plain.Hosts) < 1 {
+		return fmt.Errorf("field %s length: must be >= %d", "hosts", 1)
+	}
+	*j = SpecKubernetesLoadBalancers(plain)
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecInfrastructurePKI) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	type Plain SpecInfrastructurePKI
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	if v, ok := raw["folder"]; !ok || v == nil {
+		plain.Folder = "./pki"
+	}
+	*j = SpecInfrastructurePKI(plain)
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecKubernetesNetworking) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	type Plain SpecKubernetesNetworking
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	if v, ok := raw["dnsServiceIP"]; !ok || v == nil {
+		plain.DnsServiceIP = "10.96.0.10"
+	}
+	if v, ok := raw["podCIDR"]; !ok || v == nil {
+		plain.PodCIDR = "10.244.0.0/16"
+	}
+	if v, ok := raw["serviceCIDR"]; !ok || v == nil {
+		plain.ServiceCIDR = "10.96.0.0/12"
+	}
+	*j = SpecKubernetesNetworking(plain)
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecInfrastructureOSUpdates) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	type Plain SpecInfrastructureOSUpdates
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	if v, ok := raw["allowDuringClusterUpdate"]; !ok || v == nil {
+		plain.AllowDuringClusterUpdate = false
+	}
+	if v, ok := raw["enabled"]; !ok || v == nil {
+		plain.Enabled = true
+	}
+	if plain.Server != nil && len(*plain.Server) < 1 {
+		return fmt.Errorf("field %s length: must be >= %d", "server", 1)
+	}
+	if v, ok := raw["updateStrategy"]; !ok || v == nil {
+		plain.UpdateStrategy = "manual"
+	}
+	*j = SpecInfrastructureOSUpdates(plain)
+	return nil
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
@@ -361,135 +685,6 @@ func (j *SpecKubernetes) UnmarshalJSON(b []byte) error {
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecInfrastructureNetworkInterface) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if v, ok := raw["dhcp"]; !ok || v == nil {
-		return fmt.Errorf("field dhcp in SpecInfrastructureNetworkInterface: required")
-	}
-	if v, ok := raw["name"]; !ok || v == nil {
-		return fmt.Errorf("field name in SpecInfrastructureNetworkInterface: required")
-	}
-	type Plain SpecInfrastructureNetworkInterface
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	if plain.Addresses != nil && len(plain.Addresses) < 1 {
-		return fmt.Errorf("field %s length: must be >= %d", "addresses", 1)
-	}
-	if len(plain.Name) < 1 {
-		return fmt.Errorf("field %s length: must be >= %d", "name", 1)
-	}
-	*j = SpecInfrastructureNetworkInterface(plain)
-	return nil
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecInfrastructureSSH) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if v, ok := raw["keyPath"]; !ok || v == nil {
-		return fmt.Errorf("field keyPath in SpecInfrastructureSSH: required")
-	}
-	type Plain SpecInfrastructureSSH
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	if len(plain.KeyPath) < 1 {
-		return fmt.Errorf("field %s length: must be >= %d", "keyPath", 1)
-	}
-	if v, ok := raw["port"]; !ok || v == nil {
-		plain.Port = 22.0
-	}
-	if v, ok := raw["username"]; !ok || v == nil {
-		plain.Username = "core"
-	}
-	if len(plain.Username) < 1 {
-		return fmt.Errorf("field %s length: must be >= %d", "username", 1)
-	}
-	*j = SpecInfrastructureSSH(plain)
-	return nil
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecInfrastructurePKI) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	type Plain SpecInfrastructurePKI
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	if v, ok := raw["folder"]; !ok || v == nil {
-		plain.Folder = "./pki"
-	}
-	*j = SpecInfrastructurePKI(plain)
-	return nil
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecInfrastructureOSUpdates) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	type Plain SpecInfrastructureOSUpdates
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	if v, ok := raw["allowDuringClusterUpdate"]; !ok || v == nil {
-		plain.AllowDuringClusterUpdate = false
-	}
-	if v, ok := raw["enabled"]; !ok || v == nil {
-		plain.Enabled = true
-	}
-	if plain.Server != nil && len(*plain.Server) < 1 {
-		return fmt.Errorf("field %s length: must be >= %d", "server", 1)
-	}
-	if v, ok := raw["updateStrategy"]; !ok || v == nil {
-		plain.UpdateStrategy = "manual"
-	}
-	*j = SpecInfrastructureOSUpdates(plain)
-	return nil
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecKubernetesNode) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if v, ok := raw["hostname"]; !ok || v == nil {
-		return fmt.Errorf("field hostname in SpecKubernetesNode: required")
-	}
-	if v, ok := raw["ip"]; !ok || v == nil {
-		return fmt.Errorf("field ip in SpecKubernetesNode: required")
-	}
-	type Plain SpecKubernetesNode
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	if len(plain.Hostname) < 1 {
-		return fmt.Errorf("field %s length: must be >= %d", "hostname", 1)
-	}
-	if len(plain.Ip) < 1 {
-		return fmt.Errorf("field %s length: must be >= %d", "ip", 1)
-	}
-	*j = SpecKubernetesNode(plain)
-	return nil
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
 func (j *SpecInfrastructureOSUpdatesUpdateStrategy) UnmarshalJSON(b []byte) error {
 	var v string
 	if err := json.Unmarshal(b, &v); err != nil {
@@ -510,110 +705,29 @@ func (j *SpecInfrastructureOSUpdatesUpdateStrategy) UnmarshalJSON(b []byte) erro
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecKubernetesLoadBalancerHost) UnmarshalJSON(b []byte) error {
+func (j *SpecPluginsHelmReleasesElemSetElem) UnmarshalJSON(b []byte) error {
 	var raw map[string]interface{}
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
-	if v, ok := raw["hostname"]; !ok || v == nil {
-		return fmt.Errorf("field hostname in SpecKubernetesLoadBalancerHost: required")
+	if v, ok := raw["name"]; !ok || v == nil {
+		return fmt.Errorf("field name in SpecPluginsHelmReleasesElemSetElem: required")
 	}
-	if v, ok := raw["ip"]; !ok || v == nil {
-		return fmt.Errorf("field ip in SpecKubernetesLoadBalancerHost: required")
+	if v, ok := raw["value"]; !ok || v == nil {
+		return fmt.Errorf("field value in SpecPluginsHelmReleasesElemSetElem: required")
 	}
-	type Plain SpecKubernetesLoadBalancerHost
+	type Plain SpecPluginsHelmReleasesElemSetElem
 	var plain Plain
 	if err := json.Unmarshal(b, &plain); err != nil {
 		return err
 	}
-	if len(plain.Hostname) < 1 {
-		return fmt.Errorf("field %s length: must be >= %d", "hostname", 1)
-	}
-	if len(plain.Ip) < 1 {
-		return fmt.Errorf("field %s length: must be >= %d", "ip", 1)
-	}
-	*j = SpecKubernetesLoadBalancerHost(plain)
-	return nil
-}
-
-// VRRP (Virtual Router Redundancy Protocol) configuration for keepalived. If
-// disabled, load balancers work without high availability (single active LB).
-type SpecKubernetesVRRP struct {
-	// Password for VRRP authentication. Required when enabled is true. Prevents rogue
-	// VRRP instances. Best practice: use environment variable substitution (e.g.,
-	// $VRRP_PASSWORD). Maximum length: 8 characters
-	AuthPassword *string `json:"authPassword,omitempty" yaml:"authPassword,omitempty" mapstructure:"authPassword,omitempty"`
-
-	// Enable VRRP for load balancer high availability. If false, only the first load
-	// balancer will be active. Default: false
-	Enabled bool `json:"enabled,omitempty" yaml:"enabled,omitempty" mapstructure:"enabled,omitempty"`
-
-	// Network interface where the VIP will be configured. Required when enabled is
-	// true. Must exist on ALL load balancer nodes. Examples: ens3, eth0, eno1
-	Interface *string `json:"interface,omitempty" yaml:"interface,omitempty" mapstructure:"interface,omitempty"`
-
-	// Virtual IP (VIP) shared between load balancers in CIDR format. Required when
-	// enabled is true. Must be in the same subnet as load balancer nodes. Must NOT be
-	// assigned to any physical interface. Must be the IP that controlPlaneAddress
-	// resolves to. Example: 10.0.1.100/24
-	VirtualIP *string `json:"virtualIP,omitempty" yaml:"virtualIP,omitempty" mapstructure:"virtualIP,omitempty"`
-
-	// Unique identifier for the VRRP router. Required when enabled is true. Must be
-	// unique in the network segment. Range: 1-255
-	VirtualRouterID *int `json:"virtualRouterID,omitempty" yaml:"virtualRouterID,omitempty" mapstructure:"virtualRouterID,omitempty"`
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecKubernetesVRRP) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	type Plain SpecKubernetesVRRP
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	if plain.AuthPassword != nil && len(*plain.AuthPassword) < 1 {
-		return fmt.Errorf("field %s length: must be >= %d", "authPassword", 1)
-	}
-	if plain.AuthPassword != nil && len(*plain.AuthPassword) > 8 {
-		return fmt.Errorf("field %s length: must be <= %d", "authPassword", 8)
-	}
-	if v, ok := raw["enabled"]; !ok || v == nil {
-		plain.Enabled = false
-	}
-	if plain.Interface != nil && len(*plain.Interface) < 1 {
-		return fmt.Errorf("field %s length: must be >= %d", "interface", 1)
-	}
-	*j = SpecKubernetesVRRP(plain)
+	*j = SpecPluginsHelmReleasesElemSetElem(plain)
 	return nil
 }
 
 var enumValues_SpecInfrastructureOSUpdatesUpdateStrategy = []interface{}{
 	"manual",
 	"automatic",
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecKubernetesLoadBalancers) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	type Plain SpecKubernetesLoadBalancers
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	if v, ok := raw["enabled"]; !ok || v == nil {
-		plain.Enabled = false
-	}
-	if plain.Hosts != nil && len(plain.Hosts) < 1 {
-		return fmt.Errorf("field %s length: must be >= %d", "hosts", 1)
-	}
-	*j = SpecKubernetesLoadBalancers(plain)
-	return nil
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
@@ -672,9 +786,6 @@ func (j *SpecInfrastructureNode) UnmarshalJSON(b []byte) error {
 	if err := json.Unmarshal(b, &plain); err != nil {
 		return err
 	}
-	if len(plain.Hostname) < 1 {
-		return fmt.Errorf("field %s length: must be >= %d", "hostname", 1)
-	}
 	if len(plain.InstallDisk) < 1 {
 		return fmt.Errorf("field %s length: must be >= %d", "installDisk", 1)
 	}
@@ -686,117 +797,6 @@ func (j *SpecInfrastructureNode) UnmarshalJSON(b []byte) error {
 	}
 	*j = SpecInfrastructureNode(plain)
 	return nil
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecInfrastructure) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if v, ok := raw["matchbox"]; !ok || v == nil {
-		return fmt.Errorf("field matchbox in SpecInfrastructure: required")
-	}
-	if v, ok := raw["nodes"]; !ok || v == nil {
-		return fmt.Errorf("field nodes in SpecInfrastructure: required")
-	}
-	if v, ok := raw["ssh"]; !ok || v == nil {
-		return fmt.Errorf("field ssh in SpecInfrastructure: required")
-	}
-	type Plain SpecInfrastructure
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = SpecInfrastructure(plain)
-	return nil
-}
-
-type SpecPluginsHelmReleasesElemSetElem struct {
-	// The name of the set
-	Name string `json:"name" yaml:"name" mapstructure:"name"`
-
-	// The value of the set
-	Value string `json:"value" yaml:"value" mapstructure:"value"`
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecPluginsHelmReleasesElemSetElem) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if v, ok := raw["name"]; !ok || v == nil {
-		return fmt.Errorf("field name in SpecPluginsHelmReleasesElemSetElem: required")
-	}
-	if v, ok := raw["value"]; !ok || v == nil {
-		return fmt.Errorf("field value in SpecPluginsHelmReleasesElemSetElem: required")
-	}
-	type Plain SpecPluginsHelmReleasesElemSetElem
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = SpecPluginsHelmReleasesElemSetElem(plain)
-	return nil
-}
-
-type SpecPluginsHelmReleases []struct {
-	// The chart of the release
-	Chart string `json:"chart" yaml:"chart" mapstructure:"chart"`
-
-	// Disable running `helm diff` validation when installing the plugin, it will
-	// still be done when upgrading.
-	DisableValidationOnInstall *bool `json:"disableValidationOnInstall,omitempty" yaml:"disableValidationOnInstall,omitempty" mapstructure:"disableValidationOnInstall,omitempty"`
-
-	// The name of the release
-	Name string `json:"name" yaml:"name" mapstructure:"name"`
-
-	// The namespace of the release
-	Namespace string `json:"namespace" yaml:"namespace" mapstructure:"namespace"`
-
-	// Set corresponds to the JSON schema field "set".
-	Set []SpecPluginsHelmReleasesElemSetElem `json:"set,omitempty" yaml:"set,omitempty" mapstructure:"set,omitempty"`
-
-	// The values of the release
-	Values []string `json:"values,omitempty" yaml:"values,omitempty" mapstructure:"values,omitempty"`
-
-	// The version of the release
-	Version *string `json:"version,omitempty" yaml:"version,omitempty" mapstructure:"version,omitempty"`
-}
-
-type SpecPluginsHelmRepositories []struct {
-	// The name of the repository
-	Name string `json:"name" yaml:"name" mapstructure:"name"`
-
-	// The url of the repository
-	Url string `json:"url" yaml:"url" mapstructure:"url"`
-}
-
-type SpecPluginsHelm struct {
-	// Releases corresponds to the JSON schema field "releases".
-	Releases SpecPluginsHelmReleases `json:"releases,omitempty" yaml:"releases,omitempty" mapstructure:"releases,omitempty"`
-
-	// Repositories corresponds to the JSON schema field "repositories".
-	Repositories SpecPluginsHelmRepositories `json:"repositories,omitempty" yaml:"repositories,omitempty" mapstructure:"repositories,omitempty"`
-}
-
-type SpecPluginsKustomize []struct {
-	// The folder of the kustomize plugin
-	Folder string `json:"folder" yaml:"folder" mapstructure:"folder"`
-
-	// The name of the kustomize plugin. A lowercase RFC 1123 subdomain must consist
-	// of lower case alphanumeric characters, '-' or '.', and must start and end with
-	// an alphanumeric character (e.g. 'example.com', 'local-storage')
-	Name string `json:"name" yaml:"name" mapstructure:"name"`
-}
-
-type SpecPlugins struct {
-	// Helm corresponds to the JSON schema field "helm".
-	Helm *SpecPluginsHelm `json:"helm,omitempty" yaml:"helm,omitempty" mapstructure:"helm,omitempty"`
-
-	// Kustomize corresponds to the JSON schema field "kustomize".
-	Kustomize SpecPluginsKustomize `json:"kustomize,omitempty" yaml:"kustomize,omitempty" mapstructure:"kustomize,omitempty"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
@@ -816,6 +816,37 @@ func (j *SpecInfrastructureNodePartitioning) UnmarshalJSON(b []byte) error {
 		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_SpecInfrastructureNodePartitioning, v)
 	}
 	*j = SpecInfrastructureNodePartitioning(v)
+	return nil
+}
+
+var enumValues_SpecInfrastructureNodePartitioning = []interface{}{
+	"auto",
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecInfrastructureNetworkInterface) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	if v, ok := raw["dhcp"]; !ok || v == nil {
+		return fmt.Errorf("field dhcp in SpecInfrastructureNetworkInterface: required")
+	}
+	if v, ok := raw["name"]; !ok || v == nil {
+		return fmt.Errorf("field name in SpecInfrastructureNetworkInterface: required")
+	}
+	type Plain SpecInfrastructureNetworkInterface
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	if plain.Addresses != nil && len(plain.Addresses) < 1 {
+		return fmt.Errorf("field %s length: must be >= %d", "addresses", 1)
+	}
+	if len(plain.Name) < 1 {
+		return fmt.Errorf("field %s length: must be >= %d", "name", 1)
+	}
+	*j = SpecInfrastructureNetworkInterface(plain)
 	return nil
 }
 
@@ -860,9 +891,6 @@ func (j *SpecInfrastructureMatchbox) UnmarshalJSON(b []byte) error {
 	if err := json.Unmarshal(b, &plain); err != nil {
 		return err
 	}
-	if len(plain.Url) < 1 {
-		return fmt.Errorf("field %s length: must be >= %d", "url", 1)
-	}
 	*j = SpecInfrastructureMatchbox(plain)
 	return nil
 }
@@ -891,9 +919,9 @@ func (j *ImmutableKfdV1Alpha2Kind) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-var enumValues_SpecInfrastructureNodePartitioning = []interface{}{
-	"auto",
-}
+// Uniform Resource Identifier (URI). Must be a valid URL with scheme. Example:
+// https://example.com:8080
+type TypesUri string
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *Metadata) UnmarshalJSON(b []byte) error {
