@@ -73,6 +73,7 @@ type KFDToolsCommon struct {
 	Kapp      KFDTool `yaml:"kapp"`
 	Helm      KFDTool `yaml:"helm"`
 	Helmfile  KFDTool `yaml:"helmfile"`
+	Go        KFDTool `yaml:"go"`
 }
 
 type KFDToolsEks struct {

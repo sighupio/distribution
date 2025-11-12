@@ -8,8 +8,8 @@ modules:
   aws: v5.1.0
   dr: v3.2.0
   ingress: v4.1.1
-  logging: v5.2.0
-  monitoring: v4.0.1
+  logging: feat/validate-installation-subcommand
+  monitoring: feat/validate-installation-subcommand
   opa: v1.15.0
   networking: v3.0.0
   tracing: v1.3.0
@@ -48,6 +48,8 @@ tools:
       version: 0.156.0
     kapp:
       version: 0.64.2
+    go:
+      version: 1.23.2
   eks:
     awscli:
       version: ">= 2.8.12"
