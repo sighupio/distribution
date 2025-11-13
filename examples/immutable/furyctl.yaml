@@ -38,10 +38,8 @@ spec:
     nodes:
       # Control-plane nodes (stacked etcd)
       controlPlanes:
-        - name: master1
-          hostname: master1.prod.example.com
+        - hostname: master1.prod.example.com
           macAddress: "52:54:00:aa:bb:10"
-          ip: 10.0.1.20
           installDisk: /dev/sda
           partitioning: auto
           networkInterfaces:
@@ -50,12 +48,9 @@ spec:
               addresses: ["10.0.1.20/24"]
               gateway: 10.0.1.1
               dns: ["10.0.1.53"]
-          managementIP: 10.0.1.20
 
-        - name: master2
-          hostname: master2.prod.example.com
+        - hostname: master2.prod.example.com
           macAddress: "52:54:00:aa:bb:11"
-          ip: 10.0.1.21
           installDisk: /dev/sda
           partitioning: auto
           networkInterfaces:
@@ -64,12 +59,9 @@ spec:
               addresses: ["10.0.1.21/24"]
               gateway: 10.0.1.1
               dns: ["10.0.1.53"]
-          managementIP: 10.0.1.21
 
-        - name: master3
-          hostname: master3.prod.example.com
+        - hostname: master3.prod.example.com
           macAddress: "52:54:00:aa:bb:12"
-          ip: 10.0.1.22
           installDisk: /dev/sda
           partitioning: auto
           networkInterfaces:
@@ -78,14 +70,11 @@ spec:
               addresses: ["10.0.1.22/24"]
               gateway: 10.0.1.1
               dns: ["10.0.1.53"]
-          managementIP: 10.0.1.22
 
       # Worker nodes
       workers:
-        - name: worker1
-          hostname: worker1.prod.example.com
+        - hostname: worker1.prod.example.com
           macAddress: "52:54:00:aa:bb:20"
-          ip: 10.0.1.30
           installDisk: /dev/sda
           partitioning: auto
           networkInterfaces:
@@ -94,12 +83,9 @@ spec:
               addresses: ["10.0.1.30/24"]
               gateway: 10.0.1.1
               dns: ["10.0.1.53"]
-          managementIP: 10.0.1.30
 
-        - name: worker2
-          hostname: worker2.prod.example.com
+        - hostname: worker2.prod.example.com
           macAddress: "52:54:00:aa:bb:21"
-          ip: 10.0.1.31
           installDisk: /dev/sda
           partitioning: auto
           networkInterfaces:
@@ -108,12 +94,9 @@ spec:
               addresses: ["10.0.1.31/24"]
               gateway: 10.0.1.1
               dns: ["10.0.1.53"]
-          managementIP: 10.0.1.31
 
-        - name: worker3
-          hostname: worker3.prod.example.com
+        - hostname: worker3.prod.example.com
           macAddress: "52:54:00:aa:bb:22"
-          ip: 10.0.1.32
           installDisk: /dev/sda
           partitioning: auto
           networkInterfaces:
@@ -122,15 +105,36 @@ spec:
               addresses: ["10.0.1.32/24"]
               gateway: 10.0.1.1
               dns: ["10.0.1.53"]
-          managementIP: 10.0.1.32
+
+      # Load balancer nodes (HAProxy + keepalived)
+      loadBalancers:
+        - hostname: lb1.prod.example.com
+          macAddress: "52:54:00:aa:bb:01"
+          installDisk: /dev/sda
+          partitioning: auto
+          networkInterfaces:
+            - name: ens3
+              dhcp: false
+              addresses: ["10.0.1.10/24"]
+              gateway: 10.0.1.1
+              dns: ["10.0.1.53", "1.1.1.1"]
+
+        - hostname: lb2.prod.example.com
+          macAddress: "52:54:00:aa:bb:02"
+          installDisk: /dev/sda
+          partitioning: auto
+          networkInterfaces:
+            - name: ens3
+              dhcp: false
+              addresses: ["10.0.1.11/24"]
+              gateway: 10.0.1.1
+              dns: ["10.0.1.53", "1.1.1.1"]
 
       # Dedicated etcd nodes (OPTIONAL)
       # Uncomment to use external etcd instead of stacked etcd
       # etcds:
-      #   - name: etcd1
-      #     hostname: etcd1.prod.example.com
+      #   - hostname: etcd1.prod.example.com
       #     macAddress: "52:54:00:aa:bb:30"
-      #     ip: 10.0.1.40
       #     installDisk: /dev/sdb
       #     partitioning: auto
       #     networkInterfaces:
@@ -139,7 +143,6 @@ spec:
       #         addresses: ["10.0.1.40/24"]
       #         gateway: 10.0.1.1
       #         dns: ["10.0.1.53"]
-      #     managementIP: 10.0.1.40
 
     # -------------------------------------------------------------------------
     # OS Update Management (Nebraska)
@@ -185,52 +188,48 @@ spec:
     controlPlanePort: 6443                         # API server port
 
     # -------------------------------------------------------------------------
+    # Control Plane Nodes (References to infrastructure nodes)
+    # -------------------------------------------------------------------------
+    controlPlanes:
+      - hostname: master1.prod.example.com
+        ip: 10.0.1.20                         # Must be from networkInterfaces in infrastructure
+      - hostname: master2.prod.example.com
+        ip: 10.0.1.21
+      - hostname: master3.prod.example.com
+        ip: 10.0.1.22
+
+    # -------------------------------------------------------------------------
+    # Worker Nodes (References to infrastructure nodes)
+    # -------------------------------------------------------------------------
+    workers:
+      - hostname: worker1.prod.example.com
+        ip: 10.0.1.30                         # Must be from networkInterfaces in infrastructure
+      - hostname: worker2.prod.example.com
+        ip: 10.0.1.31
+      - hostname: worker3.prod.example.com
+        ip: 10.0.1.32
+
+    # -------------------------------------------------------------------------
     # Load Balancer Configuration (HAProxy + keepalived)
     # -------------------------------------------------------------------------
     loadBalancers:
-      - name: lb1
-        hostname: lb1.prod.example.com
-        macAddress: "52:54:00:aa:bb:01"
-        ip: 10.0.1.10
-        installDisk: /dev/sda
-        partitioning: auto
-        networkInterfaces:
-          - name: ens3
-            dhcp: false
-            addresses: ["10.0.1.10/24"]
-            gateway: 10.0.1.1
-            dns: ["10.0.1.53", "1.1.1.1"]
-        managementIP: 10.0.1.10
-        vrrp:
-          interface: ens3                     # Network interface for VIP
-          virtualIP: 10.0.1.100/24           # Virtual IP (VIP) - what k8s-api resolves to
-          virtualRouterID: 1                  # VRRP router ID (1-255, unique in network)
-          authPassword: "vrrppass"            # VRRP authentication (max 8 chars)
-
-      - name: lb2
-        hostname: lb2.prod.example.com
-        macAddress: "52:54:00:aa:bb:02"
-        ip: 10.0.1.11
-        installDisk: /dev/sda
-        partitioning: auto
-        networkInterfaces:
-          - name: ens3
-            dhcp: false
-            addresses: ["10.0.1.11/24"]
-            gateway: 10.0.1.1
-            dns: ["10.0.1.53", "1.1.1.1"]
-        managementIP: 10.0.1.11
-        vrrp:
-          interface: ens3
-          virtualIP: 10.0.1.100/24
-          virtualRouterID: 1
-          authPassword: "vrrppass"
+      enabled: true                           # Enable HAProxy load balancers
+      hosts:
+        - hostname: lb1.prod.example.com
+          ip: 10.0.1.10                       # Must be from networkInterfaces in infrastructure
+        - hostname: lb2.prod.example.com
+          ip: 10.0.1.11
+      vrrp:                                   # Shared VRRP configuration
+        enabled: true
+        interface: ens3                       # Network interface for VIP
+        virtualIP: 10.0.1.100/24             # Virtual IP (VIP) - what k8s-api resolves to
+        virtualRouterID: 1                    # VRRP router ID (1-255, unique in network)
+        authPassword: "vrrppass"              # VRRP authentication (max 8 chars)
 
     # Network configuration (required)
     networking:
       podCIDR: 172.16.128.0/17                # Pod network CIDR
       serviceCIDR: 172.16.0.0/17              # Service network CIDR
-      dnsServiceIP: 172.16.0.10               # CoreDNS service IP
 
     # Advanced configuration (optional - most fields use sensible defaults)
     # advanced:

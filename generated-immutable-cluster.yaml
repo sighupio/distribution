@@ -165,7 +165,6 @@ spec:
     networking:
       podCIDR: 10.244.0.0/16
       serviceCIDR: 10.96.0.0/12
-      dnsServiceIP: 10.96.0.10
 
   # Distribution modules
   distribution:

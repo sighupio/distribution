@@ -63,7 +63,6 @@ spec:
     networking:
       podCIDR: 192.168.0.0/16
       serviceCIDR: 10.96.0.0/12
-      dnsServiceIP: 10.96.0.10
 
     # Advanced configuration
     advanced:

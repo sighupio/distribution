@@ -4,9 +4,9 @@ This directory contains comprehensive test cases for the Immutable provider JSON
 
 ## Test Statistics
 
-- **Total Tests**: 26
+- **Total Tests**: 29
 - **Valid Configurations (OK)**: 6
-- **Invalid Configurations (NO)**: 20
+- **Invalid Configurations (NO)**: 23
 
 ## Test Execution
 
@@ -126,6 +126,21 @@ jv ../../../../schemas/public/immutable-kfd-v1alpha2.json 001-ok.yaml
 **Error**: Matchbox URL not using HTTPS
 **Value**: `http://matchbox...` (should be `https://`)
 **Validates**: HTTPS requirement for matchbox
+
+#### 021-no.yaml
+**Error**: Invalid IP address (octets exceeding 255)
+**Value**: `999.999.999.999` (octets must be 0-255)
+**Validates**: Types.IpAddress strict pattern validation
+
+#### 022-no.yaml
+**Error**: Invalid CIDR subnet mask
+**Value**: `10.0.1.20/99` (subnet mask must be 0-32)
+**Validates**: Types.Cidr pattern validation
+
+#### 023-no.yaml
+**Error**: Invalid TCP port (port 0)
+**Value**: `0` (must be 1-65535)
+**Validates**: Types.TcpPort minimum value constraint
 
 ### VRRP/Load Balancer Validation
 

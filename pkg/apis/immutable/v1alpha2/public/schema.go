@@ -297,9 +297,6 @@ type SpecKubernetesLoadBalancers struct {
 
 // Kubernetes network configuration.
 type SpecKubernetesNetworking struct {
-	// CoreDNS service IP address. Must be within serviceCIDR. Default: 10.96.0.10
-	DnsServiceIP TypesIpAddress `json:"dnsServiceIP,omitempty" yaml:"dnsServiceIP,omitempty" mapstructure:"dnsServiceIP,omitempty"`
-
 	// The subnet CIDR to use for the Pods network. Default: 10.244.0.0/16
 	PodCIDR TypesCidr `json:"podCIDR,omitempty" yaml:"podCIDR,omitempty" mapstructure:"podCIDR,omitempty"`
 
@@ -604,9 +601,6 @@ func (j *SpecKubernetesNetworking) UnmarshalJSON(b []byte) error {
 	var plain Plain
 	if err := json.Unmarshal(b, &plain); err != nil {
 		return err
-	}
-	if v, ok := raw["dnsServiceIP"]; !ok || v == nil {
-		plain.DnsServiceIP = "10.96.0.10"
 	}
 	if v, ok := raw["podCIDR"]; !ok || v == nil {
 		plain.PodCIDR = "10.244.0.0/16"

@@ -514,11 +514,6 @@
           "$ref": "#/$defs/Types.Cidr",
           "description": "The subnet CIDR to use for the Services network. Must not overlap with podCIDR. Default: 10.96.0.0/12",
           "default": "10.96.0.0/12"
-        },
-        "dnsServiceIP": {
-          "$ref": "#/$defs/Types.IpAddress",
-          "description": "CoreDNS service IP address. Must be within serviceCIDR. Default: 10.96.0.10",
-          "default": "10.96.0.10"
         }
       }
     },

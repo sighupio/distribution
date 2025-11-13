@@ -1262,31 +1262,14 @@ Unique identifier for the VRRP router. Required when enabled is true. Must be un
 
 ### Properties
 
-| Property                                              | Type     | Required |
-|:------------------------------------------------------|:---------|:---------|
-| [dnsServiceIP](#speckubernetesnetworkingdnsserviceip) | `string` | Optional |
-| [podCIDR](#speckubernetesnetworkingpodcidr)           | `string` | Optional |
-| [serviceCIDR](#speckubernetesnetworkingservicecidr)   | `string` | Optional |
+| Property                                            | Type     | Required |
+|:----------------------------------------------------|:---------|:---------|
+| [podCIDR](#speckubernetesnetworkingpodcidr)         | `string` | Optional |
+| [serviceCIDR](#speckubernetesnetworkingservicecidr) | `string` | Optional |
 
 ### Description
 
 Kubernetes network configuration.
-
-## .spec.kubernetes.networking.dnsServiceIP
-
-### Description
-
-IPv4 address in dotted decimal notation (0.0.0.0 to 255.255.255.255). Example: 192.168.1.100
-
-### Constraints
-
-**pattern**: the string must match the following regular expression:
-
-```regexp
-^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$
-```
-
-[try pattern](https://regexr.com/?expression=^\(\(25[0-5]|\(2[0-4]|1\d|[1-9]|\)\d\)\.?\b\){4}$)
 
 ## .spec.kubernetes.networking.podCIDR
 
