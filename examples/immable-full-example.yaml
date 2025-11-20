@@ -1,0 +1,870 @@
+---
+apiVersion: kfd.sighup.io/v1alpha1
+kind: Immutable
+metadata:
+  name: production-cluster-advanced
+spec:
+  distributionVersion: v1.32.1
+  infrastructure:
+    proxy: {}
+
+    # Global kernel parameters applied to all nodes at infrastructure level
+    # Node-specific parameters override these global values
+    # Ref: https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/
+    kernelParameters:
+      - name: net.ipv4.ip_forward
+        value: "1"
+      - name: net.bridge.bridge-nf-call-iptables
+        value: "1"
+
+    # iPXE server for network boot provisioning
+    # Ref: https://www.flatcar.org/docs/latest/setup/customization/
+    ipxeServer:
+      url: https://ipxe.internal.example.com:8080
+      advanced:
+        logLevel: info
+        dataPath: /var/lib/matchbox
+        assetsPath: /var/lib/matchbox/assets
+
+    nodes:
+      # Control plane nodes (3)
+      # Ref: https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/setup-ha-etcd-with-kubeadm/
+      - hostname: ctrl01.k8s.example.com
+        macAddress: 52:54:00:10:00:01
+        storage:
+          installDisk: /dev/sda
+          additionalDisks:
+            - device: /dev/sdb
+              partitions:
+                - label: etcd-data
+                  number: 1
+                  sizeMiB: 0
+                  filesystem:
+                    format: ext4
+                    label: ETCD
+                    mountPoint: /var/lib/etcd
+        # Node-specific kernel parameters (override global settings)
+        # Control plane: tuning for high connection rates
+        kernelParameters:
+          - name: fs.inotify.max_user_watches
+            value: "1048576"
+        # iSCSI initiator configuration
+        # Ref: https://www.flatcar.org/docs/latest/setup/customization/other-settings/
+        iscsi:
+          enabled: true
+          config: |
+            # Example iSCSI configuration
+        # DM-Multipath configuration for redundant paths
+        multipath:
+          enabled: false
+          config: |
+            defaults {
+              // some multipath config
+            }
+        networkInterfaces:
+          - name: ens3
+            dhcp: false
+            addresses:
+              - 192.168.100.10/24
+            gateway: 192.168.100.1
+            dns:
+              - 192.168.100.53
+              - 8.8.8.8
+
+      - hostname: ctrl02.k8s.example.com
+        macAddress: 52:54:00:10:00:02
+        storage:
+          installDisk: /dev/sda
+          additionalDisks:
+            - device: /dev/sdb
+              partitions:
+                - label: etcd-data
+                  number: 1
+                  sizeMiB: 0
+                  filesystem:
+                    format: ext4
+                    label: ETCD
+                    mountPoint: /var/lib/etcd
+        kernelParameters:
+          - name: fs.inotify.max_user_watches
+            value: "1048576"
+        iscsi:
+          enabled: true
+          config: |
+            # Example iSCSI configuration
+        multipath:
+          enabled: true
+          config: |
+            defaults {
+              // some multipath config
+            }
+        networkInterfaces:
+          - name: ens3
+            dhcp: false
+            addresses:
+              - 192.168.100.11/24
+            gateway: 192.168.100.1
+            dns:
+              - 192.168.100.53
+              - 8.8.8.8
+
+      - hostname: ctrl03.k8s.example.com
+        macAddress: 52:54:00:10:00:03
+        storage:
+          installDisk: /dev/sda
+          additionalDisks:
+            - device: /dev/sdb
+              partitions:
+                - label: etcd-data
+                  number: 1
+                  sizeMiB: 0
+                  filesystem:
+                    format: ext4
+                    label: ETCD
+                    mountPoint: /var/lib/etcd
+        kernelParameters:
+          - name: fs.inotify.max_user_watches
+            value: "1048576"
+        iscsi:
+          enabled: true
+          config: |
+            # Example iSCSI configuration
+        multipath:
+          enabled: true
+          config: |
+            defaults {
+              // some multipath config
+            }
+        networkInterfaces:
+          - name: ens3
+            dhcp: false
+            addresses:
+              - 192.168.100.12/24
+            gateway: 192.168.100.1
+            dns:
+              - 192.168.100.53
+              - 8.8.8.8
+
+      # Load balancer nodes (2) with Keepalived VIP
+      - hostname: lb01.k8s.example.com
+        macAddress: 52:54:00:30:00:01
+        storage:
+          installDisk: /dev/sda
+          additionalDisks:
+            - device: /dev/sdb
+              partitions:
+                - label: kubelet-data
+                  number: 1
+                  sizeMiB: 0
+                  filesystem:
+                    format: xfs
+                    label: KUBELET
+                    mountPoint: /var/lib/kubelet
+        # Load balancer: kernel tuning for high connection tracking
+        kernelParameters:
+          - name: net.netfilter.nf_conntrack_max
+            value: "1000000"
+        iscsi:
+          enabled: true
+          config: |
+            # Example iSCSI configuration
+        multipath:
+          enabled: true
+          config: |
+            defaults {
+              // some multipath config
+            }
+        networkInterfaces:
+          - name: ens3
+            dhcp: false
+            addresses:
+              - 192.168.100.30/24
+              - 192.168.100.100/32
+            gateway: 192.168.100.1
+            dns:
+              - 192.168.100.53
+
+      - hostname: lb02.k8s.example.com
+        macAddress: 52:54:00:30:00:02
+        storage:
+          installDisk: /dev/sda
+          additionalDisks:
+            - device: /dev/sdb
+              partitions:
+                - label: kubelet-data
+                  number: 1
+                  sizeMiB: 0
+                  filesystem:
+                    format: xfs
+                    label: KUBELET
+                    mountPoint: /var/lib/kubelet
+        kernelParameters:
+          - name: net.netfilter.nf_conntrack_max
+            value: "1000000"
+        iscsi:
+          enabled: true
+          config: |
+            # Example iSCSI configuration
+        multipath:
+          enabled: true
+          config: |
+            defaults {
+              // some multipath config
+            }
+        networkInterfaces:
+          - name: ens3
+            dhcp: false
+            addresses:
+              - 192.168.100.31/24
+              - 192.168.100.100/32
+            gateway: 192.168.100.1
+            dns:
+              - 192.168.100.53
+
+      # Infrastructure workers (3) for cluster services
+      - hostname: infra01.k8s.example.com
+        macAddress: 52:54:00:40:00:01
+        storage:
+          installDisk: /dev/sda
+          additionalDisks:
+            - device: /dev/sdb
+              partitions:
+                - label: kubelet-data
+                  number: 1
+                  sizeMiB: 0
+                  filesystem:
+                    format: xfs
+                    label: KUBELET
+                    mountPoint: /var/lib/kubelet
+        # Infrastructure: kernel tuning for Elasticsearch/logging workloads
+        kernelParameters:
+          - name: vm.max_map_count
+            value: "262144"
+        iscsi:
+          enabled: true
+          config: |
+            # Example iSCSI configuration
+        multipath:
+          enabled: true
+          config: |
+            defaults {
+              // some multipath config
+            }
+        networkInterfaces:
+          - name: ens3
+            dhcp: false
+            addresses:
+              - 192.168.100.40/24
+            gateway: 192.168.100.1
+            dns:
+              - 192.168.100.53
+
+      - hostname: infra02.k8s.example.com
+        macAddress: 52:54:00:40:00:02
+        storage:
+          installDisk: /dev/sda
+          additionalDisks:
+            - device: /dev/sdb
+              partitions:
+                - label: kubelet-data
+                  number: 1
+                  sizeMiB: 0
+                  filesystem:
+                    format: xfs
+                    label: KUBELET
+                    mountPoint: /var/lib/kubelet
+        kernelParameters:
+          - name: vm.max_map_count
+            value: "262144"
+        iscsi:
+          enabled: true
+          config: |
+            # Example iSCSI configuration
+        multipath:
+          enabled: true
+          config: |
+            defaults {
+              // some multipath config
+            }
+        networkInterfaces:
+          - name: ens3
+            dhcp: false
+            addresses:
+              - 192.168.100.41/24
+            gateway: 192.168.100.1
+            dns:
+              - 192.168.100.53
+
+      - hostname: infra03.k8s.example.com
+        macAddress: 52:54:00:40:00:03
+        storage:
+          installDisk: /dev/sda
+          additionalDisks:
+            - device: /dev/sdb
+              partitions:
+                - label: kubelet-data
+                  number: 1
+                  sizeMiB: 0
+                  filesystem:
+                    format: xfs
+                    label: KUBELET
+                    mountPoint: /var/lib/kubelet
+        kernelParameters:
+          - name: vm.max_map_count
+            value: "262144"
+        iscsi:
+          enabled: true
+          config: |
+            # Example iSCSI configuration
+        multipath:
+          enabled: false
+          config: |
+            defaults {
+              // some multipath config
+            }
+        networkInterfaces:
+          - name: ens3
+            dhcp: false
+            addresses:
+              - 192.168.100.42/24
+            gateway: 192.168.100.1
+            dns:
+              - 192.168.100.53
+
+      # Application workers (3) with dedicated containerd partition
+      - hostname: app01.k8s.example.com
+        macAddress: 52:54:00:50:00:01
+        storage:
+          installDisk: /dev/sda
+          additionalDisks:
+            - device: /dev/sdb
+              partitions:
+                - label: containerd-data
+                  number: 1
+                  sizeMiB: 0
+                  filesystem:
+                    format: xfs
+                    label: CONTAINERD
+                    mountPoint: /var/lib/containerd
+                    mountOptions: ["noatime", "nodiratime"]
+        # Application: kernel tuning for network throughput
+        kernelParameters:
+          - name: net.core.rmem_max
+            value: "16777216"
+        iscsi:
+          enabled: true
+          config: |
+            # Example iSCSI configuration
+        multipath:
+          enabled: true
+          config: |
+            defaults {
+              // some multipath config
+            }
+        networkInterfaces:
+          - name: ens3
+            dhcp: false
+            addresses:
+              - 192.168.100.50/24
+            gateway: 192.168.100.1
+            dns:
+              - 192.168.100.53
+
+      - hostname: app02.k8s.example.com
+        macAddress: 52:54:00:50:00:02
+        storage:
+          installDisk: /dev/sda
+          additionalDisks:
+            - device: /dev/sdb
+              partitions:
+                - label: containerd-data
+                  number: 1
+                  sizeMiB: 0
+                  filesystem:
+                    format: xfs
+                    label: CONTAINERD
+                    mountPoint: /var/lib/containerd
+                    mountOptions: ["noatime", "nodiratime"]
+        kernelParameters:
+          - name: net.core.rmem_max
+            value: "16777216"
+        iscsi:
+          enabled: true
+          config: |
+            # Example iSCSI configuration
+        multipath:
+          enabled: true
+          config: |
+            defaults {
+              // some multipath config
+            }
+        networkInterfaces:
+          - name: ens3
+            dhcp: false
+            addresses:
+              - 192.168.100.51/24
+            gateway: 192.168.100.1
+            dns:
+              - 192.168.100.53
+
+      - hostname: app03.k8s.example.com
+        macAddress: 52:54:00:50:00:03
+        storage:
+          installDisk: /dev/sda
+          additionalDisks:
+            - device: /dev/sdb
+              partitions:
+                - label: containerd-data
+                  number: 1
+                  sizeMiB: 0
+                  filesystem:
+                    format: xfs
+                    label: CONTAINERD
+                    mountPoint: /var/lib/containerd
+                    mountOptions: ["noatime", "nodiratime"]
+        kernelParameters:
+          - name: net.core.rmem_max
+            value: "16777216"
+        iscsi:
+          enabled: true
+          config: |
+            # Example iSCSI configuration
+        multipath:
+          enabled: true
+          config: |
+            defaults {
+              // some multipath config
+            }
+        networkInterfaces:
+          - name: ens3
+            dhcp: false
+            addresses:
+              - 192.168.100.52/24
+            gateway: 192.168.100.1
+            dns:
+              - 192.168.100.53
+
+      # Database workers (3) optimized for stateful workloads
+      - hostname: db01.k8s.example.com
+        macAddress: 52:54:00:60:00:01
+        storage:
+          installDisk: /dev/sda
+          additionalDisks:
+            - device: /dev/sdb
+              partitions:
+                - label: kubelet-data
+                  number: 1
+                  sizeMiB: 0
+                  filesystem:
+                    format: xfs
+                    label: KUBELET
+                    mountPoint: /var/lib/kubelet
+        # Database: kernel tuning for I/O optimization
+        kernelParameters:
+          - name: vm.swappiness
+            value: "10"
+        iscsi:
+          enabled: true
+          config: |
+            # Example iSCSI configuration
+        multipath:
+          enabled: true
+          config: |
+            defaults {
+              // some multipath config
+            }
+        networkInterfaces:
+          - name: ens3
+            dhcp: false
+            addresses:
+              - 192.168.100.60/24
+            gateway: 192.168.100.1
+            dns:
+              - 192.168.100.53
+
+      - hostname: db02.k8s.example.com
+        macAddress: 52:54:00:60:00:02
+        storage:
+          installDisk: /dev/sda
+          additionalDisks:
+            - device: /dev/sdb
+              partitions:
+                - label: kubelet-data
+                  number: 1
+                  sizeMiB: 0
+                  filesystem:
+                    format: xfs
+                    label: KUBELET
+                    mountPoint: /var/lib/kubelet
+        kernelParameters:
+          - name: vm.swappiness
+            value: "10"
+        iscsi:
+          enabled: true
+          config: |
+            # Example iSCSI configuration
+        multipath:
+          enabled: true
+          config: |
+            defaults {
+              // some multipath config
+            }
+        networkInterfaces:
+          - name: ens3
+            dhcp: false
+            addresses:
+              - 192.168.100.61/24
+            gateway: 192.168.100.1
+            dns:
+              - 192.168.100.53
+
+      - hostname: db03.k8s.example.com
+        macAddress: 52:54:00:60:00:03
+        storage:
+          installDisk: /dev/sda
+          additionalDisks:
+            - device: /dev/sdb
+              partitions:
+                - label: kubelet-data
+                  number: 1
+                  sizeMiB: 0
+                  filesystem:
+                    format: xfs
+                    label: KUBELET
+                    mountPoint: /var/lib/kubelet
+        kernelParameters:
+          - name: vm.swappiness
+            value: "10"
+        iscsi:
+          enabled: true
+          config: |
+            # Example iSCSI configuration
+        multipath:
+          enabled: true
+          config: |
+            defaults {
+              // some multipath config
+            }
+        networkInterfaces:
+          - name: ens3
+            dhcp: false
+            addresses:
+              - 192.168.100.62/24
+            gateway: 192.168.100.1
+            dns:
+              - 192.168.100.53
+
+    # SSH configuration for node access
+    ssh:
+      username: core
+      keyPath: ~/.ssh/id_ed25519_production
+
+  # Kubernetes cluster configuration
+  # Ref: https://kubernetes.io/docs/setup/production-environment/
+  kubernetes:
+    controlPlane:
+      address: k8s-api.example.com:6443
+      kubeletConfiguration:
+        maxPods: 200
+        podPidsLimit: 8192
+      members:
+        # IP is optional. If not specified, it is taken from the node's network interface configuration
+        - hostname: ctrl01.k8s.example.com
+          ip: 192.168.100.10
+        - hostname: ctrl02.k8s.example.com
+          ip: 192.168.100.11
+        - hostname: ctrl03.k8s.example.com
+          ip: 192.168.100.12
+
+    # etcd cluster configuration (minimum 3 nodes for HA)
+    # Ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-upgrade-etcd/
+    etcd:
+      members:
+        # IP is optional. If not specified, it is taken from the node's network interface configuration
+        - hostname: ctrl01.k8s.example.com
+          ip: 192.168.100.10
+        - hostname: ctrl02.k8s.example.com
+          ip: 192.168.100.11
+        - hostname: ctrl03.k8s.example.com
+          ip: 192.168.100.12
+
+    # Node groups with labels, taints, and annotations
+    # Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+    nodeGroups:
+      - name: infra_workers
+        nodes:
+          # IP is optional. If not specified, it is taken from the node's network interface configuration
+          - hostname: infra01.k8s.example.com
+            ip: 192.168.100.40
+          - hostname: infra02.k8s.example.com
+            ip: 192.168.100.41
+          - hostname: infra03.k8s.example.com
+            ip: 192.168.100.42
+        labels:
+          workload-type: infra
+          tier: infrastructure
+        taints:
+          - key: node-role.kubernetes.io/infra
+            value: "true"
+            effect: NoSchedule
+
+      - name: app_workers
+        nodes:
+          # IP is optional. If not specified, it is taken from the node's network interface configuration
+          - hostname: app01.k8s.example.com
+            ip: 192.168.100.50
+          - hostname: app02.k8s.example.com
+            ip: 192.168.100.51
+          - hostname: app03.k8s.example.com
+            ip: 192.168.100.52
+        labels:
+          workload-type: application
+          tier: application
+
+      - name: db_workers
+        nodes:
+          # IP is optional. If not specified, it is taken from the node's network interface configuration
+          - hostname: db01.k8s.example.com
+            ip: 192.168.100.60
+          - hostname: db02.k8s.example.com
+            ip: 192.168.100.61
+          - hostname: db03.k8s.example.com
+            ip: 192.168.100.62
+        labels:
+          workload-type: database
+          tier: data
+        taints:
+          - key: workload
+            value: database
+            effect: NoSchedule
+        annotations:
+          database.kubernetes.io/dedicated: "true"
+        kubeletConfiguration:
+          maxPods: 100
+          podPidsLimit: 8192
+
+    # Network configuration with standard CIDR ranges
+    # Ref: https://kubernetes.io/docs/concepts/cluster-administration/networking/
+    networking:
+      podCIDR: 10.244.0.0/16
+      serviceCIDR: 10.96.0.0/12
+
+    # Advanced cluster configuration
+    advanced:
+      # API server audit logging configuration
+      # Ref: https://kubernetes.io/docs/tasks/debug/debug-cluster/audit/
+      apiServer:
+        extraArgs:
+          audit-log-path: /var/log/kubernetes/audit.log
+          audit-log-maxage: "30"
+          audit-log-maxbackup: "10"
+          audit-log-maxsize: "100"
+          audit-policy-file: /etc/kubernetes/audit-policy.yaml
+
+      # API server certificate Subject Alternative Names
+      apiServerCertSANs:
+        - k8s-api.example.com
+        - k8s-api.internal.example.com
+        - api.k8s.example.com
+        - 192.168.100.100
+        - 10.96.0.1
+
+      # Global kubelet configuration
+      # Ref: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/
+      kubeletConfiguration:
+        maxPods: 250
+        podPidsLimit: 4096
+
+      # Encryption at rest configuration
+      # Ref: https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/
+      encryption:
+        tlsCipherSuites:
+          - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
+          - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+          - TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+          - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+
+        tlsCipherSuitesKubelet:
+          - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
+          - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+
+        configuration: |
+          apiVersion: apiserver.config.k8s.io/v1
+          kind: EncryptionConfiguration
+          resources:
+            - resources:
+              - secrets
+              providers:
+              - aescbc:
+                  keys:
+                  - name: key1
+                    secret: YourBase64EncodedSecretKeyHere32Bytes==
+              - identity: {}
+
+      # Container runtime registry mirrors
+      containerd:
+        registryConfigs:
+          - registry: registry.example.com
+            username: admin
+            password: changeme
+            insecureSkipVerify: false
+
+      # OIDC authentication provider configuration
+      # Ref: https://kubernetes.io/docs/reference/access-authn-authz/authentication/#openid-connect-tokens
+      oidc:
+        issuer_url: https://dex.example.com
+        client_id: kubernetes
+        username_claim: email
+        groups_claim: groups
+        username_prefix: "oidc:"
+        groups_prefix: "oidc:"
+
+      # User certificate generation
+      users:
+        names:
+          - admin
+          - developer
+          - operator
+          - sre
+        org: "fury-production-cluster"
+
+      # Cloud provider integration
+      # Ref: https://kubernetes.io/docs/concepts/architecture/cloud-controller/
+      cloud:
+        provider: external
+
+  # Fury Kubernetes Distribution modules
+  # Ref: https://docs.kubernetesfury.com/
+  distribution:
+    common:
+      registry: registry.sighup.io/fury
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Equal
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/infra
+          operator: Equal
+
+    modules:
+      # Calico CNI plugin for network policies
+      # Ref: https://docs.tigera.io/calico/latest/about/
+      networking:
+        type: calico
+
+      # Ingress controller with cert-manager
+      # Ref: https://kubernetes.github.io/ingress-nginx/
+      ingress:
+        baseDomain: example.com
+        nginx:
+          type: dual
+          tls:
+            provider: certManager
+        certManager:
+          clusterIssuer:
+            name: letsencrypt-prod
+            email: devops@example.com
+            type: http01
+
+      # Loki logging stack
+      # Ref: https://grafana.com/docs/loki/latest/
+      logging:
+        type: loki
+        loki:
+          retentionPeriod: 720h
+          storage:
+            size: 50Gi
+        minio:
+          storageSize: 20Gi
+
+      # Prometheus monitoring stack
+      # Ref: https://prometheus.io/docs/introduction/overview/
+      monitoring:
+        type: prometheus
+        prometheusAdapter:
+          installEnhancedHPAMetrics: true
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+        prometheus:
+          retentionTime: 15d
+          retentionSize: 50GB
+          storageSize: 60Gi
+        alertmanager:
+          installDefaultRules: true
+          deadMansSwitch:
+            enabled: false
+
+      # Tempo distributed tracing
+      # Ref: https://grafana.com/docs/tempo/latest/
+      tracing:
+        type: tempo
+        tempo:
+          retentionTime: 720h
+
+      # Kyverno policy engine
+      # Ref: https://kyverno.io/docs/
+      policy:
+        type: kyverno
+        kyverno:
+          validationFailureAction: Audit
+          installDefaultPolicies: true
+
+      # Velero backup and disaster recovery
+      # Ref: https://velero.io/docs/
+      dr:
+        type: on-premises
+        velero:
+          backend: s3
+          s3:
+            bucketName: production-cluster-backups
+            region: eu-west-1
+            endpoint: https://s3.eu-west-1.amazonaws.com
+          schedules:
+            - name: daily-backup
+              schedule: 0 3 * * *
+              ttl: 720h
+            - name: weekly-backup
+              schedule: 0 3 * * 0
+              ttl: 2160h
+
+      # Authentication provider
+      auth:
+        provider:
+          type: none
+
+  # Custom resources via Kustomize and Helm
+  plugins:
+    kustomize:
+      - name: csi-operator
+        folder: ./plugins/kustomize/csi/operator
+      - name: csi-backend
+        folder: ./plugins/kustomize/csi/backend
+      - name: storageclass
+        folder: ./plugins/kustomize/csi/storageclass
+      - name: network-policies
+        folder: ./plugins/kustomize/network-policies
+      - name: keepalived
+        folder: ./plugins/kustomize/keepalived
+
+    helm:
+      repositories:
+        - name: bitnami
+          url: https://charts.bitnami.com/bitnami
+        - name: prometheus-community
+          url: https://prometheus-community.github.io/helm-charts
+
+      releases:
+        - name: metrics-server
+          namespace: kube-system
+          chart: bitnami/metrics-server
+          version: 6.5.3
+          values:
+            - ./plugins/helm/metrics-server/values.yaml
+
+        - name: node-local-dns
+          namespace: kube-system
+          chart: ./plugins/helm/node-local-dns
+          values:
+            - ./plugins/helm/node-local-dns/values.yaml
