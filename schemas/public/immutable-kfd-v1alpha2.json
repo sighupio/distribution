@@ -1,0 +1,1692 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "A KFD Cluster deployed on bare metal infrastructure with iPXE boot provisioning and immutable OS configuration.",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "type": "string",
+      "pattern": "^kfd\\.sighup\\.io/v\\d+((alpha|beta)\\d+)?$"
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "Immutable"
+      ]
+    },
+    "metadata": {
+      "$ref": "#/$defs/Metadata"
+    },
+    "spec": {
+      "$ref": "#/$defs/Spec"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "apiVersion",
+    "kind",
+    "metadata",
+    "spec"
+  ],
+  "$defs": {
+    "Metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the cluster. It will also be used as a prefix for all the other resources created.",
+          "minLength": 1,
+          "maxLength": 56
+        }
+      },
+      "required": [
+        "name"
+      ]
+    },
+    "Spec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "distributionVersion": {
+          "type": "string",
+          "description": "Defines which KFD version will be installed and, in consequence, the Kubernetes version used to create the cluster. It supports git tags and branches. Example: `v1.32.1`.",
+          "minLength": 1
+        },
+        "infrastructure": {
+          "$ref": "#/$defs/Spec.Infrastructure"
+        },
+        "kubernetes": {
+          "$ref": "#/$defs/Spec.Kubernetes"
+        },
+        "distribution": {
+          "$ref": "#/$defs/Spec.Distribution"
+        },
+        "plugins": {
+          "$ref": "./spec-plugins.json"
+        }
+      },
+      "required": [
+        "distributionVersion",
+        "infrastructure",
+        "kubernetes",
+        "distribution"
+      ]
+    },
+    "Spec.Infrastructure": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Defines the bare metal infrastructure configuration, including nodes, network boot, storage, and networking.",
+      "properties": {
+        "proxy": {
+          "$ref": "#/$defs/Spec.Infrastructure.Proxy"
+        },
+        "kernelParameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Spec.Infrastructure.KernelParameter"
+          },
+          "description": "Global kernel parameters applied to all nodes at infrastructure level. Node-specific parameters override these global values. Ref: https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/"
+        },
+        "ipxeServer": {
+          "$ref": "#/$defs/Spec.Infrastructure.IpxeServer"
+        },
+        "nodes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Spec.Infrastructure.Node"
+          },
+          "description": "List of bare metal nodes to provision.",
+          "minItems": 1
+        },
+        "ssh": {
+          "$ref": "#/$defs/Spec.Infrastructure.SSH"
+        }
+      },
+      "required": [
+        "nodes",
+        "ssh"
+      ]
+    },
+    "Spec.Infrastructure.Proxy": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "HTTP/HTTPS proxy configuration for the infrastructure nodes.",
+      "properties": {
+        "http": {
+          "$ref": "#/$defs/Types.Uri",
+          "description": "The HTTP proxy URL. Example: http://proxy.example.com:3128"
+        },
+        "https": {
+          "$ref": "#/$defs/Types.Uri",
+          "description": "The HTTPS proxy URL. Example: https://proxy.example.com:3128"
+        },
+        "noProxy": {
+          "type": "string",
+          "description": "Comma-separated list of hosts that should not use the HTTP(S) proxy. Example: localhost,127.0.0.1,10.0.0.0/8,.example.com"
+        }
+      }
+    },
+    "Spec.Infrastructure.KernelParameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_-]*([.][a-z][a-z0-9_-]*)+$",
+          "description": "The kernel parameter name (sysctl format). Example: net.ipv4.ip_forward, net.bridge.bridge-nf-call-iptables",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "value": {
+          "type": "string",
+          "description": "The kernel parameter value. Example: \"1\"",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "name",
+        "value"
+      ]
+    },
+    "Spec.Infrastructure.IpxeServer": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "iPXE server configuration for network boot provisioning. Ref: https://www.flatcar.org/docs/latest/setup/customization/",
+      "properties": {
+        "url": {
+          "$ref": "#/$defs/Types.Uri",
+          "description": "The URL of the iPXE server (matchbox). Example: https://ipxe.internal.example.com:8080"
+        },
+        "advanced": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "logLevel": {
+              "type": "string",
+              "description": "Log level for the iPXE server. Example: info",
+              "enum": [
+                "debug",
+                "info",
+                "warning",
+                "error"
+              ]
+            },
+            "dataPath": {
+              "type": "string",
+              "description": "Path to the matchbox data directory. Example: /var/lib/matchbox"
+            },
+            "assetsPath": {
+              "type": "string",
+              "description": "Path to the matchbox assets directory. Example: /var/lib/matchbox/assets"
+            }
+          }
+        }
+      },
+      "required": [
+        "url"
+      ]
+    },
+    "Spec.Infrastructure.Node": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Definition of a bare metal node with storage, network, and hardware configuration.",
+      "properties": {
+        "hostname": {
+          "type": "string",
+          "description": "Fully qualified domain name for the node. Example: node01.k8s.example.com",
+          "pattern": "^([a-zA-Z0-9]([a-zA-Z0-9\\-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z]{2,}$",
+          "minLength": 1
+        },
+        "macAddress": {
+          "$ref": "#/$defs/Types.MacAddress",
+          "description": "MAC address for PXE boot identification. Example: 52:54:00:10:00:01"
+        },
+        "storage": {
+          "$ref": "#/$defs/Spec.Infrastructure.Node.Storage"
+        },
+        "kernelParameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Spec.Infrastructure.KernelParameter"
+          },
+          "description": "Node-specific kernel parameters that override global settings."
+        },
+        "iscsi": {
+          "$ref": "#/$defs/Spec.Infrastructure.Node.Iscsi"
+        },
+        "multipath": {
+          "$ref": "#/$defs/Spec.Infrastructure.Node.Multipath"
+        },
+        "network": {
+          "$ref": "#/$defs/Spec.Infrastructure.Node.Network"
+        }
+      },
+      "required": [
+        "hostname",
+        "macAddress",
+        "storage",
+        "network"
+      ]
+    },
+    "Spec.Infrastructure.Node.Storage": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Storage configuration for the node, including install disk and additional disks with partitions.",
+      "properties": {
+        "installDisk": {
+          "$ref": "#/$defs/Types.DevicePath",
+          "description": "The disk device where the OS will be installed. Example: /dev/sda"
+        },
+        "additionalDisks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Spec.Infrastructure.Node.Storage.Disk"
+          },
+          "description": "Additional disks to partition and mount."
+        }
+      },
+      "required": [
+        "installDisk"
+      ]
+    },
+    "Spec.Infrastructure.Node.Storage.Disk": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Additional disk configuration with partitions.",
+      "properties": {
+        "device": {
+          "$ref": "#/$defs/Types.DevicePath",
+          "description": "The disk device path. Example: /dev/sdb"
+        },
+        "partitions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Spec.Infrastructure.Node.Storage.Partition"
+          },
+          "description": "Partitions to create on this disk.",
+          "minItems": 1
+        }
+      },
+      "required": [
+        "device",
+        "partitions"
+      ]
+    },
+    "Spec.Infrastructure.Node.Storage.Partition": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Partition definition with filesystem and mount options.",
+      "properties": {
+        "label": {
+          "type": "string",
+          "description": "Partition label. Example: etcd-data",
+          "minLength": 1
+        },
+        "number": {
+          "type": "integer",
+          "description": "Partition number. Example: 1",
+          "minimum": 1,
+          "maximum": 128
+        },
+        "sizeMiB": {
+          "type": "integer",
+          "description": "Partition size in MiB. Use 0 to use all available space.",
+          "minimum": 0
+        },
+        "filesystem": {
+          "$ref": "#/$defs/Spec.Infrastructure.Node.Storage.Filesystem"
+        }
+      },
+      "required": [
+        "label",
+        "number",
+        "sizeMiB",
+        "filesystem"
+      ]
+    },
+    "Spec.Infrastructure.Node.Storage.Filesystem": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Filesystem configuration for a partition.",
+      "properties": {
+        "format": {
+          "$ref": "#/$defs/Types.FilesystemType",
+          "description": "Filesystem type. Example: ext4, xfs"
+        },
+        "label": {
+          "type": "string",
+          "description": "Filesystem label (max 12 chars for XFS compatibility). Example: ETCD",
+          "minLength": 1,
+          "maxLength": 12,
+          "pattern": "^[A-Z0-9_-]+$"
+        },
+        "mountPoint": {
+          "type": "string",
+          "description": "Mount point path. Example: /var/lib/etcd",
+          "pattern": "^/[a-zA-Z0-9/_-]*$"
+        },
+        "mountOptions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "noatime",
+              "nodiratime",
+              "relatime",
+              "strictatime",
+              "nodev",
+              "nosuid",
+              "noexec",
+              "ro",
+              "rw",
+              "sync",
+              "async",
+              "discard",
+              "nodiscard",
+              "defaults"
+            ]
+          },
+          "description": "Mount options (validated safe options only). Example: [\"noatime\", \"nodiratime\"]"
+        }
+      },
+      "required": [
+        "format",
+        "label",
+        "mountPoint"
+      ]
+    },
+    "Spec.Infrastructure.Node.Iscsi": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "iSCSI initiator configuration. Ref: https://www.flatcar.org/docs/latest/setup/customization/other-settings/",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable iSCSI support on this node."
+        },
+        "config": {
+          "type": "string",
+          "minLength": 1,
+          "description": "iSCSI configuration content (required when enabled=true)."
+        }
+      },
+      "required": [
+        "enabled"
+      ],
+      "if": {
+        "properties": {
+          "enabled": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "config"
+        ]
+      }
+    },
+    "Spec.Infrastructure.Node.Multipath": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "DM-Multipath configuration for redundant storage paths.",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable multipath support on this node."
+        },
+        "config": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Multipath configuration content (required when enabled=true)."
+        }
+      },
+      "required": [
+        "enabled"
+      ],
+      "if": {
+        "properties": {
+          "enabled": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "config"
+        ]
+      }
+    },
+    "Spec.Infrastructure.Node.Network": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Advanced network configuration with ethernets, bonds, and VLANs using networkd format.",
+      "properties": {
+        "ethernets": {
+          "type": "object",
+          "propertyNames": {
+            "pattern": "^(eth|ens|eno|enp|wlan|wlp|bond|br|vlan|lo|tun|tap)[a-zA-Z0-9._-]*$",
+            "maxLength": 15
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Spec.Infrastructure.Node.Network.Ethernet"
+          },
+          "description": "Ethernet interface configurations, keyed by interface name (e.g., eth0, ens3, eno49)."
+        },
+        "bonds": {
+          "type": "object",
+          "propertyNames": {
+            "pattern": "^bond[a-zA-Z0-9._-]*$",
+            "maxLength": 15
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Spec.Infrastructure.Node.Network.Bond"
+          },
+          "description": "Bond interface configurations, keyed by bond name (e.g., bond0, bond1)."
+        }
+      }
+    },
+    "Spec.Infrastructure.Node.Network.Ethernet": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Ethernet interface configuration.",
+      "properties": {
+        "addresses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Types.Cidr"
+          },
+          "description": "List of IP addresses in CIDR notation. Example: [\"192.168.1.10/24\"]"
+        },
+        "gateway": {
+          "$ref": "#/$defs/Types.IpAddress",
+          "description": "Default gateway IP address."
+        },
+        "nameservers": {
+          "$ref": "#/$defs/Spec.Infrastructure.Node.Network.Nameservers"
+        },
+        "dhcp4": {
+          "type": "boolean",
+          "description": "Enable DHCPv4. Default is false."
+        },
+        "routes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Spec.Infrastructure.Node.Network.Route"
+          },
+          "description": "Static routes for this interface."
+        }
+      },
+      "if": {
+        "anyOf": [
+          {
+            "not": {
+              "required": [
+                "dhcp4"
+              ]
+            }
+          },
+          {
+            "properties": {
+              "dhcp4": {
+                "const": false
+              }
+            }
+          }
+        ]
+      },
+      "then": {
+        "required": [
+          "addresses"
+        ],
+        "properties": {
+          "addresses": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    "Spec.Infrastructure.Node.Network.Bond": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Bond interface configuration for link aggregation.",
+      "properties": {
+        "addresses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Types.Cidr"
+          },
+          "description": "List of IP addresses in CIDR notation for the bond."
+        },
+        "gateway": {
+          "$ref": "#/$defs/Types.IpAddress",
+          "description": "Default gateway IP address for the bond."
+        },
+        "nameservers": {
+          "$ref": "#/$defs/Spec.Infrastructure.Node.Network.Nameservers"
+        },
+        "dhcp4": {
+          "type": "boolean",
+          "description": "Enable DHCPv4 on the bond. Default is false."
+        },
+        "interfaces": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^(eth|ens|eno|enp|wlan|wlp|bond|br|vlan|lo|tun|tap)[a-zA-Z0-9._-]*$",
+            "maxLength": 15,
+            "description": "Member interface name (e.g., ens1f0, ens1f1). Must be valid Linux interface name."
+          },
+          "description": "List of member interfaces for the bond.",
+          "minItems": 1
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "mode": {
+              "$ref": "#/$defs/Types.BondMode",
+              "description": "Bonding mode. Example: active-backup, 802.3ad"
+            },
+            "miiMonitorInterval": {
+              "type": "integer",
+              "description": "MII monitoring interval in milliseconds."
+            },
+            "minLinks": {
+              "type": "integer",
+              "description": "Minimum number of links that must be active before activating aggregate."
+            }
+          },
+          "required": [
+            "mode"
+          ]
+        },
+        "routes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Spec.Infrastructure.Node.Network.Route"
+          },
+          "description": "Static routes for this bond."
+        }
+      },
+      "required": [
+        "interfaces",
+        "parameters"
+      ],
+      "if": {
+        "anyOf": [
+          {
+            "not": {
+              "required": [
+                "dhcp4"
+              ]
+            }
+          },
+          {
+            "properties": {
+              "dhcp4": {
+                "const": false
+              }
+            }
+          }
+        ]
+      },
+      "then": {
+        "required": [
+          "addresses"
+        ],
+        "properties": {
+          "addresses": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    "Spec.Infrastructure.Node.Network.Nameservers": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "DNS nameserver configuration.",
+      "properties": {
+        "addresses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Types.IpAddress"
+          },
+          "description": "List of DNS server IP addresses."
+        },
+        "search": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\\.)*[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$",
+            "maxLength": 253,
+            "description": "DNS search domain in lowercase. Examples: example.com, internal, .internal"
+          },
+          "description": "List of DNS search domains (supports single-level domains).",
+          "maxItems": 6
+        }
+      }
+    },
+    "Spec.Infrastructure.Node.Network.Route": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Static route definition.",
+      "properties": {
+        "to": {
+          "type": "string",
+          "oneOf": [
+            {
+              "const": "default"
+            },
+            {
+              "$ref": "#/$defs/Types.Cidr"
+            }
+          ],
+          "description": "Destination network. Use 'default' for default route or specify CIDR. Examples: default, 10.0.0.0/8"
+        },
+        "via": {
+          "$ref": "#/$defs/Types.IpAddress",
+          "description": "Gateway IP address for this route."
+        }
+      },
+      "required": [
+        "to",
+        "via"
+      ]
+    },
+    "Spec.Infrastructure.SSH": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "SSH credentials for node access.",
+      "properties": {
+        "username": {
+          "type": "string",
+          "description": "SSH username. Example: core",
+          "minLength": 1
+        },
+        "keyPath": {
+          "type": "string",
+          "description": "Path to the SSH private key. Example: ~/.ssh/id_ed25519_production"
+        }
+      },
+      "required": [
+        "username",
+        "keyPath"
+      ]
+    },
+    "Spec.Kubernetes": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Kubernetes cluster configuration including control plane, etcd, and worker nodes.",
+      "properties": {
+        "controlPlane": {
+          "$ref": "#/$defs/Spec.Kubernetes.ControlPlane"
+        },
+        "etcd": {
+          "$ref": "#/$defs/Spec.Kubernetes.Etcd"
+        },
+        "nodeGroups": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Spec.Kubernetes.NodeGroup"
+          },
+          "description": "Worker node groups with labels, taints, and annotations."
+        },
+        "networking": {
+          "$ref": "#/$defs/Spec.Kubernetes.Networking"
+        },
+        "advanced": {
+          "$ref": "#/$defs/Spec.Kubernetes.Advanced"
+        }
+      },
+      "required": [
+        "controlPlane",
+        "etcd",
+        "networking"
+      ]
+    },
+    "Spec.Kubernetes.ControlPlane": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Control plane configuration.",
+      "properties": {
+        "address": {
+          "type": "string",
+          "description": "The address for the Kubernetes control plane with port. Example: k8s-api.example.com:6443",
+          "pattern": "^[a-zA-Z0-9.-]+:[0-9]+$"
+        },
+        "kubeletConfiguration": {
+          "$ref": "#/$defs/Spec.Kubernetes.KubeletConfiguration"
+        },
+        "members": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Spec.Kubernetes.Member"
+          },
+          "description": "Control plane member nodes.",
+          "minItems": 1
+        }
+      },
+      "required": [
+        "address",
+        "members"
+      ]
+    },
+    "Spec.Kubernetes.Etcd": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "etcd cluster configuration. Ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-upgrade-etcd/",
+      "properties": {
+        "members": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Spec.Kubernetes.Member"
+          },
+          "description": "etcd member nodes.",
+          "minItems": 1
+        }
+      },
+      "required": [
+        "members"
+      ]
+    },
+    "Spec.Kubernetes.Member": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "A member node reference with optional IP override.",
+      "properties": {
+        "hostname": {
+          "type": "string",
+          "description": "Hostname that must match an infrastructure node. Example: ctrl01.k8s.example.com",
+          "minLength": 1
+        },
+        "ip": {
+          "$ref": "#/$defs/Types.IpAddress",
+          "description": "Optional IP address. If not specified, it is inferred from the node's network configuration."
+        }
+      },
+      "required": [
+        "hostname"
+      ]
+    },
+    "Spec.Kubernetes.NodeGroup": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "A group of worker nodes with common labels, taints, and annotations. Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Node group name identifier. Example: infra_workers",
+          "minLength": 1
+        },
+        "nodes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Spec.Kubernetes.Member"
+          },
+          "description": "Nodes in this group.",
+          "minItems": 1
+        },
+        "labels": {
+          "$ref": "#/$defs/Types.KubeLabels",
+          "description": "Kubernetes labels to apply to nodes in this group."
+        },
+        "taints": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Types.KubeTaints"
+          },
+          "description": "Kubernetes taints to apply to nodes in this group."
+        },
+        "annotations": {
+          "$ref": "#/$defs/Types.KubeAnnotations",
+          "description": "Kubernetes annotations to apply to nodes in this group."
+        },
+        "kubeletConfiguration": {
+          "$ref": "#/$defs/Spec.Kubernetes.KubeletConfiguration"
+        }
+      },
+      "required": [
+        "name",
+        "nodes"
+      ]
+    },
+    "Spec.Kubernetes.KubeletConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Kubelet configuration parameters. Ref: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/",
+      "properties": {
+        "maxPods": {
+          "type": "integer",
+          "description": "Maximum number of pods per node. Example: 200",
+          "minimum": 1,
+          "maximum": 1000
+        },
+        "podPidsLimit": {
+          "type": "integer",
+          "description": "Maximum number of PIDs per pod. Example: 8192",
+          "minimum": 1
+        }
+      }
+    },
+    "Spec.Kubernetes.Networking": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Kubernetes network configuration. Ref: https://kubernetes.io/docs/concepts/cluster-administration/networking/",
+      "properties": {
+        "podCIDR": {
+          "$ref": "#/$defs/Types.Cidr",
+          "description": "Pod network CIDR. Example: 10.244.0.0/16"
+        },
+        "serviceCIDR": {
+          "$ref": "#/$defs/Types.Cidr",
+          "description": "Service network CIDR. Example: 10.96.0.0/12"
+        }
+      },
+      "required": [
+        "podCIDR",
+        "serviceCIDR"
+      ]
+    },
+    "Spec.Kubernetes.Advanced": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Advanced Kubernetes cluster configuration.",
+      "properties": {
+        "apiServer": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "API server configuration for certificate Subject Alternative Names.",
+          "properties": {
+            "certSANs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "$ref": "#/$defs/Types.IpAddress"
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,}$",
+                    "maxLength": 253
+                  }
+                ],
+                "description": "SAN entry (hostname or IP address). Examples: k8s-api.example.com, 192.168.100.100"
+              },
+              "description": "Additional Subject Alternative Names for the API server certificate."
+            }
+          }
+        },
+        "kubeletConfiguration": {
+          "$ref": "#/$defs/Spec.Kubernetes.KubeletConfiguration"
+        },
+        "encryption": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Encryption at rest configuration. Ref: https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/",
+          "properties": {
+            "tlsCipherSuites": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^TLS_(ECDHE|RSA|DHE)_(ECDSA|RSA|PSK)_WITH_(AES|CHACHA20)_(128|256)_(GCM|CBC|POLY1305)_(SHA256|SHA384)$",
+                "description": "TLS cipher suite name (IANA format). Example: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"
+              },
+              "description": "TLS cipher suites for the API server. Only secure cipher suites allowed."
+            },
+            "tlsCipherSuitesKubelet": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^TLS_(ECDHE|RSA|DHE)_(ECDSA|RSA|PSK)_WITH_(AES|CHACHA20)_(128|256)_(GCM|CBC|POLY1305)_(SHA256|SHA384)$",
+                "description": "TLS cipher suite name (IANA format). Example: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"
+              },
+              "description": "TLS cipher suites for kubelet. Only secure cipher suites allowed."
+            },
+            "configuration": {
+              "type": "string",
+              "minLength": 50,
+              "description": "EncryptionConfiguration YAML content (must be valid YAML with proper structure)."
+            }
+          }
+        },
+        "containerd": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Container runtime registry configuration.",
+          "properties": {
+            "registryConfigs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "registry": {
+                    "type": "string",
+                    "pattern": "^([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,}(:[0-9]{1,5})?(/[a-z0-9._-]+)*$",
+                    "description": "Registry hostname and optional path. Example: registry.example.com, registry.example.com:5000/myrepo"
+                  },
+                  "username": {
+                    "type": "string",
+                    "description": "Registry username."
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "Registry password."
+                  },
+                  "insecureSkipVerify": {
+                    "type": "boolean",
+                    "description": "Skip TLS verification for this registry."
+                  }
+                },
+                "required": [
+                  "registry"
+                ]
+              }
+            }
+          }
+        },
+        "oidc": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "OIDC authentication provider configuration. Ref: https://kubernetes.io/docs/reference/access-authn-authz/authentication/#openid-connect-tokens",
+          "properties": {
+            "issuer_url": {
+              "$ref": "#/$defs/Types.Uri",
+              "description": "OIDC issuer URL."
+            },
+            "client_id": {
+              "type": "string",
+              "description": "OIDC client ID."
+            },
+            "username_claim": {
+              "type": "string",
+              "description": "OIDC username claim."
+            },
+            "groups_claim": {
+              "type": "string",
+              "description": "OIDC groups claim."
+            },
+            "username_prefix": {
+              "type": "string",
+              "description": "Prefix for OIDC usernames."
+            },
+            "groups_prefix": {
+              "type": "string",
+              "description": "Prefix for OIDC groups."
+            }
+          }
+        },
+        "users": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "User certificate generation configuration.",
+          "properties": {
+            "names": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "List of user names for certificate generation."
+            },
+            "org": {
+              "type": "string",
+              "description": "Organization name for user certificates."
+            }
+          }
+        },
+        "cloud": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Cloud provider integration. Ref: https://kubernetes.io/docs/concepts/architecture/cloud-controller/",
+          "properties": {
+            "provider": {
+              "type": "string",
+              "description": "Cloud provider type. Example: external"
+            }
+          }
+        }
+      }
+    },
+    "Spec.Distribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Fury Kubernetes Distribution modules configuration. Ref: https://docs.kubernetesfury.com/",
+      "properties": {
+        "common": {
+          "$ref": "#/$defs/Spec.Distribution.Common"
+        },
+        "modules": {
+          "$ref": "#/$defs/Spec.Distribution.Modules"
+        },
+        "customPatches": {
+          "$ref": "./spec-distribution-custompatches.json"
+        }
+      },
+      "required": [
+        "modules"
+      ]
+    },
+    "Spec.Distribution.Common": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Common configuration for all distribution modules.",
+      "properties": {
+        "nodeSelector": {
+          "$ref": "#/$defs/Types.KubeNodeSelector",
+          "description": "Node selector for all KFD module pods."
+        },
+        "tolerations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Types.KubeToleration"
+          },
+          "description": "Tolerations for all KFD module pods."
+        },
+        "registry": {
+          "type": "string",
+          "pattern": "^([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,}(:[0-9]{1,5})?(/[a-z0-9._-]+)*$",
+          "description": "Container registry URL for KFD images. Example: registry.sighup.io/fury"
+        }
+      }
+    },
+    "Spec.Distribution.Modules": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "KFD modules configuration.",
+      "properties": {
+        "networking": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "CNI plugin configuration. Ref: https://docs.tigera.io/calico/latest/about/",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "calico",
+                "cilium",
+                "none"
+              ],
+              "description": "CNI plugin type."
+            }
+          },
+          "required": [
+            "type"
+          ]
+        },
+        "ingress": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Ingress controller configuration. Ref: https://kubernetes.github.io/ingress-nginx/",
+          "properties": {
+            "baseDomain": {
+              "type": "string",
+              "pattern": "^([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,}$",
+              "maxLength": 253,
+              "description": "Base domain for ingresses (lowercase). Example: example.com"
+            },
+            "nginx": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "single",
+                    "dual",
+                    "none"
+                  ],
+                  "description": "Nginx ingress controller type."
+                },
+                "tls": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "provider": {
+                      "type": "string",
+                      "enum": [
+                        "certManager",
+                        "secret",
+                        "none"
+                      ],
+                      "description": "TLS certificate provider."
+                    }
+                  },
+                  "required": [
+                    "provider"
+                  ]
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            "certManager": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "clusterIssuer": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "Cluster issuer name."
+                    },
+                    "email": {
+                      "type": "string",
+                      "format": "email",
+                      "description": "Email for Let's Encrypt."
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "http01"
+                      ],
+                      "description": "Challenge type."
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "email",
+                    "type"
+                  ]
+                }
+              },
+              "required": [
+                "clusterIssuer"
+              ]
+            }
+          },
+          "required": [
+            "baseDomain",
+            "nginx"
+          ]
+        },
+        "logging": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Logging stack configuration. Ref: https://grafana.com/docs/loki/latest/",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "loki",
+                "opensearch",
+                "none"
+              ],
+              "description": "Logging backend type."
+            },
+            "loki": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "retentionPeriod": {
+                  "$ref": "#/$defs/Types.Duration",
+                  "description": "Log retention period. Example: 720h"
+                },
+                "storage": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "size": {
+                      "$ref": "#/$defs/Types.KubernetesQuantity",
+                      "description": "Storage size. Example: 50Gi"
+                    }
+                  }
+                }
+              }
+            },
+            "minio": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "storageSize": {
+                  "$ref": "#/$defs/Types.KubernetesQuantity",
+                  "description": "MinIO storage size. Example: 20Gi"
+                }
+              }
+            }
+          },
+          "required": [
+            "type"
+          ]
+        },
+        "monitoring": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Monitoring stack configuration. Ref: https://prometheus.io/docs/introduction/overview/",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "prometheus",
+                "prometheusAgent",
+                "mimir",
+                "none"
+              ],
+              "description": "Monitoring backend type."
+            },
+            "prometheus": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "retentionTime": {
+                  "$ref": "#/$defs/Types.Duration",
+                  "description": "Metrics retention time. Example: 15d"
+                },
+                "retentionSize": {
+                  "$ref": "#/$defs/Types.KubernetesQuantity",
+                  "description": "Metrics retention size. Example: 50GB"
+                },
+                "storageSize": {
+                  "$ref": "#/$defs/Types.KubernetesQuantity",
+                  "description": "Storage size for Prometheus. Example: 60Gi"
+                }
+              }
+            },
+            "prometheusAdapter": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "installEnhancedHPAMetrics": {
+                  "type": "boolean",
+                  "description": "Install enhanced HPA metrics."
+                },
+                "resources": {
+                  "$ref": "#/$defs/Types.KubeResources"
+                }
+              }
+            },
+            "alertmanager": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "installDefaultRules": {
+                  "type": "boolean",
+                  "description": "Install default alerting rules."
+                },
+                "deadMansSwitch": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean",
+                      "description": "Enable dead man's switch."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "required": [
+            "type"
+          ]
+        },
+        "tracing": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Tracing configuration. Ref: https://grafana.com/docs/tempo/latest/",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "tempo",
+                "none"
+              ],
+              "description": "Tracing backend type."
+            },
+            "tempo": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "retentionTime": {
+                  "$ref": "#/$defs/Types.Duration",
+                  "description": "Trace retention time. Example: 720h"
+                }
+              }
+            }
+          },
+          "required": [
+            "type"
+          ]
+        },
+        "policy": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Policy engine configuration. Ref: https://kyverno.io/docs/",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "kyverno",
+                "gatekeeper",
+                "none"
+              ],
+              "description": "Policy engine type."
+            },
+            "kyverno": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "validationFailureAction": {
+                  "type": "string",
+                  "enum": [
+                    "Audit",
+                    "Enforce"
+                  ],
+                  "description": "Default action for validation failures."
+                },
+                "installDefaultPolicies": {
+                  "type": "boolean",
+                  "description": "Install default Kyverno policies."
+                }
+              }
+            }
+          },
+          "required": [
+            "type"
+          ]
+        },
+        "dr": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Disaster recovery configuration. Ref: https://velero.io/docs/",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "on-premises",
+                "none"
+              ],
+              "description": "DR backend type."
+            },
+            "velero": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "backend": {
+                  "type": "string",
+                  "enum": [
+                    "s3",
+                    "minio"
+                  ],
+                  "description": "Backup storage backend."
+                },
+                "s3": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "bucketName": {
+                      "type": "string",
+                      "pattern": "^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$",
+                      "minLength": 3,
+                      "maxLength": 63,
+                      "description": "S3 bucket name (3-63 chars, lowercase, no underscores). Example: production-cluster-backups"
+                    },
+                    "region": {
+                      "type": "string",
+                      "description": "S3 region."
+                    },
+                    "endpoint": {
+                      "$ref": "#/$defs/Types.Uri",
+                      "description": "S3 endpoint URL."
+                    }
+                  }
+                },
+                "schedules": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Schedule name."
+                      },
+                      "schedule": {
+                        "type": "string",
+                        "pattern": "^(@(annually|yearly|monthly|weekly|daily|hourly|reboot))|(@every (\\d+(ns|us|µs|ms|s|m|h))+)|(((\\d+,)+\\d+|(\\d+([/-])\\d+)|\\d+|\\*) +){4}((\\d+,)+\\d+|(\\d+([/-])\\d+)|\\d+|\\*)$",
+                        "description": "Cron expression (standard 5-field format). Examples: 0 3 * * *, */5 * * * *, @daily"
+                      },
+                      "ttl": {
+                        "$ref": "#/$defs/Types.Duration",
+                        "description": "Backup retention duration. Example: 720h"
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "schedule",
+                      "ttl"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "required": [
+            "type"
+          ]
+        },
+        "auth": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Authentication provider configuration.",
+          "properties": {
+            "provider": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "none",
+                    "basicAuth",
+                    "sso"
+                  ],
+                  "description": "Authentication provider type."
+                }
+              },
+              "required": [
+                "type"
+              ]
+            }
+          },
+          "required": [
+            "provider"
+          ]
+        }
+      },
+      "required": [
+        "networking",
+        "ingress",
+        "logging",
+        "monitoring",
+        "policy",
+        "dr",
+        "auth"
+      ]
+    },
+    "Types.MacAddress": {
+      "type": "string",
+      "pattern": "^([0-9A-Fa-f]{2}:){5}([0-9A-Fa-f]{2})$",
+      "description": "MAC address in format XX:XX:XX:XX:XX:XX"
+    },
+    "Types.DevicePath": {
+      "type": "string",
+      "pattern": "^/dev/[a-zA-Z0-9/]+$",
+      "description": "Unix device path. Example: /dev/sda, /dev/nvme0n1"
+    },
+    "Types.FilesystemType": {
+      "type": "string",
+      "enum": [
+        "ext4",
+        "xfs",
+        "btrfs",
+        "ext3",
+        "vfat"
+      ],
+      "description": "Filesystem type"
+    },
+    "Types.BondMode": {
+      "type": "string",
+      "enum": [
+        "balance-rr",
+        "active-backup",
+        "balance-xor",
+        "broadcast",
+        "802.3ad",
+        "balance-tlb",
+        "balance-alb"
+      ],
+      "description": "Linux bonding mode"
+    },
+    "Types.SemVer": {
+      "type": "string",
+      "pattern": "^v?(?P<major>0|[1-9]\\d*)\\.(?P<minor>0|[1-9]\\d*)\\.(?P<patch>0|[1-9]\\d*)(?:-(?P<prerelease>(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"
+    },
+    "Types.IpAddress": {
+      "type": "string",
+      "pattern": "^((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)\\.){3}(25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)$"
+    },
+    "Types.Cidr": {
+      "type": "string",
+      "pattern": "^((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)\\.){3}(25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)\\/(3[0-2]|[1-2][0-9]|[0-9])$"
+    },
+    "Types.FileRef": {
+      "type": "string",
+      "pattern": "^\\{file\\:\\/\\/.+\\}$"
+    },
+    "Types.EnvRef": {
+      "type": "string",
+      "pattern": "\\{^env\\:\\/\\/.*\\}$"
+    },
+    "Types.TcpPort": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 65535
+    },
+    "Types.SshPubKey": {
+      "type": "string",
+      "pattern": "^ssh\\-(dsa|ecdsa|ecdsa-sk|ed25519|ed25519-sk|rsa)\\s+"
+    },
+    "Types.Uri": {
+      "type": "string",
+      "pattern": "^(http|https)\\:\\/\\/.+$"
+    },
+    "Types.KubeLabels": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "propertyNames": {
+        "pattern": "^([a-zA-Z0-9][a-zA-Z0-9-.]*[a-zA-Z0-9]/)?([a-zA-Z0-9][-a-zA-Z0-9_.]*)?[a-zA-Z0-9]$",
+        "maxLength": 253
+      },
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^(([a-zA-Z0-9][-a-zA-Z0-9_.]*)?[a-zA-Z0-9])?$",
+        "maxLength": 63
+      }
+    },
+    "Types.KubeAnnotations": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "propertyNames": {
+        "pattern": "^([a-zA-Z0-9][a-zA-Z0-9-.]*[a-zA-Z0-9]/)?([a-zA-Z0-9][-a-zA-Z0-9_.]*)?[a-zA-Z0-9]$",
+        "maxLength": 253
+      },
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "Types.KubeTaints": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "effect": {
+          "type": "string",
+          "enum": [
+            "NoSchedule",
+            "PreferNoSchedule",
+            "NoExecute"
+          ]
+        },
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "effect",
+        "key",
+        "value"
+      ]
+    },
+    "Types.KubeNodeSelector": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "Types.KubeToleration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "effect": {
+          "type": "string",
+          "enum": [
+            "NoSchedule",
+            "PreferNoSchedule",
+            "NoExecute"
+          ]
+        },
+        "operator": {
+          "type": "string",
+          "enum": [
+            "Exists",
+            "Equal"
+          ]
+        },
+        "key": {
+          "type": "string",
+          "description": "The key of the toleration"
+        },
+        "value": {
+          "type": "string",
+          "description": "The value of the toleration"
+        }
+      },
+      "required": [
+        "effect",
+        "key"
+      ],
+      "anyOf": [
+        {
+          "required": [
+            "operator"
+          ]
+        },
+        {
+          "required": [
+            "value"
+          ]
+        }
+      ]
+    },
+    "Types.KubeResources": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "requests": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "cpu": {
+              "type": "string",
+              "pattern": "^[0-9]+(\\.[0-9]+)?(m|)$",
+              "description": "The CPU request for the Pod, in cores or millicores. Examples: 500m, 1, 0.5"
+            },
+            "memory": {
+              "$ref": "#/$defs/Types.KubernetesQuantity",
+              "description": "The memory request for the Pod. Example: 500Mi, 1Gi"
+            }
+          }
+        },
+        "limits": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "cpu": {
+              "type": "string",
+              "pattern": "^[0-9]+(\\.[0-9]+)?(m|)$",
+              "description": "The CPU limit for the Pod, in cores or millicores. Examples: 1000m, 2, 1.5"
+            },
+            "memory": {
+              "$ref": "#/$defs/Types.KubernetesQuantity",
+              "description": "The memory limit for the Pod. Example: 1Gi, 2Gi"
+            }
+          }
+        }
+      }
+    },
+    "Types.KubernetesQuantity": {
+      "type": "string",
+      "pattern": "^[0-9]+(\\.[0-9]+)?(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk])$",
+      "description": "Kubernetes resource quantity format. Examples: 50Gi, 100Mi, 1Ti"
+    },
+    "Types.Duration": {
+      "type": "string",
+      "pattern": "^[0-9]+(\\.[0-9]+)?(ns|us|µs|ms|s|m|h|d)$",
+      "description": "Duration format with unit suffix. Examples: 720h, 15d, 30m, 5s"
+    }
+  }
+}
