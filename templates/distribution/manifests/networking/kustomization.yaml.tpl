@@ -17,6 +17,9 @@ resources:
     {{- if eq .spec.distribution.modules.networking.type "calico" }}
   - {{ print $vendorPrefix "/modules/networking/katalog/tigera/on-prem" }}
   - resources/calico-ns.yml
+      {{- if $kubeProxyDisabled }}
+  - resources/tigera-kubernetes-service.yaml
+      {{- end }}
     {{- end }}
     {{- if eq .spec.distribution.modules.networking.type "cilium" }}
   - {{ print $vendorPrefix "/modules/networking/katalog/cilium" }}
@@ -40,6 +43,9 @@ patches:
       name: tigera-operator
       namespace: tigera-operator
     path: patches/tigera/tigera-operator-tolerations.yaml
+      {{- if $kubeProxyDisabled }}
+  - path: patches/tigera/ebpf-mode.yaml
+      {{- end }}
   {{- end }}
   {{- if eq .spec.distribution.modules.networking.type "cilium" }}
   - path: patches/cilium/infra-nodes.yaml
