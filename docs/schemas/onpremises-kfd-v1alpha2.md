@@ -4937,6 +4937,7 @@ Defines the Kubernetes components configuration and the values needed for the ku
 | [encryption](#speckubernetesadvancedencryption)                           | `object`  | Optional |
 | [eventRateLimits](#speckubernetesadvancedeventratelimits)                 | `array`   | Optional |
 | [kernelParameters](#speckubernetesadvancedkernelparameters)               | `array`   | Optional |
+| [kubeProxy](#speckubernetesadvancedkubeproxy)                             | `object`  | Optional |
 | [kubeletConfiguration](#speckubernetesadvancedkubeletconfiguration)       | `object`  | Optional |
 | [oidc](#speckubernetesadvancedoidc)                                       | `object`  | Optional |
 | [registry](#speckubernetesadvancedregistry)                               | `string`  | Optional |
@@ -5398,6 +5399,29 @@ The kernel parameter to edit. Example: `kernel.panic`
 ### Description
 
 The value of the kernel parameter to edit. Example: `"15"`
+
+## .spec.kubernetes.advanced.kubeProxy
+
+### Properties
+
+| Property                                                                     | Type      | Required |
+|:-----------------------------------------------------------------------------|:----------|:---------|
+| [additionalProperties](#speckubernetesadvancedkubeproxyadditionalproperties) | `object`  | Optional |
+| [enabled](#speckubernetesadvancedkubeproxyenabled)                           | `boolean` | Optional |
+
+### Description
+
+Configuration for the kube-proxy component.
+
+## .spec.kubernetes.advanced.kubeProxy.additionalProperties
+
+## .spec.kubernetes.advanced.kubeProxy.enabled
+
+### Description
+
+Setting this option to `false` will skip the installation of the kube-proxy component and install the CNI plugin with the following configuration: Cilium in kube-proxy-replacement mode and Calico in eBPF mode. Default is `true`.
+
+NOTE: Changing this option after the cluster has been created is not currently supported.
 
 ## .spec.kubernetes.advanced.kubeletConfiguration
 
