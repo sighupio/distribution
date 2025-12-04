@@ -1,6 +1,9 @@
 # Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
+
+{{- /* This file should be rendered only for OnPremises - other providers don't have support */}}
+{{- if and (eq .spec.distribution.common.provider.type "none") (hasKeyAny .spec "kubernetes") }}
 ---
 apiVersion: apps/v1
 kind: DaemonSet
@@ -46,3 +49,4 @@ spec:
               value: "{{- template "controlPlaneAddress" (dict "config" . "args" "host") -}}"
             - name: KUBERNETES_SERVICE_PORT
               value: "{{- template "controlPlaneAddress" (dict "config" . "args" "port") -}}"
+{{ end }}
