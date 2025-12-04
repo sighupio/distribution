@@ -3,7 +3,6 @@
 # license that can be found in the LICENSE file.
 
 {{- $vendorPrefix := print "../" .spec.distribution.common.relativeVendorPath }}
-{{- $kubeProxyDisabled := and (hasKeyAny .spec "kubernetes") (hasKeyAny .spec.kubernetes "advanced") (hasKeyAny .spec.kubernetes.advanced "kubeProxy") (not (index .spec.kubernetes.advanced.kubeProxy "enabled")) }}
 ---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
@@ -17,9 +16,8 @@ resources:
     {{- if eq .spec.distribution.modules.networking.type "calico" }}
   - {{ print $vendorPrefix "/modules/networking/katalog/tigera/on-prem" }}
   - resources/calico-ns.yml
-      {{- if $kubeProxyDisabled }}
-  - resources/tigera-kubernetes-service.yaml
-      {{- end }}
+  {{- /* NOTE: Indentation is important in the following line */}}
+  {{ template "IncludeIfKubeProxyEnabled" (dict "state" false "config" . "object" "- resources/tigera-kubernetes-service.yaml") }}
     {{- end }}
     {{- if eq .spec.distribution.modules.networking.type "cilium" }}
   - {{ print $vendorPrefix "/modules/networking/katalog/cilium" }}
@@ -43,9 +41,8 @@ patches:
       name: tigera-operator
       namespace: tigera-operator
     path: patches/tigera/tigera-operator-tolerations.yaml
-      {{- if $kubeProxyDisabled }}
-  - path: patches/tigera/ebpf-mode.yaml
-      {{- end }}
+  {{- /* NOTE: Indentation is important in the following line */}}
+  {{ template "IncludeIfKubeProxyEnabled" (dict "state" false "config" . "object" "- path: patches/tigera/ebpf-mode.yaml") }}
   {{- end }}
   {{- if eq .spec.distribution.modules.networking.type "cilium" }}
   - path: patches/cilium/infra-nodes.yaml
@@ -56,9 +53,8 @@ patches:
       name: cilium-operator
       namespace: kube-system
     path: patches/cilium/cilium-operator-tolerations.yaml
-    {{- if $kubeProxyDisabled }}
-  - path: patches/cilium/kube-proxy-replacement.yaml
-    {{- end }}
+  {{- /* NOTE: Indentation is important in the following line */}}
+  {{ template "IncludeIfKubeProxyEnabled" (dict "state" false "config" . "object" "- path: patches/cilium/kube-proxy-replacement.yaml") }}
   {{- end }}
 {{- end }}
 

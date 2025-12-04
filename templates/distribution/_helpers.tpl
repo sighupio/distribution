@@ -224,3 +224,54 @@ cert-manager.io/cluster-issuer: {{ .spec.distribution.modules.ingress.certManage
 {{ define "hubbleUrl" }}
   {{- template "ingressHost" (dict "module" "networking" "package" "hubble" "prefix" "hubble." "spec" .) -}}
 {{ end }}
+
+{{- /* controlPlaneAddress {config: <config> args: ["host"| "port"]}
+   Where:
+    <config> is the root of the config file (usually `.`)
+    <args> is one of the following:
+      - "host": to get only the host part of the controlPlaneAddress
+      - "port": to get only the port part of the controlPlaneAddress
+    if no args is provided, the full controlPlaneAddress ("address:port") is returned
+*/}}
+{{- define "controlPlaneAddress"}}
+  {{- $controlPlaneAddress := "" }}
+  {{- $controlPlaneHost := "" }}
+  {{- $controlPlanePort := "" }}
+  {{- if and (eq .config.spec.distribution.common.provider.type "none") (hasKeyAny .config.spec "kubernetes") }}
+    {{- $controlPlaneAddress = .config.spec.kubernetes.controlPlaneAddress }}
+  {{- else }}
+    {{- fail "controlPlaneAddress is currently only available for OnPremises kind" }}
+  {{- end }}
+  {{- if index . "args" }}
+    {{- if eq .args "host" }}
+      {{- $controlPlaneHost = (split ":" $controlPlaneAddress)._0 }}
+      {{- if eq $controlPlaneHost "" }}
+        {{- fail "Error while calculating the Kubernetes API endpoint host." }}
+      {{- end }}
+      {{- $controlPlaneHost -}}
+    {{- else if eq .args "port" }}
+      {{- $controlPlanePort = "" }}
+      {{- $addressParts := split ":" $controlPlaneAddress }}
+      {{- if eq (len $addressParts) 2 }}
+        {{- $controlPlanePort = $addressParts._1 }}
+      {{- else }}
+        {{- $controlPlanePort = "443" }}
+      {{- end }}
+      {{- if eq $controlPlanePort "" }}
+        {{- fail "Error while calculating the Kubernetes API endpoint port." }}
+      {{- end }}
+      {{- $controlPlanePort -}}
+    {{- else }}
+      {{- fail (print "Unknown argument '" .args "' for controlPlaneAddress template.") }}
+    {{- end }}
+  {{- else }}
+    {{- $controlPlaneAddress -}}
+  {{- end }}
+{{- end }}
+
+{{- /* Usage: includeIfKubeProxyEnabled {state: [true|false], config: <configuration object, usually `.`>, object: <object to include if condition is true> } */}}
+{{- define "IncludeIfKubeProxyEnabled" -}}
+  {{- if and (hasKeyAny .config.spec "kubernetes") (hasKeyAny .config.spec.kubernetes "advanced") (hasKeyAny .config.spec.kubernetes.advanced "kubeProxy") (eq (index .config.spec.kubernetes.advanced.kubeProxy "enabled") .state) -}}
+    {{- .object }}
+  {{- end -}}
+{{- end -}}
