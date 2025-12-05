@@ -10,8 +10,8 @@ cluster-pool-ipv4-cidr={{ .spec.kubernetes.podCidr }}
     {{- else }}
 cluster-pool-ipv4-cidr={{ .spec.distribution.modules.networking.cilium.podCidr }}
     {{- end }}
-    {{/* Set kube-proxy-replacement only if kube-proxy is disabled */}}
-    {{- if and (hasKeyAny .spec.kubernetes "advanced") (hasKeyAny .spec.kubernetes.advanced "kubeProxy") (not (index .spec.kubernetes.advanced.kubeProxy "enabled")) }}
+    {{- /* We assume that kubeProxy is enabled by default */}}
+    {{- if not (.spec | digAny "kubernetes" "advanced" "kubeProxy" "enabled" true) }}
 kube-proxy-replacement=true
     {{- end }}
   {{- end }}

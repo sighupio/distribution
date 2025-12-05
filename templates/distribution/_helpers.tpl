@@ -268,10 +268,3 @@ cert-manager.io/cluster-issuer: {{ .spec.distribution.modules.ingress.certManage
     {{- $controlPlaneAddress -}}
   {{- end }}
 {{- end }}
-
-{{- /* Usage: includeIfKubeProxyEnabled {state: [true|false], config: <configuration object, usually `.`>, object: <object to include if condition is true> } */}}
-{{- define "IncludeIfKubeProxyEnabled" -}}
-  {{- if and (hasKeyAny .config.spec "kubernetes") (hasKeyAny .config.spec.kubernetes "advanced") (hasKeyAny .config.spec.kubernetes.advanced "kubeProxy") (eq (index .config.spec.kubernetes.advanced.kubeProxy "enabled") .state) -}}
-    {{- .object }}
-  {{- end -}}
-{{- end -}}

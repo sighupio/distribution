@@ -156,7 +156,7 @@ all:
         kubernetes_apiserver_certSANs:
 {{ .spec.kubernetes.advanced.apiServerCertSANs | toYaml | indent 10 }}
         {{- end }}
-        {{- if and (hasKeyAny .spec.kubernetes "advanced") (hasKeyAny .spec.kubernetes.advanced "kubeProxy") (not (index .spec.kubernetes.advanced.kubeProxy "enabled")) }}
+        {{- if not (.spec | digAny "kubernetes" "advanced" "kubeProxy" "enabled" true) }}
         kubeadm_skip_phases:
           - "addon/kube-proxy"
         {{- end }}

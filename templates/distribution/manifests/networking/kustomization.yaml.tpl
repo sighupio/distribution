@@ -16,8 +16,9 @@ resources:
     {{- if eq .spec.distribution.modules.networking.type "calico" }}
   - {{ print $vendorPrefix "/modules/networking/katalog/tigera/on-prem" }}
   - resources/calico-ns.yml
-  {{- /* NOTE: Indentation is important in the following line */}}
-  {{ template "IncludeIfKubeProxyEnabled" (dict "state" false "config" . "object" "- resources/tigera-kubernetes-service.yaml") }}
+      {{- if not (.spec | digAny "kubernetes" "advanced" "kubeProxy" "enabled" true) }}
+  - resources/tigera-kubernetes-service.yaml
+      {{- end }}
     {{- end }}
     {{- if eq .spec.distribution.modules.networking.type "cilium" }}
   - {{ print $vendorPrefix "/modules/networking/katalog/cilium" }}
@@ -41,8 +42,9 @@ patches:
       name: tigera-operator
       namespace: tigera-operator
     path: patches/tigera/tigera-operator-tolerations.yaml
-  {{- /* NOTE: Indentation is important in the following line */}}
-  {{ template "IncludeIfKubeProxyEnabled" (dict "state" false "config" . "object" "- path: patches/tigera/ebpf-mode.yaml") }}
+  {{- if not (.spec | digAny "kubernetes" "advanced" "kubeProxy" "enabled" true) }}
+  - path: patches/tigera/ebpf-mode.yaml
+  {{- end }}
   {{- end }}
   {{- if eq .spec.distribution.modules.networking.type "cilium" }}
   - path: patches/cilium/infra-nodes.yaml
@@ -53,8 +55,9 @@ patches:
       name: cilium-operator
       namespace: kube-system
     path: patches/cilium/cilium-operator-tolerations.yaml
-  {{- /* NOTE: Indentation is important in the following line */}}
-  {{ template "IncludeIfKubeProxyEnabled" (dict "state" false "config" . "object" "- path: patches/cilium/kube-proxy-replacement.yaml") }}
+    {{- if not (.spec | digAny "kubernetes" "advanced" "kubeProxy" "enabled" true) }}
+  - path: patches/cilium/kube-proxy-replacement.yaml
+    {{- end }}
   {{- end }}
 {{- end }}
 

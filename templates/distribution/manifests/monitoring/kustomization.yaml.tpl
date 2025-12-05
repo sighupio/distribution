@@ -14,7 +14,9 @@ resources:
 {{- /* common components for all the monitoring types */}}
   - kapp-configs/prometheus-operator-crd.yaml
   - {{ print $vendorPrefix "/modules/monitoring/katalog/prometheus-operator" }}
-  {{ template "IncludeIfKubeProxyEnabled" (dict "state" true "config" . "object" (print "- " $vendorPrefix "/modules/monitoring/katalog/kube-proxy-metrics")) }}
+{{- if .spec | digAny "kubernetes" "advanced" "kubeProxy" "enabled" true }}
+  - {{ print $vendorPrefix "/modules/monitoring/katalog/kube-proxy-metrics" }}
+{{- end }}
   - {{ print $vendorPrefix "/modules/monitoring/katalog/kube-state-metrics" }}
   - {{ print $vendorPrefix "/modules/monitoring/katalog/node-exporter" }}
   - {{ print $vendorPrefix "/modules/monitoring/katalog/x509-exporter" }}
