@@ -16,6 +16,8 @@ resources:
     {{- if eq .spec.distribution.modules.networking.type "calico" }}
   - {{ print $vendorPrefix "/modules/networking/katalog/tigera/on-prem" }}
   - resources/calico-ns.yml
+      {{- /* We assume that kubeProxy is enabled by default */}}
+      {{- /* The `digAny` condition needs to be specified exactly as written below to properly check if the field has been populated */}}
       {{- if not (.spec | digAny "kubernetes" "advanced" "kubeProxy" "enabled" true) }}
   - resources/tigera-kubernetes-service.yaml
       {{- end }}
@@ -42,6 +44,8 @@ patches:
       name: tigera-operator
       namespace: tigera-operator
     path: patches/tigera/tigera-operator-tolerations.yaml
+  {{- /* We assume that kubeProxy is enabled by default */}}
+  {{- /* The `digAny` condition needs to be specified exactly as written below to properly check if the field has been populated */}}
   {{- if not (.spec | digAny "kubernetes" "advanced" "kubeProxy" "enabled" true) }}
   - path: patches/tigera/ebpf-mode.yaml
   {{- end }}
@@ -55,6 +59,8 @@ patches:
       name: cilium-operator
       namespace: kube-system
     path: patches/cilium/cilium-operator-tolerations.yaml
+    {{- /* We assume that kubeProxy is enabled by default */}}
+    {{- /* The `digAny` condition needs to be specified exactly as written below to properly check if the field has been populated */}}
     {{- if not (.spec | digAny "kubernetes" "advanced" "kubeProxy" "enabled" true) }}
   - path: patches/cilium/kube-proxy-replacement.yaml
     {{- end }}

@@ -11,6 +11,7 @@ cluster-pool-ipv4-cidr={{ .spec.kubernetes.podCidr }}
 cluster-pool-ipv4-cidr={{ .spec.distribution.modules.networking.cilium.podCidr }}
     {{- end }}
     {{- /* We assume that kubeProxy is enabled by default */}}
+    {{- /* The `digAny` condition needs to be specified exactly as written below to properly check if the field has been populated */}}
     {{- if not (.spec | digAny "kubernetes" "advanced" "kubeProxy" "enabled" true) }}
 kube-proxy-replacement=true
     {{- end }}
