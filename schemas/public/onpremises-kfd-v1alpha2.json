@@ -18,6 +18,9 @@
     },
     "spec": {
       "$ref": "#/$defs/Spec"
+    },
+    "flags": {
+      "description": "Persistent furyctl command flags, see the documentation for more details: https://docs.sighup.io/furyctl/flags-configuration"
     }
   },
   "additionalProperties": false,
