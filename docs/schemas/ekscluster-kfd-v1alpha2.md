@@ -15,6 +15,7 @@ furyctl create config --kind EKSCluster --version v1.29.4 --name example-cluster
 | Property                  | Type     | Required |
 |:--------------------------|:---------|:---------|
 | [apiVersion](#apiversion) | `string` | Required |
+| [flags](#flags)           | `object` | Optional |
 | [kind](#kind)             | `string` | Required |
 | [metadata](#metadata)     | `object` | Required |
 | [spec](#spec)             | `object` | Required |
@@ -34,6 +35,12 @@ A KFD Cluster deployed on top of AWS's Elastic Kubernetes Service (EKS).
 ```
 
 [try pattern](https://regexr.com/?expression=^kfd\.sighup\.io\/v\d%2B\(\(alpha|beta\)\d%2B\)?$)
+
+## .flags
+
+### Description
+
+Persistent furyctl command flags, see the documentation for more details: https://docs.sighup.io/furyctl/flags-configuration
 
 ## .kind
 
