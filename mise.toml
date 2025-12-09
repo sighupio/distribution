@@ -17,7 +17,7 @@ python = "3.12"
 pipx = "latest"
 ansible = "latest"
 awscli = "2.24.17"
-furyctl = "0.33.2-rc.1"
+furyctl = "0.33.2-rc.7"
 
 # Go packages (using go: backend)
 "go:github.com/evanphx/json-patch/v5/cmd/json-patch" = "v5.9.0"
@@ -115,7 +115,7 @@ run = [
   "go-jsonschema --package public --resolve-extension json --output pkg/apis/ekscluster/v1alpha2/public/schema.go schemas/public/ekscluster-kfd-v1alpha2.json",
   "go-jsonschema --package private --resolve-extension json --output pkg/apis/ekscluster/v1alpha2/private/schema.go schemas/private/ekscluster-kfd-v1alpha2.json",
   "go-jsonschema --package public --resolve-extension json --output pkg/apis/kfddistribution/v1alpha2/public/schema.go schemas/public/kfddistribution-kfd-v1alpha2.json",
-  "go-jsonschema --package public --resolve-extension json --output pkg/apis/onpremises/v1alpha2/public/schema.go schemas/public/onpremises-kfd-v1alpha2.json"
+  "go-jsonschema --package public --resolve-extension json --output pkg/apis/onpremises/v1alpha2/public/schema.go schemas/public/onpremises-kfd-v1alpha2.json",
 ]
 
 [tasks.generate-go-models]
@@ -127,7 +127,7 @@ description = "generate documentation from schemas"
 run = [
   "md-gen gen --input schemas/public/onpremises-kfd-v1alpha2.json --output docs/schemas/onpremises-kfd-v1alpha2.md --overwrite --banner banners/onpremises.md",
   "md-gen gen --input schemas/public/kfddistribution-kfd-v1alpha2.json --output docs/schemas/kfddistribution-kfd-v1alpha2.md --overwrite --banner banners/kfddistribution.md",
-  "md-gen gen --input schemas/public/ekscluster-kfd-v1alpha2.json --output docs/schemas/ekscluster-kfd-v1alpha2.md --overwrite --banner banners/ekscluster.md"
+  "md-gen gen --input schemas/public/ekscluster-kfd-v1alpha2.json --output docs/schemas/ekscluster-kfd-v1alpha2.md --overwrite --banner banners/ekscluster.md",
 ]
 
 [tasks.generate-np-diagrams]
@@ -143,5 +143,5 @@ run = [
   "docker run --rm -v $(PWD)/docs/network-policies/modules/monitoring:/workdir minlag/mermaid-cli:latest -i \"/workdir/prometheus.md\" -o \"/workdir/prometheus.png\" -w 2048 -H 1536 -b white",
   "docker run --rm -v $(PWD)/docs/network-policies/modules/opa:/workdir minlag/mermaid-cli:latest -i \"/workdir/gatekeeper.md\" -o \"/workdir/gatekeeper.png\" -w 2048 -H 1536 -b white",
   "docker run --rm -v $(PWD)/docs/network-policies/modules/opa:/workdir minlag/mermaid-cli:latest -i \"/workdir/kyverno.md\" -o \"/workdir/kyverno.png\" -w 2048 -H 1536 -b white",
-  "docker run --rm -v $(PWD)/docs/network-policies/modules/tracing:/workdir minlag/mermaid-cli:latest -i \"/workdir/tempo.md\" -o \"/workdir/tempo.png\" -w 2048 -H 1536 -b white"
+  "docker run --rm -v $(PWD)/docs/network-policies/modules/tracing:/workdir minlag/mermaid-cli:latest -i \"/workdir/tempo.md\" -o \"/workdir/tempo.png\" -w 2048 -H 1536 -b white",
 ]
