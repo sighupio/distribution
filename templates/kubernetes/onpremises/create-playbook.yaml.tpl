@@ -36,54 +36,6 @@
   tags:
     - haproxy
 
-# cluster
-- name: Copy etcd and master PKIs
-  hosts: master,etcd
-  become: true
-  vars:
-    pki_dir: "{{ .spec.kubernetes.pkiFolder }}"
-  tasks:
-    - name: Create etcd PKI directory
-      file:
-        path: /etc/etcd/pki/etcd
-        owner: root
-        group: root
-        mode: 0750
-        state: directory
-    - name: Create Kubernetes PKI directory
-      file:
-        path: /etc/kubernetes/pki
-        owner: root
-        group: root
-        mode: 0750
-        state: directory
-    - name: Copy etcd CA
-      copy:
-        src: "{{ "{{ pki_dir }}" }}/etcd/{{ "{{ item }}" }}"
-        dest: "/etc/etcd/pki/etcd/{{ "{{ item }}" }}"
-        owner: root
-        group: root
-        mode: 0640
-      with_items:
-        - ca.crt
-        - ca.key
-    - name: Copy Kubernetes CA
-      copy:
-        src: "{{ "{{ pki_dir }}" }}/master/{{ "{{ item }}" }}"
-        dest: "/etc/kubernetes/pki/{{ "{{ item }}" }}"
-        owner: root
-        group: root
-        mode: 0600
-      with_items:
-        - ca.crt
-        - ca.key
-        - front-proxy-ca.crt
-        - front-proxy-ca.key
-        - sa.key
-        - sa.pub
-  tags:
-    - pki
-
 - name: Kubernetes node preparation
   hosts: master,nodes,etcd
   become: true
@@ -97,6 +49,7 @@
   become: true
   vars:
     etcd_address: "{{ "{{ ansible_host }}" }}"
+    etcd_local_pki_dir: "{{ .spec.kubernetes.pkiFolder }}"
   roles:
     - etcd
   tags:
@@ -105,6 +58,8 @@
 - name: Control plane configuration
   hosts: master
   become: true
+  vars:
+    kubernetes_local_pki_dir: "{{ .spec.kubernetes.pkiFolder }}"
   serial: 1
   roles:
     - kube-control-plane
