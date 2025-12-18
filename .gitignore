@@ -9,3 +9,4 @@ go.work.sum
 .envrc
 .local
 .furyctl
+docs/presentation/presentation-immutable.md
