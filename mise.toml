@@ -17,7 +17,7 @@ python = "3.12"
 pipx = "latest"
 ansible = "latest"
 awscli = "2.24.17"
-furyctl = "0.33.2-rc.7"
+furyctl = "0.33.2"
 
 # Go packages (using go: backend)
 "go:github.com/evanphx/json-patch/v5/cmd/json-patch" = "v5.9.0"
