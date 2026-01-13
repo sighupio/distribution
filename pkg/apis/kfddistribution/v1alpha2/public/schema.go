@@ -5,15 +5,18 @@ package public
 import (
 	"encoding/json"
 	"fmt"
-	"reflect"
-
 	"github.com/sighupio/go-jsonschema/pkg/types"
+	"reflect"
 )
 
 // KFD modules deployed on top of an existing Kubernetes cluster.
 type KfddistributionKfdV1Alpha2 struct {
 	// ApiVersion corresponds to the JSON schema field "apiVersion".
 	ApiVersion string `json:"apiVersion" yaml:"apiVersion" mapstructure:"apiVersion"`
+
+	// Persistent furyctl command flags, see the documentation for more details:
+	// https://docs.sighup.io/furyctl/flags-configuration
+	Flags interface{} `json:"flags,omitempty" yaml:"flags,omitempty" mapstructure:"flags,omitempty"`
 
 	// Kind corresponds to the JSON schema field "kind".
 	Kind KfddistributionKfdV1Alpha2Kind `json:"kind" yaml:"kind" mapstructure:"kind"`

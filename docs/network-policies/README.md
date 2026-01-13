@@ -21,4 +21,4 @@ All namespaces include:
 - [Overview](overview.md)
 
 ## Instructions
-Generate the new Network Policies diagrams with `make generate-np-diagrams`.
+Generate the new Network Policies diagrams with `mise run generate-np-diagrams`.

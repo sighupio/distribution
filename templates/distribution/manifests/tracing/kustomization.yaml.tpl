@@ -2,14 +2,16 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
+{{- $vendorPrefix := print "../" .spec.distribution.common.relativeVendorPath }}
+
 ---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/tracing/katalog/tempo-distributed" }}
+  - {{ print $vendorPrefix "/modules/tracing/katalog/tempo-distributed" }}
 {{- if eq .spec.distribution.modules.tracing.tempo.backend "minio" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/tracing/katalog/minio-ha" }}
+  - {{ print $vendorPrefix "/modules/tracing/katalog/minio-ha" }}
 {{- end }}
 {{- if ne .spec.distribution.modules.ingress.nginx.type "none" }}
 {{- if eq .spec.distribution.modules.tracing.tempo.backend "minio" }}

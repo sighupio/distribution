@@ -16,6 +16,20 @@ Usually, a new release of SD is triggered by one of these events:
 
 The release is needed to render this updates available to SD's user base.
 
+## CI/CD Pipeline Triggers
+
+Different tag patterns trigger specific combinations of test pipelines to optimize CI resource usage and testing coverage:
+
+| Tag Pattern                 | Pipelines Triggered                                                           |
+| --------------------------- | ----------------------------------------------------------------------------- |
+| **Any push**                | QA only                                                                       |
+| **`e2e-all-*`**             | QA + ALL e2e tests (kfddistro, eks, eks-selfmanaged, onpremises) - NO release |
+| **`e2e-eks-*`**             | QA + ALL EKS e2e only (standard + selfmanaged + upgrades)                     |
+| **`e2e-kfddistribution-*`** | QA + kfddistro e2e only                                                       |
+| **`e2e-onpremises-*`**      | QA + onpremises e2e only                                                      |
+| **`v1.XX.X`**               | QA + ALL e2e EXCEPT selfmanaged → release (stable)                            |
+| **`v1.XX.X-rc.X`**          | QA + ALL e2e EXCEPT selfmanaged → release (prerelease)                        |
+
 ## Process
 
 The update process usually involves going back and forward between SD (this repo) and furyctl.
@@ -34,9 +48,9 @@ With no further ado, the steps to release a new version are:
 2. Create the PRs fixing the issues or adding new features to the templates or other files of fury-distribution, test them and merge them.
 3. Update the `kfd.yaml` and `Furyfile.yaml` files, bumping the distribution version, adjusting the modules and installers versions where needed.
 4. If the distribution schemas have been changed:
-   1. If you haven't already, install the needed tools with `make tools-go`.
-   2. Generate the new docs with `make generate-docs`.
-   3. Generate the go models with `make generate-go-models`
+   1. If you haven't already, install the needed tools with `mise install`.
+   2. Generate the new docs with `mise run generate-docs`.
+   3. Generate the go models with `mise run generate-go-models`
 5. Update the CI and e2e tests to point to the new version:
    1. `.drone.yaml`
    2. `tests/e2e-kfddistribution-*.yaml`

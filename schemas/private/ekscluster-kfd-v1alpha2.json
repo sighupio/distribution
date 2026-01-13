@@ -18,6 +18,9 @@
     },
     "spec": {
       "$ref": "#/$defs/Spec"
+    },
+    "flags": {
+      "description": "Persistent furyctl command flags, see the documentation for more details: https://docs.sighup.io/furyctl/flags-configuration"
     }
   },
   "additionalProperties": false,
@@ -137,11 +140,25 @@
       "additionalProperties": false,
       "properties": {
         "terraform": {
-          "$ref": "#/$defs/Spec.ToolsConfiguration.Terraform"
+          "$ref": "#/$defs/Spec.ToolsConfiguration.Terraform",
+          "description": "DEPRECATED: Configuration for storing the Terraform state of the cluster. Use 'opentofu' instead. This field will be removed in the next versions."
+        },
+        "opentofu": {
+          "$ref": "#/$defs/Spec.ToolsConfiguration.OpenTofu",
+          "description": "Configuration for storing the OpenTofu state of the cluster."
         }
       },
-      "required": [
-        "terraform"
+      "anyOf": [
+        {
+          "required": [
+            "terraform"
+          ]
+        },
+        {
+          "required": [
+            "opentofu"
+          ]
+        }
       ]
     },
     "Spec.ToolsConfiguration.Terraform": {
@@ -189,6 +206,59 @@
         "skipRegionValidation": {
           "type": "boolean",
           "description": "This value defines if the region of the bucket should be validated or not by Terraform, useful when using a bucket in a recently added region."
+        }
+      },
+      "required": [
+        "bucketName",
+        "keyPrefix",
+        "region"
+      ]
+    },
+    "Spec.ToolsConfiguration.OpenTofu": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "$ref": "#/$defs/Spec.ToolsConfiguration.OpenTofu.State"
+        }
+      },
+      "required": [
+        "state"
+      ]
+    },
+    "Spec.ToolsConfiguration.OpenTofu.State": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configuration for storing the OpenTofu state of the cluster.",
+      "properties": {
+        "s3": {
+          "$ref": "#/$defs/Spec.ToolsConfiguration.OpenTofu.State.S3"
+        }
+      },
+      "required": [
+        "s3"
+      ]
+    },
+    "Spec.ToolsConfiguration.OpenTofu.State.S3": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configuration for the S3 bucket used to store the OpenTofu state.",
+      "properties": {
+        "bucketName": {
+          "$ref": "#/$defs/Types.AwsS3BucketName",
+          "description": "This value defines which bucket will be used to store all the states."
+        },
+        "keyPrefix": {
+          "$ref": "#/$defs/Types.AwsS3KeyPrefix",
+          "description": "This value defines which folder will be used to store all the states inside the bucket."
+        },
+        "region": {
+          "$ref": "#/$defs/Types.AwsRegion",
+          "description": "This value defines in which region the bucket is located."
+        },
+        "skipRegionValidation": {
+          "type": "boolean",
+          "description": "This value defines if the region of the bucket should be validated or not by OpenTofu, useful when using a bucket in a recently added region."
         }
       },
       "required": [

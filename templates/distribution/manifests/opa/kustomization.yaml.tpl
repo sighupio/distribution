@@ -2,28 +2,30 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
+{{- $vendorPrefix := print "../" .spec.distribution.common.relativeVendorPath }}
+
 ---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
 {{- if eq .spec.distribution.modules.policy.type "gatekeeper" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/opa/katalog/gatekeeper/core" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/opa/katalog/gatekeeper/gpm" }}
+  - {{ print $vendorPrefix "/modules/opa/katalog/gatekeeper/core" }}
+  - {{ print $vendorPrefix "/modules/opa/katalog/gatekeeper/gpm" }}
   {{- if .spec.distribution.modules.policy.gatekeeper.installDefaultPolicies }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/opa/katalog/gatekeeper/rules" }}
+  - {{ print $vendorPrefix "/modules/opa/katalog/gatekeeper/rules" }}
   {{- end }}
   {{- if ne .spec.distribution.modules.monitoring.type "none" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/opa/katalog/gatekeeper/monitoring" }}
+  - {{ print $vendorPrefix "/modules/opa/katalog/gatekeeper/monitoring" }}
   {{- end }}
   {{- if ne .spec.distribution.modules.ingress.nginx.type "none" }}
   - resources/ingress-infra.yml
   {{- end }}
 {{- end }}
 {{- if eq .spec.distribution.modules.policy.type "kyverno" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/opa/katalog/kyverno/core" }}
+  - {{ print $vendorPrefix "/modules/opa/katalog/kyverno/core" }}
   {{- if .spec.distribution.modules.policy.kyverno.installDefaultPolicies }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/opa/katalog/kyverno/policies" }}
+  - {{ print $vendorPrefix "/modules/opa/katalog/kyverno/policies" }}
   {{- end }}
 {{- end }}
 

@@ -17,7 +17,7 @@ metadata:
 spec:
   distributionVersion: v1.33.1
   toolsConfiguration:
-    terraform:
+    opentofu:
       state:
         s3:
           bucketName: e2e-drone-eks

@@ -15,6 +15,7 @@ furyctl create config --kind EKSCluster --version v1.29.4 --name example-cluster
 | Property                  | Type     | Required |
 |:--------------------------|:---------|:---------|
 | [apiVersion](#apiversion) | `string` | Required |
+| [flags](#flags)           | `object` | Optional |
 | [kind](#kind)             | `string` | Required |
 | [metadata](#metadata)     | `object` | Required |
 | [spec](#spec)             | `object` | Required |
@@ -34,6 +35,12 @@ A KFD Cluster deployed on top of AWS's Elastic Kubernetes Service (EKS).
 ```
 
 [try pattern](https://regexr.com/?expression=^kfd\.sighup\.io\/v\d%2B\(\(alpha|beta\)\d%2B\)?$)
+
+## .flags
+
+### Description
+
+Persistent furyctl command flags, see the documentation for more details: https://docs.sighup.io/furyctl/flags-configuration
 
 ## .kind
 
@@ -6182,11 +6189,123 @@ This map defines which will be the common tags that will be added to all the res
 
 | Property                                      | Type     | Required |
 |:----------------------------------------------|:---------|:---------|
-| [terraform](#spectoolsconfigurationterraform) | `object` | Required |
+| [opentofu](#spectoolsconfigurationopentofu)   | `object` | Optional |
+| [terraform](#spectoolsconfigurationterraform) | `object` | Optional |
 
 ### Description
 
 Configuration for tools used by furyctl, like Terraform.
+
+## .spec.toolsConfiguration.opentofu
+
+### Properties
+
+| Property                                      | Type     | Required |
+|:----------------------------------------------|:---------|:---------|
+| [state](#spectoolsconfigurationopentofustate) | `object` | Required |
+
+### Description
+
+Configuration for storing the OpenTofu state of the cluster.
+
+## .spec.toolsConfiguration.opentofu.state
+
+### Properties
+
+| Property                                     | Type     | Required |
+|:---------------------------------------------|:---------|:---------|
+| [s3](#spectoolsconfigurationopentofustates3) | `object` | Required |
+
+### Description
+
+Configuration for storing the OpenTofu state of the cluster.
+
+## .spec.toolsConfiguration.opentofu.state.s3
+
+### Properties
+
+| Property                                                                           | Type      | Required |
+|:-----------------------------------------------------------------------------------|:----------|:---------|
+| [bucketName](#spectoolsconfigurationopentofustates3bucketname)                     | `string`  | Required |
+| [keyPrefix](#spectoolsconfigurationopentofustates3keyprefix)                       | `string`  | Required |
+| [region](#spectoolsconfigurationopentofustates3region)                             | `string`  | Required |
+| [skipRegionValidation](#spectoolsconfigurationopentofustates3skipregionvalidation) | `boolean` | Optional |
+
+### Description
+
+Configuration for the S3 bucket used to store the OpenTofu state.
+
+## .spec.toolsConfiguration.opentofu.state.s3.bucketName
+
+### Description
+
+This value defines which bucket will be used to store all the states.
+
+## .spec.toolsConfiguration.opentofu.state.s3.keyPrefix
+
+### Description
+
+This value defines which folder will be used to store all the states inside the bucket.
+
+### Constraints
+
+**maximum length**: the maximum number of characters for this string is: `960`
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[A-z0-9][A-z0-9!-_.*'()]+$
+```
+
+[try pattern](https://regexr.com/?expression=^[A-z0-9][A-z0-9!-_.*'\(\)]%2B$)
+
+## .spec.toolsConfiguration.opentofu.state.s3.region
+
+### Description
+
+This value defines in which region the bucket is located.
+
+### Constraints
+
+**enum**: the value of this property must be equal to one of the following string values:
+
+| Value            |
+|:-----------------|
+|`"af-south-1"`    |
+|`"ap-east-1"`     |
+|`"ap-northeast-1"`|
+|`"ap-northeast-2"`|
+|`"ap-northeast-3"`|
+|`"ap-south-1"`    |
+|`"ap-south-2"`    |
+|`"ap-southeast-1"`|
+|`"ap-southeast-2"`|
+|`"ap-southeast-3"`|
+|`"ap-southeast-4"`|
+|`"ca-central-1"`  |
+|`"eu-central-1"`  |
+|`"eu-central-2"`  |
+|`"eu-north-1"`    |
+|`"eu-south-1"`    |
+|`"eu-south-2"`    |
+|`"eu-west-1"`     |
+|`"eu-west-2"`     |
+|`"eu-west-3"`     |
+|`"me-central-1"`  |
+|`"me-south-1"`    |
+|`"sa-east-1"`     |
+|`"us-east-1"`     |
+|`"us-east-2"`     |
+|`"us-gov-east-1"` |
+|`"us-gov-west-1"` |
+|`"us-west-1"`     |
+|`"us-west-2"`     |
+
+## .spec.toolsConfiguration.opentofu.state.s3.skipRegionValidation
+
+### Description
+
+This value defines if the region of the bucket should be validated or not by OpenTofu, useful when using a bucket in a recently added region.
 
 ## .spec.toolsConfiguration.terraform
 
@@ -6195,6 +6314,10 @@ Configuration for tools used by furyctl, like Terraform.
 | Property                                       | Type     | Required |
 |:-----------------------------------------------|:---------|:---------|
 | [state](#spectoolsconfigurationterraformstate) | `object` | Required |
+
+### Description
+
+DEPRECATED: Configuration for storing the Terraform state of the cluster. Use 'opentofu' instead. This field will be removed in the next versions.
 
 ## .spec.toolsConfiguration.terraform.state
 
