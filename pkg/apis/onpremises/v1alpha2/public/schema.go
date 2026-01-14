@@ -2,12 +2,10 @@
 
 package public
 
-import (
-	"encoding/json"
-	"fmt"
-	"github.com/sighupio/go-jsonschema/pkg/types"
-	"reflect"
-)
+import "encoding/json"
+import "fmt"
+import "github.com/sighupio/go-jsonschema/pkg/types"
+import "reflect"
 
 type Metadata struct {
 	// The name of the cluster. It will also be used as a prefix for all the other
@@ -131,11 +129,9 @@ type SpecDistributionCustomPatchesConfigMapGeneratorResource struct {
 
 type SpecDistributionCustomPatchesConfigMapGeneratorResourceBehavior string
 
-const (
-	SpecDistributionCustomPatchesConfigMapGeneratorResourceBehaviorCreate  SpecDistributionCustomPatchesConfigMapGeneratorResourceBehavior = "create"
-	SpecDistributionCustomPatchesConfigMapGeneratorResourceBehaviorMerge   SpecDistributionCustomPatchesConfigMapGeneratorResourceBehavior = "merge"
-	SpecDistributionCustomPatchesConfigMapGeneratorResourceBehaviorReplace SpecDistributionCustomPatchesConfigMapGeneratorResourceBehavior = "replace"
-)
+const SpecDistributionCustomPatchesConfigMapGeneratorResourceBehaviorCreate SpecDistributionCustomPatchesConfigMapGeneratorResourceBehavior = "create"
+const SpecDistributionCustomPatchesConfigMapGeneratorResourceBehaviorMerge SpecDistributionCustomPatchesConfigMapGeneratorResourceBehavior = "merge"
+const SpecDistributionCustomPatchesConfigMapGeneratorResourceBehaviorReplace SpecDistributionCustomPatchesConfigMapGeneratorResourceBehavior = "replace"
 
 type SpecDistributionCustomPatchesConfigMapGeneratorResourceOptions struct {
 	// The annotations of the configmap
@@ -235,11 +231,9 @@ type SpecDistributionCustomPatchesSecretGeneratorResource struct {
 
 type SpecDistributionCustomPatchesSecretGeneratorResourceBehavior string
 
-const (
-	SpecDistributionCustomPatchesSecretGeneratorResourceBehaviorCreate  SpecDistributionCustomPatchesSecretGeneratorResourceBehavior = "create"
-	SpecDistributionCustomPatchesSecretGeneratorResourceBehaviorMerge   SpecDistributionCustomPatchesSecretGeneratorResourceBehavior = "merge"
-	SpecDistributionCustomPatchesSecretGeneratorResourceBehaviorReplace SpecDistributionCustomPatchesSecretGeneratorResourceBehavior = "replace"
-)
+const SpecDistributionCustomPatchesSecretGeneratorResourceBehaviorCreate SpecDistributionCustomPatchesSecretGeneratorResourceBehavior = "create"
+const SpecDistributionCustomPatchesSecretGeneratorResourceBehaviorMerge SpecDistributionCustomPatchesSecretGeneratorResourceBehavior = "merge"
+const SpecDistributionCustomPatchesSecretGeneratorResourceBehaviorReplace SpecDistributionCustomPatchesSecretGeneratorResourceBehavior = "replace"
 
 type SpecDistributionCustomPatchesSecretGeneratorResourceOptions struct {
 	// The annotations of the secret
@@ -575,11 +569,9 @@ type SpecDistributionModulesAuthProviderBasicAuth struct {
 
 type SpecDistributionModulesAuthProviderType string
 
-const (
-	SpecDistributionModulesAuthProviderTypeBasicAuth SpecDistributionModulesAuthProviderType = "basicAuth"
-	SpecDistributionModulesAuthProviderTypeNone      SpecDistributionModulesAuthProviderType = "none"
-	SpecDistributionModulesAuthProviderTypeSso       SpecDistributionModulesAuthProviderType = "sso"
-)
+const SpecDistributionModulesAuthProviderTypeBasicAuth SpecDistributionModulesAuthProviderType = "basicAuth"
+const SpecDistributionModulesAuthProviderTypeNone SpecDistributionModulesAuthProviderType = "none"
+const SpecDistributionModulesAuthProviderTypeSso SpecDistributionModulesAuthProviderType = "sso"
 
 // Configuration for the Disaster Recovery module.
 type SpecDistributionModulesDr struct {
@@ -689,19 +681,15 @@ type SpecDistributionModulesDrEtcdBackupS3 struct {
 
 type SpecDistributionModulesDrEtcdBackupType string
 
-const (
-	SpecDistributionModulesDrEtcdBackupTypeAll  SpecDistributionModulesDrEtcdBackupType = "all"
-	SpecDistributionModulesDrEtcdBackupTypeNone SpecDistributionModulesDrEtcdBackupType = "none"
-	SpecDistributionModulesDrEtcdBackupTypePvc  SpecDistributionModulesDrEtcdBackupType = "pvc"
-	SpecDistributionModulesDrEtcdBackupTypeS3   SpecDistributionModulesDrEtcdBackupType = "s3"
-)
+const SpecDistributionModulesDrEtcdBackupTypeAll SpecDistributionModulesDrEtcdBackupType = "all"
+const SpecDistributionModulesDrEtcdBackupTypeNone SpecDistributionModulesDrEtcdBackupType = "none"
+const SpecDistributionModulesDrEtcdBackupTypePvc SpecDistributionModulesDrEtcdBackupType = "pvc"
+const SpecDistributionModulesDrEtcdBackupTypeS3 SpecDistributionModulesDrEtcdBackupType = "s3"
 
 type SpecDistributionModulesDrType string
 
-const (
-	SpecDistributionModulesDrTypeNone       SpecDistributionModulesDrType = "none"
-	SpecDistributionModulesDrTypeOnPremises SpecDistributionModulesDrType = "on-premises"
-)
+const SpecDistributionModulesDrTypeNone SpecDistributionModulesDrType = "none"
+const SpecDistributionModulesDrTypeOnPremises SpecDistributionModulesDrType = "on-premises"
 
 // Configuration for the Velero package.
 type SpecDistributionModulesDrVelero struct {
@@ -725,10 +713,8 @@ type SpecDistributionModulesDrVelero struct {
 
 type SpecDistributionModulesDrVeleroBackend string
 
-const (
-	SpecDistributionModulesDrVeleroBackendExternalEndpoint SpecDistributionModulesDrVeleroBackend = "externalEndpoint"
-	SpecDistributionModulesDrVeleroBackendMinio            SpecDistributionModulesDrVeleroBackend = "minio"
-)
+const SpecDistributionModulesDrVeleroBackendExternalEndpoint SpecDistributionModulesDrVeleroBackend = "externalEndpoint"
+const SpecDistributionModulesDrVeleroBackendMinio SpecDistributionModulesDrVeleroBackend = "minio"
 
 // Configuration for Velero's external storage backend.
 type SpecDistributionModulesDrVeleroExternalEndpoint struct {
@@ -771,17 +757,13 @@ type SpecDistributionModulesDrVeleroExternalEndpoint struct {
 
 type SpecDistributionModulesDrVeleroExternalEndpointAccessMode string
 
-const (
-	SpecDistributionModulesDrVeleroExternalEndpointAccessModeReadOnly  SpecDistributionModulesDrVeleroExternalEndpointAccessMode = "ReadOnly"
-	SpecDistributionModulesDrVeleroExternalEndpointAccessModeReadWrite SpecDistributionModulesDrVeleroExternalEndpointAccessMode = "ReadWrite"
-)
+const SpecDistributionModulesDrVeleroExternalEndpointAccessModeReadOnly SpecDistributionModulesDrVeleroExternalEndpointAccessMode = "ReadOnly"
+const SpecDistributionModulesDrVeleroExternalEndpointAccessModeReadWrite SpecDistributionModulesDrVeleroExternalEndpointAccessMode = "ReadWrite"
 
 type SpecDistributionModulesDrVeleroExternalEndpointType string
 
-const (
-	SpecDistributionModulesDrVeleroExternalEndpointTypeGcs SpecDistributionModulesDrVeleroExternalEndpointType = "gcs"
-	SpecDistributionModulesDrVeleroExternalEndpointTypeS3  SpecDistributionModulesDrVeleroExternalEndpointType = "s3"
-)
+const SpecDistributionModulesDrVeleroExternalEndpointTypeGcs SpecDistributionModulesDrVeleroExternalEndpointType = "gcs"
+const SpecDistributionModulesDrVeleroExternalEndpointTypeS3 SpecDistributionModulesDrVeleroExternalEndpointType = "s3"
 
 // Configuration for Velero's backup schedules.
 type SpecDistributionModulesDrVeleroSchedules struct {
@@ -943,11 +925,9 @@ type SpecDistributionModulesIngressNginxTLS struct {
 
 type SpecDistributionModulesIngressNginxTLSProvider string
 
-const (
-	SpecDistributionModulesIngressNginxTLSProviderCertManager SpecDistributionModulesIngressNginxTLSProvider = "certManager"
-	SpecDistributionModulesIngressNginxTLSProviderNone        SpecDistributionModulesIngressNginxTLSProvider = "none"
-	SpecDistributionModulesIngressNginxTLSProviderSecret      SpecDistributionModulesIngressNginxTLSProvider = "secret"
-)
+const SpecDistributionModulesIngressNginxTLSProviderCertManager SpecDistributionModulesIngressNginxTLSProvider = "certManager"
+const SpecDistributionModulesIngressNginxTLSProviderNone SpecDistributionModulesIngressNginxTLSProvider = "none"
+const SpecDistributionModulesIngressNginxTLSProviderSecret SpecDistributionModulesIngressNginxTLSProvider = "secret"
 
 // Kubernetes TLS secret for the ingresses TLS certificate.
 type SpecDistributionModulesIngressNginxTLSSecret struct {
@@ -966,11 +946,9 @@ type SpecDistributionModulesIngressNginxTLSSecret struct {
 
 type SpecDistributionModulesIngressNginxType string
 
-const (
-	SpecDistributionModulesIngressNginxTypeDual   SpecDistributionModulesIngressNginxType = "dual"
-	SpecDistributionModulesIngressNginxTypeNone   SpecDistributionModulesIngressNginxType = "none"
-	SpecDistributionModulesIngressNginxTypeSingle SpecDistributionModulesIngressNginxType = "single"
-)
+const SpecDistributionModulesIngressNginxTypeDual SpecDistributionModulesIngressNginxType = "dual"
+const SpecDistributionModulesIngressNginxTypeNone SpecDistributionModulesIngressNginxType = "none"
+const SpecDistributionModulesIngressNginxTypeSingle SpecDistributionModulesIngressNginxType = "single"
 
 // Override the common configuration with a particular configuration for the
 // Ingress module.
@@ -1126,10 +1104,8 @@ type SpecDistributionModulesLoggingLoki struct {
 
 type SpecDistributionModulesLoggingLokiBackend string
 
-const (
-	SpecDistributionModulesLoggingLokiBackendExternalEndpoint SpecDistributionModulesLoggingLokiBackend = "externalEndpoint"
-	SpecDistributionModulesLoggingLokiBackendMinio            SpecDistributionModulesLoggingLokiBackend = "minio"
-)
+const SpecDistributionModulesLoggingLokiBackendExternalEndpoint SpecDistributionModulesLoggingLokiBackend = "externalEndpoint"
+const SpecDistributionModulesLoggingLokiBackendMinio SpecDistributionModulesLoggingLokiBackend = "minio"
 
 // Configuration for Loki's external storage backend.
 type SpecDistributionModulesLoggingLokiExternalEndpoint struct {
@@ -1187,10 +1163,8 @@ type SpecDistributionModulesLoggingOpensearch struct {
 
 type SpecDistributionModulesLoggingOpensearchType string
 
-const (
-	SpecDistributionModulesLoggingOpensearchTypeSingle SpecDistributionModulesLoggingOpensearchType = "single"
-	SpecDistributionModulesLoggingOpensearchTypeTriple SpecDistributionModulesLoggingOpensearchType = "triple"
-)
+const SpecDistributionModulesLoggingOpensearchTypeSingle SpecDistributionModulesLoggingOpensearchType = "single"
+const SpecDistributionModulesLoggingOpensearchTypeTriple SpecDistributionModulesLoggingOpensearchType = "triple"
 
 // Configuration for the Logging Operator.
 type SpecDistributionModulesLoggingOperator struct {
@@ -1225,12 +1199,10 @@ type SpecDistributionModulesLoggingOperatorFluentd struct {
 
 type SpecDistributionModulesLoggingType string
 
-const (
-	SpecDistributionModulesLoggingTypeCustomOutputs SpecDistributionModulesLoggingType = "customOutputs"
-	SpecDistributionModulesLoggingTypeLoki          SpecDistributionModulesLoggingType = "loki"
-	SpecDistributionModulesLoggingTypeNone          SpecDistributionModulesLoggingType = "none"
-	SpecDistributionModulesLoggingTypeOpensearch    SpecDistributionModulesLoggingType = "opensearch"
-)
+const SpecDistributionModulesLoggingTypeCustomOutputs SpecDistributionModulesLoggingType = "customOutputs"
+const SpecDistributionModulesLoggingTypeLoki SpecDistributionModulesLoggingType = "loki"
+const SpecDistributionModulesLoggingTypeNone SpecDistributionModulesLoggingType = "none"
+const SpecDistributionModulesLoggingTypeOpensearch SpecDistributionModulesLoggingType = "opensearch"
 
 // Configuration for the Monitoring module.
 type SpecDistributionModulesMonitoring struct {
@@ -1356,10 +1328,8 @@ type SpecDistributionModulesMonitoringMimir struct {
 
 type SpecDistributionModulesMonitoringMimirBackend string
 
-const (
-	SpecDistributionModulesMonitoringMimirBackendExternalEndpoint SpecDistributionModulesMonitoringMimirBackend = "externalEndpoint"
-	SpecDistributionModulesMonitoringMimirBackendMinio            SpecDistributionModulesMonitoringMimirBackend = "minio"
-)
+const SpecDistributionModulesMonitoringMimirBackendExternalEndpoint SpecDistributionModulesMonitoringMimirBackend = "externalEndpoint"
+const SpecDistributionModulesMonitoringMimirBackendMinio SpecDistributionModulesMonitoringMimirBackend = "minio"
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *SpecDistributionModulesTracing) UnmarshalJSON(b []byte) error {
@@ -2263,12 +2233,10 @@ func (j *SpecDistributionModulesMonitoringType) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-const (
-	SpecDistributionModulesMonitoringTypeNone            SpecDistributionModulesMonitoringType = "none"
-	SpecDistributionModulesMonitoringTypePrometheus      SpecDistributionModulesMonitoringType = "prometheus"
-	SpecDistributionModulesMonitoringTypePrometheusAgent SpecDistributionModulesMonitoringType = "prometheusAgent"
-	SpecDistributionModulesMonitoringTypeMimir           SpecDistributionModulesMonitoringType = "mimir"
-)
+const SpecDistributionModulesMonitoringTypeNone SpecDistributionModulesMonitoringType = "none"
+const SpecDistributionModulesMonitoringTypePrometheus SpecDistributionModulesMonitoringType = "prometheus"
+const SpecDistributionModulesMonitoringTypePrometheusAgent SpecDistributionModulesMonitoringType = "prometheusAgent"
+const SpecDistributionModulesMonitoringTypeMimir SpecDistributionModulesMonitoringType = "mimir"
 
 type SpecDistributionModulesMonitoringX509Exporter struct {
 	// Overrides corresponds to the JSON schema field "overrides".
@@ -2357,10 +2325,8 @@ func (j *SpecDistributionModulesNetworkingType) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-const (
-	SpecDistributionModulesNetworkingTypeCalico SpecDistributionModulesNetworkingType = "calico"
-	SpecDistributionModulesNetworkingTypeCilium SpecDistributionModulesNetworkingType = "cilium"
-)
+const SpecDistributionModulesNetworkingTypeCalico SpecDistributionModulesNetworkingType = "calico"
+const SpecDistributionModulesNetworkingTypeCilium SpecDistributionModulesNetworkingType = "cilium"
 
 // Configuration for the Networking module.
 type SpecDistributionModulesNetworking struct {
@@ -2424,11 +2390,9 @@ func (j *SpecDistributionModulesPolicyGatekeeperEnforcementAction) UnmarshalJSON
 	return nil
 }
 
-const (
-	SpecDistributionModulesPolicyGatekeeperEnforcementActionDeny   SpecDistributionModulesPolicyGatekeeperEnforcementAction = "deny"
-	SpecDistributionModulesPolicyGatekeeperEnforcementActionDryrun SpecDistributionModulesPolicyGatekeeperEnforcementAction = "dryrun"
-	SpecDistributionModulesPolicyGatekeeperEnforcementActionWarn   SpecDistributionModulesPolicyGatekeeperEnforcementAction = "warn"
-)
+const SpecDistributionModulesPolicyGatekeeperEnforcementActionDeny SpecDistributionModulesPolicyGatekeeperEnforcementAction = "deny"
+const SpecDistributionModulesPolicyGatekeeperEnforcementActionDryrun SpecDistributionModulesPolicyGatekeeperEnforcementAction = "dryrun"
+const SpecDistributionModulesPolicyGatekeeperEnforcementActionWarn SpecDistributionModulesPolicyGatekeeperEnforcementAction = "warn"
 
 // Configuration for the Gatekeeper package.
 type SpecDistributionModulesPolicyGatekeeper struct {
@@ -2498,10 +2462,8 @@ func (j *SpecDistributionModulesPolicyKyvernoValidationFailureAction) UnmarshalJ
 	return nil
 }
 
-const (
-	SpecDistributionModulesPolicyKyvernoValidationFailureActionAudit   SpecDistributionModulesPolicyKyvernoValidationFailureAction = "Audit"
-	SpecDistributionModulesPolicyKyvernoValidationFailureActionEnforce SpecDistributionModulesPolicyKyvernoValidationFailureAction = "Enforce"
-)
+const SpecDistributionModulesPolicyKyvernoValidationFailureActionAudit SpecDistributionModulesPolicyKyvernoValidationFailureAction = "Audit"
+const SpecDistributionModulesPolicyKyvernoValidationFailureActionEnforce SpecDistributionModulesPolicyKyvernoValidationFailureAction = "Enforce"
 
 // Configuration for the Kyverno package.
 type SpecDistributionModulesPolicyKyverno struct {
@@ -2571,11 +2533,9 @@ func (j *SpecDistributionModulesPolicyType) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-const (
-	SpecDistributionModulesPolicyTypeNone       SpecDistributionModulesPolicyType = "none"
-	SpecDistributionModulesPolicyTypeGatekeeper SpecDistributionModulesPolicyType = "gatekeeper"
-	SpecDistributionModulesPolicyTypeKyverno    SpecDistributionModulesPolicyType = "kyverno"
-)
+const SpecDistributionModulesPolicyTypeNone SpecDistributionModulesPolicyType = "none"
+const SpecDistributionModulesPolicyTypeGatekeeper SpecDistributionModulesPolicyType = "gatekeeper"
+const SpecDistributionModulesPolicyTypeKyverno SpecDistributionModulesPolicyType = "kyverno"
 
 // Configuration for the Policy module.
 type SpecDistributionModulesPolicy struct {
@@ -2660,10 +2620,8 @@ func (j *SpecDistributionModulesTracingTempoBackend) UnmarshalJSON(b []byte) err
 	return nil
 }
 
-const (
-	SpecDistributionModulesTracingTempoBackendMinio            SpecDistributionModulesTracingTempoBackend = "minio"
-	SpecDistributionModulesTracingTempoBackendExternalEndpoint SpecDistributionModulesTracingTempoBackend = "externalEndpoint"
-)
+const SpecDistributionModulesTracingTempoBackendMinio SpecDistributionModulesTracingTempoBackend = "minio"
+const SpecDistributionModulesTracingTempoBackendExternalEndpoint SpecDistributionModulesTracingTempoBackend = "externalEndpoint"
 
 // Configuration for Tempo's external storage backend.
 type SpecDistributionModulesTracingTempoExternalEndpoint struct {
@@ -2727,10 +2685,8 @@ func (j *SpecDistributionModulesTracingType) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-const (
-	SpecDistributionModulesTracingTypeNone  SpecDistributionModulesTracingType = "none"
-	SpecDistributionModulesTracingTypeTempo SpecDistributionModulesTracingType = "tempo"
-)
+const SpecDistributionModulesTracingTypeNone SpecDistributionModulesTracingType = "none"
+const SpecDistributionModulesTracingTypeTempo SpecDistributionModulesTracingType = "tempo"
 
 // Configuration for the Tracing module.
 type SpecDistributionModulesTracing struct {
@@ -3132,12 +3088,10 @@ func (j *SpecKubernetesAdvancedEventRateLimitsElemType) UnmarshalJSON(b []byte) 
 	return nil
 }
 
-const (
-	SpecKubernetesAdvancedEventRateLimitsElemTypeServer          SpecKubernetesAdvancedEventRateLimitsElemType = "Server"
-	SpecKubernetesAdvancedEventRateLimitsElemTypeNamespace       SpecKubernetesAdvancedEventRateLimitsElemType = "Namespace"
-	SpecKubernetesAdvancedEventRateLimitsElemTypeUser            SpecKubernetesAdvancedEventRateLimitsElemType = "User"
-	SpecKubernetesAdvancedEventRateLimitsElemTypeSourceAndObject SpecKubernetesAdvancedEventRateLimitsElemType = "SourceAndObject"
-)
+const SpecKubernetesAdvancedEventRateLimitsElemTypeServer SpecKubernetesAdvancedEventRateLimitsElemType = "Server"
+const SpecKubernetesAdvancedEventRateLimitsElemTypeNamespace SpecKubernetesAdvancedEventRateLimitsElemType = "Namespace"
+const SpecKubernetesAdvancedEventRateLimitsElemTypeUser SpecKubernetesAdvancedEventRateLimitsElemType = "User"
+const SpecKubernetesAdvancedEventRateLimitsElemTypeSourceAndObject SpecKubernetesAdvancedEventRateLimitsElemType = "SourceAndObject"
 
 type SpecKubernetesAdvancedEventRateLimitsElem struct {
 	// Maximum allowed burst for this bucket type.
@@ -3569,11 +3523,9 @@ func (j *TypesKubeTaintsEffect) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-const (
-	TypesKubeTaintsEffectNoSchedule       TypesKubeTaintsEffect = "NoSchedule"
-	TypesKubeTaintsEffectPreferNoSchedule TypesKubeTaintsEffect = "PreferNoSchedule"
-	TypesKubeTaintsEffectNoExecute        TypesKubeTaintsEffect = "NoExecute"
-)
+const TypesKubeTaintsEffectNoSchedule TypesKubeTaintsEffect = "NoSchedule"
+const TypesKubeTaintsEffectPreferNoSchedule TypesKubeTaintsEffect = "PreferNoSchedule"
+const TypesKubeTaintsEffectNoExecute TypesKubeTaintsEffect = "NoExecute"
 
 type TypesKubeTaints struct {
 	// Effect corresponds to the JSON schema field "effect".
@@ -4066,10 +4018,8 @@ type TypesKubeToleration struct {
 	Value *string `json:"value,omitempty" yaml:"value,omitempty" mapstructure:"value,omitempty"`
 }
 
-const (
-	TypesKubeTolerationOperatorEqual  TypesKubeTolerationOperator = "Equal"
-	TypesKubeTolerationOperatorExists TypesKubeTolerationOperator = "Exists"
-)
+const TypesKubeTolerationOperatorEqual TypesKubeTolerationOperator = "Equal"
+const TypesKubeTolerationOperatorExists TypesKubeTolerationOperator = "Exists"
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *TypesKubeTolerationOperator) UnmarshalJSON(b []byte) error {
@@ -4098,11 +4048,9 @@ var enumValues_TypesKubeTolerationOperator = []interface{}{
 
 type TypesKubeTolerationOperator string
 
-const (
-	TypesKubeTolerationEffectNoExecute        TypesKubeTolerationEffect = "NoExecute"
-	TypesKubeTolerationEffectPreferNoSchedule TypesKubeTolerationEffect = "PreferNoSchedule"
-	TypesKubeTolerationEffectNoSchedule       TypesKubeTolerationEffect = "NoSchedule"
-)
+const TypesKubeTolerationEffectNoExecute TypesKubeTolerationEffect = "NoExecute"
+const TypesKubeTolerationEffectPreferNoSchedule TypesKubeTolerationEffect = "PreferNoSchedule"
+const TypesKubeTolerationEffectNoSchedule TypesKubeTolerationEffect = "NoSchedule"
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *TypesKubeTolerationEffect) UnmarshalJSON(b []byte) error {
@@ -4181,11 +4129,9 @@ func (j *TypesKubeTolerationEffect_1) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-const (
-	TypesKubeTolerationEffect_1_NoSchedule       TypesKubeTolerationEffect_1 = "NoSchedule"
-	TypesKubeTolerationEffect_1_PreferNoSchedule TypesKubeTolerationEffect_1 = "PreferNoSchedule"
-	TypesKubeTolerationEffect_1_NoExecute        TypesKubeTolerationEffect_1 = "NoExecute"
-)
+const TypesKubeTolerationEffect_1_NoSchedule TypesKubeTolerationEffect_1 = "NoSchedule"
+const TypesKubeTolerationEffect_1_PreferNoSchedule TypesKubeTolerationEffect_1 = "PreferNoSchedule"
+const TypesKubeTolerationEffect_1_NoExecute TypesKubeTolerationEffect_1 = "NoExecute"
 
 type TypesKubeTolerationOperator_1 string
 
@@ -4214,10 +4160,8 @@ func (j *TypesKubeTolerationOperator_1) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-const (
-	TypesKubeTolerationOperator_1_Exists TypesKubeTolerationOperator_1 = "Exists"
-	TypesKubeTolerationOperator_1_Equal  TypesKubeTolerationOperator_1 = "Equal"
-)
+const TypesKubeTolerationOperator_1_Exists TypesKubeTolerationOperator_1 = "Exists"
+const TypesKubeTolerationOperator_1_Equal TypesKubeTolerationOperator_1 = "Equal"
 
 type TypesKubeToleration_1 struct {
 	// Effect corresponds to the JSON schema field "effect".
