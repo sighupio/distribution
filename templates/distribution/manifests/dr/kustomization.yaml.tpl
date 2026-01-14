@@ -18,13 +18,13 @@ resources:
   - {{ print $vendorPrefix "/modules/dr/katalog/velero/velero-on-prem" }}
 {{- else }}
 {{- if eq .spec.distribution.modules.dr.velero.externalEndpoint.type "s3" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/dr/katalog/velero/velero-aws" }}
+  - {{ print $vendorPrefix "/modules/dr/katalog/velero/velero-aws" }}
   - resources/storageLocation.s3.yaml
   - resources/volumeSnapshotLocation.s3.yaml
 {{- end }}
 
 {{- if eq .spec.distribution.modules.dr.velero.externalEndpoint.type "gcs" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/dr/katalog/velero/velero-gcp" }}
+  - {{ print $vendorPrefix "/modules/dr/katalog/velero/velero-gcp" }}
   - resources/storageLocation.gcs.yaml
   - resources/volumeSnapshotLocation.gcs.yaml
 {{- end }}
