@@ -14,8 +14,19 @@ data:
     # where all the KFD modules are downloaded
     relativeVendorPath: "../../vendor"
     provider:
-      type: none
+      type: immutable
     networkPoliciesEnabled: false
+
+  # Immutable-specific infrastructure defaults
+  infrastructure:
+    flatcarVersion: "4206.0.0"
+    installDisk: "/dev/sda"
+    ssh:
+      username: "core"
+      # keyPath is required and must come from user spec
+    # ipxeServer.url is required and must come from user spec
+    # nodes is required and must come from user spec
+
   # the module section will be used to fine tune each module behaviour and configuration
   modules:
     # ingress module configuration
