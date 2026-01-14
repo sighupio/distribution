@@ -601,7 +601,7 @@ spec:
     # SSH configuration for node access
     ssh:
       username: core
-      keyPath: ~/.ssh/id_ed25519_production
+      keyPath: ~/.ssh/id_ed25519
 
   # Kubernetes cluster configuration
   # Ref: https://kubernetes.io/docs/setup/production-environment/
