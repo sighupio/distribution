@@ -1,0 +1,144 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+# Large cluster with many nodes
+apiVersion: kfd.sighup.io/v1alpha2
+kind: Immutable
+metadata:
+  name: large-cluster
+spec:
+  distributionVersion: v1.32.1
+
+  infrastructure:
+    nodes:
+      - hostname: cp01.k8s.example.com
+        macAddress: 52:54:00:10:00:01
+        storage:
+          installDisk: /dev/sda
+        network:
+          ethernets:
+            eth0:
+              addresses:
+                - "192.168.1.11/24"
+      - hostname: cp02.k8s.example.com
+        macAddress: 52:54:00:10:00:02
+        storage:
+          installDisk: /dev/sda
+        network:
+          ethernets:
+            eth0:
+              addresses:
+                - "192.168.1.12/24"
+      - hostname: cp03.k8s.example.com
+        macAddress: 52:54:00:10:00:03
+        storage:
+          installDisk: /dev/sda
+        network:
+          ethernets:
+            eth0:
+              addresses:
+                - "192.168.1.13/24"
+      - hostname: worker01.k8s.example.com
+        macAddress: 52:54:00:10:00:11
+        storage:
+          installDisk: /dev/sda
+        network:
+          ethernets:
+            eth0:
+              addresses:
+                - "192.168.1.21/24"
+      - hostname: worker02.k8s.example.com
+        macAddress: 52:54:00:10:00:12
+        storage:
+          installDisk: /dev/sda
+        network:
+          ethernets:
+            eth0:
+              addresses:
+                - "192.168.1.22/24"
+      - hostname: worker03.k8s.example.com
+        macAddress: 52:54:00:10:00:13
+        storage:
+          installDisk: /dev/sda
+        network:
+          ethernets:
+            eth0:
+              addresses:
+                - "192.168.1.23/24"
+      - hostname: worker04.k8s.example.com
+        macAddress: 52:54:00:10:00:14
+        storage:
+          installDisk: /dev/sda
+        network:
+          ethernets:
+            eth0:
+              addresses:
+                - "192.168.1.24/24"
+      - hostname: worker05.k8s.example.com
+        macAddress: 52:54:00:10:00:15
+        storage:
+          installDisk: /dev/sda
+        network:
+          ethernets:
+            eth0:
+              addresses:
+                - "192.168.1.25/24"
+
+    ssh:
+      username: core
+      keyPath: ~/.ssh/id_rsa
+
+  kubernetes:
+    controlPlane:
+      address: k8s-api.example.com:6443
+      members:
+        - hostname: cp01.k8s.example.com
+          ip: 192.168.1.11
+        - hostname: cp02.k8s.example.com
+          ip: 192.168.1.12
+        - hostname: cp03.k8s.example.com
+          ip: 192.168.1.13
+
+    etcd:
+      members:
+        - hostname: cp01.k8s.example.com
+          ip: 192.168.1.11
+        - hostname: cp02.k8s.example.com
+          ip: 192.168.1.12
+        - hostname: cp03.k8s.example.com
+          ip: 192.168.1.13
+
+    networking:
+      podCIDR: 10.244.0.0/16
+      serviceCIDR: 10.96.0.0/12
+
+  distribution:
+    modules:
+      networking:
+        type: cilium
+
+      ingress:
+        baseDomain: example.com
+        nginx:
+          type: dual
+
+      logging:
+        type: loki
+
+      monitoring:
+        type: prometheus
+
+      tracing:
+        type: tempo
+
+      policy:
+        type: kyverno
+
+      dr:
+        type: on-premises
+
+      auth:
+        provider:
+          type: none
