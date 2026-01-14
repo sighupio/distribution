@@ -1,0 +1,325 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+data:
+  customPatches:
+    configMapGenerator: []
+    secretGenerator: []
+    patches: []
+    patchesStrategicMerge: []
+    images: []
+  # the common section will be used by all the templates in all modules, everything defined here is something used by all the KFD modules.
+  common:
+    # where all the KFD modules are downloaded
+    relativeVendorPath: "../../vendor"
+    provider:
+      type: none
+    networkPoliciesEnabled: false
+  # the module section will be used to fine tune each module behaviour and configuration
+  modules:
+    # ingress module configuration
+    ingress:
+      overrides:
+        nodeSelector: null
+        tolerations: null
+        # override ingresses parameters
+        ingresses:
+          forecastle:
+            # disable authentication if set globally on auth module
+            disableAuth: false
+            # if empty, will use the default packageName + baseDomain from common configurations
+            host: ""
+            ingressClass: ""
+
+      baseDomain: example.dev
+      dns:
+        public:
+          name: ""
+          # if create is false, a data source will be used to get the public DNS, otherwise a public zone will be created
+          create: false
+        # private is used only when ingress.nginx.type is "dual"
+        private:
+          # required to be set by the user, ex: internal.fury-demo.sighup.io
+          name: ""
+          create: true
+          # internal field, not applicable for Immutable (no VPC)
+          vpcId: ""
+      # common configuration for nginx ingress controller
+      nginx:
+        # can be single or dual
+        type: single
+        tls:
+          # can be certManager, secret or none
+          provider: certManager # it uses the configuration below as default when certManager is chosen
+          secret: #if we want to use custom certificates, the template should create a secret and set it as default certificate in NGINX, so patch nginx deployment accordingly
+            cert: |
+              value
+            key: |
+              value
+            ca: |
+              value
+      # the standard configuration for cert-manager on the ingress module
+      certManager:
+        # to create the clusterIssuer, this is an additional clusterIssuer than the two provided by cert-manager, for simplicity
+        clusterIssuer:
+          name: letsencrypt-fury
+          email: engineering+fury-distribution@sighup.io
+          type: null
+    # logging module configuration
+    logging:
+      overrides:
+        nodeSelector: null
+        tolerations: null
+        ingresses:
+          opensearchDashboards:
+            disableAuth: false
+            host: ""
+            ingressClass: ""
+          cerebro:
+            disableAuth: false
+            host: ""
+            ingressClass: ""
+          minio:
+            disableAuth: false
+            host: ""
+            ingressClass: ""
+      operator:
+        fluentd: {}
+        fluentbit: {}
+      # can be none, opensearch, loki or customOutputs
+      type: loki
+      opensearch:
+        # can be single or triple
+        type: single
+        # if set, it will override the volumeClaimTemplates in the opensearch statefulSet
+        storageSize: 150Gi
+      minio:
+        # define the size for each minio disk, total disks to be created: 6
+        storageSize: 20Gi
+        rootUser:
+          username: minio
+          password: minio123
+      loki:
+        tsdbStartDate: "2025-05-15" # we needed this field when migrating from BoltDB to TSDB. Now TSDB is the default.
+        backend: minio
+        externalEndpoint:
+          endpoint: s3.eu-west-1.amazonaws.com
+          insecure: false
+          secretAccessKey: example
+          accessKeyId: example
+          bucketName: lokibucket
+        # retentionTime can be set to 0s to disable retention
+        retentionTime: 720h # 30 days
+      customOutputs: {}
+    # monitoring module configuration
+    monitoring:
+      type: prometheus
+      overrides:
+        nodeSelector: null
+        tolerations: null
+        # override ingresses parameters
+        ingresses:
+          prometheus:
+            disableAuth: false
+            host: ""
+            ingressClass: ""
+          alertmanager:
+            disableAuth: false
+            host: ""
+            ingressClass: ""
+          grafana:
+            disableAuth: false
+            host: ""
+            ingressClass: ""
+          grafanaBasicAuth:
+            disableAuth: false
+            host: ""
+            ingressClass: ""
+          minio:
+            disableAuth: false
+            host: ""
+            ingressClass: ""
+      prometheus:
+        retentionTime: 30d
+        retentionSize: 120GB
+        storageSize: 150Gi
+      prometheusAgent: {}
+      prometheusAdapter:
+        installEnhancedHPAMetrics: true
+      alertmanager:
+        installDefaultRules: true
+        deadManSwitchWebhookUrl: ""
+        slackWebhookUrl: ""
+      mimir:
+        retentionTime: 30d
+        # backend can be minio, externalEndpoint
+        backend: minio
+        externalEndpoint:
+          endpoint: s3.eu-west-1.amazonaws.com
+          insecure: false
+          secretAccessKey: example
+          accessKeyId: example
+          bucketName: mimirbucket
+      minio:
+        # define the size for each minio disk, total disks to be created: 6
+        storageSize: 20Gi
+        rootUser:
+          username: minio
+          password: minio123
+      grafana:
+        basicAuthIngress: false
+    # tracing module configuration
+    tracing:
+      overrides:
+        nodeSelector: null
+        tolerations: null
+        ingresses:
+          minio:
+            disableAuth: false
+            host: ""
+            ingressClass: ""
+      type: tempo
+      tempo:
+        retentionTime: 720h
+        backend: minio
+        externalEndpoint:
+          endpoint: s3.eu-west-1.amazonaws.com
+          insecure: false
+          secretAccessKey: example
+          accessKeyId: example
+          bucketName: tempobucket
+      minio:
+        # define the size for each minio disk, total disks to be created: 6
+        storageSize: 20Gi
+        rootUser:
+          username: minio
+          password: minio123
+    # networking module configuration
+    networking:
+      tigeraOperator:
+        podCidr: null
+        blockSize: 26
+      cilium:
+        podCidr: null
+        maskSize: "24"
+      overrides:
+        nodeSelector: null
+        tolerations: null
+        ingresses:
+          hubble:
+            disableAuth: false
+            host: ""
+            ingressClass: ""
+    # policy module configuration
+    policy:
+      overrides:
+        nodeSelector: null
+        tolerations: null
+        # override ingresses parameters
+        ingresses:
+          gpm:
+            disableAuth: false
+            host: ""
+            ingressClass: ""
+      # the standard configuration for gatekeeper on the policy module
+      gatekeeper:
+        # this configuration adds namespaces to the excluded list, actually whitelisting them
+        additionalExcludedNamespaces: []
+        enforcementAction: deny
+        installDefaultPolicies: true
+      kyverno:
+        # this configuration adds namespaces to the excluded list, actually whitelisting them
+        additionalExcludedNamespaces: []
+        validationFailureAction: Enforce
+        installDefaultPolicies: true
+    # dr module configuration
+    dr:
+      type: on-premises
+      overrides:
+        nodeSelector: null
+        tolerations: null
+      # etcdBackup configuration for bare-metal clusters
+      etcdBackup:
+        type: "minio"
+        # minio configuration for etcd backups
+        minio:
+          endpoint: "minio.minio.svc:9000"
+          bucketName: "etcd-backups"
+          secretAccessKey: "minio123"
+          accessKeyId: "minio"
+          insecure: true
+        # schedule for etcd backups
+        schedule: "0 */6 * * *" # Every 6 hours
+      # the standard configuration for velero on the dr module
+      velero:
+        backend: minio
+        externalEndpoint:
+          endpoint: s3.eu-west-1.amazonaws.com
+          insecure: false
+          secretAccessKey: example
+          accessKeyId: example
+          bucketName: velerobucket
+        schedules:
+          install: true
+          definitions:
+            manifests:
+              schedule: "*/15 * * * *"
+              ttl: "720h0m0s"
+            full:
+              schedule: "0 1 * * *"
+              ttl: "720h0m0s"
+              snapshotMoveData: false
+        snapshotController:
+          install: false
+    # auth module configuration
+    auth:
+      overrides:
+        nodeSelector: null
+        # override ingresses parameters
+        ingresses:
+          pomerium:
+            # disableAuth: false <- This doesn't make sense here.
+            host: ""
+            ingressClass: ""
+          dex:
+            host: ""
+            ingressClass: ""
+          gangplank: # only needed as default
+            host: ""
+            ingressClass: ""
+        tolerations: null
+      provider:
+        # can be none, basicAuth or sso. SSO uses pomerium+dex
+        type: none
+        basicAuth:
+          username: admin
+          password: admin
+      pomerium:
+        policy: ""
+        secrets:
+          # override environment variables here
+          ##COOKIE_SECRET is obtained with  `head -c32 /dev/urandom | base64` see https://www.pomerium.io/reference/#cookie-secret
+          COOKIE_SECRET: ""
+          ##IDP_CLIENT_SECRET is the secret configured in the pomerium Dex static client
+          IDP_CLIENT_SECRET: ""
+          ##SHARED_SECRET is obtained with  `head -c32 /dev/urandom | base64` see https://www.pomerium.io/reference/#shared-secret
+          SHARED_SECRET: ""
+      dex:
+        # see dex documentation for more information
+        connectors: []
+        additionalStaticClients: []
+        expiry:
+          signingKeys: "6h"
+          idTokens: "24h"
+      oidcTrustedCA: "" # only needed as default
+      oidcKubernetesAuth: # only needed as default
+        enabled: false
+      baseDomain: ""
+
+templates:
+  includes:
+    - ".*\\.yaml"
+    - ".*\\.yml"
+  suffix: ".tpl"
+  processFilename: true

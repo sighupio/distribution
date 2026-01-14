@@ -1,0 +1,76 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+apiVersion: kfd.sighup.io/v1alpha2
+kind: Immutable
+metadata:
+  name: additional-properties
+  # ERROR: Additional property not allowed in metadata
+  extraField: "not-allowed"
+spec:
+  distributionVersion: v1.32.1
+
+  infrastructure:
+    nodes:
+      - hostname: node01.k8s.example.com
+        macAddress: 52:54:00:10:00:01
+        storage:
+          installDisk: /dev/sda
+        network:
+          ethernets:
+            eth0:
+              addresses:
+                - "192.168.1.10/24"
+
+    ssh:
+      username: core
+      keyPath: ~/.ssh/id_rsa
+
+  kubernetes:
+    controlPlane:
+      address: k8s-api.example.com:6443
+      members:
+        - hostname: node01.k8s.example.com
+          ip: 192.168.1.10
+
+    etcd:
+      members:
+        - hostname: node01.k8s.example.com
+          ip: 192.168.1.10
+
+    networking:
+      podCIDR: 10.244.0.0/16
+      serviceCIDR: 10.96.0.0/12
+
+  distribution:
+    modules:
+      networking:
+        type: calico
+
+      ingress:
+        baseDomain: example.com
+        nginx:
+          type: single
+          tls:
+            provider: none
+
+      logging:
+        type: none
+
+      monitoring:
+        type: none
+
+      tracing:
+        type: none
+
+      policy:
+        type: none
+
+      dr:
+        type: none
+
+      auth:
+        provider:
+          type: none
