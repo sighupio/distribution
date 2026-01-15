@@ -197,6 +197,12 @@
           "pattern": "^([a-zA-Z0-9]([a-zA-Z0-9\\-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z]{2,}$",
           "minLength": 1
         },
+        "arch": {
+          "type": "string",
+          "description": "CPU architecture for the node. Determines which sysext packages are downloaded. Example: x86-64, arm64",
+          "enum": ["x86-64", "arm64"],
+          "default": "x86-64"
+        },
         "macAddress": {
           "$ref": "#/$defs/Types.MacAddress",
           "description": "MAC address for PXE boot identification. Example: 52:54:00:10:00:01"
@@ -679,11 +685,19 @@
       "additionalProperties": false,
       "description": "Kubernetes cluster configuration including control plane, etcd, and worker nodes.",
       "properties": {
+        "version": {
+          "type": "string",
+          "description": "Kubernetes version for sysext packages. Determines versions of containerd, kubernetes, and other components from installer defaults. Example: 1.33.4",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
         "controlPlane": {
           "$ref": "#/$defs/Spec.Kubernetes.ControlPlane"
         },
         "etcd": {
           "$ref": "#/$defs/Spec.Kubernetes.Etcd"
+        },
+        "loadBalancers": {
+          "$ref": "#/$defs/Spec.Kubernetes.LoadBalancers"
         },
         "nodeGroups": {
           "type": "array",
@@ -748,6 +762,34 @@
       },
       "required": [
         "members"
+      ]
+    },
+    "Spec.Kubernetes.LoadBalancers": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Load balancer configuration for high-availability API server access. Uses HAProxy for load balancing and keepalived for VIP failover.",
+      "properties": {
+        "members": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Spec.Kubernetes.Member"
+          },
+          "description": "Load balancer member nodes. These nodes will run HAProxy and keepalived.",
+          "minItems": 1
+        },
+        "virtualIP": {
+          "$ref": "#/$defs/Types.IpAddress",
+          "description": "Virtual IP address managed by keepalived for HA. This IP will be used as the control plane address. Example: 192.168.1.10"
+        },
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable load balancer configuration. When true, HAProxy and keepalived will be configured.",
+          "default": true
+        }
+      },
+      "required": [
+        "members",
+        "virtualIP"
       ]
     },
     "Spec.Kubernetes.Member": {

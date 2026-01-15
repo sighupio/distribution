@@ -1720,10 +1720,13 @@ const (
 	SpecDistributionModulesPolicyTypeNone       SpecDistributionModulesPolicyType = "none"
 )
 
-// Configuration for the Tracing module.
-type SpecDistributionModulesTracing struct {
-	// Minio corresponds to the JSON schema field "minio".
-	Minio *SpecDistributionModulesTracingMinio `json:"minio,omitempty" yaml:"minio,omitempty" mapstructure:"minio,omitempty"`
+// Configuration for the Policy module.
+type SpecDistributionModulesPolicy struct {
+	// Gatekeeper corresponds to the JSON schema field "gatekeeper".
+	Gatekeeper *SpecDistributionModulesPolicyGatekeeper `json:"gatekeeper,omitempty" yaml:"gatekeeper,omitempty" mapstructure:"gatekeeper,omitempty"`
+
+	// Kyverno corresponds to the JSON schema field "kyverno".
+	Kyverno *SpecDistributionModulesPolicyKyverno `json:"kyverno,omitempty" yaml:"kyverno,omitempty" mapstructure:"kyverno,omitempty"`
 
 	// Overrides corresponds to the JSON schema field "overrides".
 	Overrides *TypesFuryModuleOverrides `json:"overrides,omitempty" yaml:"overrides,omitempty" mapstructure:"overrides,omitempty"`
@@ -1748,31 +1751,6 @@ type SpecDistributionModulesTracingMinio struct {
 
 	// The PVC size for each MinIO disk, 6 disks total.
 	StorageSize *string `json:"storageSize,omitempty" yaml:"storageSize,omitempty" mapstructure:"storageSize,omitempty"`
-}
-
-type SpecDistributionModulesTracingMinioRootUser struct {
-	// The password for the default MinIO root user.
-	Password *string `json:"password,omitempty" yaml:"password,omitempty" mapstructure:"password,omitempty"`
-
-	// The username for the default MinIO root user.
-	Username *string `json:"username,omitempty" yaml:"username,omitempty" mapstructure:"username,omitempty"`
-}
-
-// Configuration for the Tempo package.
-type SpecDistributionModulesTracingTempo struct {
-	// The storage backend type for Tempo. `minio` will use an in-cluster MinIO
-	// deployment for object storage, `externalEndpoint` can be used to point to an
-	// external S3-compatible object storage instead of deploying an in-cluster MinIO.
-	Backend *SpecDistributionModulesTracingTempoBackend `json:"backend,omitempty" yaml:"backend,omitempty" mapstructure:"backend,omitempty"`
-
-	// Configuration for Tempo's external storage backend.
-	ExternalEndpoint *SpecDistributionModulesTracingTempoExternalEndpoint `json:"externalEndpoint,omitempty" yaml:"externalEndpoint,omitempty" mapstructure:"externalEndpoint,omitempty"`
-
-	// Overrides corresponds to the JSON schema field "overrides".
-	Overrides *TypesFuryModuleComponentOverrides `json:"overrides,omitempty" yaml:"overrides,omitempty" mapstructure:"overrides,omitempty"`
-
-	// The retention time for the traces stored in Tempo.
-	RetentionTime *string `json:"retentionTime,omitempty" yaml:"retentionTime,omitempty" mapstructure:"retentionTime,omitempty"`
 }
 
 type SpecDistributionModulesTracingTempoBackend string
@@ -1812,6 +1790,9 @@ const (
 type SpecKubernetes struct {
 	// Advanced corresponds to the JSON schema field "advanced".
 	Advanced *SpecKubernetesAdvanced `json:"advanced,omitempty" yaml:"advanced,omitempty" mapstructure:"advanced,omitempty"`
+
+	// Configuration for Tempo's external storage backend.
+	ExternalEndpoint *SpecDistributionModulesTracingTempoExternalEndpoint `json:"externalEndpoint,omitempty" yaml:"externalEndpoint,omitempty" mapstructure:"externalEndpoint,omitempty"`
 
 	// AdvancedAnsible corresponds to the JSON schema field "advancedAnsible".
 	AdvancedAnsible *SpecKubernetesAdvancedAnsible `json:"advancedAnsible,omitempty" yaml:"advancedAnsible,omitempty" mapstructure:"advancedAnsible,omitempty"`
@@ -4185,90 +4166,67 @@ func (j *TypesKubeTolerationEffect_1) UnmarshalJSON(b []byte) error {
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionModulesMonitoringType) UnmarshalJSON(b []byte) error {
+func (j *SpecDistributionModulesDr) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	if v, ok := raw["type"]; !ok || v == nil {
+		return fmt.Errorf("field type in SpecDistributionModulesDr: required")
+	}
+	type Plain SpecDistributionModulesDr
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	*j = SpecDistributionModulesDr(plain)
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecDistributionModulesDrVeleroBackend) UnmarshalJSON(b []byte) error {
 	var v string
 	if err := json.Unmarshal(b, &v); err != nil {
 		return err
 	}
 	var ok bool
-	for _, expected := range enumValues_SpecDistributionModulesMonitoringType {
+	for _, expected := range enumValues_SpecDistributionModulesDrVeleroBackend {
 		if reflect.DeepEqual(v, expected) {
 			ok = true
 			break
 		}
 	}
 	if !ok {
-		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_SpecDistributionModulesMonitoringType, v)
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_SpecDistributionModulesDrVeleroBackend, v)
 	}
-	*j = SpecDistributionModulesMonitoringType(v)
+	*j = SpecDistributionModulesDrVeleroBackend(v)
 	return nil
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionModulesDrEtcdBackupType) UnmarshalJSON(b []byte) error {
+func (j *SpecDistributionModulesPolicyKyvernoValidationFailureAction) UnmarshalJSON(b []byte) error {
 	var v string
 	if err := json.Unmarshal(b, &v); err != nil {
 		return err
 	}
 	var ok bool
-	for _, expected := range enumValues_SpecDistributionModulesDrEtcdBackupType {
+	for _, expected := range enumValues_SpecDistributionModulesPolicyKyvernoValidationFailureAction {
 		if reflect.DeepEqual(v, expected) {
 			ok = true
 			break
 		}
 	}
 	if !ok {
-		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_SpecDistributionModulesDrEtcdBackupType, v)
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_SpecDistributionModulesPolicyKyvernoValidationFailureAction, v)
 	}
-	*j = SpecDistributionModulesDrEtcdBackupType(v)
+	*j = SpecDistributionModulesPolicyKyvernoValidationFailureAction(v)
 	return nil
 }
 
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionModulesDrEtcdBackupS3) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if v, ok := raw["accessKeyId"]; !ok || v == nil {
-		return fmt.Errorf("field accessKeyId in SpecDistributionModulesDrEtcdBackupS3: required")
-	}
-	if v, ok := raw["bucketName"]; !ok || v == nil {
-		return fmt.Errorf("field bucketName in SpecDistributionModulesDrEtcdBackupS3: required")
-	}
-	if v, ok := raw["endpoint"]; !ok || v == nil {
-		return fmt.Errorf("field endpoint in SpecDistributionModulesDrEtcdBackupS3: required")
-	}
-	if v, ok := raw["secretAccessKey"]; !ok || v == nil {
-		return fmt.Errorf("field secretAccessKey in SpecDistributionModulesDrEtcdBackupS3: required")
-	}
-	type Plain SpecDistributionModulesDrEtcdBackupS3
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = SpecDistributionModulesDrEtcdBackupS3(plain)
-	return nil
+var enumValues_SpecDistributionModulesPolicyKyvernoValidationFailureAction = []interface{}{
+	"Audit",
+	"Enforce",
 }
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionModulesAuth) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if v, ok := raw["provider"]; !ok || v == nil {
-		return fmt.Errorf("field provider in SpecDistributionModulesAuth: required")
-	}
-	type Plain SpecDistributionModulesAuth
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = SpecDistributionModulesAuth(plain)
-	return nil
-}
-
 var enumValues_TypesKubeTolerationOperator_1 = []interface{}{
 	"Exists",
 	"Equal",

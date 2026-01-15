@@ -7,6 +7,7 @@
 # BUTANE TEMPLATE - Load Balancer Node: {{ .Hostname }}
 # =============================================================================
 # This template is rendered by furyctl from fury-distribution
+# Architecture: {{ .Arch }}
 # =============================================================================
 variant: flatcar
 version: 1.1.0
@@ -51,10 +52,10 @@ storage:
     # =========================================================================
     # Sysext: Containerd
     # =========================================================================
-    - path: /opt/extensions/containerd/containerd-2.1.4-x86-64.raw
+    - path: /opt/extensions/containerd/containerd-{{ $.data.sysext.containerd.version }}-{{ .Arch }}.raw
       mode: 0644
       contents:
-        source: {{ $.data.ipxeServerURL }}/assets/extensions/containerd-2.1.4-x86-64.raw
+        source: {{ $.data.ipxeServerURL }}/assets/extensions/containerd-{{ $.data.sysext.containerd.version }}-{{ .Arch }}.raw
 
     - path: /etc/sysupdate.containerd.d/containerd.conf
       contents:
@@ -63,10 +64,10 @@ storage:
     # =========================================================================
     # Sysext: keepalived
     # =========================================================================
-    - path: /opt/extensions/keepalived/keepalived-v2.3.4-x86-64.raw
+    - path: /opt/extensions/keepalived/keepalived-{{ $.data.sysext.keepalived.version }}-{{ .Arch }}.raw
       mode: 0644
       contents:
-        source: {{ $.data.ipxeServerURL }}/assets/extensions/keepalived-v2.3.4-x86-64.raw
+        source: {{ $.data.ipxeServerURL }}/assets/extensions/keepalived-{{ $.data.sysext.keepalived.version }}-{{ .Arch }}.raw
 
     - path: /etc/sysupdate.keepalived.d/keepalived.conf
       contents:
@@ -85,12 +86,12 @@ storage:
 
     # Enable containerd sysext
     - path: /etc/extensions/containerd.raw
-      target: /opt/extensions/containerd/containerd-2.1.4-x86-64.raw
+      target: /opt/extensions/containerd/containerd-{{ $.data.sysext.containerd.version }}-{{ .Arch }}.raw
       hard: false
 
     # Enable keepalived sysext
     - path: /etc/extensions/keepalived.raw
-      target: /opt/extensions/keepalived/keepalived-v2.3.4-x86-64.raw
+      target: /opt/extensions/keepalived/keepalived-{{ $.data.sysext.keepalived.version }}-{{ .Arch }}.raw
       hard: false
 
 systemd:

@@ -1,10 +1,10 @@
-{{- /* Template for worker nodes */ -}}
+{{- /* Template for dedicated etcd nodes */ -}}
 {{- range .data.nodes }}
-{{- if eq .Role "worker" }}
+{{- if eq .Role "etcd" }}
 ---
 # yaml-language-server: $schema=https://relativ-it.github.io/Butane-Schemas/Butane-Schema.json
 # =============================================================================
-# BUTANE TEMPLATE - Worker Node: {{ .Hostname }}
+# BUTANE TEMPLATE - etcd Node: {{ .Hostname }}
 # =============================================================================
 # This template is rendered by furyctl from fury-distribution
 # Architecture: {{ .Arch }}
@@ -61,6 +61,18 @@ storage:
       contents:
         source: {{ $.data.ipxeServerURL }}/assets/extensions/containerd.conf
 
+    # =========================================================================
+    # Sysext: etcd
+    # =========================================================================
+    - path: /opt/extensions/etcd/etcd-{{ $.data.sysext.etcd.version }}-{{ .Arch }}.raw
+      mode: 0644
+      contents:
+        source: {{ $.data.ipxeServerURL }}/assets/extensions/etcd-{{ $.data.sysext.etcd.version }}-{{ .Arch }}.raw
+
+    - path: /etc/sysupdate.etcd.d/etcd.conf
+      contents:
+        source: {{ $.data.ipxeServerURL }}/assets/extensions/etcd.conf
+
   links:
     # Disable Docker from Flatcar base OS
     - path: /etc/extensions/docker-flatcar.raw
@@ -77,6 +89,11 @@ storage:
       target: /opt/extensions/containerd/containerd-{{ $.data.sysext.containerd.version }}-{{ .Arch }}.raw
       hard: false
 
+    # Enable etcd sysext
+    - path: /etc/extensions/etcd.raw
+      target: /opt/extensions/etcd/etcd-{{ $.data.sysext.etcd.version }}-{{ .Arch }}.raw
+      hard: false
+
 systemd:
   units:
     - name: systemd-sysupdate.timer
@@ -91,6 +108,14 @@ systemd:
             ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C containerd update
             ExecStartPost=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/containerd.raw > /tmp/containerd-new"
             ExecStartPost=/usr/bin/sh -c "if ! cmp --silent /tmp/containerd /tmp/containerd-new; then touch /run/reboot-required; fi"
+
+        - name: etcd.conf
+          contents: |
+            [Service]
+            ExecStartPre=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/etcd.raw > /tmp/etcd"
+            ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C etcd update
+            ExecStartPost=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/etcd.raw > /tmp/etcd-new"
+            ExecStartPost=/usr/bin/sh -c "if ! cmp --silent /tmp/etcd /tmp/etcd-new; then touch /run/reboot-required; fi"
 
     - name: containerd.service
       dropins:
