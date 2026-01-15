@@ -2,10 +2,12 @@
 
 package public
 
-import "encoding/json"
-import "fmt"
-import "github.com/sighupio/go-jsonschema/pkg/types"
-import "reflect"
+import (
+	"encoding/json"
+	"fmt"
+	"github.com/sighupio/go-jsonschema/pkg/types"
+	"reflect"
+)
 
 // A KFD Cluster deployed on top of AWS's Elastic Kubernetes Service (EKS).
 type EksclusterKfdV1Alpha2 struct {
