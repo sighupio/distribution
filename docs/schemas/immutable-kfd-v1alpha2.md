@@ -1351,13 +1351,13 @@ iPXE server configuration for network boot provisioning. Ref: https://www.flatca
 
 ### Description
 
-Path to the matchbox assets directory. Example: /var/lib/matchbox/assets
+Path to the iPXE server assets directory. Example: /var/lib/ipxe-server/assets
 
 ## .spec.infrastructure.ipxeServer.advanced.dataPath
 
 ### Description
 
-Path to the matchbox data directory. Example: /var/lib/matchbox
+Path to the iPXE server data directory. Example: /var/lib/ipxe-server
 
 ## .spec.infrastructure.ipxeServer.advanced.logLevel
 
@@ -1380,7 +1380,7 @@ Log level for the iPXE server. Example: info
 
 ### Description
 
-The URL of the iPXE server (matchbox). Example: https://ipxe.internal.example.com:8080
+The URL of the iPXE boot server. Example: https://ipxe.internal.example.com:8080
 
 ### Constraints
 
@@ -1441,6 +1441,7 @@ The kernel parameter value. Example: "1"
 
 | Property                                                     | Type     | Required |
 |:-------------------------------------------------------------|:---------|:---------|
+| [arch](#specinfrastructurenodesarch)                         | `string` | Optional |
 | [hostname](#specinfrastructurenodeshostname)                 | `string` | Required |
 | [iscsi](#specinfrastructurenodesiscsi)                       | `object` | Optional |
 | [kernelParameters](#specinfrastructurenodeskernelparameters) | `array`  | Optional |
@@ -1456,6 +1457,21 @@ Definition of a bare metal node with storage, network, and hardware configuratio
 ### Constraints
 
 **minimum number of items**: the minimum number of items for this array is: `1`
+
+## .spec.infrastructure.nodes.arch
+
+### Description
+
+CPU architecture for the node. Determines which sysext packages are downloaded. Example: x86-64, arm64
+
+### Constraints
+
+**enum**: the value of this property must be equal to one of the following string values:
+
+| Value    |
+|:---------|
+|`"x86-64"`|
+|`"arm64"` |
 
 ## .spec.infrastructure.nodes.hostname
 
@@ -1897,13 +1913,15 @@ SSH username. Example: core
 
 ### Properties
 
-| Property                                    | Type     | Required |
-|:--------------------------------------------|:---------|:---------|
-| [advanced](#speckubernetesadvanced)         | `object` | Optional |
-| [controlPlane](#speckubernetescontrolplane) | `object` | Required |
-| [etcd](#speckubernetesetcd)                 | `object` | Required |
-| [networking](#speckubernetesnetworking)     | `object` | Required |
-| [nodeGroups](#speckubernetesnodegroups)     | `array`  | Optional |
+| Property                                      | Type     | Required |
+|:----------------------------------------------|:---------|:---------|
+| [advanced](#speckubernetesadvanced)           | `object` | Optional |
+| [controlPlane](#speckubernetescontrolplane)   | `object` | Required |
+| [etcd](#speckubernetesetcd)                   | `object` | Required |
+| [loadBalancers](#speckubernetesloadbalancers) | `object` | Optional |
+| [networking](#speckubernetesnetworking)       | `object` | Required |
+| [nodeGroups](#speckubernetesnodegroups)       | `array`  | Optional |
+| [version](#speckubernetesversion)             | `string` | Optional |
 
 ### Description
 
@@ -2342,6 +2360,85 @@ Optional IP address. If not specified, it is inferred from the node's network co
 
 [try pattern](https://regexr.com/?expression=^\(\(25[0-5]|\(2[0-4]|1\d|[1-9]|\)\d\)\.\){3}\(25[0-5]|\(2[0-4]|1\d|[1-9]|\)\d\)$)
 
+## .spec.kubernetes.loadBalancers
+
+### Properties
+
+| Property                                           | Type      | Required |
+|:---------------------------------------------------|:----------|:---------|
+| [enabled](#speckubernetesloadbalancersenabled)     | `boolean` | Optional |
+| [members](#speckubernetesloadbalancersmembers)     | `array`   | Required |
+| [virtualIP](#speckubernetesloadbalancersvirtualip) | `string`  | Required |
+
+### Description
+
+Load balancer configuration for high-availability API server access. Uses HAProxy for load balancing and keepalived for VIP failover.
+
+## .spec.kubernetes.loadBalancers.enabled
+
+### Description
+
+Enable load balancer configuration. When true, HAProxy and keepalived will be configured.
+
+## .spec.kubernetes.loadBalancers.members
+
+### Properties
+
+| Property                                                | Type     | Required |
+|:--------------------------------------------------------|:---------|:---------|
+| [hostname](#speckubernetesloadbalancersmembershostname) | `string` | Required |
+| [ip](#speckubernetesloadbalancersmembersip)             | `string` | Optional |
+
+### Description
+
+A member node reference with optional IP override.
+
+### Constraints
+
+**minimum number of items**: the minimum number of items for this array is: `1`
+
+## .spec.kubernetes.loadBalancers.members.hostname
+
+### Description
+
+Hostname that must match an infrastructure node. Example: ctrl01.k8s.example.com
+
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
+
+## .spec.kubernetes.loadBalancers.members.ip
+
+### Description
+
+Optional IP address. If not specified, it is inferred from the node's network configuration.
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.){3}(25[0-5]|(2[0-4]|1\d|[1-9]|)\d)$
+```
+
+[try pattern](https://regexr.com/?expression=^\(\(25[0-5]|\(2[0-4]|1\d|[1-9]|\)\d\)\.\){3}\(25[0-5]|\(2[0-4]|1\d|[1-9]|\)\d\)$)
+
+## .spec.kubernetes.loadBalancers.virtualIP
+
+### Description
+
+Virtual IP address managed by keepalived for HA. This IP will be used as the control plane address. Example: 192.168.1.10
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.){3}(25[0-5]|(2[0-4]|1\d|[1-9]|)\d)$
+```
+
+[try pattern](https://regexr.com/?expression=^\(\(25[0-5]|\(2[0-4]|1\d|[1-9]|\)\d\)\.\){3}\(25[0-5]|\(2[0-4]|1\d|[1-9]|\)\d\)$)
+
 ## .spec.kubernetes.networking
 
 ### Properties
@@ -2523,6 +2620,22 @@ Kubernetes taints to apply to nodes in this group.
 ## .spec.kubernetes.nodeGroups.taints.key
 
 ## .spec.kubernetes.nodeGroups.taints.value
+
+## .spec.kubernetes.version
+
+### Description
+
+Kubernetes version for sysext packages. Determines versions of containerd, kubernetes, and other components from installer defaults. Example: 1.33.4
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^\d+\.\d+\.\d+$
+```
+
+[try pattern](https://regexr.com/?expression=^\d%2B\.\d%2B\.\d%2B$)
 
 ## .spec.plugins
 

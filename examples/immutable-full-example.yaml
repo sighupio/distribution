@@ -27,8 +27,9 @@ spec:
       url: https://ipxe.internal.example.com:8080
       advanced:
         logLevel: info
-        dataPath: /var/lib/matchbox
-        assetsPath: /var/lib/matchbox/assets
+        # Example paths - configure based on your iPXE server implementation
+        dataPath: /var/lib/ipxe-server
+        assetsPath: /var/lib/ipxe-server/assets
 
     nodes:
       # Control plane nodes (3)
