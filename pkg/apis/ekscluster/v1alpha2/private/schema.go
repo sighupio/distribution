@@ -5,7 +5,6 @@ package private
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/sighupio/go-jsonschema/pkg/types"
 	"reflect"
 	"reflect"
 )

@@ -136,6 +136,11 @@ const (
 	SpecDistributionCustomPatchesConfigMapGeneratorResourceBehaviorMerge   SpecDistributionCustomPatchesConfigMapGeneratorResourceBehavior = "merge"
 	SpecDistributionCustomPatchesConfigMapGeneratorResourceBehaviorReplace SpecDistributionCustomPatchesConfigMapGeneratorResourceBehavior = "replace"
 )
+const (
+	SpecDistributionCustomPatchesConfigMapGeneratorResourceBehaviorCreate  SpecDistributionCustomPatchesConfigMapGeneratorResourceBehavior = "create"
+	SpecDistributionCustomPatchesConfigMapGeneratorResourceBehaviorMerge   SpecDistributionCustomPatchesConfigMapGeneratorResourceBehavior = "merge"
+	SpecDistributionCustomPatchesConfigMapGeneratorResourceBehaviorReplace SpecDistributionCustomPatchesConfigMapGeneratorResourceBehavior = "replace"
+)
 
 type SpecDistributionCustomPatchesConfigMapGeneratorResourceOptions struct {
 	// The annotations of the configmap
@@ -235,6 +240,11 @@ type SpecDistributionCustomPatchesSecretGeneratorResource struct {
 
 type SpecDistributionCustomPatchesSecretGeneratorResourceBehavior string
 
+const (
+	SpecDistributionCustomPatchesSecretGeneratorResourceBehaviorCreate  SpecDistributionCustomPatchesSecretGeneratorResourceBehavior = "create"
+	SpecDistributionCustomPatchesSecretGeneratorResourceBehaviorMerge   SpecDistributionCustomPatchesSecretGeneratorResourceBehavior = "merge"
+	SpecDistributionCustomPatchesSecretGeneratorResourceBehaviorReplace SpecDistributionCustomPatchesSecretGeneratorResourceBehavior = "replace"
+)
 const (
 	SpecDistributionCustomPatchesSecretGeneratorResourceBehaviorCreate  SpecDistributionCustomPatchesSecretGeneratorResourceBehavior = "create"
 	SpecDistributionCustomPatchesSecretGeneratorResourceBehaviorMerge   SpecDistributionCustomPatchesSecretGeneratorResourceBehavior = "merge"
@@ -579,6 +589,11 @@ const (
 	SpecDistributionModulesAuthProviderTypeNone      SpecDistributionModulesAuthProviderType = "none"
 	SpecDistributionModulesAuthProviderTypeSso       SpecDistributionModulesAuthProviderType = "sso"
 )
+const (
+	SpecDistributionModulesAuthProviderTypeBasicAuth SpecDistributionModulesAuthProviderType = "basicAuth"
+	SpecDistributionModulesAuthProviderTypeNone      SpecDistributionModulesAuthProviderType = "none"
+	SpecDistributionModulesAuthProviderTypeSso       SpecDistributionModulesAuthProviderType = "sso"
+)
 
 // Configuration for the Disaster Recovery module.
 type SpecDistributionModulesDr struct {
@@ -694,9 +709,19 @@ const (
 	SpecDistributionModulesDrEtcdBackupTypePvc  SpecDistributionModulesDrEtcdBackupType = "pvc"
 	SpecDistributionModulesDrEtcdBackupTypeS3   SpecDistributionModulesDrEtcdBackupType = "s3"
 )
+const (
+	SpecDistributionModulesDrEtcdBackupTypeAll  SpecDistributionModulesDrEtcdBackupType = "all"
+	SpecDistributionModulesDrEtcdBackupTypeNone SpecDistributionModulesDrEtcdBackupType = "none"
+	SpecDistributionModulesDrEtcdBackupTypePvc  SpecDistributionModulesDrEtcdBackupType = "pvc"
+	SpecDistributionModulesDrEtcdBackupTypeS3   SpecDistributionModulesDrEtcdBackupType = "s3"
+)
 
 type SpecDistributionModulesDrType string
 
+const (
+	SpecDistributionModulesDrTypeNone       SpecDistributionModulesDrType = "none"
+	SpecDistributionModulesDrTypeOnPremises SpecDistributionModulesDrType = "on-premises"
+)
 const (
 	SpecDistributionModulesDrTypeNone       SpecDistributionModulesDrType = "none"
 	SpecDistributionModulesDrTypeOnPremises SpecDistributionModulesDrType = "on-premises"
@@ -1062,6 +1087,11 @@ const (
 	SpecDistributionModulesIngressNginxTLSProviderNone        SpecDistributionModulesIngressNginxTLSProvider = "none"
 	SpecDistributionModulesIngressNginxTLSProviderSecret      SpecDistributionModulesIngressNginxTLSProvider = "secret"
 )
+const (
+	SpecDistributionModulesIngressNginxTLSProviderCertManager SpecDistributionModulesIngressNginxTLSProvider = "certManager"
+	SpecDistributionModulesIngressNginxTLSProviderNone        SpecDistributionModulesIngressNginxTLSProvider = "none"
+	SpecDistributionModulesIngressNginxTLSProviderSecret      SpecDistributionModulesIngressNginxTLSProvider = "secret"
+)
 
 // Kubernetes TLS secret for the ingresses TLS certificate.
 type SpecDistributionModulesIngressNginxTLSSecret struct {
@@ -1080,6 +1110,11 @@ type SpecDistributionModulesIngressNginxTLSSecret struct {
 
 type SpecDistributionModulesIngressNginxType string
 
+const (
+	SpecDistributionModulesIngressNginxTypeDual   SpecDistributionModulesIngressNginxType = "dual"
+	SpecDistributionModulesIngressNginxTypeNone   SpecDistributionModulesIngressNginxType = "none"
+	SpecDistributionModulesIngressNginxTypeSingle SpecDistributionModulesIngressNginxType = "single"
+)
 const (
 	SpecDistributionModulesIngressNginxTypeDual   SpecDistributionModulesIngressNginxType = "dual"
 	SpecDistributionModulesIngressNginxTypeNone   SpecDistributionModulesIngressNginxType = "none"
@@ -1250,6 +1285,10 @@ const (
 	SpecDistributionModulesLoggingLokiBackendExternalEndpoint SpecDistributionModulesLoggingLokiBackend = "externalEndpoint"
 	SpecDistributionModulesLoggingLokiBackendMinio            SpecDistributionModulesLoggingLokiBackend = "minio"
 )
+const (
+	SpecDistributionModulesLoggingLokiBackendExternalEndpoint SpecDistributionModulesLoggingLokiBackend = "externalEndpoint"
+	SpecDistributionModulesLoggingLokiBackendMinio            SpecDistributionModulesLoggingLokiBackend = "minio"
+)
 
 // Configuration for Loki's external storage backend.
 type SpecDistributionModulesLoggingLokiExternalEndpoint struct {
@@ -1311,6 +1350,10 @@ const (
 	SpecDistributionModulesLoggingOpensearchTypeSingle SpecDistributionModulesLoggingOpensearchType = "single"
 	SpecDistributionModulesLoggingOpensearchTypeTriple SpecDistributionModulesLoggingOpensearchType = "triple"
 )
+const (
+	SpecDistributionModulesLoggingOpensearchTypeSingle SpecDistributionModulesLoggingOpensearchType = "single"
+	SpecDistributionModulesLoggingOpensearchTypeTriple SpecDistributionModulesLoggingOpensearchType = "triple"
+)
 
 // Configuration for the Logging Operator.
 type SpecDistributionModulesLoggingOperator struct {
@@ -1345,6 +1388,12 @@ type SpecDistributionModulesLoggingOperatorFluentd struct {
 
 type SpecDistributionModulesLoggingType string
 
+const (
+	SpecDistributionModulesLoggingTypeCustomOutputs SpecDistributionModulesLoggingType = "customOutputs"
+	SpecDistributionModulesLoggingTypeLoki          SpecDistributionModulesLoggingType = "loki"
+	SpecDistributionModulesLoggingTypeNone          SpecDistributionModulesLoggingType = "none"
+	SpecDistributionModulesLoggingTypeOpensearch    SpecDistributionModulesLoggingType = "opensearch"
+)
 const (
 	SpecDistributionModulesLoggingTypeCustomOutputs SpecDistributionModulesLoggingType = "customOutputs"
 	SpecDistributionModulesLoggingTypeLoki          SpecDistributionModulesLoggingType = "loki"
@@ -1480,6 +1529,10 @@ const (
 	SpecDistributionModulesMonitoringMimirBackendExternalEndpoint SpecDistributionModulesMonitoringMimirBackend = "externalEndpoint"
 	SpecDistributionModulesMonitoringMimirBackendMinio            SpecDistributionModulesMonitoringMimirBackend = "minio"
 )
+const (
+	SpecDistributionModulesMonitoringMimirBackendExternalEndpoint SpecDistributionModulesMonitoringMimirBackend = "externalEndpoint"
+	SpecDistributionModulesMonitoringMimirBackendMinio            SpecDistributionModulesMonitoringMimirBackend = "minio"
+)
 
 // Configuration for Mimir's external storage backend.
 type SpecDistributionModulesMonitoringMimirExternalEndpoint struct {
@@ -1582,6 +1635,12 @@ const (
 	SpecDistributionModulesMonitoringTypePrometheus      SpecDistributionModulesMonitoringType = "prometheus"
 	SpecDistributionModulesMonitoringTypePrometheusAgent SpecDistributionModulesMonitoringType = "prometheusAgent"
 )
+const (
+	SpecDistributionModulesMonitoringTypeMimir           SpecDistributionModulesMonitoringType = "mimir"
+	SpecDistributionModulesMonitoringTypeNone            SpecDistributionModulesMonitoringType = "none"
+	SpecDistributionModulesMonitoringTypePrometheus      SpecDistributionModulesMonitoringType = "prometheus"
+	SpecDistributionModulesMonitoringTypePrometheusAgent SpecDistributionModulesMonitoringType = "prometheusAgent"
+)
 
 type SpecDistributionModulesMonitoringX509Exporter struct {
 	// Overrides corresponds to the JSON schema field "overrides".
@@ -1639,6 +1698,10 @@ const (
 	SpecDistributionModulesNetworkingTypeCalico SpecDistributionModulesNetworkingType = "calico"
 	SpecDistributionModulesNetworkingTypeCilium SpecDistributionModulesNetworkingType = "cilium"
 )
+const (
+	SpecDistributionModulesNetworkingTypeCalico SpecDistributionModulesNetworkingType = "calico"
+	SpecDistributionModulesNetworkingTypeCilium SpecDistributionModulesNetworkingType = "cilium"
+)
 
 // Configuration for the Policy module.
 type SpecDistributionModulesPolicy struct {
@@ -1685,6 +1748,11 @@ const (
 	SpecDistributionModulesPolicyGatekeeperEnforcementActionDryrun SpecDistributionModulesPolicyGatekeeperEnforcementAction = "dryrun"
 	SpecDistributionModulesPolicyGatekeeperEnforcementActionWarn   SpecDistributionModulesPolicyGatekeeperEnforcementAction = "warn"
 )
+const (
+	SpecDistributionModulesPolicyGatekeeperEnforcementActionDeny   SpecDistributionModulesPolicyGatekeeperEnforcementAction = "deny"
+	SpecDistributionModulesPolicyGatekeeperEnforcementActionDryrun SpecDistributionModulesPolicyGatekeeperEnforcementAction = "dryrun"
+	SpecDistributionModulesPolicyGatekeeperEnforcementActionWarn   SpecDistributionModulesPolicyGatekeeperEnforcementAction = "warn"
+)
 
 // Configuration for the Kyverno package.
 type SpecDistributionModulesPolicyKyverno struct {
@@ -1711,9 +1779,18 @@ const (
 	SpecDistributionModulesPolicyKyvernoValidationFailureActionAudit   SpecDistributionModulesPolicyKyvernoValidationFailureAction = "Audit"
 	SpecDistributionModulesPolicyKyvernoValidationFailureActionEnforce SpecDistributionModulesPolicyKyvernoValidationFailureAction = "Enforce"
 )
+const (
+	SpecDistributionModulesPolicyKyvernoValidationFailureActionAudit   SpecDistributionModulesPolicyKyvernoValidationFailureAction = "Audit"
+	SpecDistributionModulesPolicyKyvernoValidationFailureActionEnforce SpecDistributionModulesPolicyKyvernoValidationFailureAction = "Enforce"
+)
 
 type SpecDistributionModulesPolicyType string
 
+const (
+	SpecDistributionModulesPolicyTypeGatekeeper SpecDistributionModulesPolicyType = "gatekeeper"
+	SpecDistributionModulesPolicyTypeKyverno    SpecDistributionModulesPolicyType = "kyverno"
+	SpecDistributionModulesPolicyTypeNone       SpecDistributionModulesPolicyType = "none"
+)
 const (
 	SpecDistributionModulesPolicyTypeGatekeeper SpecDistributionModulesPolicyType = "gatekeeper"
 	SpecDistributionModulesPolicyTypeKyverno    SpecDistributionModulesPolicyType = "kyverno"
@@ -1759,6 +1836,10 @@ const (
 	SpecDistributionModulesTracingTempoBackendExternalEndpoint SpecDistributionModulesTracingTempoBackend = "externalEndpoint"
 	SpecDistributionModulesTracingTempoBackendMinio            SpecDistributionModulesTracingTempoBackend = "minio"
 )
+const (
+	SpecDistributionModulesTracingTempoBackendExternalEndpoint SpecDistributionModulesTracingTempoBackend = "externalEndpoint"
+	SpecDistributionModulesTracingTempoBackendMinio            SpecDistributionModulesTracingTempoBackend = "minio"
+)
 
 // Configuration for Tempo's external storage backend.
 type SpecDistributionModulesTracingTempoExternalEndpoint struct {
@@ -1780,6 +1861,10 @@ type SpecDistributionModulesTracingTempoExternalEndpoint struct {
 
 type SpecDistributionModulesTracingType string
 
+const (
+	SpecDistributionModulesTracingTypeNone  SpecDistributionModulesTracingType = "none"
+	SpecDistributionModulesTracingTypeTempo SpecDistributionModulesTracingType = "tempo"
+)
 const (
 	SpecDistributionModulesTracingTypeNone  SpecDistributionModulesTracingType = "none"
 	SpecDistributionModulesTracingTypeTempo SpecDistributionModulesTracingType = "tempo"
@@ -2131,6 +2216,12 @@ type SpecKubernetesAdvancedEventRateLimitsElem struct {
 
 type SpecKubernetesAdvancedEventRateLimitsElemType string
 
+const (
+	SpecKubernetesAdvancedEventRateLimitsElemTypeNamespace       SpecKubernetesAdvancedEventRateLimitsElemType = "Namespace"
+	SpecKubernetesAdvancedEventRateLimitsElemTypeServer          SpecKubernetesAdvancedEventRateLimitsElemType = "Server"
+	SpecKubernetesAdvancedEventRateLimitsElemTypeSourceAndObject SpecKubernetesAdvancedEventRateLimitsElemType = "SourceAndObject"
+	SpecKubernetesAdvancedEventRateLimitsElemTypeUser            SpecKubernetesAdvancedEventRateLimitsElemType = "User"
+)
 const (
 	SpecKubernetesAdvancedEventRateLimitsElemTypeNamespace       SpecKubernetesAdvancedEventRateLimitsElemType = "Namespace"
 	SpecKubernetesAdvancedEventRateLimitsElemTypeServer          SpecKubernetesAdvancedEventRateLimitsElemType = "Server"
@@ -2592,6 +2683,11 @@ const (
 	TypesKubeTaintsEffectNoSchedule       TypesKubeTaintsEffect = "NoSchedule"
 	TypesKubeTaintsEffectPreferNoSchedule TypesKubeTaintsEffect = "PreferNoSchedule"
 )
+const (
+	TypesKubeTaintsEffectNoExecute        TypesKubeTaintsEffect = "NoExecute"
+	TypesKubeTaintsEffectNoSchedule       TypesKubeTaintsEffect = "NoSchedule"
+	TypesKubeTaintsEffectPreferNoSchedule TypesKubeTaintsEffect = "PreferNoSchedule"
+)
 
 type TypesKubeToleration struct {
 	// Effect corresponds to the JSON schema field "effect".
@@ -2614,9 +2710,19 @@ const (
 	TypesKubeTolerationEffectNoSchedule       TypesKubeTolerationEffect = "NoSchedule"
 	TypesKubeTolerationEffectPreferNoSchedule TypesKubeTolerationEffect = "PreferNoSchedule"
 )
+const (
+	TypesKubeTolerationEffectNoExecute        TypesKubeTolerationEffect = "NoExecute"
+	TypesKubeTolerationEffectNoSchedule       TypesKubeTolerationEffect = "NoSchedule"
+	TypesKubeTolerationEffectPreferNoSchedule TypesKubeTolerationEffect = "PreferNoSchedule"
+)
 
 type TypesKubeTolerationEffect_1 string
 
+const (
+	TypesKubeTolerationEffect_1_NoExecute        TypesKubeTolerationEffect_1 = "NoExecute"
+	TypesKubeTolerationEffect_1_NoSchedule       TypesKubeTolerationEffect_1 = "NoSchedule"
+	TypesKubeTolerationEffect_1_PreferNoSchedule TypesKubeTolerationEffect_1 = "PreferNoSchedule"
+)
 const (
 	TypesKubeTolerationEffect_1_NoExecute        TypesKubeTolerationEffect_1 = "NoExecute"
 	TypesKubeTolerationEffect_1_NoSchedule       TypesKubeTolerationEffect_1 = "NoSchedule"
@@ -2629,9 +2735,17 @@ const (
 	TypesKubeTolerationOperatorEqual  TypesKubeTolerationOperator = "Equal"
 	TypesKubeTolerationOperatorExists TypesKubeTolerationOperator = "Exists"
 )
+const (
+	TypesKubeTolerationOperatorEqual  TypesKubeTolerationOperator = "Equal"
+	TypesKubeTolerationOperatorExists TypesKubeTolerationOperator = "Exists"
+)
 
 type TypesKubeTolerationOperator_1 string
 
+const (
+	TypesKubeTolerationOperator_1_Equal  TypesKubeTolerationOperator_1 = "Equal"
+	TypesKubeTolerationOperator_1_Exists TypesKubeTolerationOperator_1 = "Exists"
+)
 const (
 	TypesKubeTolerationOperator_1_Equal  TypesKubeTolerationOperator_1 = "Equal"
 	TypesKubeTolerationOperator_1_Exists TypesKubeTolerationOperator_1 = "Exists"
@@ -2663,11 +2777,13 @@ var enumValues_OnpremisesKfdV1Alpha2Kind = []interface{}{
 	"OnPremises",
 }
 
+
 var enumValues_SpecDistributionCustomPatchesConfigMapGeneratorResourceBehavior = []interface{}{
 	"create",
 	"replace",
 	"merge",
 }
+
 
 var enumValues_SpecDistributionCustomPatchesSecretGeneratorResourceBehavior = []interface{}{
 	"create",
@@ -2675,11 +2791,13 @@ var enumValues_SpecDistributionCustomPatchesSecretGeneratorResourceBehavior = []
 	"merge",
 }
 
+
 var enumValues_SpecDistributionModulesAuthProviderType = []interface{}{
 	"none",
 	"basicAuth",
 	"sso",
 }
+
 
 var enumValues_SpecDistributionModulesDrEtcdBackupType = []interface{}{
 	"s3",
@@ -2688,10 +2806,12 @@ var enumValues_SpecDistributionModulesDrEtcdBackupType = []interface{}{
 	"all",
 }
 
+
 var enumValues_SpecDistributionModulesDrType = []interface{}{
 	"none",
 	"on-premises",
 }
+
 
 var enumValues_SpecDistributionModulesDrVeleroBackend = []interface{}{
 	"minio",
@@ -2731,11 +2851,13 @@ var enumValues_SpecDistributionModulesIngressNginxTLSProvider = []interface{}{
 	"none",
 }
 
+
 var enumValues_SpecDistributionModulesIngressNginxType = []interface{}{
 	"none",
 	"single",
 	"dual",
 }
+
 
 var enumValues_SpecDistributionModulesLoggingLokiBackend = []interface{}{
 	"minio",
@@ -4227,6 +4349,7 @@ var enumValues_SpecDistributionModulesPolicyKyvernoValidationFailureAction = []i
 	"Audit",
 	"Enforce",
 }
+
 var enumValues_TypesKubeTolerationOperator_1 = []interface{}{
 	"Exists",
 	"Equal",
