@@ -673,6 +673,10 @@
         "keyPath": {
           "type": "string",
           "description": "Path to the SSH private key. Example: ~/.ssh/id_ed25519_production"
+        },
+        "publicKeyPath": {
+          "type": "string",
+          "description": "Path to the SSH public key. If not specified, defaults to keyPath + '.pub'. Example: ~/.ssh/id_ed25519_production.pub"
         }
       },
       "required": [

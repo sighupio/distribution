@@ -2,13 +2,10 @@
 
 package public
 
-import (
-	"encoding/json"
-	"fmt"
-	"reflect"
-
-	"github.com/sighupio/go-jsonschema/pkg/types"
-)
+import "encoding/json"
+import "fmt"
+import "github.com/sighupio/go-jsonschema/pkg/types"
+import "reflect"
 
 type Metadata struct {
 	// The name of the cluster. It will also be used as a prefix for all the other
@@ -132,11 +129,9 @@ type SpecDistributionCustomPatchesConfigMapGeneratorResource struct {
 
 type SpecDistributionCustomPatchesConfigMapGeneratorResourceBehavior string
 
-const (
-	SpecDistributionCustomPatchesConfigMapGeneratorResourceBehaviorCreate  SpecDistributionCustomPatchesConfigMapGeneratorResourceBehavior = "create"
-	SpecDistributionCustomPatchesConfigMapGeneratorResourceBehaviorMerge   SpecDistributionCustomPatchesConfigMapGeneratorResourceBehavior = "merge"
-	SpecDistributionCustomPatchesConfigMapGeneratorResourceBehaviorReplace SpecDistributionCustomPatchesConfigMapGeneratorResourceBehavior = "replace"
-)
+const SpecDistributionCustomPatchesConfigMapGeneratorResourceBehaviorCreate SpecDistributionCustomPatchesConfigMapGeneratorResourceBehavior = "create"
+const SpecDistributionCustomPatchesConfigMapGeneratorResourceBehaviorMerge SpecDistributionCustomPatchesConfigMapGeneratorResourceBehavior = "merge"
+const SpecDistributionCustomPatchesConfigMapGeneratorResourceBehaviorReplace SpecDistributionCustomPatchesConfigMapGeneratorResourceBehavior = "replace"
 
 type SpecDistributionCustomPatchesConfigMapGeneratorResourceOptions struct {
 	// The annotations of the configmap
@@ -236,11 +231,9 @@ type SpecDistributionCustomPatchesSecretGeneratorResource struct {
 
 type SpecDistributionCustomPatchesSecretGeneratorResourceBehavior string
 
-const (
-	SpecDistributionCustomPatchesSecretGeneratorResourceBehaviorCreate  SpecDistributionCustomPatchesSecretGeneratorResourceBehavior = "create"
-	SpecDistributionCustomPatchesSecretGeneratorResourceBehaviorMerge   SpecDistributionCustomPatchesSecretGeneratorResourceBehavior = "merge"
-	SpecDistributionCustomPatchesSecretGeneratorResourceBehaviorReplace SpecDistributionCustomPatchesSecretGeneratorResourceBehavior = "replace"
-)
+const SpecDistributionCustomPatchesSecretGeneratorResourceBehaviorCreate SpecDistributionCustomPatchesSecretGeneratorResourceBehavior = "create"
+const SpecDistributionCustomPatchesSecretGeneratorResourceBehaviorMerge SpecDistributionCustomPatchesSecretGeneratorResourceBehavior = "merge"
+const SpecDistributionCustomPatchesSecretGeneratorResourceBehaviorReplace SpecDistributionCustomPatchesSecretGeneratorResourceBehavior = "replace"
 
 type SpecDistributionCustomPatchesSecretGeneratorResourceOptions struct {
 	// The annotations of the secret
@@ -576,11 +569,9 @@ type SpecDistributionModulesAuthProviderBasicAuth struct {
 
 type SpecDistributionModulesAuthProviderType string
 
-const (
-	SpecDistributionModulesAuthProviderTypeBasicAuth SpecDistributionModulesAuthProviderType = "basicAuth"
-	SpecDistributionModulesAuthProviderTypeNone      SpecDistributionModulesAuthProviderType = "none"
-	SpecDistributionModulesAuthProviderTypeSso       SpecDistributionModulesAuthProviderType = "sso"
-)
+const SpecDistributionModulesAuthProviderTypeBasicAuth SpecDistributionModulesAuthProviderType = "basicAuth"
+const SpecDistributionModulesAuthProviderTypeNone SpecDistributionModulesAuthProviderType = "none"
+const SpecDistributionModulesAuthProviderTypeSso SpecDistributionModulesAuthProviderType = "sso"
 
 // Configuration for the Disaster Recovery module.
 type SpecDistributionModulesDr struct {
@@ -690,19 +681,15 @@ type SpecDistributionModulesDrEtcdBackupS3 struct {
 
 type SpecDistributionModulesDrEtcdBackupType string
 
-const (
-	SpecDistributionModulesDrEtcdBackupTypeAll  SpecDistributionModulesDrEtcdBackupType = "all"
-	SpecDistributionModulesDrEtcdBackupTypeNone SpecDistributionModulesDrEtcdBackupType = "none"
-	SpecDistributionModulesDrEtcdBackupTypePvc  SpecDistributionModulesDrEtcdBackupType = "pvc"
-	SpecDistributionModulesDrEtcdBackupTypeS3   SpecDistributionModulesDrEtcdBackupType = "s3"
-)
+const SpecDistributionModulesDrEtcdBackupTypeAll SpecDistributionModulesDrEtcdBackupType = "all"
+const SpecDistributionModulesDrEtcdBackupTypeNone SpecDistributionModulesDrEtcdBackupType = "none"
+const SpecDistributionModulesDrEtcdBackupTypePvc SpecDistributionModulesDrEtcdBackupType = "pvc"
+const SpecDistributionModulesDrEtcdBackupTypeS3 SpecDistributionModulesDrEtcdBackupType = "s3"
 
 type SpecDistributionModulesDrType string
 
-const (
-	SpecDistributionModulesDrTypeNone       SpecDistributionModulesDrType = "none"
-	SpecDistributionModulesDrTypeOnPremises SpecDistributionModulesDrType = "on-premises"
-)
+const SpecDistributionModulesDrTypeNone SpecDistributionModulesDrType = "none"
+const SpecDistributionModulesDrTypeOnPremises SpecDistributionModulesDrType = "on-premises"
 
 // Configuration for the Velero package.
 type SpecDistributionModulesDrVelero struct {
@@ -731,10 +718,8 @@ type SpecDistributionModulesDrVelero struct {
 
 type SpecDistributionModulesDrVeleroBackend string
 
-const (
-	SpecDistributionModulesDrVeleroBackendExternalEndpoint SpecDistributionModulesDrVeleroBackend = "externalEndpoint"
-	SpecDistributionModulesDrVeleroBackendMinio            SpecDistributionModulesDrVeleroBackend = "minio"
-)
+const SpecDistributionModulesDrVeleroBackendExternalEndpoint SpecDistributionModulesDrVeleroBackend = "externalEndpoint"
+const SpecDistributionModulesDrVeleroBackendMinio SpecDistributionModulesDrVeleroBackend = "minio"
 
 // Configuration for Velero's external storage backend.
 type SpecDistributionModulesDrVeleroExternalEndpoint struct {
@@ -948,11 +933,9 @@ type SpecDistributionModulesIngressNginxTLS struct {
 
 type SpecDistributionModulesIngressNginxTLSProvider string
 
-const (
-	SpecDistributionModulesIngressNginxTLSProviderCertManager SpecDistributionModulesIngressNginxTLSProvider = "certManager"
-	SpecDistributionModulesIngressNginxTLSProviderNone        SpecDistributionModulesIngressNginxTLSProvider = "none"
-	SpecDistributionModulesIngressNginxTLSProviderSecret      SpecDistributionModulesIngressNginxTLSProvider = "secret"
-)
+const SpecDistributionModulesIngressNginxTLSProviderCertManager SpecDistributionModulesIngressNginxTLSProvider = "certManager"
+const SpecDistributionModulesIngressNginxTLSProviderNone SpecDistributionModulesIngressNginxTLSProvider = "none"
+const SpecDistributionModulesIngressNginxTLSProviderSecret SpecDistributionModulesIngressNginxTLSProvider = "secret"
 
 // Kubernetes TLS secret for the ingresses TLS certificate.
 type SpecDistributionModulesIngressNginxTLSSecret struct {
@@ -971,11 +954,9 @@ type SpecDistributionModulesIngressNginxTLSSecret struct {
 
 type SpecDistributionModulesIngressNginxType string
 
-const (
-	SpecDistributionModulesIngressNginxTypeDual   SpecDistributionModulesIngressNginxType = "dual"
-	SpecDistributionModulesIngressNginxTypeNone   SpecDistributionModulesIngressNginxType = "none"
-	SpecDistributionModulesIngressNginxTypeSingle SpecDistributionModulesIngressNginxType = "single"
-)
+const SpecDistributionModulesIngressNginxTypeDual SpecDistributionModulesIngressNginxType = "dual"
+const SpecDistributionModulesIngressNginxTypeNone SpecDistributionModulesIngressNginxType = "none"
+const SpecDistributionModulesIngressNginxTypeSingle SpecDistributionModulesIngressNginxType = "single"
 
 // Override the common configuration with a particular configuration for the
 // Ingress module.
@@ -1131,10 +1112,8 @@ type SpecDistributionModulesLoggingLoki struct {
 
 type SpecDistributionModulesLoggingLokiBackend string
 
-const (
-	SpecDistributionModulesLoggingLokiBackendExternalEndpoint SpecDistributionModulesLoggingLokiBackend = "externalEndpoint"
-	SpecDistributionModulesLoggingLokiBackendMinio            SpecDistributionModulesLoggingLokiBackend = "minio"
-)
+const SpecDistributionModulesLoggingLokiBackendExternalEndpoint SpecDistributionModulesLoggingLokiBackend = "externalEndpoint"
+const SpecDistributionModulesLoggingLokiBackendMinio SpecDistributionModulesLoggingLokiBackend = "minio"
 
 // Configuration for Loki's external storage backend.
 type SpecDistributionModulesLoggingLokiExternalEndpoint struct {
@@ -1192,10 +1171,8 @@ type SpecDistributionModulesLoggingOpensearch struct {
 
 type SpecDistributionModulesLoggingOpensearchType string
 
-const (
-	SpecDistributionModulesLoggingOpensearchTypeSingle SpecDistributionModulesLoggingOpensearchType = "single"
-	SpecDistributionModulesLoggingOpensearchTypeTriple SpecDistributionModulesLoggingOpensearchType = "triple"
-)
+const SpecDistributionModulesLoggingOpensearchTypeSingle SpecDistributionModulesLoggingOpensearchType = "single"
+const SpecDistributionModulesLoggingOpensearchTypeTriple SpecDistributionModulesLoggingOpensearchType = "triple"
 
 // Configuration for the Logging Operator.
 type SpecDistributionModulesLoggingOperator struct {
@@ -1230,12 +1207,10 @@ type SpecDistributionModulesLoggingOperatorFluentd struct {
 
 type SpecDistributionModulesLoggingType string
 
-const (
-	SpecDistributionModulesLoggingTypeCustomOutputs SpecDistributionModulesLoggingType = "customOutputs"
-	SpecDistributionModulesLoggingTypeLoki          SpecDistributionModulesLoggingType = "loki"
-	SpecDistributionModulesLoggingTypeNone          SpecDistributionModulesLoggingType = "none"
-	SpecDistributionModulesLoggingTypeOpensearch    SpecDistributionModulesLoggingType = "opensearch"
-)
+const SpecDistributionModulesLoggingTypeCustomOutputs SpecDistributionModulesLoggingType = "customOutputs"
+const SpecDistributionModulesLoggingTypeLoki SpecDistributionModulesLoggingType = "loki"
+const SpecDistributionModulesLoggingTypeNone SpecDistributionModulesLoggingType = "none"
+const SpecDistributionModulesLoggingTypeOpensearch SpecDistributionModulesLoggingType = "opensearch"
 
 // Configuration for the Monitoring module.
 type SpecDistributionModulesMonitoring struct {
@@ -1361,10 +1336,8 @@ type SpecDistributionModulesMonitoringMimir struct {
 
 type SpecDistributionModulesMonitoringMimirBackend string
 
-const (
-	SpecDistributionModulesMonitoringMimirBackendExternalEndpoint SpecDistributionModulesMonitoringMimirBackend = "externalEndpoint"
-	SpecDistributionModulesMonitoringMimirBackendMinio            SpecDistributionModulesMonitoringMimirBackend = "minio"
-)
+const SpecDistributionModulesMonitoringMimirBackendExternalEndpoint SpecDistributionModulesMonitoringMimirBackend = "externalEndpoint"
+const SpecDistributionModulesMonitoringMimirBackendMinio SpecDistributionModulesMonitoringMimirBackend = "minio"
 
 // Configuration for Mimir's external storage backend.
 type SpecDistributionModulesMonitoringMimirExternalEndpoint struct {
@@ -1485,12 +1458,10 @@ type SpecDistributionModulesMonitoringPrometheusRemoteWriteElem map[string]inter
 
 type SpecDistributionModulesMonitoringType string
 
-const (
-	SpecDistributionModulesMonitoringTypeMimir           SpecDistributionModulesMonitoringType = "mimir"
-	SpecDistributionModulesMonitoringTypeNone            SpecDistributionModulesMonitoringType = "none"
-	SpecDistributionModulesMonitoringTypePrometheus      SpecDistributionModulesMonitoringType = "prometheus"
-	SpecDistributionModulesMonitoringTypePrometheusAgent SpecDistributionModulesMonitoringType = "prometheusAgent"
-)
+const SpecDistributionModulesMonitoringTypeMimir SpecDistributionModulesMonitoringType = "mimir"
+const SpecDistributionModulesMonitoringTypeNone SpecDistributionModulesMonitoringType = "none"
+const SpecDistributionModulesMonitoringTypePrometheus SpecDistributionModulesMonitoringType = "prometheus"
+const SpecDistributionModulesMonitoringTypePrometheusAgent SpecDistributionModulesMonitoringType = "prometheusAgent"
 
 type SpecDistributionModulesMonitoringX509Exporter struct {
 	// Overrides corresponds to the JSON schema field "overrides".
@@ -1554,10 +1525,8 @@ type SpecDistributionModulesNetworkingTigeraOperator struct {
 
 type SpecDistributionModulesNetworkingType string
 
-const (
-	SpecDistributionModulesNetworkingTypeCalico SpecDistributionModulesNetworkingType = "calico"
-	SpecDistributionModulesNetworkingTypeCilium SpecDistributionModulesNetworkingType = "cilium"
-)
+const SpecDistributionModulesNetworkingTypeCalico SpecDistributionModulesNetworkingType = "calico"
+const SpecDistributionModulesNetworkingTypeCilium SpecDistributionModulesNetworkingType = "cilium"
 
 // Configuration for the Policy module.
 type SpecDistributionModulesPolicy struct {
@@ -1650,11 +1619,9 @@ type SpecDistributionModulesPolicyGatekeeper struct {
 
 type SpecDistributionModulesPolicyGatekeeperEnforcementAction string
 
-const (
-	SpecDistributionModulesPolicyGatekeeperEnforcementActionDeny   SpecDistributionModulesPolicyGatekeeperEnforcementAction = "deny"
-	SpecDistributionModulesPolicyGatekeeperEnforcementActionDryrun SpecDistributionModulesPolicyGatekeeperEnforcementAction = "dryrun"
-	SpecDistributionModulesPolicyGatekeeperEnforcementActionWarn   SpecDistributionModulesPolicyGatekeeperEnforcementAction = "warn"
-)
+const SpecDistributionModulesPolicyGatekeeperEnforcementActionDeny SpecDistributionModulesPolicyGatekeeperEnforcementAction = "deny"
+const SpecDistributionModulesPolicyGatekeeperEnforcementActionDryrun SpecDistributionModulesPolicyGatekeeperEnforcementAction = "dryrun"
+const SpecDistributionModulesPolicyGatekeeperEnforcementActionWarn SpecDistributionModulesPolicyGatekeeperEnforcementAction = "warn"
 
 // Configuration for the Kyverno package.
 type SpecDistributionModulesPolicyKyverno struct {
@@ -1677,18 +1644,14 @@ type SpecDistributionModulesPolicyKyverno struct {
 
 type SpecDistributionModulesPolicyKyvernoValidationFailureAction string
 
-const (
-	SpecDistributionModulesPolicyKyvernoValidationFailureActionAudit   SpecDistributionModulesPolicyKyvernoValidationFailureAction = "Audit"
-	SpecDistributionModulesPolicyKyvernoValidationFailureActionEnforce SpecDistributionModulesPolicyKyvernoValidationFailureAction = "Enforce"
-)
+const SpecDistributionModulesPolicyKyvernoValidationFailureActionAudit SpecDistributionModulesPolicyKyvernoValidationFailureAction = "Audit"
+const SpecDistributionModulesPolicyKyvernoValidationFailureActionEnforce SpecDistributionModulesPolicyKyvernoValidationFailureAction = "Enforce"
 
 type SpecDistributionModulesPolicyType string
 
-const (
-	SpecDistributionModulesPolicyTypeGatekeeper SpecDistributionModulesPolicyType = "gatekeeper"
-	SpecDistributionModulesPolicyTypeKyverno    SpecDistributionModulesPolicyType = "kyverno"
-	SpecDistributionModulesPolicyTypeNone       SpecDistributionModulesPolicyType = "none"
-)
+const SpecDistributionModulesPolicyTypeGatekeeper SpecDistributionModulesPolicyType = "gatekeeper"
+const SpecDistributionModulesPolicyTypeKyverno SpecDistributionModulesPolicyType = "kyverno"
+const SpecDistributionModulesPolicyTypeNone SpecDistributionModulesPolicyType = "none"
 
 // Configuration for the Policy module.
 type SpecDistributionModulesPolicy struct {
@@ -1748,10 +1711,8 @@ type SpecDistributionModulesTracingMinio struct {
 
 type SpecDistributionModulesTracingTempoBackend string
 
-const (
-	SpecDistributionModulesTracingTempoBackendExternalEndpoint SpecDistributionModulesTracingTempoBackend = "externalEndpoint"
-	SpecDistributionModulesTracingTempoBackendMinio            SpecDistributionModulesTracingTempoBackend = "minio"
-)
+const SpecDistributionModulesTracingTempoBackendExternalEndpoint SpecDistributionModulesTracingTempoBackend = "externalEndpoint"
+const SpecDistributionModulesTracingTempoBackendMinio SpecDistributionModulesTracingTempoBackend = "minio"
 
 // Configuration for Tempo's external storage backend.
 type SpecDistributionModulesTracingTempoExternalEndpoint struct {
@@ -1773,10 +1734,8 @@ type SpecDistributionModulesTracingTempoExternalEndpoint struct {
 
 type SpecDistributionModulesTracingType string
 
-const (
-	SpecDistributionModulesTracingTypeNone  SpecDistributionModulesTracingType = "none"
-	SpecDistributionModulesTracingTypeTempo SpecDistributionModulesTracingType = "tempo"
-)
+const SpecDistributionModulesTracingTypeNone SpecDistributionModulesTracingType = "none"
+const SpecDistributionModulesTracingTypeTempo SpecDistributionModulesTracingType = "tempo"
 
 // Defines the Kubernetes components configuration and the values needed for the
 // kubernetes phase of furyctl.
@@ -2257,12 +2216,10 @@ type SpecKubernetesAdvancedEventRateLimitsElem struct {
 
 type SpecKubernetesAdvancedEventRateLimitsElemType string
 
-const (
-	SpecKubernetesAdvancedEventRateLimitsElemTypeNamespace       SpecKubernetesAdvancedEventRateLimitsElemType = "Namespace"
-	SpecKubernetesAdvancedEventRateLimitsElemTypeServer          SpecKubernetesAdvancedEventRateLimitsElemType = "Server"
-	SpecKubernetesAdvancedEventRateLimitsElemTypeSourceAndObject SpecKubernetesAdvancedEventRateLimitsElemType = "SourceAndObject"
-	SpecKubernetesAdvancedEventRateLimitsElemTypeUser            SpecKubernetesAdvancedEventRateLimitsElemType = "User"
-)
+const SpecKubernetesAdvancedEventRateLimitsElemTypeNamespace SpecKubernetesAdvancedEventRateLimitsElemType = "Namespace"
+const SpecKubernetesAdvancedEventRateLimitsElemTypeServer SpecKubernetesAdvancedEventRateLimitsElemType = "Server"
+const SpecKubernetesAdvancedEventRateLimitsElemTypeSourceAndObject SpecKubernetesAdvancedEventRateLimitsElemType = "SourceAndObject"
+const SpecKubernetesAdvancedEventRateLimitsElemTypeUser SpecKubernetesAdvancedEventRateLimitsElemType = "User"
 
 // Allows customization of kernel parameters with sysctl on all Kubernetes nodes.
 // NOTE: if you remove a parameter from this list, it will not be reset to its
@@ -2602,11 +2559,9 @@ type TypesKubeTaints struct {
 
 type TypesKubeTaintsEffect string
 
-const (
-	TypesKubeTaintsEffectNoExecute        TypesKubeTaintsEffect = "NoExecute"
-	TypesKubeTaintsEffectNoSchedule       TypesKubeTaintsEffect = "NoSchedule"
-	TypesKubeTaintsEffectPreferNoSchedule TypesKubeTaintsEffect = "PreferNoSchedule"
-)
+const TypesKubeTaintsEffectNoExecute TypesKubeTaintsEffect = "NoExecute"
+const TypesKubeTaintsEffectNoSchedule TypesKubeTaintsEffect = "NoSchedule"
+const TypesKubeTaintsEffectPreferNoSchedule TypesKubeTaintsEffect = "PreferNoSchedule"
 
 type TypesKubeToleration struct {
 	// Effect corresponds to the JSON schema field "effect".
@@ -2624,33 +2579,25 @@ type TypesKubeToleration struct {
 
 type TypesKubeTolerationEffect string
 
-const (
-	TypesKubeTolerationEffectNoExecute        TypesKubeTolerationEffect = "NoExecute"
-	TypesKubeTolerationEffectNoSchedule       TypesKubeTolerationEffect = "NoSchedule"
-	TypesKubeTolerationEffectPreferNoSchedule TypesKubeTolerationEffect = "PreferNoSchedule"
-)
+const TypesKubeTolerationEffectNoExecute TypesKubeTolerationEffect = "NoExecute"
+const TypesKubeTolerationEffectNoSchedule TypesKubeTolerationEffect = "NoSchedule"
+const TypesKubeTolerationEffectPreferNoSchedule TypesKubeTolerationEffect = "PreferNoSchedule"
 
 type TypesKubeTolerationEffect_1 string
 
-const (
-	TypesKubeTolerationEffect_1_NoExecute        TypesKubeTolerationEffect_1 = "NoExecute"
-	TypesKubeTolerationEffect_1_NoSchedule       TypesKubeTolerationEffect_1 = "NoSchedule"
-	TypesKubeTolerationEffect_1_PreferNoSchedule TypesKubeTolerationEffect_1 = "PreferNoSchedule"
-)
+const TypesKubeTolerationEffect_1_NoExecute TypesKubeTolerationEffect_1 = "NoExecute"
+const TypesKubeTolerationEffect_1_NoSchedule TypesKubeTolerationEffect_1 = "NoSchedule"
+const TypesKubeTolerationEffect_1_PreferNoSchedule TypesKubeTolerationEffect_1 = "PreferNoSchedule"
 
 type TypesKubeTolerationOperator string
 
-const (
-	TypesKubeTolerationOperatorEqual  TypesKubeTolerationOperator = "Equal"
-	TypesKubeTolerationOperatorExists TypesKubeTolerationOperator = "Exists"
-)
+const TypesKubeTolerationOperatorEqual TypesKubeTolerationOperator = "Equal"
+const TypesKubeTolerationOperatorExists TypesKubeTolerationOperator = "Exists"
 
 type TypesKubeTolerationOperator_1 string
 
-const (
-	TypesKubeTolerationOperator_1_Equal  TypesKubeTolerationOperator_1 = "Equal"
-	TypesKubeTolerationOperator_1_Exists TypesKubeTolerationOperator_1 = "Exists"
-)
+const TypesKubeTolerationOperator_1_Equal TypesKubeTolerationOperator_1 = "Equal"
+const TypesKubeTolerationOperator_1_Exists TypesKubeTolerationOperator_1 = "Exists"
 
 type TypesKubeToleration_1 struct {
 	// Effect corresponds to the JSON schema field "effect".
@@ -2677,58 +2624,48 @@ type TypesUri string
 var enumValues_OnpremisesKfdV1Alpha2Kind = []interface{}{
 	"OnPremises",
 }
-
 var enumValues_SpecDistributionCustomPatchesConfigMapGeneratorResourceBehavior = []interface{}{
 	"create",
 	"replace",
 	"merge",
 }
-
 var enumValues_SpecDistributionCustomPatchesSecretGeneratorResourceBehavior = []interface{}{
 	"create",
 	"replace",
 	"merge",
 }
-
 var enumValues_SpecDistributionModulesAuthProviderType = []interface{}{
 	"none",
 	"basicAuth",
 	"sso",
 }
-
 var enumValues_SpecDistributionModulesDrEtcdBackupType = []interface{}{
 	"s3",
 	"pvc",
 	"none",
 	"all",
 }
-
 var enumValues_SpecDistributionModulesDrType = []interface{}{
 	"none",
 	"on-premises",
 }
-
 var enumValues_SpecDistributionModulesDrVeleroBackend = []interface{}{
 	"minio",
 	"externalEndpoint",
 }
-
 var enumValues_SpecDistributionModulesIngressCertManagerClusterIssuerType = []interface{}{
 	"http01",
 }
-
 var enumValues_SpecDistributionModulesIngressNginxTLSProvider = []interface{}{
 	"certManager",
 	"secret",
 	"none",
 }
-
 var enumValues_SpecDistributionModulesIngressNginxType = []interface{}{
 	"none",
 	"single",
 	"dual",
 }
-
 var enumValues_SpecDistributionModulesLoggingLokiBackend = []interface{}{
 	"minio",
 	"externalEndpoint",
@@ -3658,7 +3595,6 @@ var enumValues_SpecDistributionModulesPolicyKyvernoValidationFailureAction = []i
 	"Audit",
 	"Enforce",
 }
-
 var enumValues_TypesKubeTolerationOperator_1 = []interface{}{
 	"Exists",
 	"Equal",
