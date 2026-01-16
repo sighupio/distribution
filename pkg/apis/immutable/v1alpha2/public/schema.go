@@ -2202,6 +2202,10 @@ type SpecInfrastructureSSH struct {
 	// Path to the SSH private key. Example: ~/.ssh/id_ed25519_production
 	KeyPath string `json:"keyPath" yaml:"keyPath" mapstructure:"keyPath"`
 
+	// Path to the SSH public key. If not specified, defaults to keyPath + '.pub'.
+	// Example: ~/.ssh/id_ed25519_production.pub
+	PublicKeyPath *string `json:"publicKeyPath,omitempty" yaml:"publicKeyPath,omitempty" mapstructure:"publicKeyPath,omitempty"`
+
 	// SSH username. Example: core
 	Username string `json:"username" yaml:"username" mapstructure:"username"`
 }
