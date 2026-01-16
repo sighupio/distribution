@@ -155,7 +155,7 @@
       "properties": {
         "url": {
           "$ref": "#/$defs/Types.Uri",
-          "description": "The URL of the iPXE server (matchbox). Example: https://ipxe.internal.example.com:8080"
+          "description": "The URL of the iPXE boot server. Example: https://ipxe.internal.example.com:8080"
         },
         "advanced": {
           "type": "object",
@@ -173,11 +173,11 @@
             },
             "dataPath": {
               "type": "string",
-              "description": "Path to the matchbox data directory. Example: /var/lib/matchbox"
+              "description": "Path to the iPXE server data directory. Example: /var/lib/ipxe-server"
             },
             "assetsPath": {
               "type": "string",
-              "description": "Path to the matchbox assets directory. Example: /var/lib/matchbox/assets"
+              "description": "Path to the iPXE server assets directory. Example: /var/lib/ipxe-server/assets"
             }
           }
         }

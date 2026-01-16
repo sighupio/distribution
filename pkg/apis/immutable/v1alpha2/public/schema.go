@@ -2,9 +2,11 @@
 
 package public
 
-import "encoding/json"
-import "fmt"
-import "reflect"
+import (
+	"encoding/json"
+	"fmt"
+	"reflect"
+)
 
 // A KFD Cluster deployed on bare metal infrastructure with iPXE boot provisioning
 // and immutable OS configuration.
@@ -103,9 +105,11 @@ type SpecDistributionCustomPatchesConfigMapGeneratorResource struct {
 
 type SpecDistributionCustomPatchesConfigMapGeneratorResourceBehavior string
 
-const SpecDistributionCustomPatchesConfigMapGeneratorResourceBehaviorCreate SpecDistributionCustomPatchesConfigMapGeneratorResourceBehavior = "create"
-const SpecDistributionCustomPatchesConfigMapGeneratorResourceBehaviorMerge SpecDistributionCustomPatchesConfigMapGeneratorResourceBehavior = "merge"
-const SpecDistributionCustomPatchesConfigMapGeneratorResourceBehaviorReplace SpecDistributionCustomPatchesConfigMapGeneratorResourceBehavior = "replace"
+const (
+	SpecDistributionCustomPatchesConfigMapGeneratorResourceBehaviorCreate  SpecDistributionCustomPatchesConfigMapGeneratorResourceBehavior = "create"
+	SpecDistributionCustomPatchesConfigMapGeneratorResourceBehaviorMerge   SpecDistributionCustomPatchesConfigMapGeneratorResourceBehavior = "merge"
+	SpecDistributionCustomPatchesConfigMapGeneratorResourceBehaviorReplace SpecDistributionCustomPatchesConfigMapGeneratorResourceBehavior = "replace"
+)
 
 type SpecDistributionCustomPatchesConfigMapGeneratorResourceOptions struct {
 	// The annotations of the configmap
@@ -205,9 +209,11 @@ type SpecDistributionCustomPatchesSecretGeneratorResource struct {
 
 type SpecDistributionCustomPatchesSecretGeneratorResourceBehavior string
 
-const SpecDistributionCustomPatchesSecretGeneratorResourceBehaviorCreate SpecDistributionCustomPatchesSecretGeneratorResourceBehavior = "create"
-const SpecDistributionCustomPatchesSecretGeneratorResourceBehaviorMerge SpecDistributionCustomPatchesSecretGeneratorResourceBehavior = "merge"
-const SpecDistributionCustomPatchesSecretGeneratorResourceBehaviorReplace SpecDistributionCustomPatchesSecretGeneratorResourceBehavior = "replace"
+const (
+	SpecDistributionCustomPatchesSecretGeneratorResourceBehaviorCreate  SpecDistributionCustomPatchesSecretGeneratorResourceBehavior = "create"
+	SpecDistributionCustomPatchesSecretGeneratorResourceBehaviorMerge   SpecDistributionCustomPatchesSecretGeneratorResourceBehavior = "merge"
+	SpecDistributionCustomPatchesSecretGeneratorResourceBehaviorReplace SpecDistributionCustomPatchesSecretGeneratorResourceBehavior = "replace"
+)
 
 type SpecDistributionCustomPatchesSecretGeneratorResourceOptions struct {
 	// The annotations of the secret
@@ -283,9 +289,11 @@ type SpecDistributionModulesAuthProvider struct {
 
 type SpecDistributionModulesAuthProviderType string
 
-const SpecDistributionModulesAuthProviderTypeBasicAuth SpecDistributionModulesAuthProviderType = "basicAuth"
-const SpecDistributionModulesAuthProviderTypeNone SpecDistributionModulesAuthProviderType = "none"
-const SpecDistributionModulesAuthProviderTypeSso SpecDistributionModulesAuthProviderType = "sso"
+const (
+	SpecDistributionModulesAuthProviderTypeBasicAuth SpecDistributionModulesAuthProviderType = "basicAuth"
+	SpecDistributionModulesAuthProviderTypeNone      SpecDistributionModulesAuthProviderType = "none"
+	SpecDistributionModulesAuthProviderTypeSso       SpecDistributionModulesAuthProviderType = "sso"
+)
 
 // Disaster recovery configuration. Ref: https://velero.io/docs/
 type SpecDistributionModulesDr struct {
@@ -298,8 +306,10 @@ type SpecDistributionModulesDr struct {
 
 type SpecDistributionModulesDrType string
 
-const SpecDistributionModulesDrTypeNone SpecDistributionModulesDrType = "none"
-const SpecDistributionModulesDrTypeOnPremises SpecDistributionModulesDrType = "on-premises"
+const (
+	SpecDistributionModulesDrTypeNone       SpecDistributionModulesDrType = "none"
+	SpecDistributionModulesDrTypeOnPremises SpecDistributionModulesDrType = "on-premises"
+)
 
 type SpecDistributionModulesDrVelero struct {
 	// Backup storage backend.
@@ -314,8 +324,10 @@ type SpecDistributionModulesDrVelero struct {
 
 type SpecDistributionModulesDrVeleroBackend string
 
-const SpecDistributionModulesDrVeleroBackendMinio SpecDistributionModulesDrVeleroBackend = "minio"
-const SpecDistributionModulesDrVeleroBackendS3 SpecDistributionModulesDrVeleroBackend = "s3"
+const (
+	SpecDistributionModulesDrVeleroBackendMinio SpecDistributionModulesDrVeleroBackend = "minio"
+	SpecDistributionModulesDrVeleroBackendS3    SpecDistributionModulesDrVeleroBackend = "s3"
+)
 
 type SpecDistributionModulesDrVeleroS3 struct {
 	// S3 bucket name (3-63 chars, lowercase, no underscores). Example:
@@ -389,15 +401,19 @@ type SpecDistributionModulesIngressNginxTls struct {
 
 type SpecDistributionModulesIngressNginxTlsProvider string
 
-const SpecDistributionModulesIngressNginxTlsProviderCertManager SpecDistributionModulesIngressNginxTlsProvider = "certManager"
-const SpecDistributionModulesIngressNginxTlsProviderNone SpecDistributionModulesIngressNginxTlsProvider = "none"
-const SpecDistributionModulesIngressNginxTlsProviderSecret SpecDistributionModulesIngressNginxTlsProvider = "secret"
+const (
+	SpecDistributionModulesIngressNginxTlsProviderCertManager SpecDistributionModulesIngressNginxTlsProvider = "certManager"
+	SpecDistributionModulesIngressNginxTlsProviderNone        SpecDistributionModulesIngressNginxTlsProvider = "none"
+	SpecDistributionModulesIngressNginxTlsProviderSecret      SpecDistributionModulesIngressNginxTlsProvider = "secret"
+)
 
 type SpecDistributionModulesIngressNginxType string
 
-const SpecDistributionModulesIngressNginxTypeDual SpecDistributionModulesIngressNginxType = "dual"
-const SpecDistributionModulesIngressNginxTypeNone SpecDistributionModulesIngressNginxType = "none"
-const SpecDistributionModulesIngressNginxTypeSingle SpecDistributionModulesIngressNginxType = "single"
+const (
+	SpecDistributionModulesIngressNginxTypeDual   SpecDistributionModulesIngressNginxType = "dual"
+	SpecDistributionModulesIngressNginxTypeNone   SpecDistributionModulesIngressNginxType = "none"
+	SpecDistributionModulesIngressNginxTypeSingle SpecDistributionModulesIngressNginxType = "single"
+)
 
 // Logging stack configuration. Ref: https://grafana.com/docs/loki/latest/
 type SpecDistributionModulesLogging struct {
@@ -431,9 +447,11 @@ type SpecDistributionModulesLoggingMinio struct {
 
 type SpecDistributionModulesLoggingType string
 
-const SpecDistributionModulesLoggingTypeLoki SpecDistributionModulesLoggingType = "loki"
-const SpecDistributionModulesLoggingTypeNone SpecDistributionModulesLoggingType = "none"
-const SpecDistributionModulesLoggingTypeOpensearch SpecDistributionModulesLoggingType = "opensearch"
+const (
+	SpecDistributionModulesLoggingTypeLoki       SpecDistributionModulesLoggingType = "loki"
+	SpecDistributionModulesLoggingTypeNone       SpecDistributionModulesLoggingType = "none"
+	SpecDistributionModulesLoggingTypeOpensearch SpecDistributionModulesLoggingType = "opensearch"
+)
 
 // Monitoring stack configuration. Ref:
 // https://prometheus.io/docs/introduction/overview/
@@ -485,10 +503,12 @@ type SpecDistributionModulesMonitoringPrometheusAdapter struct {
 
 type SpecDistributionModulesMonitoringType string
 
-const SpecDistributionModulesMonitoringTypeMimir SpecDistributionModulesMonitoringType = "mimir"
-const SpecDistributionModulesMonitoringTypeNone SpecDistributionModulesMonitoringType = "none"
-const SpecDistributionModulesMonitoringTypePrometheus SpecDistributionModulesMonitoringType = "prometheus"
-const SpecDistributionModulesMonitoringTypePrometheusAgent SpecDistributionModulesMonitoringType = "prometheusAgent"
+const (
+	SpecDistributionModulesMonitoringTypeMimir           SpecDistributionModulesMonitoringType = "mimir"
+	SpecDistributionModulesMonitoringTypeNone            SpecDistributionModulesMonitoringType = "none"
+	SpecDistributionModulesMonitoringTypePrometheus      SpecDistributionModulesMonitoringType = "prometheus"
+	SpecDistributionModulesMonitoringTypePrometheusAgent SpecDistributionModulesMonitoringType = "prometheusAgent"
+)
 
 // CNI plugin configuration. Ref: https://docs.tigera.io/calico/latest/about/
 type SpecDistributionModulesNetworking struct {
@@ -498,9 +518,11 @@ type SpecDistributionModulesNetworking struct {
 
 type SpecDistributionModulesNetworkingType string
 
-const SpecDistributionModulesNetworkingTypeCalico SpecDistributionModulesNetworkingType = "calico"
-const SpecDistributionModulesNetworkingTypeCilium SpecDistributionModulesNetworkingType = "cilium"
-const SpecDistributionModulesNetworkingTypeNone SpecDistributionModulesNetworkingType = "none"
+const (
+	SpecDistributionModulesNetworkingTypeCalico SpecDistributionModulesNetworkingType = "calico"
+	SpecDistributionModulesNetworkingTypeCilium SpecDistributionModulesNetworkingType = "cilium"
+	SpecDistributionModulesNetworkingTypeNone   SpecDistributionModulesNetworkingType = "none"
+)
 
 // Policy engine configuration. Ref: https://kyverno.io/docs/
 type SpecDistributionModulesPolicy struct {
@@ -521,14 +543,18 @@ type SpecDistributionModulesPolicyKyverno struct {
 
 type SpecDistributionModulesPolicyKyvernoValidationFailureAction string
 
-const SpecDistributionModulesPolicyKyvernoValidationFailureActionAudit SpecDistributionModulesPolicyKyvernoValidationFailureAction = "Audit"
-const SpecDistributionModulesPolicyKyvernoValidationFailureActionEnforce SpecDistributionModulesPolicyKyvernoValidationFailureAction = "Enforce"
+const (
+	SpecDistributionModulesPolicyKyvernoValidationFailureActionAudit   SpecDistributionModulesPolicyKyvernoValidationFailureAction = "Audit"
+	SpecDistributionModulesPolicyKyvernoValidationFailureActionEnforce SpecDistributionModulesPolicyKyvernoValidationFailureAction = "Enforce"
+)
 
 type SpecDistributionModulesPolicyType string
 
-const SpecDistributionModulesPolicyTypeGatekeeper SpecDistributionModulesPolicyType = "gatekeeper"
-const SpecDistributionModulesPolicyTypeKyverno SpecDistributionModulesPolicyType = "kyverno"
-const SpecDistributionModulesPolicyTypeNone SpecDistributionModulesPolicyType = "none"
+const (
+	SpecDistributionModulesPolicyTypeGatekeeper SpecDistributionModulesPolicyType = "gatekeeper"
+	SpecDistributionModulesPolicyTypeKyverno    SpecDistributionModulesPolicyType = "kyverno"
+	SpecDistributionModulesPolicyTypeNone       SpecDistributionModulesPolicyType = "none"
+)
 
 // Tracing configuration. Ref: https://grafana.com/docs/tempo/latest/
 type SpecDistributionModulesTracing struct {
@@ -546,8 +572,10 @@ type SpecDistributionModulesTracingTempo struct {
 
 type SpecDistributionModulesTracingType string
 
-const SpecDistributionModulesTracingTypeNone SpecDistributionModulesTracingType = "none"
-const SpecDistributionModulesTracingTypeTempo SpecDistributionModulesTracingType = "tempo"
+const (
+	SpecDistributionModulesTracingTypeNone  SpecDistributionModulesTracingType = "none"
+	SpecDistributionModulesTracingTypeTempo SpecDistributionModulesTracingType = "tempo"
+)
 
 // Defines the bare metal infrastructure configuration, including nodes, network
 // boot, storage, and networking.
@@ -576,16 +604,16 @@ type SpecInfrastructureIpxeServer struct {
 	// Advanced corresponds to the JSON schema field "advanced".
 	Advanced *SpecInfrastructureIpxeServerAdvanced `json:"advanced,omitempty" yaml:"advanced,omitempty" mapstructure:"advanced,omitempty"`
 
-	// The URL of the iPXE server (matchbox). Example:
+	// The URL of the iPXE boot server. Example:
 	// https://ipxe.internal.example.com:8080
 	Url TypesUri `json:"url" yaml:"url" mapstructure:"url"`
 }
 
 type SpecInfrastructureIpxeServerAdvanced struct {
-	// Path to the matchbox assets directory. Example: /var/lib/matchbox/assets
+	// Path to the iPXE server assets directory. Example: /var/lib/ipxe-server/assets
 	AssetsPath *string `json:"assetsPath,omitempty" yaml:"assetsPath,omitempty" mapstructure:"assetsPath,omitempty"`
 
-	// Path to the matchbox data directory. Example: /var/lib/matchbox
+	// Path to the iPXE server data directory. Example: /var/lib/ipxe-server
 	DataPath *string `json:"dataPath,omitempty" yaml:"dataPath,omitempty" mapstructure:"dataPath,omitempty"`
 
 	// Log level for the iPXE server. Example: info
@@ -594,10 +622,12 @@ type SpecInfrastructureIpxeServerAdvanced struct {
 
 type SpecInfrastructureIpxeServerAdvancedLogLevel string
 
-const SpecInfrastructureIpxeServerAdvancedLogLevelDebug SpecInfrastructureIpxeServerAdvancedLogLevel = "debug"
-const SpecInfrastructureIpxeServerAdvancedLogLevelError SpecInfrastructureIpxeServerAdvancedLogLevel = "error"
-const SpecInfrastructureIpxeServerAdvancedLogLevelInfo SpecInfrastructureIpxeServerAdvancedLogLevel = "info"
-const SpecInfrastructureIpxeServerAdvancedLogLevelWarning SpecInfrastructureIpxeServerAdvancedLogLevel = "warning"
+const (
+	SpecInfrastructureIpxeServerAdvancedLogLevelDebug   SpecInfrastructureIpxeServerAdvancedLogLevel = "debug"
+	SpecInfrastructureIpxeServerAdvancedLogLevelError   SpecInfrastructureIpxeServerAdvancedLogLevel = "error"
+	SpecInfrastructureIpxeServerAdvancedLogLevelInfo    SpecInfrastructureIpxeServerAdvancedLogLevel = "info"
+	SpecInfrastructureIpxeServerAdvancedLogLevelWarning SpecInfrastructureIpxeServerAdvancedLogLevel = "warning"
+)
 
 type SpecInfrastructureKernelParameter struct {
 	// The kernel parameter name (sysctl format). Example: net.ipv4.ip_forward,
@@ -639,8 +669,10 @@ type SpecInfrastructureNode struct {
 
 type SpecInfrastructureNodeArch string
 
-const SpecInfrastructureNodeArchArm64 SpecInfrastructureNodeArch = "arm64"
-const SpecInfrastructureNodeArchX8664 SpecInfrastructureNodeArch = "x86-64"
+const (
+	SpecInfrastructureNodeArchArm64 SpecInfrastructureNodeArch = "arm64"
+	SpecInfrastructureNodeArchX8664 SpecInfrastructureNodeArch = "x86-64"
+)
 
 // iSCSI initiator configuration. Ref:
 // https://www.flatcar.org/docs/latest/setup/customization/other-settings/
@@ -787,18 +819,20 @@ type SpecInfrastructureNodeStorageFilesystem struct {
 
 type SpecInfrastructureNodeStorageFilesystemMountOptionsElem string
 
-const SpecInfrastructureNodeStorageFilesystemMountOptionsElemAsync SpecInfrastructureNodeStorageFilesystemMountOptionsElem = "async"
-const SpecInfrastructureNodeStorageFilesystemMountOptionsElemDefaults SpecInfrastructureNodeStorageFilesystemMountOptionsElem = "defaults"
-const SpecInfrastructureNodeStorageFilesystemMountOptionsElemDiscard SpecInfrastructureNodeStorageFilesystemMountOptionsElem = "discard"
-const SpecInfrastructureNodeStorageFilesystemMountOptionsElemNoatime SpecInfrastructureNodeStorageFilesystemMountOptionsElem = "noatime"
-const SpecInfrastructureNodeStorageFilesystemMountOptionsElemNodev SpecInfrastructureNodeStorageFilesystemMountOptionsElem = "nodev"
-const SpecInfrastructureNodeStorageFilesystemMountOptionsElemNodiratime SpecInfrastructureNodeStorageFilesystemMountOptionsElem = "nodiratime"
-const SpecInfrastructureNodeStorageFilesystemMountOptionsElemNodiscard SpecInfrastructureNodeStorageFilesystemMountOptionsElem = "nodiscard"
-const SpecInfrastructureNodeStorageFilesystemMountOptionsElemNoexec SpecInfrastructureNodeStorageFilesystemMountOptionsElem = "noexec"
-const SpecInfrastructureNodeStorageFilesystemMountOptionsElemNosuid SpecInfrastructureNodeStorageFilesystemMountOptionsElem = "nosuid"
-const SpecInfrastructureNodeStorageFilesystemMountOptionsElemRelatime SpecInfrastructureNodeStorageFilesystemMountOptionsElem = "relatime"
-const SpecInfrastructureNodeStorageFilesystemMountOptionsElemRo SpecInfrastructureNodeStorageFilesystemMountOptionsElem = "ro"
-const SpecInfrastructureNodeStorageFilesystemMountOptionsElemRw SpecInfrastructureNodeStorageFilesystemMountOptionsElem = "rw"
+const (
+	SpecInfrastructureNodeStorageFilesystemMountOptionsElemAsync      SpecInfrastructureNodeStorageFilesystemMountOptionsElem = "async"
+	SpecInfrastructureNodeStorageFilesystemMountOptionsElemDefaults   SpecInfrastructureNodeStorageFilesystemMountOptionsElem = "defaults"
+	SpecInfrastructureNodeStorageFilesystemMountOptionsElemDiscard    SpecInfrastructureNodeStorageFilesystemMountOptionsElem = "discard"
+	SpecInfrastructureNodeStorageFilesystemMountOptionsElemNoatime    SpecInfrastructureNodeStorageFilesystemMountOptionsElem = "noatime"
+	SpecInfrastructureNodeStorageFilesystemMountOptionsElemNodev      SpecInfrastructureNodeStorageFilesystemMountOptionsElem = "nodev"
+	SpecInfrastructureNodeStorageFilesystemMountOptionsElemNodiratime SpecInfrastructureNodeStorageFilesystemMountOptionsElem = "nodiratime"
+	SpecInfrastructureNodeStorageFilesystemMountOptionsElemNodiscard  SpecInfrastructureNodeStorageFilesystemMountOptionsElem = "nodiscard"
+	SpecInfrastructureNodeStorageFilesystemMountOptionsElemNoexec     SpecInfrastructureNodeStorageFilesystemMountOptionsElem = "noexec"
+	SpecInfrastructureNodeStorageFilesystemMountOptionsElemNosuid     SpecInfrastructureNodeStorageFilesystemMountOptionsElem = "nosuid"
+	SpecInfrastructureNodeStorageFilesystemMountOptionsElemRelatime   SpecInfrastructureNodeStorageFilesystemMountOptionsElem = "relatime"
+	SpecInfrastructureNodeStorageFilesystemMountOptionsElemRo         SpecInfrastructureNodeStorageFilesystemMountOptionsElem = "ro"
+	SpecInfrastructureNodeStorageFilesystemMountOptionsElemRw         SpecInfrastructureNodeStorageFilesystemMountOptionsElem = "rw"
+)
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *SpecDistributionCustomPatchesSecretGeneratorResourceBehavior) UnmarshalJSON(b []byte) error {
@@ -1195,6 +1229,7 @@ var enumValues_SpecDistributionModulesIngressNginxType = []interface{}{
 	"dual",
 	"none",
 }
+
 var enumValues_SpecInfrastructureIpxeServerAdvancedLogLevel = []interface{}{
 	"debug",
 	"info",
@@ -1592,13 +1627,15 @@ func (j *TypesBondMode) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-const TypesBondModeBalanceRr TypesBondMode = "balance-rr"
-const TypesBondModeActiveBackup TypesBondMode = "active-backup"
-const TypesBondModeBalanceXor TypesBondMode = "balance-xor"
-const TypesBondModeBroadcast TypesBondMode = "broadcast"
-const TypesBondModeA8023Ad TypesBondMode = "802.3ad"
-const TypesBondModeBalanceTlb TypesBondMode = "balance-tlb"
-const TypesBondModeBalanceAlb TypesBondMode = "balance-alb"
+const (
+	TypesBondModeBalanceRr    TypesBondMode = "balance-rr"
+	TypesBondModeActiveBackup TypesBondMode = "active-backup"
+	TypesBondModeBalanceXor   TypesBondMode = "balance-xor"
+	TypesBondModeBroadcast    TypesBondMode = "broadcast"
+	TypesBondModeA8023Ad      TypesBondMode = "802.3ad"
+	TypesBondModeBalanceTlb   TypesBondMode = "balance-tlb"
+	TypesBondModeBalanceAlb   TypesBondMode = "balance-alb"
+)
 
 var enumValues_SpecDistributionModulesDrVeleroBackend = []interface{}{
 	"s3",
@@ -1788,11 +1825,13 @@ func (j *TypesFilesystemType) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-const TypesFilesystemTypeExt4 TypesFilesystemType = "ext4"
-const TypesFilesystemTypeXfs TypesFilesystemType = "xfs"
-const TypesFilesystemTypeBtrfs TypesFilesystemType = "btrfs"
-const TypesFilesystemTypeExt3 TypesFilesystemType = "ext3"
-const TypesFilesystemTypeVfat TypesFilesystemType = "vfat"
+const (
+	TypesFilesystemTypeExt4  TypesFilesystemType = "ext4"
+	TypesFilesystemTypeXfs   TypesFilesystemType = "xfs"
+	TypesFilesystemTypeBtrfs TypesFilesystemType = "btrfs"
+	TypesFilesystemTypeExt3  TypesFilesystemType = "ext3"
+	TypesFilesystemTypeVfat  TypesFilesystemType = "vfat"
+)
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *SpecDistributionCustomPatchesSecretGeneratorResource) UnmarshalJSON(b []byte) error {
@@ -1956,9 +1995,11 @@ type TypesKubeToleration struct {
 	Value *string `json:"value,omitempty" yaml:"value,omitempty" mapstructure:"value,omitempty"`
 }
 
-const SpecInfrastructureNodeStorageFilesystemMountOptionsElemSync SpecInfrastructureNodeStorageFilesystemMountOptionsElem = "sync"
-const TypesKubeTolerationOperatorEqual TypesKubeTolerationOperator = "Equal"
-const TypesKubeTolerationOperatorExists TypesKubeTolerationOperator = "Exists"
+const (
+	SpecInfrastructureNodeStorageFilesystemMountOptionsElemSync SpecInfrastructureNodeStorageFilesystemMountOptionsElem = "sync"
+	TypesKubeTolerationOperatorEqual                            TypesKubeTolerationOperator                             = "Equal"
+	TypesKubeTolerationOperatorExists                           TypesKubeTolerationOperator                             = "Exists"
+)
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *TypesKubeTolerationOperator) UnmarshalJSON(b []byte) error {
@@ -2589,9 +2630,11 @@ func (j *TypesKubeTaintsEffect) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-const TypesKubeTaintsEffectNoSchedule TypesKubeTaintsEffect = "NoSchedule"
-const TypesKubeTaintsEffectPreferNoSchedule TypesKubeTaintsEffect = "PreferNoSchedule"
-const TypesKubeTaintsEffectNoExecute TypesKubeTaintsEffect = "NoExecute"
+const (
+	TypesKubeTaintsEffectNoSchedule       TypesKubeTaintsEffect = "NoSchedule"
+	TypesKubeTaintsEffectPreferNoSchedule TypesKubeTaintsEffect = "PreferNoSchedule"
+	TypesKubeTaintsEffectNoExecute        TypesKubeTaintsEffect = "NoExecute"
+)
 
 type TypesKubeTaints struct {
 	// Effect corresponds to the JSON schema field "effect".
