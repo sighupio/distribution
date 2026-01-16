@@ -4349,7 +4349,6 @@ var enumValues_SpecDistributionModulesPolicyKyvernoValidationFailureAction = []i
 	"Audit",
 	"Enforce",
 }
-
 var enumValues_TypesKubeTolerationOperator_1 = []interface{}{
 	"Exists",
 	"Equal",
