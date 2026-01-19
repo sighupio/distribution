@@ -27,6 +27,10 @@ spec:
     ...
 ```
 
+## Bug Fixes 🐛
+
+- [[#480]](https://github.com/sighupio/distribution/pull/480) The `x509-certificate-exporter-data-plane` DaemonSet was incorrectly patched with the common nodeSelector (e.g., infra nodes), so was unable to monitor kubelet certificates on all worker nodes.
+
 ## Breaking Changes 💔
 
 None, but the `spec.toolsConfiguration.terraform` field is deprecated in favor of `spec.toolsConfiguration.opentofu`
