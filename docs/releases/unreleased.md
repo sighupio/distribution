@@ -12,11 +12,27 @@ The distribution is maintained with ❤️ by the team [SIGHUP by ReeVo](https:/
   - Existing `terraform` configurations continue to work
 - [[#479](https://github.com/sighupio/distribution/pull/479)] Add `vpn_furyagent_path` to infrastructure terraform template for EKSCluster provider to avoid re-download.
 
+- [[#459]](https://github.com/sighupio/distribution/pull/459) Support for kube-proxy-less clusters: on-premises clusters can be now created without kube-proxy. Disabling kube-proxy will enable Calico in eBPF mode and Cilium's kube-proxy-replacement mode in the networking module. You can disable the kube-proxy like so:
+
+```yaml
+apiVersion: kfd.sighup.io/v1alpha2
+kind: OnPremises
+metadata:
+  name: kube-proxy-less
+spec:
+  kubernetes:
+    advanced:
+      kubeProxy:
+        enabled: false
+    ...
+```
+
 ## Breaking Changes 💔
 
 None, but the `spec.toolsConfiguration.terraform` field is deprecated in favor of `spec.toolsConfiguration.opentofu`
-  - Users are encouraged to migrate to `opentofu` configuration
-  - The `terraform` field will be removed in a future version
+
+- Users are encouraged to migrate to `opentofu` configuration
+- The `terraform` field will be removed in a future version
 
 ## Migration Guide
 
@@ -36,4 +52,5 @@ spec:
 ```
 
 ## Upgrade procedure
+
 Check the [upgrade docs](https://docs.sighup.io/docs/installation/upgrades/) for the steps to upgrade the SIGHUP Distribution from one version to the next using furyctl.
