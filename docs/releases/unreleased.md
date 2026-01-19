@@ -10,6 +10,7 @@ The distribution is maintained with ❤️ by the team [SIGHUP by ReeVo](https:/
   - New `spec.toolsConfiguration.opentofu` field for state backend configuration
   - Under the hood furyctl will use the OpenTofu binary
   - Existing `terraform` configurations continue to work
+- [[#479](https://github.com/sighupio/distribution/pull/479)] Add `vpn_furyagent_path` to infrastructure terraform template for EKSCluster provider to avoid re-download.
 
 ## Breaking Changes 💔
 
