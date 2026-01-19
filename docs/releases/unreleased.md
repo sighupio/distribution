@@ -31,6 +31,8 @@ spec:
 
 - [[#480]](https://github.com/sighupio/distribution/pull/480) The `x509-certificate-exporter-data-plane` DaemonSet was incorrectly patched with the common nodeSelector (e.g., infra nodes), so was unable to monitor kubelet certificates on all worker nodes.
 
+- [[#477]](https://github.com/sighupio/distribution/pull/477) Both control-plane Pods and Etcd systemd service make use of several kubeadm-generated PKI files. These files are generated using a dedicated CA PKI that is expected to be already available in the target node. This PR makes sure that these CA PKI are uploaded to targets nodes in a way that prevents any inconsistencies on file permissions and ownership, which could case errors during etcd or control-plane Pods startup.
+
 ## Breaking Changes 💔
 
 None, but the `spec.toolsConfiguration.terraform` field is deprecated in favor of `spec.toolsConfiguration.opentofu`
