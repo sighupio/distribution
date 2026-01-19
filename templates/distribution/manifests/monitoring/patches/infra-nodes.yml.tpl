@@ -130,8 +130,6 @@ metadata:
 spec:
   template:
     spec:
-      nodeSelector:
-        {{ template "nodeSelector" $x509ExporterArgs }}
       tolerations:
         {{ template "tolerations" $x509ExporterArgs }}
 {{- end }}
