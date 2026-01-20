@@ -769,6 +769,18 @@
           "type": "string",
           "description": "URL to the path where the etcd `tar.gz`s are available. etcd will be downloaded from `<etcdDownloadUrl>/<etcd_version>/etcd-<etcd_version>-linux-<host_architecture>.tar.gz`"
         },
+        "kubeadmDownloadUrl": {
+          "type": "string",
+          "description": "URL where to download the kubeadm binary from. Used for certificate management on dedicated etcd nodes."
+        },
+        "kubeadmChecksum": {
+          "type": "string",
+          "description": "Checksum for the kubeadm binary on dedicated etcd nodes."
+        },
+        "kubeadmBinaryDir": {
+          "type": "string",
+          "description": "Directory where to install the kubeadm binary on dedicated etcd nodes. Defaults to `/usr/local/bin`."
+        },
         "dependenciesOverride": {
           "type": "object",
           "additionalProperties": false,
