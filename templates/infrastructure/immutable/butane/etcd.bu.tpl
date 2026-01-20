@@ -50,6 +50,20 @@ storage:
           DNS={{ .DNS }}
 
     # =========================================================================
+    # Sysext: Common noop
+    # =========================================================================
+    - path: /etc/sysupdate.d/noop.conf
+      contents:
+        inline: |
+          [Source]
+          Type=regular-file
+          Path=/
+          MatchPattern=invalid@v.raw
+          [Target]
+          Type=regular-file
+          Path=/
+
+    # =========================================================================
     # Sysext: Containerd
     # =========================================================================
     - path: /opt/extensions/containerd/containerd-{{ $.data.sysext.containerd.version }}-{{ .Arch }}.raw
@@ -59,7 +73,20 @@ storage:
 
     - path: /etc/sysupdate.containerd.d/containerd.conf
       contents:
-        source: {{ $.data.ipxeServerURL }}/assets/extensions/containerd.conf
+        inline: |
+          [Transfer]
+          ProtectVersion=%A
+
+          [Source]
+          Type=regular-file
+          Path=/opt/extensions/containerd
+          MatchPattern=containerd-@v-@u.raw
+
+          [Target]
+          Type=regular-file
+          Path=/etc/extensions
+          MatchPattern=containerd-@v
+          CurrentSymlink=/etc/extensions/containerd.raw
 
     # =========================================================================
     # Sysext: etcd
@@ -71,7 +98,20 @@ storage:
 
     - path: /etc/sysupdate.etcd.d/etcd.conf
       contents:
-        source: {{ $.data.ipxeServerURL }}/assets/extensions/etcd.conf
+        inline: |
+          [Transfer]
+          ProtectVersion=%A
+
+          [Source]
+          Type=regular-file
+          Path=/opt/extensions/etcd
+          MatchPattern=etcd-@v-@u.raw
+
+          [Target]
+          Type=regular-file
+          Path=/etc/extensions
+          MatchPattern=etcd-@v
+          CurrentSymlink=/etc/extensions/etcd.raw
 
   links:
     # Disable Docker from Flatcar base OS

@@ -10,3 +10,4 @@ go.work.sum
 .local
 .furyctl
 docs/presentation/presentation-immutable.md
+installers/immutable/fury-distribution.code-workspace

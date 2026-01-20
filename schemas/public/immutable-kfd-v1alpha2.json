@@ -672,16 +672,27 @@
         },
         "keyPath": {
           "type": "string",
+          "description": "DEPRECATED: Use privateKeyPath instead. Path to the SSH private key. Example: ~/.ssh/id_ed25519_production"
+        },
+        "privateKeyPath": {
+          "type": "string",
           "description": "Path to the SSH private key. Example: ~/.ssh/id_ed25519_production"
         },
         "publicKeyPath": {
           "type": "string",
-          "description": "Path to the SSH public key. If not specified, defaults to keyPath + '.pub'. Example: ~/.ssh/id_ed25519_production.pub"
+          "description": "Path to the SSH public key. If not specified, defaults to privateKeyPath + '.pub' (or keyPath + '.pub' if using deprecated keyPath). Example: ~/.ssh/id_ed25519_production.pub"
         }
       },
       "required": [
-        "username",
-        "keyPath"
+        "username"
+      ],
+      "oneOf": [
+        {
+          "required": ["keyPath"]
+        },
+        {
+          "required": ["privateKeyPath"]
+        }
       ]
     },
     "Spec.Kubernetes": {

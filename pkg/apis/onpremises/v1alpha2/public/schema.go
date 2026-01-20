@@ -8,6 +8,12 @@ import (
 	"github.com/sighupio/go-jsonschema/pkg/types"
 	"reflect"
 )
+import (
+	"encoding/json"
+	"fmt"
+	"github.com/sighupio/go-jsonschema/pkg/types"
+	"reflect"
+)
 
 type Metadata struct {
 	// The name of the cluster. It will also be used as a prefix for all the other
@@ -4349,6 +4355,7 @@ var enumValues_SpecDistributionModulesPolicyKyvernoValidationFailureAction = []i
 	"Audit",
 	"Enforce",
 }
+
 var enumValues_TypesKubeTolerationOperator_1 = []interface{}{
 	"Exists",
 	"Equal",
