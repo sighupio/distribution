@@ -343,6 +343,15 @@ all:
     {{- if index .spec.kubernetes.advanced.airGap "etcdDownloadUrl" }}
     etcd_download_url: "{{ .spec.kubernetes.advanced.airGap.etcdDownloadUrl }}"
     {{- end }}
+    {{- if index .spec.kubernetes.advanced.airGap "kubeadmDownloadUrl" }}
+    kubeadm_download_url: "{{ .spec.kubernetes.advanced.airGap.kubeadmDownloadUrl }}"
+    {{- end }}
+    {{- if index .spec.kubernetes.advanced.airGap "kubeadmChecksum" }}
+    kubeadm_checksum: "{{ .spec.kubernetes.advanced.airGap.kubeadmChecksum }}"
+    {{- end }}
+    {{- if index .spec.kubernetes.advanced.airGap "kubeadmBinaryDir" }}
+    kubeadm_binary_dir: "{{ .spec.kubernetes.advanced.airGap.kubeadmBinaryDir }}"
+    {{- end }}
     {{- end }}
 
     {{- range $key, $value := index .spec.kubernetes.advanced "kubeletConfiguration" }}
