@@ -2199,11 +2199,16 @@ type SpecInfrastructureProxy struct {
 
 // SSH credentials for node access.
 type SpecInfrastructureSSH struct {
-	// Path to the SSH private key. Example: ~/.ssh/id_ed25519_production
-	KeyPath string `json:"keyPath" yaml:"keyPath" mapstructure:"keyPath"`
+	// DEPRECATED: Use privateKeyPath instead. Path to the SSH private key. Example:
+	// ~/.ssh/id_ed25519_production
+	KeyPath *string `json:"keyPath,omitempty" yaml:"keyPath,omitempty" mapstructure:"keyPath,omitempty"`
 
-	// Path to the SSH public key. If not specified, defaults to keyPath + '.pub'.
-	// Example: ~/.ssh/id_ed25519_production.pub
+	// Path to the SSH private key. Example: ~/.ssh/id_ed25519_production
+	PrivateKeyPath *string `json:"privateKeyPath,omitempty" yaml:"privateKeyPath,omitempty" mapstructure:"privateKeyPath,omitempty"`
+
+	// Path to the SSH public key. If not specified, defaults to privateKeyPath +
+	// '.pub' (or keyPath + '.pub' if using deprecated keyPath). Example:
+	// ~/.ssh/id_ed25519_production.pub
 	PublicKeyPath *string `json:"publicKeyPath,omitempty" yaml:"publicKeyPath,omitempty" mapstructure:"publicKeyPath,omitempty"`
 
 	// SSH username. Example: core
@@ -2215,9 +2220,6 @@ func (j *SpecInfrastructureSSH) UnmarshalJSON(b []byte) error {
 	var raw map[string]interface{}
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
-	}
-	if v, ok := raw["keyPath"]; !ok || v == nil {
-		return fmt.Errorf("field keyPath in SpecInfrastructureSSH: required")
 	}
 	if v, ok := raw["username"]; !ok || v == nil {
 		return fmt.Errorf("field username in SpecInfrastructureSSH: required")
