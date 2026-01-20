@@ -7,85 +7,60 @@ default_kubernetes_version: "1.33.4"
 kubernetes:
   "1.33.4":
     sysext:
-      - name: containerd
+      - name: "containerd"
         version: "2.1.4"
         arch:
           x86-64:
             url: "https://extensions.flatcar.org/extensions/containerd/containerd-2.1.4-x86-64.raw"
-            sha256: ""  # Optional: Add SHA256 for verification
           arm64:
             url: "https://extensions.flatcar.org/extensions/containerd/containerd-2.1.4-arm64.raw"
-            sha256: ""
 
-      - name: kubernetes
+      - name: "kubernetes"
         version: "v1.33.6"
+        version_major_minor: "v1.33"
         arch:
           x86-64:
             url: "https://extensions.flatcar.org/extensions/kubernetes/kubernetes-v1.33.6-x86-64.raw"
-            sha256: ""
           arm64:
             url: "https://extensions.flatcar.org/extensions/kubernetes/kubernetes-v1.33.6-arm64.raw"
-            sha256: ""
 
-      - name: etcd
+      - name: "etcd"
         version: "3.6.6"
         arch:
           x86-64:
             url: "https://extensions.flatcar.org/extensions/etcd/etcd-3.6.6-x86-64.raw"
-            sha256: ""
           arm64:
             url: "https://extensions.flatcar.org/extensions/etcd/etcd-3.6.6-arm64.raw"
-            sha256: ""
 
-      - name: keepalived
+      - name: "keepalived"
         version: "v2.3.4"
         arch:
           x86-64:
             url: "https://extensions.flatcar.org/extensions/keepalived/keepalived-v2.3.4-x86-64.raw"
-            sha256: ""
           arm64:
             url: "https://extensions.flatcar.org/extensions/keepalived/keepalived-v2.3.4-arm64.raw"
-            sha256: ""
 
-    # Flatcar Container Linux version and boot artifacts
     flatcar:
       version: "4459.2.2"
       channel: "stable"
       arch:
         x86-64:
-          # Kernel for network boot (iPXE/PXE)
           kernel:
             filename: "flatcar_production_pxe.vmlinuz"
             url: "https://stable.release.flatcar-linux.net/amd64-usr/4459.2.2/flatcar_production_pxe.vmlinuz"
-            sha256: ""
-
-          # Initial ramdisk for network boot
           initrd:
             filename: "flatcar_production_pxe_image.cpio.gz"
             url: "https://stable.release.flatcar-linux.net/amd64-usr/4459.2.2/flatcar_production_pxe_image.cpio.gz"
-            sha256: ""
-
-          # Root filesystem image (optional, for installation)
           image:
             filename: "flatcar_production_image.bin.bz2"
             url: "https://stable.release.flatcar-linux.net/amd64-usr/4459.2.2/flatcar_production_image.bin.bz2"
-            sha256: ""
-
         arm64:
-          # Kernel for network boot (iPXE/PXE)
           kernel:
             filename: "flatcar_production_pxe.vmlinuz"
             url: "https://stable.release.flatcar-linux.net/arm64-usr/4459.2.2/flatcar_production_pxe.vmlinuz"
-            sha256: ""
-
-          # Initial ramdisk for network boot
           initrd:
             filename: "flatcar_production_pxe_image.cpio.gz"
             url: "https://stable.release.flatcar-linux.net/arm64-usr/4459.2.2/flatcar_production_pxe_image.cpio.gz"
-            sha256: ""
-
-          # Root filesystem image (optional, for installation)
           image:
             filename: "flatcar_production_image.bin.bz2"
             url: "https://stable.release.flatcar-linux.net/arm64-usr/4459.2.2/flatcar_production_image.bin.bz2"
-            sha256: ""
