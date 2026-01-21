@@ -256,11 +256,14 @@ data:
       velero:
         backend: minio
         externalEndpoint:
-          type: s3
           endpoint: s3.eu-west-1.amazonaws.com
           insecure: false
           secretAccessKey: example
           accessKeyId: example
+          bucketName: velerobucket
+          prefixName: ""
+          accessMode: ReadWrite
+        gcs:
           bucketName: velerobucket
           prefixName: ""
           accessMode: ReadWrite
