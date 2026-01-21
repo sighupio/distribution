@@ -1386,6 +1386,7 @@ Default is `none`.
 |:-------------------------------------------------------------------------|:---------|:---------|
 | [backend](#specdistributionmodulesdrvelerobackend)                       | `string` | Optional |
 | [externalEndpoint](#specdistributionmodulesdrveleroexternalendpoint)     | `object` | Optional |
+| [gcs](#specdistributionmodulesdrvelerogcs)                               | `object` | Optional |
 | [overrides](#specdistributionmodulesdrvelerooverrides)                   | `object` | Optional |
 | [schedules](#specdistributionmodulesdrveleroschedules)                   | `object` | Optional |
 | [snapshotController](#specdistributionmodulesdrvelerosnapshotcontroller) | `object` | Optional |
@@ -1398,7 +1399,7 @@ Configuration for the Velero package.
 
 ### Description
 
-The storage backend type for Velero. `minio` will use an in-cluster MinIO deployment for object storage, `externalEndpoint` can be used to point to an external S3-compatible object storage instead of deploying an in-cluster MinIO.
+The storage backend type for Velero. `minio` will use an in-cluster MinIO deployment for object storage, `externalEndpoint` can be used to point to an external S3-compatible object storage instead of deploying an in-cluster MinIO, `gcs` can be used to point to an external GCS object storage instead of deploying an in-cluster MinIO.
 
 ### Constraints
 
@@ -1408,23 +1409,21 @@ The storage backend type for Velero. `minio` will use an in-cluster MinIO deploy
 |:-------------------|
 |`"minio"`           |
 |`"externalEndpoint"`|
+|`"gcs"`             |
 
 ## .spec.distribution.modules.dr.velero.externalEndpoint
 
 ### Properties
 
-| Property                                                                                     | Type      | Required |
-|:---------------------------------------------------------------------------------------------|:----------|:---------|
-| [accessKeyId](#specdistributionmodulesdrveleroexternalendpointaccesskeyid)                   | `string`  | Optional |
-| [accessMode](#specdistributionmodulesdrveleroexternalendpointaccessmode)                     | `string`  | Optional |
-| [bucketName](#specdistributionmodulesdrveleroexternalendpointbucketname)                     | `string`  | Optional |
-| [clientEmail](#specdistributionmodulesdrveleroexternalendpointclientemail)                   | `string`  | Optional |
-| [endpoint](#specdistributionmodulesdrveleroexternalendpointendpoint)                         | `string`  | Optional |
-| [insecure](#specdistributionmodulesdrveleroexternalendpointinsecure)                         | `boolean` | Optional |
-| [prefixName](#specdistributionmodulesdrveleroexternalendpointprefixname)                     | `string`  | Optional |
-| [secretAccessKey](#specdistributionmodulesdrveleroexternalendpointsecretaccesskey)           | `string`  | Optional |
-| [serviceAccountString](#specdistributionmodulesdrveleroexternalendpointserviceaccountstring) | `string`  | Optional |
-| [type](#specdistributionmodulesdrveleroexternalendpointtype)                                 | `string`  | Optional |
+| Property                                                                           | Type      | Required |
+|:-----------------------------------------------------------------------------------|:----------|:---------|
+| [accessKeyId](#specdistributionmodulesdrveleroexternalendpointaccesskeyid)         | `string`  | Optional |
+| [accessMode](#specdistributionmodulesdrveleroexternalendpointaccessmode)           | `string`  | Optional |
+| [bucketName](#specdistributionmodulesdrveleroexternalendpointbucketname)           | `string`  | Optional |
+| [endpoint](#specdistributionmodulesdrveleroexternalendpointendpoint)               | `string`  | Optional |
+| [insecure](#specdistributionmodulesdrveleroexternalendpointinsecure)               | `boolean` | Optional |
+| [prefixName](#specdistributionmodulesdrveleroexternalendpointprefixname)           | `string`  | Optional |
+| [secretAccessKey](#specdistributionmodulesdrveleroexternalendpointsecretaccesskey) | `string`  | Optional |
 
 ### Description
 
@@ -1434,13 +1433,13 @@ Configuration for Velero's external storage backend.
 
 ### Description
 
-The access key ID (username) for the external S3-compatible bucket. Has effect only when type is 's3'.
+The access key ID (username) for the external S3-compatible bucket.
 
 ## .spec.distribution.modules.dr.velero.externalEndpoint.accessMode
 
 ### Description
 
-How Velero can access the backup storage location. Valid for both types (gcs and s3).
+How Velero can access the backup storage location.
 
 ### Constraints
 
@@ -1455,54 +1454,86 @@ How Velero can access the backup storage location. Valid for both types (gcs and
 
 ### Description
 
-The bucket name of the external object storage. Valid for both types (gcs and s3)
-
-## .spec.distribution.modules.dr.velero.externalEndpoint.clientEmail
-
-### Description
-
-Full client email. Has effect only when type is 'gcs'.
+The bucket name of the external object storage.
 
 ## .spec.distribution.modules.dr.velero.externalEndpoint.endpoint
 
 ### Description
 
-External S3-compatible endpoint for Velero's storage. Has effect only when type is 's3'.
+External S3-compatible endpoint for Velero's storage.
 
 ## .spec.distribution.modules.dr.velero.externalEndpoint.insecure
 
 ### Description
 
-If true, will use HTTP as protocol instead of HTTPS. Has effect only when type is 's3'.
+If true, will use HTTP as protocol instead of HTTPS.
 
 ## .spec.distribution.modules.dr.velero.externalEndpoint.prefixName
 
 ### Description
 
-The prefix name to use inside the bucket. Valid for both types (gcs and s3)
+The prefix name to use inside the bucket.
 
 ## .spec.distribution.modules.dr.velero.externalEndpoint.secretAccessKey
 
 ### Description
 
-The secret access key (password) for the external S3-compatible bucket. Has effect only when type is 's3'.
+The secret access key (password) for the external S3-compatible bucket.
 
-## .spec.distribution.modules.dr.velero.externalEndpoint.serviceAccountString
+## .spec.distribution.modules.dr.velero.gcs
+
+### Properties
+
+| Property                                                                        | Type     | Required |
+|:--------------------------------------------------------------------------------|:---------|:---------|
+| [accessMode](#specdistributionmodulesdrvelerogcsaccessmode)                     | `string` | Optional |
+| [bucketName](#specdistributionmodulesdrvelerogcsbucketname)                     | `string` | Optional |
+| [clientEmail](#specdistributionmodulesdrvelerogcsclientemail)                   | `string` | Optional |
+| [prefixName](#specdistributionmodulesdrvelerogcsprefixname)                     | `string` | Optional |
+| [serviceAccountString](#specdistributionmodulesdrvelerogcsserviceaccountstring) | `string` | Optional |
 
 ### Description
 
-Service account JSON string. Has effect only when type is 'gcs'.
+Configuration for Velero's gcs storage backend.
 
-## .spec.distribution.modules.dr.velero.externalEndpoint.type
+## .spec.distribution.modules.dr.velero.gcs.accessMode
+
+### Description
+
+How Velero can access the backup storage location.
 
 ### Constraints
 
 **enum**: the value of this property must be equal to one of the following string values:
 
-| Value |
-|:------|
-|`"s3"` |
-|`"gcs"`|
+| Value       |
+|:------------|
+|`"ReadWrite"`|
+|`"ReadOnly"` |
+
+## .spec.distribution.modules.dr.velero.gcs.bucketName
+
+### Description
+
+The bucket name of the gcs object storage.
+
+## .spec.distribution.modules.dr.velero.gcs.clientEmail
+
+### Description
+
+Full gcs client email.
+
+## .spec.distribution.modules.dr.velero.gcs.prefixName
+
+### Description
+
+The prefix name to use inside the gcs bucket.
+
+## .spec.distribution.modules.dr.velero.gcs.serviceAccountString
+
+### Description
+
+Service gcs account JSON string.
 
 ## .spec.distribution.modules.dr.velero.overrides
 

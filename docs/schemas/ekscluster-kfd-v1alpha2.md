@@ -1536,7 +1536,7 @@ Default is `none`.
 
 ### Description
 
-How Velero can access the backup storage location. Valid for both types (gcs and s3).
+How Velero can access the backup storage location.
 
 ### Constraints
 
@@ -1557,7 +1557,7 @@ The name of the bucket for Velero.
 
 ### Description
 
-The prefix name to use inside the bucket. Valid for both types (gcs and s3)
+The prefix name to use inside the bucket.
 
 ## .spec.distribution.modules.dr.velero.eks.region
 
