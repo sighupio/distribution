@@ -2537,11 +2537,11 @@
         },
         "prefixName": {
           "type": "string",
-          "description": "The prefix name to use inside the bucket. Valid for both types (gcs and s3)"
+          "description": "The prefix name to use inside the bucket."
         },
         "accessMode": {
           "type": "string",
-          "description": "How Velero can access the backup storage location. Valid for both types (gcs and s3).",
+          "description": "How Velero can access the backup storage location.",
           "enum": [
             "ReadWrite",
             "ReadOnly"

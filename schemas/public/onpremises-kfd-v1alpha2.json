@@ -2254,61 +2254,78 @@
           "type": "string",
           "enum": [
             "minio",
-            "externalEndpoint"
+            "externalEndpoint",
+            "gcs"
           ],
-          "description": "The storage backend type for Velero. `minio` will use an in-cluster MinIO deployment for object storage, `externalEndpoint` can be used to point to an external S3-compatible object storage instead of deploying an in-cluster MinIO."
+          "description": "The storage backend type for Velero. `minio` will use an in-cluster MinIO deployment for object storage, `externalEndpoint` can be used to point to an external S3-compatible object storage instead of deploying an in-cluster MinIO, `gcs` can be used to point to an external GCS object storage instead of deploying an in-cluster MinIO."
         },
         "externalEndpoint": {
           "type": "object",
           "additionalProperties": false,
           "description": "Configuration for Velero's external storage backend.",
           "properties": {
-            "type": {
-              "type": "string",
-              "enum": [
-                "s3",
-                "gcs"
-              ]
-            },
             "endpoint": {
               "type": "string",
-              "description": "External S3-compatible endpoint for Velero's storage. Has effect only when type is 's3'."
+              "description": "External S3-compatible endpoint for Velero's storage."
             },
             "insecure": {
               "type": "boolean",
-              "description": "If true, will use HTTP as protocol instead of HTTPS. Has effect only when type is 's3'."
+              "description": "If true, will use HTTP as protocol instead of HTTPS."
             },
             "secretAccessKey": {
               "type": "string",
-              "description": "The secret access key (password) for the external S3-compatible bucket. Has effect only when type is 's3'."
+              "description": "The secret access key (password) for the external S3-compatible bucket."
             },
             "accessKeyId": {
               "type": "string",
-              "description": "The access key ID (username) for the external S3-compatible bucket. Has effect only when type is 's3'."
+              "description": "The access key ID (username) for the external S3-compatible bucket."
             },
             "bucketName": {
               "type": "string",
-              "description": "The bucket name of the external object storage. Valid for both types (gcs and s3)"
+              "description": "The bucket name of the external object storage."
             },
             "prefixName": {
               "type": "string",
-              "description": "The prefix name to use inside the bucket. Valid for both types (gcs and s3)"
+              "description": "The prefix name to use inside the bucket."
             },
             "accessMode": {
               "type": "string",
-              "description": "How Velero can access the backup storage location. Valid for both types (gcs and s3).",
               "enum": [
                 "ReadWrite",
                 "ReadOnly"
-              ]
+              ],
+              "description": "How Velero can access the backup storage location."
+            }
+          }
+        },
+        "gcs": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Configuration for Velero's gcs storage backend.",
+          "properties": {
+            "bucketName": {
+              "type": "string",
+              "description": "The bucket name of the gcs object storage."
+            },
+            "prefixName": {
+              "type": "string",
+              "description": "The prefix name to use inside the gcs bucket."
+            },
+            "accessMode": {
+              "type": "string",
+              "enum": [
+                "ReadWrite",
+                "ReadOnly"
+              ],
+              "description": "How Velero can access the backup storage location."
             },
             "clientEmail": {
               "type": "string",
-              "description": "Full client email. Has effect only when type is 'gcs'."
+              "description": "Full gcs client email."
             },
             "serviceAccountString": {
               "type": "string",
-              "description": "Service account JSON string. Has effect only when type is 'gcs'."
+              "description": "Service gcs account JSON string."
             }
           }
         },
