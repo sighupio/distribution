@@ -199,7 +199,7 @@
         },
         "arch": {
           "type": "string",
-          "description": "CPU architecture for the node. Determines which sysext packages are downloaded. Example: x86-64, arm64",
+          "description": "CPU architecture for the node. Determines which Flatcar artifacts and sysext packages are downloaded. Supports mixed-architecture clusters where different nodes can run different architectures. Kubernetes automatically labels nodes with kubernetes.io/arch. Examples: x86-64 (Intel/AMD amd64), arm64 (ARM aarch64). See examples/immutable-mixed-arch-example.yaml for mixed-architecture cluster configuration.",
           "enum": ["x86-64", "arm64"],
           "default": "x86-64"
         },

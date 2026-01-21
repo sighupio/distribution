@@ -1,73 +1,36 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/sighupio/distribution/{{.DistributionVersion}}/schemas/public/immutable-kfd-v1alpha2.json
 # Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
+# yaml-language-server: $schema=https://raw.githubusercontent.com/sighupio/distribution/refs/heads/main/schemas/public/immutable-kfd-v1alpha2.json
 
-# This is a sample configuration file to be used as a starting point. For the
-# complete reference of the configuration file schema, please refer to the
-# official documentation:
-# https://docs.kubernetesfury.com/docs/installation/kfd-configuration/providers/Immutable
+# Mixed Architecture Kubernetes Cluster Example
+# Demonstrates per-node architecture selection for heterogeneous hardware
+#
+# Use case: Leverage existing x86-64 infrastructure while gradually
+# migrating to ARM64 or run cost-effective ARM64 workers alongside
+# x86-64 control plane for optimal price/performance
 
 ---
 apiVersion: kfd.sighup.io/v1alpha2
 kind: Immutable
 metadata:
-  # The name of the cluster
-  name: {{.Name}}
+  name: mixed-arch-cluster
 spec:
-  # Defines which KFD version will be installed
-  distributionVersion: {{.DistributionVersion}}
+  distributionVersion: v1.32.1
 
-  # Infrastructure configuration for bare-metal nodes
   infrastructure:
-    # SSH configuration for node access
     ssh:
       username: core
       privateKeyPath: ~/.ssh/id_rsa
-      # publicKeyPath: ~/.ssh/id_rsa.pub  # Optional: auto-derived if not specified
 
-    # iPXE server for network boot
     ipxeServer:
       url: https://ipxe.example.com:8080
 
-    # Nodes configuration (11 nodes: 2 load balancers + 3 control plane + 3 infra workers + 3 app workers)
     nodes:
-      # Load Balancer Nodes (HAProxy + Keepalived for HA)
-      - hostname: haproxy1.example.com
-        macAddress: "52:54:00:00:00:01"
-        # arch: x86-64  # Optional: CPU architecture (x86-64|arm64). Default: x86-64. See examples/immutable-mixed-arch-example.yaml
-        storage:
-          installDisk: /dev/sda
-        network:
-          ethernets:
-            eth0:
-              addresses:
-                - 192.168.1.200/24
-              gateway: 192.168.1.1
-              nameservers:
-                addresses:
-                  - 8.8.8.8
-                  - 8.8.4.4
-
-      - hostname: haproxy2.example.com
-        macAddress: "52:54:00:00:00:02"
-        storage:
-          installDisk: /dev/sda
-        network:
-          ethernets:
-            eth0:
-              addresses:
-                - 192.168.1.202/24
-              gateway: 192.168.1.1
-              nameservers:
-                addresses:
-                  - 8.8.8.8
-                  - 8.8.4.4
-
-      # Control Plane Nodes
-      - hostname: master1.example.com
-        macAddress: "52:54:00:01:00:01"
-        # arch: x86-64  # Optional: Each node can have different arch for mixed clusters
+      # Control Plane: x86-64 (traditional, stable)
+      - hostname: ctrl01.k8s.example.com
+        macAddress: "52:54:00:10:00:01"
+        arch: x86-64  # Explicitly set for clarity
         storage:
           installDisk: /dev/sda
         network:
@@ -81,8 +44,9 @@ spec:
                   - 8.8.8.8
                   - 8.8.4.4
 
-      - hostname: master2.example.com
-        macAddress: "52:54:00:01:00:02"
+      - hostname: ctrl02.k8s.example.com
+        macAddress: "52:54:00:10:00:02"
+        arch: x86-64
         storage:
           installDisk: /dev/sda
         network:
@@ -96,8 +60,9 @@ spec:
                   - 8.8.8.8
                   - 8.8.4.4
 
-      - hostname: master3.example.com
-        macAddress: "52:54:00:01:00:03"
+      - hostname: ctrl03.k8s.example.com
+        macAddress: "52:54:00:10:00:03"
+        arch: x86-64
         storage:
           installDisk: /dev/sda
         network:
@@ -111,10 +76,43 @@ spec:
                   - 8.8.8.8
                   - 8.8.4.4
 
-      # Infrastructure Worker Nodes
-      - hostname: infra1.example.com
-        macAddress: "52:54:00:02:00:01"
-        # arch: arm64  # Example: ARM64 node in mixed-architecture cluster
+      # Load Balancers: x86-64 (lightweight, proven)
+      - hostname: lb01.k8s.example.com
+        macAddress: "52:54:00:30:00:01"
+        arch: x86-64
+        storage:
+          installDisk: /dev/sda
+        network:
+          ethernets:
+            eth0:
+              addresses:
+                - 192.168.1.200/24
+              gateway: 192.168.1.1
+              nameservers:
+                addresses:
+                  - 8.8.8.8
+                  - 8.8.4.4
+
+      - hostname: lb02.k8s.example.com
+        macAddress: "52:54:00:30:00:02"
+        arch: x86-64
+        storage:
+          installDisk: /dev/sda
+        network:
+          ethernets:
+            eth0:
+              addresses:
+                - 192.168.1.202/24
+              gateway: 192.168.1.1
+              nameservers:
+                addresses:
+                  - 8.8.8.8
+                  - 8.8.4.4
+
+      # Infrastructure Workers: ARM64 (cost-effective for system workloads)
+      - hostname: infra01.k8s.example.com
+        macAddress: "52:54:00:40:00:01"
+        arch: arm64
         storage:
           installDisk: /dev/sda
         network:
@@ -128,8 +126,9 @@ spec:
                   - 8.8.8.8
                   - 8.8.4.4
 
-      - hostname: infra2.example.com
-        macAddress: "52:54:00:02:00:02"
+      - hostname: infra02.k8s.example.com
+        macAddress: "52:54:00:40:00:02"
+        arch: arm64
         storage:
           installDisk: /dev/sda
         network:
@@ -143,8 +142,9 @@ spec:
                   - 8.8.8.8
                   - 8.8.4.4
 
-      - hostname: infra3.example.com
-        macAddress: "52:54:00:02:00:03"
+      - hostname: infra03.k8s.example.com
+        macAddress: "52:54:00:40:00:03"
+        arch: arm64
         storage:
           installDisk: /dev/sda
         network:
@@ -158,10 +158,10 @@ spec:
                   - 8.8.8.8
                   - 8.8.4.4
 
-      # Application Worker Nodes
-      - hostname: worker1.example.com
-        macAddress: "52:54:00:03:00:01"
-        # arch: x86-64  # Optional: Specify per-node architecture
+      # Application Workers: Mixed (2 ARM64 + 1 x86-64)
+      - hostname: app01.k8s.example.com
+        macAddress: "52:54:00:50:00:01"
+        arch: arm64  # ARM64 for cost-effective compute
         storage:
           installDisk: /dev/sda
         network:
@@ -175,8 +175,9 @@ spec:
                   - 8.8.8.8
                   - 8.8.4.4
 
-      - hostname: worker2.example.com
-        macAddress: "52:54:00:03:00:02"
+      - hostname: app02.k8s.example.com
+        macAddress: "52:54:00:50:00:02"
+        arch: arm64
         storage:
           installDisk: /dev/sda
         network:
@@ -190,8 +191,9 @@ spec:
                   - 8.8.8.8
                   - 8.8.4.4
 
-      - hostname: worker3.example.com
-        macAddress: "52:54:00:03:00:03"
+      - hostname: app03.k8s.example.com
+        macAddress: "52:54:00:50:00:03"
+        arch: x86-64  # x86-64 for workloads requiring specific libraries
         storage:
           installDisk: /dev/sda
         network:
@@ -205,76 +207,63 @@ spec:
                   - 8.8.8.8
                   - 8.8.4.4
 
-  # Kubernetes cluster configuration
   kubernetes:
-    # Kubernetes version (matches immutable.yaml)
     version: "1.33.4"
 
-    # Control plane configuration (3 masters for HA)
-    # The address points to the load balancer VIP for HA
     controlPlane:
       address: 192.168.1.201:6443
       members:
-        - hostname: master1.example.com
+        - hostname: ctrl01.k8s.example.com
           ip: 192.168.1.10
-        - hostname: master2.example.com
+        - hostname: ctrl02.k8s.example.com
           ip: 192.168.1.11
-        - hostname: master3.example.com
+        - hostname: ctrl03.k8s.example.com
           ip: 192.168.1.12
 
-    # etcd configuration (stacked on control plane)
     etcd:
       members:
-        - hostname: master1.example.com
+        - hostname: ctrl01.k8s.example.com
           ip: 192.168.1.10
-        - hostname: master2.example.com
+        - hostname: ctrl02.k8s.example.com
           ip: 192.168.1.11
-        - hostname: master3.example.com
+        - hostname: ctrl03.k8s.example.com
           ip: 192.168.1.12
 
-    # Load balancers (HAProxy) with Keepalived for VIP HA
     loadBalancers:
       enabled: true
       members:
-        - hostname: haproxy1.example.com
+        - hostname: lb01.k8s.example.com
           ip: 192.168.1.200
-        - hostname: haproxy2.example.com
+        - hostname: lb02.k8s.example.com
           ip: 192.168.1.202
       virtualIP: 192.168.1.201
 
-    # Worker nodes organized in node groups
     nodeGroups:
-      # Infrastructure workers (for system components)
       - name: infra
         nodes:
-          - hostname: infra1.example.com
+          - hostname: infra01.k8s.example.com
             ip: 192.168.1.100
-          - hostname: infra2.example.com
+          - hostname: infra02.k8s.example.com
             ip: 192.168.1.101
-          - hostname: infra3.example.com
+          - hostname: infra03.k8s.example.com
             ip: 192.168.1.102
-      # Application workers (for user workloads)
       - name: workers
         nodes:
-          - hostname: worker1.example.com
+          - hostname: app01.k8s.example.com
             ip: 192.168.1.110
-          - hostname: worker2.example.com
+          - hostname: app02.k8s.example.com
             ip: 192.168.1.111
-          - hostname: worker3.example.com
+          - hostname: app03.k8s.example.com
             ip: 192.168.1.112
 
-    # Networking configuration
     networking:
       podCIDR: 10.244.0.0/16
       serviceCIDR: 10.96.0.0/12
 
-  # Fury Kubernetes Distribution modules
   distribution:
     common:
-      # Node selector for common components (deploy to infra nodes)
       nodeSelector:
         node-role.kubernetes.io/infra: ""
-      # Tolerations to allow scheduling on infra nodes
       tolerations:
         - key: node-role.kubernetes.io/infra
           operator: Exists
@@ -309,3 +298,58 @@ spec:
       auth:
         provider:
           type: none
+
+# ==================================================================================
+# IMPORTANT CONSIDERATIONS FOR MIXED ARCHITECTURE CLUSTERS
+# ==================================================================================
+#
+# 1. CONTAINER IMAGES
+#    All workloads MUST use multi-architecture container images.
+#    Most official images support multi-arch: nginx, redis, postgres, mysql, etc.
+#
+#    Check image platforms:
+#      docker manifest inspect <image> | jq '.manifests[].platform'
+#
+#    Build multi-arch images:
+#      docker buildx build --platform linux/amd64,linux/arm64 -t myapp:latest --push .
+#
+# 2. NODE SCHEDULING
+#    Kubernetes automatically labels nodes with kubernetes.io/arch
+#
+#    For architecture-specific workloads, use nodeSelector:
+#      nodeSelector:
+#        kubernetes.io/arch: amd64  # or arm64
+#
+#    For flexible scheduling with preferences, use nodeAffinity:
+#      affinity:
+#        nodeAffinity:
+#          preferredDuringSchedulingIgnoredDuringExecution:
+#            - weight: 100
+#              preference:
+#                matchExpressions:
+#                  - key: kubernetes.io/arch
+#                    operator: In
+#                    values: ["arm64"]
+#
+# 3. ASSET MANAGEMENT
+#    furyctl automatically:
+#    - Detects architectures in use: [x86-64 arm64]
+#    - Downloads only required Flatcar images + sysext packages for those architectures
+#    - Generates correct per-node Butane templates with architecture-specific URLs
+#
+#    Expected asset downloads for this example:
+#    - Flatcar artifacts: kernel, initrd, image (x86-64 + arm64)
+#    - Sysext packages: containerd, kubernetes, etcd, keepalived (x86-64 + arm64)
+#
+# 4. PERFORMANCE CONSIDERATIONS
+#    - ARM64 typically offers better price/performance for general workloads (up to 40% cost savings)
+#    - x86-64 may be required for specific software without ARM64 builds
+#    - Test critical workloads on both architectures before production deployment
+#    - Consider gradual migration: start with workers, then infra, finally control plane
+#
+# 5. VERIFICATION
+#    After deployment, verify architecture labels:
+#      kubectl get nodes -L kubernetes.io/arch
+#
+#    Check node architecture distribution:
+#      kubectl get nodes -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.status.nodeInfo.architecture}{"\n"}{end}'
