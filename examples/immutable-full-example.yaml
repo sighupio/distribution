@@ -36,6 +36,7 @@ spec:
       # Ref: https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/setup-ha-etcd-with-kubeadm/
       - hostname: ctrl01.k8s.example.com
         macAddress: 52:54:00:10:00:01
+        # arch: x86-64  # Optional: CPU architecture (x86-64|arm64). See immutable-mixed-arch-example.yaml
         storage:
           installDisk: /dev/sda
           additionalDisks:
