@@ -695,11 +695,16 @@ const SpecDistributionModulesDrTypeOnPremises SpecDistributionModulesDrType = "o
 type SpecDistributionModulesDrVelero struct {
 	// The storage backend type for Velero. `minio` will use an in-cluster MinIO
 	// deployment for object storage, `externalEndpoint` can be used to point to an
-	// external S3-compatible object storage instead of deploying an in-cluster MinIO.
+	// external S3-compatible object storage instead of deploying an in-cluster MinIO,
+	// `gcs` can be used to point to an external GCS object storage instead of
+	// deploying an in-cluster MinIO.
 	Backend *SpecDistributionModulesDrVeleroBackend `json:"backend,omitempty" yaml:"backend,omitempty" mapstructure:"backend,omitempty"`
 
 	// Configuration for Velero's external storage backend.
 	ExternalEndpoint *SpecDistributionModulesDrVeleroExternalEndpoint `json:"externalEndpoint,omitempty" yaml:"externalEndpoint,omitempty" mapstructure:"externalEndpoint,omitempty"`
+
+	// Configuration for Velero's gcs storage backend.
+	Gcs *SpecDistributionModulesDrVeleroGcs `json:"gcs,omitempty" yaml:"gcs,omitempty" mapstructure:"gcs,omitempty"`
 
 	// Overrides corresponds to the JSON schema field "overrides".
 	Overrides *TypesFuryModuleComponentOverrides `json:"overrides,omitempty" yaml:"overrides,omitempty" mapstructure:"overrides,omitempty"`
@@ -714,45 +719,31 @@ type SpecDistributionModulesDrVelero struct {
 type SpecDistributionModulesDrVeleroBackend string
 
 const SpecDistributionModulesDrVeleroBackendExternalEndpoint SpecDistributionModulesDrVeleroBackend = "externalEndpoint"
+const SpecDistributionModulesDrVeleroBackendGcs SpecDistributionModulesDrVeleroBackend = "gcs"
 const SpecDistributionModulesDrVeleroBackendMinio SpecDistributionModulesDrVeleroBackend = "minio"
 
 // Configuration for Velero's external storage backend.
 type SpecDistributionModulesDrVeleroExternalEndpoint struct {
-	// The access key ID (username) for the external S3-compatible bucket. Has effect
-	// only when type is 's3'.
+	// The access key ID (username) for the external S3-compatible bucket.
 	AccessKeyId *string `json:"accessKeyId,omitempty" yaml:"accessKeyId,omitempty" mapstructure:"accessKeyId,omitempty"`
 
-	// How Velero can access the backup storage location. Valid for both types (gcs
-	// and s3).
+	// How Velero can access the backup storage location.
 	AccessMode *SpecDistributionModulesDrVeleroExternalEndpointAccessMode `json:"accessMode,omitempty" yaml:"accessMode,omitempty" mapstructure:"accessMode,omitempty"`
 
-	// The bucket name of the external object storage. Valid for both types (gcs and
-	// s3)
+	// The bucket name of the external object storage.
 	BucketName *string `json:"bucketName,omitempty" yaml:"bucketName,omitempty" mapstructure:"bucketName,omitempty"`
 
-	// Full client email. Has effect only when type is 'gcs'.
-	ClientEmail *string `json:"clientEmail,omitempty" yaml:"clientEmail,omitempty" mapstructure:"clientEmail,omitempty"`
-
-	// External S3-compatible endpoint for Velero's storage. Has effect only when type
-	// is 's3'.
+	// External S3-compatible endpoint for Velero's storage.
 	Endpoint *string `json:"endpoint,omitempty" yaml:"endpoint,omitempty" mapstructure:"endpoint,omitempty"`
 
-	// If true, will use HTTP as protocol instead of HTTPS. Has effect only when type
-	// is 's3'.
+	// If true, will use HTTP as protocol instead of HTTPS.
 	Insecure *bool `json:"insecure,omitempty" yaml:"insecure,omitempty" mapstructure:"insecure,omitempty"`
 
-	// The prefix name to use inside the bucket. Valid for both types (gcs and s3)
+	// The prefix name to use inside the bucket.
 	PrefixName *string `json:"prefixName,omitempty" yaml:"prefixName,omitempty" mapstructure:"prefixName,omitempty"`
 
-	// The secret access key (password) for the external S3-compatible bucket. Has
-	// effect only when type is 's3'.
+	// The secret access key (password) for the external S3-compatible bucket.
 	SecretAccessKey *string `json:"secretAccessKey,omitempty" yaml:"secretAccessKey,omitempty" mapstructure:"secretAccessKey,omitempty"`
-
-	// Service account JSON string. Has effect only when type is 'gcs'.
-	ServiceAccountString *string `json:"serviceAccountString,omitempty" yaml:"serviceAccountString,omitempty" mapstructure:"serviceAccountString,omitempty"`
-
-	// Type corresponds to the JSON schema field "type".
-	Type *SpecDistributionModulesDrVeleroExternalEndpointType `json:"type,omitempty" yaml:"type,omitempty" mapstructure:"type,omitempty"`
 }
 
 type SpecDistributionModulesDrVeleroExternalEndpointAccessMode string
@@ -760,10 +751,28 @@ type SpecDistributionModulesDrVeleroExternalEndpointAccessMode string
 const SpecDistributionModulesDrVeleroExternalEndpointAccessModeReadOnly SpecDistributionModulesDrVeleroExternalEndpointAccessMode = "ReadOnly"
 const SpecDistributionModulesDrVeleroExternalEndpointAccessModeReadWrite SpecDistributionModulesDrVeleroExternalEndpointAccessMode = "ReadWrite"
 
-type SpecDistributionModulesDrVeleroExternalEndpointType string
+// Configuration for Velero's gcs storage backend.
+type SpecDistributionModulesDrVeleroGcs struct {
+	// How Velero can access the backup storage location.
+	AccessMode *SpecDistributionModulesDrVeleroGcsAccessMode `json:"accessMode,omitempty" yaml:"accessMode,omitempty" mapstructure:"accessMode,omitempty"`
 
-const SpecDistributionModulesDrVeleroExternalEndpointTypeGcs SpecDistributionModulesDrVeleroExternalEndpointType = "gcs"
-const SpecDistributionModulesDrVeleroExternalEndpointTypeS3 SpecDistributionModulesDrVeleroExternalEndpointType = "s3"
+	// The bucket name of the gcs object storage.
+	BucketName *string `json:"bucketName,omitempty" yaml:"bucketName,omitempty" mapstructure:"bucketName,omitempty"`
+
+	// Full gcs client email.
+	ClientEmail *string `json:"clientEmail,omitempty" yaml:"clientEmail,omitempty" mapstructure:"clientEmail,omitempty"`
+
+	// The prefix name to use inside the gcs bucket.
+	PrefixName *string `json:"prefixName,omitempty" yaml:"prefixName,omitempty" mapstructure:"prefixName,omitempty"`
+
+	// Service gcs account JSON string.
+	ServiceAccountString *string `json:"serviceAccountString,omitempty" yaml:"serviceAccountString,omitempty" mapstructure:"serviceAccountString,omitempty"`
+}
+
+type SpecDistributionModulesDrVeleroGcsAccessMode string
+
+const SpecDistributionModulesDrVeleroGcsAccessModeReadOnly SpecDistributionModulesDrVeleroGcsAccessMode = "ReadOnly"
+const SpecDistributionModulesDrVeleroGcsAccessModeReadWrite SpecDistributionModulesDrVeleroGcsAccessMode = "ReadWrite"
 
 // Configuration for Velero's backup schedules.
 type SpecDistributionModulesDrVeleroSchedules struct {
@@ -1608,22 +1617,22 @@ func (j *SpecDistributionModulesDr) UnmarshalJSON(b []byte) error {
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionModulesDrVeleroExternalEndpointType) UnmarshalJSON(b []byte) error {
+func (j *SpecDistributionModulesDrVeleroGcsAccessMode) UnmarshalJSON(b []byte) error {
 	var v string
 	if err := json.Unmarshal(b, &v); err != nil {
 		return err
 	}
 	var ok bool
-	for _, expected := range enumValues_SpecDistributionModulesDrVeleroExternalEndpointType {
+	for _, expected := range enumValues_SpecDistributionModulesDrVeleroGcsAccessMode {
 		if reflect.DeepEqual(v, expected) {
 			ok = true
 			break
 		}
 	}
 	if !ok {
-		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_SpecDistributionModulesDrVeleroExternalEndpointType, v)
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_SpecDistributionModulesDrVeleroGcsAccessMode, v)
 	}
-	*j = SpecDistributionModulesDrVeleroExternalEndpointType(v)
+	*j = SpecDistributionModulesDrVeleroGcsAccessMode(v)
 	return nil
 }
 
@@ -1651,9 +1660,9 @@ type TypesKubeResources struct {
 	Requests *TypesKubeResourcesRequests `json:"requests,omitempty" yaml:"requests,omitempty" mapstructure:"requests,omitempty"`
 }
 
-var enumValues_SpecDistributionModulesDrVeleroExternalEndpointType = []interface{}{
-	"s3",
-	"gcs",
+var enumValues_SpecDistributionModulesDrVeleroGcsAccessMode = []interface{}{
+	"ReadWrite",
+	"ReadOnly",
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
@@ -1729,6 +1738,7 @@ func (j *SpecDistributionModulesLoggingOpensearchType) UnmarshalJSON(b []byte) e
 var enumValues_SpecDistributionModulesDrVeleroBackend = []interface{}{
 	"minio",
 	"externalEndpoint",
+	"gcs",
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
