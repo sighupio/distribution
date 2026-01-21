@@ -28,17 +28,17 @@ kubernetes:
         version: "3.6.6"
         arch:
           x86-64:
-            url: "https://extensions.flatcar.org/extensions/etcd/etcd-3.6.6-x86-64.raw"
+            url: "file:///Users/smerlos/work/github.com/sighupio/fury-distribution/installers/immutable/dummy-assets/etcd-3.6.6-x86-64.raw"
           arm64:
-            url: "https://extensions.flatcar.org/extensions/etcd/etcd-3.6.6-arm64.raw"
+            url: "file:///Users/smerlos/work/github.com/sighupio/fury-distribution/installers/immutable/dummy-assets/etcd-3.6.6-arm64.raw"
 
       - name: "keepalived"
         version: "v2.3.4"
         arch:
           x86-64:
-            url: "https://extensions.flatcar.org/extensions/keepalived/keepalived-v2.3.4-x86-64.raw"
+            url: "file:///Users/smerlos/work/github.com/sighupio/fury-distribution/installers/immutable/dummy-assets/keepalived-v2.3.4-x86-64.raw"
           arm64:
-            url: "https://extensions.flatcar.org/extensions/keepalived/keepalived-v2.3.4-arm64.raw"
+            url: "file:///Users/smerlos/work/github.com/sighupio/fury-distribution/installers/immutable/dummy-assets/keepalived-v2.3.4-arm64.raw"
 
     flatcar:
       version: "4459.2.2"
