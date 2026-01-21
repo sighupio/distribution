@@ -4953,6 +4953,9 @@ Defines the Kubernetes components configuration and the values needed for the ku
 | [containerdDownloadUrl](#speckubernetesadvancedairgapcontainerddownloadurl) | `string` | Optional |
 | [dependenciesOverride](#speckubernetesadvancedairgapdependenciesoverride)   | `object` | Optional |
 | [etcdDownloadUrl](#speckubernetesadvancedairgapetcddownloadurl)             | `string` | Optional |
+| [kubeadmBinaryDir](#speckubernetesadvancedairgapkubeadmbinarydir)           | `string` | Optional |
+| [kubeadmChecksum](#speckubernetesadvancedairgapkubeadmchecksum)             | `string` | Optional |
+| [kubeadmDownloadUrl](#speckubernetesadvancedairgapkubeadmdownloadurl)       | `string` | Optional |
 | [runcChecksum](#speckubernetesadvancedairgapruncchecksum)                   | `string` | Optional |
 | [runcDownloadUrl](#speckubernetesadvancedairgapruncdownloadurl)             | `string` | Optional |
 
@@ -5057,6 +5060,24 @@ If true, the GPG signature check on the `repodata` will be enabled.
 ### Description
 
 URL to the path where the etcd `tar.gz`s are available. etcd will be downloaded from `<etcdDownloadUrl>/<etcd_version>/etcd-<etcd_version>-linux-<host_architecture>.tar.gz`
+
+## .spec.kubernetes.advanced.airGap.kubeadmBinaryDir
+
+### Description
+
+Directory where to install the kubeadm binary on dedicated etcd nodes. Defaults to `/usr/local/bin`.
+
+## .spec.kubernetes.advanced.airGap.kubeadmChecksum
+
+### Description
+
+Checksum for the kubeadm binary on dedicated etcd nodes.
+
+## .spec.kubernetes.advanced.airGap.kubeadmDownloadUrl
+
+### Description
+
+URL where to download the kubeadm binary from. Used for certificate management on dedicated etcd nodes.
 
 ## .spec.kubernetes.advanced.airGap.runcChecksum
 

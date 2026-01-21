@@ -11,7 +11,7 @@ The distribution is maintained with ❤️ by the team [SIGHUP by ReeVo](https:/
   - Under the hood furyctl will use the OpenTofu binary
   - Existing `terraform` configurations continue to work
 - [[#479](https://github.com/sighupio/distribution/pull/479)] Add `vpn_furyagent_path` to infrastructure terraform template for EKSCluster provider to avoid re-download.
-
+- [[#482](https://github.com/sighupio/distribution/pull/482)] Added `kubeadmDownloadUrl`, `kubeadmChecksum`, and `kubeadmBinaryDir` fields to `spec.kubernetes.advanced.airGap` for air-gapped on-premises clusters, used on dedicated etcd nodes for certificate management.
 - [[#459]](https://github.com/sighupio/distribution/pull/459) Support for kube-proxy-less clusters: on-premises clusters can be now created without kube-proxy. Disabling kube-proxy will enable Calico in eBPF mode and Cilium's kube-proxy-replacement mode in the networking module. You can disable the kube-proxy like so:
 
 ```yaml
