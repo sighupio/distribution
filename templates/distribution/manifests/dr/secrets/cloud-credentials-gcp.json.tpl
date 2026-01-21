@@ -1,1 +1,1 @@
-{{ .spec.distribution.modules.dr.velero.externalEndpoint.serviceAccountString }}
+{{ .spec.distribution.modules.dr.velero.gcs.serviceAccountString }}

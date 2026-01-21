@@ -14,8 +14,8 @@ spec:
   default: true
   provider: gcp
   objectStorage:
-    bucket: {{ .spec.distribution.modules.dr.velero.externalEndpoint.bucketName }}
-    prefix: {{ .spec.distribution.modules.dr.velero.externalEndpoint.prefixName }}
+    bucket: {{ .spec.distribution.modules.dr.velero.gcs.bucketName }}
+    prefix: {{ .spec.distribution.modules.dr.velero.gcs.prefixName }}
   config:
-    serviceAccount: {{ .spec.distribution.modules.dr.velero.externalEndpoint.clientEmail }}
-  accessMode: {{ .spec.distribution.modules.dr.velero.externalEndpoint.accessMode }}
+    serviceAccount: {{ .spec.distribution.modules.dr.velero.gcs.clientEmail }}
+  accessMode: {{ .spec.distribution.modules.dr.velero.gcs.accessMode }}
