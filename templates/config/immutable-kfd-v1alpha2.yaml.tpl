@@ -23,16 +23,49 @@ spec:
     # SSH configuration for node access
     ssh:
       username: core
-      keyPath: ~/.ssh/id_rsa
+      privateKeyPath: ~/.ssh/id_rsa
+      # publicKeyPath: ~/.ssh/id_rsa.pub  # Optional: auto-derived if not specified
 
     # iPXE server for network boot
     ipxeServer:
       url: https://ipxe.example.com:8080
 
-    # Nodes configuration (minimum 1 node for testing)
+    # Nodes configuration (11 nodes: 2 load balancers + 3 control plane + 3 infra workers + 3 app workers)
     nodes:
-      - hostname: node01.example.com
+      # Load Balancer Nodes (HAProxy + Keepalived for HA)
+      - hostname: haproxy1.example.com
         macAddress: "52:54:00:00:00:01"
+        storage:
+          installDisk: /dev/sda
+        network:
+          ethernets:
+            eth0:
+              addresses:
+                - 192.168.1.200/24
+              gateway: 192.168.1.1
+              nameservers:
+                addresses:
+                  - 8.8.8.8
+                  - 8.8.4.4
+
+      - hostname: haproxy2.example.com
+        macAddress: "52:54:00:00:00:02"
+        storage:
+          installDisk: /dev/sda
+        network:
+          ethernets:
+            eth0:
+              addresses:
+                - 192.168.1.202/24
+              gateway: 192.168.1.1
+              nameservers:
+                addresses:
+                  - 8.8.8.8
+                  - 8.8.4.4
+
+      # Control Plane Nodes
+      - hostname: master1.example.com
+        macAddress: "52:54:00:01:00:01"
         storage:
           installDisk: /dev/sda
         network:
@@ -44,21 +77,187 @@ spec:
               nameservers:
                 addresses:
                   - 8.8.8.8
+                  - 8.8.4.4
+
+      - hostname: master2.example.com
+        macAddress: "52:54:00:01:00:02"
+        storage:
+          installDisk: /dev/sda
+        network:
+          ethernets:
+            eth0:
+              addresses:
+                - 192.168.1.11/24
+              gateway: 192.168.1.1
+              nameservers:
+                addresses:
+                  - 8.8.8.8
+                  - 8.8.4.4
+
+      - hostname: master3.example.com
+        macAddress: "52:54:00:01:00:03"
+        storage:
+          installDisk: /dev/sda
+        network:
+          ethernets:
+            eth0:
+              addresses:
+                - 192.168.1.12/24
+              gateway: 192.168.1.1
+              nameservers:
+                addresses:
+                  - 8.8.8.8
+                  - 8.8.4.4
+
+      # Infrastructure Worker Nodes
+      - hostname: infra1.example.com
+        macAddress: "52:54:00:02:00:01"
+        storage:
+          installDisk: /dev/sda
+        network:
+          ethernets:
+            eth0:
+              addresses:
+                - 192.168.1.100/24
+              gateway: 192.168.1.1
+              nameservers:
+                addresses:
+                  - 8.8.8.8
+                  - 8.8.4.4
+
+      - hostname: infra2.example.com
+        macAddress: "52:54:00:02:00:02"
+        storage:
+          installDisk: /dev/sda
+        network:
+          ethernets:
+            eth0:
+              addresses:
+                - 192.168.1.101/24
+              gateway: 192.168.1.1
+              nameservers:
+                addresses:
+                  - 8.8.8.8
+                  - 8.8.4.4
+
+      - hostname: infra3.example.com
+        macAddress: "52:54:00:02:00:03"
+        storage:
+          installDisk: /dev/sda
+        network:
+          ethernets:
+            eth0:
+              addresses:
+                - 192.168.1.102/24
+              gateway: 192.168.1.1
+              nameservers:
+                addresses:
+                  - 8.8.8.8
+                  - 8.8.4.4
+
+      # Application Worker Nodes
+      - hostname: worker1.example.com
+        macAddress: "52:54:00:03:00:01"
+        storage:
+          installDisk: /dev/sda
+        network:
+          ethernets:
+            eth0:
+              addresses:
+                - 192.168.1.110/24
+              gateway: 192.168.1.1
+              nameservers:
+                addresses:
+                  - 8.8.8.8
+                  - 8.8.4.4
+
+      - hostname: worker2.example.com
+        macAddress: "52:54:00:03:00:02"
+        storage:
+          installDisk: /dev/sda
+        network:
+          ethernets:
+            eth0:
+              addresses:
+                - 192.168.1.111/24
+              gateway: 192.168.1.1
+              nameservers:
+                addresses:
+                  - 8.8.8.8
+                  - 8.8.4.4
+
+      - hostname: worker3.example.com
+        macAddress: "52:54:00:03:00:03"
+        storage:
+          installDisk: /dev/sda
+        network:
+          ethernets:
+            eth0:
+              addresses:
+                - 192.168.1.112/24
+              gateway: 192.168.1.1
+              nameservers:
+                addresses:
+                  - 8.8.8.8
+                  - 8.8.4.4
 
   # Kubernetes cluster configuration
   kubernetes:
-    # Control plane configuration
-    controlPlane:
-      address: k8s-api.example.com:6443
-      members:
-        - hostname: node01.example.com
-          ip: 192.168.1.10
+    # Kubernetes version (matches immutable.yaml)
+    version: "1.33.4"
 
-    # etcd configuration
+    # Control plane configuration (3 masters for HA)
+    # The address points to the load balancer VIP for HA
+    controlPlane:
+      address: 192.168.1.201:6443
+      members:
+        - hostname: master1.example.com
+          ip: 192.168.1.10
+        - hostname: master2.example.com
+          ip: 192.168.1.11
+        - hostname: master3.example.com
+          ip: 192.168.1.12
+
+    # etcd configuration (stacked on control plane)
     etcd:
       members:
-        - hostname: node01.example.com
+        - hostname: master1.example.com
           ip: 192.168.1.10
+        - hostname: master2.example.com
+          ip: 192.168.1.11
+        - hostname: master3.example.com
+          ip: 192.168.1.12
+
+    # Load balancers (HAProxy) with Keepalived for VIP HA
+    loadBalancers:
+      enabled: true
+      members:
+        - hostname: haproxy1.example.com
+          ip: 192.168.1.200
+        - hostname: haproxy2.example.com
+          ip: 192.168.1.202
+      virtualIP: 192.168.1.201
+
+    # Worker nodes organized in node groups
+    nodeGroups:
+      # Infrastructure workers (for system components)
+      - name: infra
+        nodes:
+          - hostname: infra1.example.com
+            ip: 192.168.1.100
+          - hostname: infra2.example.com
+            ip: 192.168.1.101
+          - hostname: infra3.example.com
+            ip: 192.168.1.102
+      # Application workers (for user workloads)
+      - name: workers
+        nodes:
+          - hostname: worker1.example.com
+            ip: 192.168.1.110
+          - hostname: worker2.example.com
+            ip: 192.168.1.111
+          - hostname: worker3.example.com
+            ip: 192.168.1.112
 
     # Networking configuration
     networking:
@@ -68,8 +267,14 @@ spec:
   # Fury Kubernetes Distribution modules
   distribution:
     common:
-      # Node selector for common components
-      nodeSelector: {}
+      # Node selector for common components (deploy to infra nodes)
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+      # Tolerations to allow scheduling on infra nodes
+      tolerations:
+        - key: node-role.kubernetes.io/infra
+          operator: Exists
+          effect: NoSchedule
 
     modules:
       networking:
