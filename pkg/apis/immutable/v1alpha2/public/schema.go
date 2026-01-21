@@ -641,8 +641,12 @@ type SpecInfrastructureKernelParameter struct {
 // Definition of a bare metal node with storage, network, and hardware
 // configuration.
 type SpecInfrastructureNode struct {
-	// CPU architecture for the node. Determines which sysext packages are downloaded.
-	// Example: x86-64, arm64
+	// CPU architecture for the node. Determines which Flatcar artifacts and sysext
+	// packages are downloaded. Supports mixed-architecture clusters where different
+	// nodes can run different architectures. Kubernetes automatically labels nodes
+	// with kubernetes.io/arch. Examples: x86-64 (Intel/AMD amd64), arm64 (ARM
+	// aarch64). See examples/immutable-mixed-arch-example.yaml for mixed-architecture
+	// cluster configuration.
 	Arch SpecInfrastructureNodeArch `json:"arch,omitempty" yaml:"arch,omitempty" mapstructure:"arch,omitempty"`
 
 	// Fully qualified domain name for the node. Example: node01.k8s.example.com
