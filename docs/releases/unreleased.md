@@ -11,6 +11,8 @@ The distribution is maintained with ❤️ by the team [SIGHUP by ReeVo](https:/
   - Under the hood furyctl will use the OpenTofu binary
   - Existing `terraform` configurations continue to work
 
+
+
 ## Breaking Changes 💔
 
 None, but the `spec.toolsConfiguration.terraform` field is deprecated in favor of `spec.toolsConfiguration.opentofu`
