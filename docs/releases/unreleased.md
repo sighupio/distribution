@@ -26,6 +26,7 @@ spec:
         enabled: false
     ...
 ```
+- [[#442]((https://github.com/sighupio/distribution/pull/442)] Added GCS as a supported backend for the DR module configuration and added support for new fields. 
 
 ## Bug Fixes 🐛
 
