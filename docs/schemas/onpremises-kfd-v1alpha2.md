@@ -1714,8 +1714,10 @@ Whether to install or not the snapshotController component in the cluster. Befor
 | Property                                                  | Type     | Required |
 |:----------------------------------------------------------|:---------|:---------|
 | [baseDomain](#specdistributionmodulesingressbasedomain)   | `string` | Required |
+| [byoic](#specdistributionmodulesingressbyoic)             | `object` | Optional |
 | [certManager](#specdistributionmodulesingresscertmanager) | `object` | Optional |
 | [forecastle](#specdistributionmodulesingressforecastle)   | `object` | Optional |
+| [haproxy](#specdistributionmodulesingresshaproxy)         | `object` | Optional |
 | [nginx](#specdistributionmodulesingressnginx)             | `object` | Required |
 | [overrides](#specdistributionmodulesingressoverrides)     | `object` | Optional |
 | [then](#specdistributionmodulesingressthen)               | `object` | Optional |
@@ -1725,6 +1727,31 @@ Whether to install or not the snapshotController component in the cluster. Befor
 ### Description
 
 The base domain used for all the KFD infrastructural ingresses. If using the nginx `dual` type, this value should be the same as the domain associated with the `internal` ingress class.
+
+## .spec.distribution.modules.ingress.byoic
+
+### Properties
+
+| Property                                                         | Type      | Required |
+|:-----------------------------------------------------------------|:----------|:---------|
+| [enabled](#specdistributionmodulesingressbyoicenabled)           | `boolean` | Required |
+| [ingressClass](#specdistributionmodulesingressbyoicingressclass) | `string`  | Required |
+
+### Description
+
+Configuration for Bring Your Own Ingress Controller mode. The ingressClass is used for infrastructure ingresses when both controllers are disabled.
+
+## .spec.distribution.modules.ingress.byoic.enabled
+
+### Description
+
+Enable BYOIC mode.
+
+## .spec.distribution.modules.ingress.byoic.ingressClass
+
+### Description
+
+The IngressClass to use for infrastructure ingresses (Prometheus, Grafana, etc.) when both nginx and haproxy are disabled.
 
 ## .spec.distribution.modules.ingress.certManager
 
@@ -1924,6 +1951,167 @@ The key of the toleration
 
 The value of the toleration
 
+## .spec.distribution.modules.ingress.haproxy
+
+### Properties
+
+| Property                                                     | Type     | Required |
+|:-------------------------------------------------------------|:---------|:---------|
+| [overrides](#specdistributionmodulesingresshaproxyoverrides) | `object` | Optional |
+| [tls](#specdistributionmodulesingresshaproxytls)             | `object` | Optional |
+| [type](#specdistributionmodulesingresshaproxytype)           | `string` | Required |
+
+### Description
+
+Configuration for HAProxy ingress controller.
+
+## .spec.distribution.modules.ingress.haproxy.overrides
+
+### Properties
+
+| Property                                                                    | Type     | Required |
+|:----------------------------------------------------------------------------|:---------|:---------|
+| [nodeSelector](#specdistributionmodulesingresshaproxyoverridesnodeselector) | `object` | Optional |
+| [tolerations](#specdistributionmodulesingresshaproxyoverridestolerations)   | `array`  | Optional |
+
+## .spec.distribution.modules.ingress.haproxy.overrides.nodeSelector
+
+### Description
+
+Set to override the node selector used to place the pods of the package.
+
+## .spec.distribution.modules.ingress.haproxy.overrides.tolerations
+
+### Properties
+
+| Property                                                                       | Type     | Required |
+|:-------------------------------------------------------------------------------|:---------|:---------|
+| [effect](#specdistributionmodulesingresshaproxyoverridestolerationseffect)     | `string` | Required |
+| [key](#specdistributionmodulesingresshaproxyoverridestolerationskey)           | `string` | Required |
+| [operator](#specdistributionmodulesingresshaproxyoverridestolerationsoperator) | `string` | Optional |
+| [value](#specdistributionmodulesingresshaproxyoverridestolerationsvalue)       | `string` | Optional |
+
+### Description
+
+Set to override the tolerations that will be added to the pods of the package.
+
+## .spec.distribution.modules.ingress.haproxy.overrides.tolerations.effect
+
+### Constraints
+
+**enum**: the value of this property must be equal to one of the following string values:
+
+| Value              |
+|:-------------------|
+|`"NoSchedule"`      |
+|`"PreferNoSchedule"`|
+|`"NoExecute"`       |
+
+## .spec.distribution.modules.ingress.haproxy.overrides.tolerations.key
+
+### Description
+
+The key of the toleration
+
+## .spec.distribution.modules.ingress.haproxy.overrides.tolerations.operator
+
+### Constraints
+
+**enum**: the value of this property must be equal to one of the following string values:
+
+| Value    |
+|:---------|
+|`"Exists"`|
+|`"Equal"` |
+
+## .spec.distribution.modules.ingress.haproxy.overrides.tolerations.value
+
+### Description
+
+The value of the toleration
+
+## .spec.distribution.modules.ingress.haproxy.tls
+
+### Properties
+
+| Property                                                      | Type     | Required |
+|:--------------------------------------------------------------|:---------|:---------|
+| [provider](#specdistributionmodulesingresshaproxytlsprovider) | `string` | Required |
+| [secret](#specdistributionmodulesingresshaproxytlssecret)     | `object` | Optional |
+
+### Description
+
+TLS configuration for the HAProxy ingress controller.
+
+## .spec.distribution.modules.ingress.haproxy.tls.provider
+
+### Description
+
+The provider of the TLS certificates for the ingresses, one of: `none`, `certManager`, or `secret`.
+
+### Constraints
+
+**enum**: the value of this property must be equal to one of the following string values:
+
+| Value         |
+|:--------------|
+|`"certManager"`|
+|`"secret"`     |
+|`"none"`       |
+
+## .spec.distribution.modules.ingress.haproxy.tls.secret
+
+### Properties
+
+| Property                                                    | Type     | Required |
+|:------------------------------------------------------------|:---------|:---------|
+| [ca](#specdistributionmodulesingresshaproxytlssecretca)     | `string` | Required |
+| [cert](#specdistributionmodulesingresshaproxytlssecretcert) | `string` | Required |
+| [key](#specdistributionmodulesingresshaproxytlssecretkey)   | `string` | Required |
+
+### Description
+
+Kubernetes TLS secret for the HAProxy ingresses TLS certificate.
+
+## .spec.distribution.modules.ingress.haproxy.tls.secret.ca
+
+### Description
+
+The Certificate Authority certificate file's content. You can use the `"{file://<path>}"` notation to get the content from a file.
+
+## .spec.distribution.modules.ingress.haproxy.tls.secret.cert
+
+### Description
+
+The certificate file's content. You can use the `"{file://<path>}"` notation to get the content from a file.
+
+## .spec.distribution.modules.ingress.haproxy.tls.secret.key
+
+### Description
+
+The signing key file's content. You can use the `"{file://<path>}"` notation to get the content from a file.
+
+## .spec.distribution.modules.ingress.haproxy.type
+
+### Description
+
+The type of the HAProxy ingress controller, options are:
+- `none`: HAProxy ingress controller will not be installed.
+- `single`: a single HAProxy ingress controller with ingress class `haproxy` will be installed.
+- `dual`: two independent HAProxy ingress controllers will be installed, one for the `haproxy-internal` ingress class and one for the `haproxy-external` ingress class.
+
+Default is `none`.
+
+### Constraints
+
+**enum**: the value of this property must be equal to one of the following string values:
+
+| Value    |
+|:---------|
+|`"none"`  |
+|`"single"`|
+|`"dual"`  |
+
 ## .spec.distribution.modules.ingress.nginx
 
 ### Properties
@@ -2011,6 +2199,10 @@ The value of the toleration
 |:------------------------------------------------------------|:---------|:---------|
 | [provider](#specdistributionmodulesingressnginxtlsprovider) | `string` | Required |
 | [secret](#specdistributionmodulesingressnginxtlssecret)     | `object` | Optional |
+
+### Description
+
+TLS configuration for the nginx ingress controller.
 
 ## .spec.distribution.modules.ingress.nginx.tls.provider
 
