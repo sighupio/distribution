@@ -11,7 +11,7 @@ The distribution is maintained with ❤️ by the team [SIGHUP by ReeVo](https:/
   - Under the hood furyctl will use the OpenTofu binary
   - Existing `terraform` configurations continue to work
 
-
+- [[#442]((https://github.com/sighupio/distribution/pull/442)] Added GCS as a supported backend for the DR module configuration and added support for new fields. 
 
 ## Breaking Changes 💔
 
