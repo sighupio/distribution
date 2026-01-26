@@ -42,9 +42,9 @@ With no further ado, the steps to release a new version are:
 ### fury-distribution
 
 > [!WARNING]
-> If you are releasing a new `x.y.0` version create a `release-vX.<y-1>` branch for the previous release.
+> If you are releasing a new `x.y.0` version create a `release-vX.<y-1>` branch for the previous release (to be used later for backporting).
 
-1. Create a new branch `feat/vx.y.z` (`v1.29.4`, for example) where to work on.
+1. Create a new branch `feat/release-vx.y.z` (`v1.29.4`, for example) where to work on.
 2. Create the PRs fixing the issues or adding new features to the templates or other files of fury-distribution, test them and merge them.
 3. Update the `kfd.yaml` and `Furyfile.yaml` files, bumping the distribution version, adjusting the modules and installers versions where needed.
 4. If the distribution schemas have been changed:

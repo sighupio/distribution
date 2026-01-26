@@ -512,6 +512,17 @@
           },
           "description": "Additional Subject Alternative Names for the API server certificates. These are used to secure connections to the API server from various clients."
         },
+        "kubeProxy": {
+          "description": "Configuration for the kube-proxy component.",
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Setting this option to `false` will skip the installation of the kube-proxy component and install the CNI plugin with the following configuration: Cilium in kube-proxy-replacement mode and Calico in eBPF mode. Default is `true`.\n\nNOTE: Changing this option after the cluster has been created is not currently supported."
+            },
+            "additionalProperties": false
+          }
+        },
         "kubeletConfiguration": {
           "$ref": "#/$defs/Spec.Kubernetes.Advanced.KubeletConfiguration"
         },
@@ -766,6 +777,18 @@
         "etcdDownloadUrl": {
           "type": "string",
           "description": "URL to the path where the etcd `tar.gz`s are available. etcd will be downloaded from `<etcdDownloadUrl>/<etcd_version>/etcd-<etcd_version>-linux-<host_architecture>.tar.gz`"
+        },
+        "kubeadmDownloadUrl": {
+          "type": "string",
+          "description": "URL where to download the kubeadm binary from. Used for certificate management on dedicated etcd nodes."
+        },
+        "kubeadmChecksum": {
+          "type": "string",
+          "description": "Checksum for the kubeadm binary on dedicated etcd nodes."
+        },
+        "kubeadmBinaryDir": {
+          "type": "string",
+          "description": "Directory where to install the kubeadm binary on dedicated etcd nodes. Defaults to `/usr/local/bin`."
         },
         "dependenciesOverride": {
           "type": "object",

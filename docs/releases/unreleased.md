@@ -10,14 +10,37 @@ The distribution is maintained with ❤️ by the team [SIGHUP by ReeVo](https:/
   - New `spec.toolsConfiguration.opentofu` field for state backend configuration
   - Under the hood furyctl will use the OpenTofu binary
   - Existing `terraform` configurations continue to work
+- [[#479](https://github.com/sighupio/distribution/pull/479)] Add `vpn_furyagent_path` to infrastructure terraform template for EKSCluster provider to avoid re-download.
+- [[#482](https://github.com/sighupio/distribution/pull/482)] Added `kubeadmDownloadUrl`, `kubeadmChecksum`, and `kubeadmBinaryDir` fields to `spec.kubernetes.advanced.airGap` for air-gapped on-premises clusters, used on dedicated etcd nodes for certificate management.
+- [[#459]](https://github.com/sighupio/distribution/pull/459) Support for kube-proxy-less clusters: on-premises clusters can be now created without kube-proxy. Disabling kube-proxy will enable Calico in eBPF mode and Cilium's kube-proxy-replacement mode in the networking module. You can disable the kube-proxy like so:
+
+```yaml
+apiVersion: kfd.sighup.io/v1alpha2
+kind: OnPremises
+metadata:
+  name: kube-proxy-less
+spec:
+  kubernetes:
+    advanced:
+      kubeProxy:
+        enabled: false
+    ...
+```
+
+## Bug Fixes 🐛
+
+- [[#480]](https://github.com/sighupio/distribution/pull/480) The `x509-certificate-exporter-data-plane` DaemonSet was incorrectly patched with the common nodeSelector (e.g., infra nodes), so was unable to monitor kubelet certificates on all worker nodes.
+
+- [[#477]](https://github.com/sighupio/distribution/pull/477) Both control-plane Pods and Etcd systemd service make use of several kubeadm-generated PKI files. These files are generated using a dedicated CA PKI that is expected to be already available in the target node. This PR makes sure that these CA PKI are uploaded to targets nodes in a way that prevents any inconsistencies on file permissions and ownership, which could case errors during etcd or control-plane Pods startup.
 
 - [[#442]((https://github.com/sighupio/distribution/pull/442)] Added GCS as a supported backend for the DR module configuration and added support for new fields. 
 
 ## Breaking Changes 💔
 
 None, but the `spec.toolsConfiguration.terraform` field is deprecated in favor of `spec.toolsConfiguration.opentofu`
-  - Users are encouraged to migrate to `opentofu` configuration
-  - The `terraform` field will be removed in a future version
+
+- Users are encouraged to migrate to `opentofu` configuration
+- The `terraform` field will be removed in a future version
 
 ## Migration Guide
 
@@ -37,4 +60,5 @@ spec:
 ```
 
 ## Upgrade procedure
+
 Check the [upgrade docs](https://docs.sighup.io/docs/installation/upgrades/) for the steps to upgrade the SIGHUP Distribution from one version to the next using furyctl.

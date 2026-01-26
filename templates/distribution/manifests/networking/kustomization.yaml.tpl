@@ -3,7 +3,6 @@
 # license that can be found in the LICENSE file.
 
 {{- $vendorPrefix := print "../" .spec.distribution.common.relativeVendorPath }}
-
 ---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
@@ -17,6 +16,11 @@ resources:
     {{- if eq .spec.distribution.modules.networking.type "calico" }}
   - {{ print $vendorPrefix "/modules/networking/katalog/tigera/on-prem" }}
   - resources/calico-ns.yml
+      {{- /* We assume that kubeProxy is enabled by default */}}
+      {{- /* The `digAny` condition needs to be specified exactly as written below to properly check if the field has been populated */}}
+      {{- if not (.spec | digAny "kubernetes" "advanced" "kubeProxy" "enabled" true) }}
+  - resources/tigera-kubernetes-service.yaml
+      {{- end }}
     {{- end }}
     {{- if eq .spec.distribution.modules.networking.type "cilium" }}
   - {{ print $vendorPrefix "/modules/networking/katalog/cilium" }}
@@ -40,6 +44,11 @@ patches:
       name: tigera-operator
       namespace: tigera-operator
     path: patches/tigera/tigera-operator-tolerations.yaml
+  {{- /* We assume that kubeProxy is enabled by default */}}
+  {{- /* The `digAny` condition needs to be specified exactly as written below to properly check if the field has been populated */}}
+  {{- if not (.spec | digAny "kubernetes" "advanced" "kubeProxy" "enabled" true) }}
+  - path: patches/tigera/ebpf-mode.yaml
+  {{- end }}
   {{- end }}
   {{- if eq .spec.distribution.modules.networking.type "cilium" }}
   - path: patches/cilium/infra-nodes.yaml
@@ -50,6 +59,11 @@ patches:
       name: cilium-operator
       namespace: kube-system
     path: patches/cilium/cilium-operator-tolerations.yaml
+    {{- /* We assume that kubeProxy is enabled by default */}}
+    {{- /* The `digAny` condition needs to be specified exactly as written below to properly check if the field has been populated */}}
+    {{- if not (.spec | digAny "kubernetes" "advanced" "kubeProxy" "enabled" true) }}
+  - path: patches/cilium/kube-proxy-replacement.yaml
+    {{- end }}
   {{- end }}
 {{- end }}
 
