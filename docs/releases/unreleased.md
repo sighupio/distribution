@@ -27,7 +27,7 @@ spec:
     ...
 ```
 
-- [[#442](https://github.com/sighupio/distribution/pull/442)] Added GCS as a supported backend for the DR module configuration and added support for new fields. 
+- [[#442](https://github.com/sighupio/distribution/pull/442)] Added GCS (Google Cloud Storage) as a supported backend for the DR module configuration and added support for new fields. 
 
 ## Bug Fixes 🐛
 
@@ -35,7 +35,6 @@ spec:
 
 - [[#477]](https://github.com/sighupio/distribution/pull/477) Both control-plane Pods and Etcd systemd service make use of several kubeadm-generated PKI files. These files are generated using a dedicated CA PKI that is expected to be already available in the target node. This PR makes sure that these CA PKI are uploaded to targets nodes in a way that prevents any inconsistencies on file permissions and ownership, which could case errors during etcd or control-plane Pods startup.
 
-- [[#442]((https://github.com/sighupio/distribution/pull/442)] Added GCS as a supported backend for the DR module configuration and added support for new fields. 
 
 ## Breaking Changes 💔
 
