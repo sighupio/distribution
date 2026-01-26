@@ -47,7 +47,7 @@ spec:
           type: dual
           # the tls section defines how the tls for the ingresses should be managed
           tls:
-            # provider can be certManager, secret
+            # provider can be certManager, secret, or none
             provider: certManager
             # if provider is set as secret, this key will be used to create the certificate in the cluster
             # secret:
@@ -57,6 +57,20 @@ spec:
               # key: "{file://relative/path/to/ssl.key}"
               # the ca file, a file notation can be used to get the content from a file
               # ca: "{file://relative/path/to/ssl.ca}"
+        # configurations for the haproxy ingress controller package
+        # haproxy:
+        #   # type defines if haproxy should be configured as single or dual (internal + external) or none
+        #   type: none
+        #   # the tls section defines how the tls for the ingresses should be managed
+        #   tls:
+        #     # provider can be certManager, secret, or none
+        #     provider: certManager
+        # Bring Your Own Ingress Controller (BYOIC) used when you want to use an external ingress controller
+        # byoic:
+        #   # enable BYOIC mode
+        #   enabled: false
+        #   # the ingressClass to use for infrastructure ingresses when BYOIC is enabled
+        #   ingressClass: ""
         # configuration for the cert-manager package
         certManager:
           # the configuration for the clusterIssuer that will be created
