@@ -2919,6 +2919,17 @@ type SpecKubernetesAdvancedAirGap struct {
 	// `<etcdDownloadUrl>/<etcd_version>/etcd-<etcd_version>-linux-<host_architecture>.tar.gz`
 	EtcdDownloadUrl *string `json:"etcdDownloadUrl,omitempty" yaml:"etcdDownloadUrl,omitempty" mapstructure:"etcdDownloadUrl,omitempty"`
 
+	// Directory where to install the kubeadm binary on dedicated etcd nodes. Defaults
+	// to `/usr/local/bin`.
+	KubeadmBinaryDir *string `json:"kubeadmBinaryDir,omitempty" yaml:"kubeadmBinaryDir,omitempty" mapstructure:"kubeadmBinaryDir,omitempty"`
+
+	// Checksum for the kubeadm binary on dedicated etcd nodes.
+	KubeadmChecksum *string `json:"kubeadmChecksum,omitempty" yaml:"kubeadmChecksum,omitempty" mapstructure:"kubeadmChecksum,omitempty"`
+
+	// URL where to download the kubeadm binary from. Used for certificate management
+	// on dedicated etcd nodes.
+	KubeadmDownloadUrl *string `json:"kubeadmDownloadUrl,omitempty" yaml:"kubeadmDownloadUrl,omitempty" mapstructure:"kubeadmDownloadUrl,omitempty"`
+
 	// Checksum for the runc binary.
 	RuncChecksum *string `json:"runcChecksum,omitempty" yaml:"runcChecksum,omitempty" mapstructure:"runcChecksum,omitempty"`
 
@@ -3153,6 +3164,21 @@ type SpecKubernetesAdvancedKernelParameters []struct {
 	Value string `json:"value" yaml:"value" mapstructure:"value"`
 }
 
+// Configuration for the kube-proxy component.
+type SpecKubernetesAdvancedKubeProxy struct {
+	// AdditionalProperties corresponds to the JSON schema field
+	// "additionalProperties".
+	AdditionalProperties interface{} `json:"additionalProperties,omitempty" yaml:"additionalProperties,omitempty" mapstructure:"additionalProperties,omitempty"`
+
+	// Setting this option to `false` will skip the installation of the kube-proxy
+	// component and install the CNI plugin with the following configuration: Cilium
+	// in kube-proxy-replacement mode and Calico in eBPF mode. Default is `true`.
+	//
+	// NOTE: Changing this option after the cluster has been created is not currently
+	// supported.
+	Enabled *bool `json:"enabled,omitempty" yaml:"enabled,omitempty" mapstructure:"enabled,omitempty"`
+}
+
 // Advanced configuration for Kubelet. This open field allows users to specify any
 // parameter supported by the `KubeletConfiguration` object. Examples of uses
 // include controlling the maximum number of pods per core (`podsPerCore`),
@@ -3238,6 +3264,9 @@ type SpecKubernetesAdvanced struct {
 
 	// KernelParameters corresponds to the JSON schema field "kernelParameters".
 	KernelParameters SpecKubernetesAdvancedKernelParameters `json:"kernelParameters,omitempty" yaml:"kernelParameters,omitempty" mapstructure:"kernelParameters,omitempty"`
+
+	// Configuration for the kube-proxy component.
+	KubeProxy *SpecKubernetesAdvancedKubeProxy `json:"kubeProxy,omitempty" yaml:"kubeProxy,omitempty" mapstructure:"kubeProxy,omitempty"`
 
 	// KubeletConfiguration corresponds to the JSON schema field
 	// "kubeletConfiguration".
