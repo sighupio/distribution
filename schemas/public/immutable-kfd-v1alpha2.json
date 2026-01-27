@@ -9,24 +9,20 @@
     },
     "kind": {
       "type": "string",
-      "enum": [
-        "Immutable"
-      ]
+      "enum": ["Immutable"]
     },
     "metadata": {
       "$ref": "#/$defs/Metadata"
     },
     "spec": {
       "$ref": "#/$defs/Spec"
+    },
+    "flags": {
+      "description": "Persistent furyctl command flags, see the documentation for more details: https://docs.sighup.io/furyctl/flags-configuration"
     }
   },
   "additionalProperties": false,
-  "required": [
-    "apiVersion",
-    "kind",
-    "metadata",
-    "spec"
-  ],
+  "required": ["apiVersion", "kind", "metadata", "spec"],
   "$defs": {
     "Metadata": {
       "type": "object",
@@ -39,9 +35,7 @@
           "maxLength": 56
         }
       },
-      "required": [
-        "name"
-      ]
+      "required": ["name"]
     },
     "Spec": {
       "type": "object",
@@ -49,7 +43,7 @@
       "properties": {
         "distributionVersion": {
           "type": "string",
-          "description": "Defines which KFD version will be installed and, in consequence, the Kubernetes version used to create the cluster. It supports git tags and branches. Example: `v1.32.1`.",
+          "description": "Defines which SD version will be installed and, in consequence, the Kubernetes version used to create the cluster. It supports git tags and branches. Example: `v1.32.1`.",
           "minLength": 1
         },
         "infrastructure": {
@@ -102,10 +96,7 @@
           "$ref": "#/$defs/Spec.Infrastructure.SSH"
         }
       },
-      "required": [
-        "nodes",
-        "ssh"
-      ]
+      "required": ["nodes", "ssh"]
     },
     "Spec.Infrastructure.Proxy": {
       "type": "object",
@@ -143,10 +134,7 @@
           "minLength": 1
         }
       },
-      "required": [
-        "name",
-        "value"
-      ]
+      "required": ["name", "value"]
     },
     "Spec.Infrastructure.IpxeServer": {
       "type": "object",
@@ -164,12 +152,7 @@
             "logLevel": {
               "type": "string",
               "description": "Log level for the iPXE server. Example: info",
-              "enum": [
-                "debug",
-                "info",
-                "warning",
-                "error"
-              ]
+              "enum": ["debug", "info", "warning", "error"]
             },
             "dataPath": {
               "type": "string",
@@ -182,9 +165,7 @@
           }
         }
       },
-      "required": [
-        "url"
-      ]
+      "required": ["url"]
     },
     "Spec.Infrastructure.Node": {
       "type": "object",
@@ -227,12 +208,7 @@
           "$ref": "#/$defs/Spec.Infrastructure.Node.Network"
         }
       },
-      "required": [
-        "hostname",
-        "macAddress",
-        "storage",
-        "network"
-      ]
+      "required": ["hostname", "macAddress", "storage", "network"]
     },
     "Spec.Infrastructure.Node.Storage": {
       "type": "object",
@@ -251,9 +227,7 @@
           "description": "Additional disks to partition and mount."
         }
       },
-      "required": [
-        "installDisk"
-      ]
+      "required": ["installDisk"]
     },
     "Spec.Infrastructure.Node.Storage.Disk": {
       "type": "object",
@@ -273,10 +247,7 @@
           "minItems": 1
         }
       },
-      "required": [
-        "device",
-        "partitions"
-      ]
+      "required": ["device", "partitions"]
     },
     "Spec.Infrastructure.Node.Storage.Partition": {
       "type": "object",
@@ -303,12 +274,7 @@
           "$ref": "#/$defs/Spec.Infrastructure.Node.Storage.Filesystem"
         }
       },
-      "required": [
-        "label",
-        "number",
-        "sizeMiB",
-        "filesystem"
-      ]
+      "required": ["label", "number", "sizeMiB", "filesystem"]
     },
     "Spec.Infrastructure.Node.Storage.Filesystem": {
       "type": "object",
@@ -355,11 +321,7 @@
           "description": "Mount options (validated safe options only). Example: [\"noatime\", \"nodiratime\"]"
         }
       },
-      "required": [
-        "format",
-        "label",
-        "mountPoint"
-      ]
+      "required": ["format", "label", "mountPoint"]
     },
     "Spec.Infrastructure.Node.Iscsi": {
       "type": "object",
@@ -376,9 +338,7 @@
           "description": "iSCSI configuration content (required when enabled=true)."
         }
       },
-      "required": [
-        "enabled"
-      ],
+      "required": ["enabled"],
       "if": {
         "properties": {
           "enabled": {
@@ -387,9 +347,7 @@
         }
       },
       "then": {
-        "required": [
-          "config"
-        ]
+        "required": ["config"]
       }
     },
     "Spec.Infrastructure.Node.Multipath": {
@@ -407,9 +365,7 @@
           "description": "Multipath configuration content (required when enabled=true)."
         }
       },
-      "required": [
-        "enabled"
-      ],
+      "required": ["enabled"],
       "if": {
         "properties": {
           "enabled": {
@@ -418,9 +374,7 @@
         }
       },
       "then": {
-        "required": [
-          "config"
-        ]
+        "required": ["config"]
       }
     },
     "Spec.Infrastructure.Node.Network": {
@@ -487,9 +441,7 @@
         "anyOf": [
           {
             "not": {
-              "required": [
-                "dhcp4"
-              ]
+              "required": ["dhcp4"]
             }
           },
           {
@@ -502,9 +454,7 @@
         ]
       },
       "then": {
-        "required": [
-          "addresses"
-        ],
+        "required": ["addresses"],
         "properties": {
           "addresses": {
             "minItems": 1
@@ -563,9 +513,7 @@
               "description": "Minimum number of links that must be active before activating aggregate."
             }
           },
-          "required": [
-            "mode"
-          ]
+          "required": ["mode"]
         },
         "routes": {
           "type": "array",
@@ -575,17 +523,12 @@
           "description": "Static routes for this bond."
         }
       },
-      "required": [
-        "interfaces",
-        "parameters"
-      ],
+      "required": ["interfaces", "parameters"],
       "if": {
         "anyOf": [
           {
             "not": {
-              "required": [
-                "dhcp4"
-              ]
+              "required": ["dhcp4"]
             }
           },
           {
@@ -598,9 +541,7 @@
         ]
       },
       "then": {
-        "required": [
-          "addresses"
-        ],
+        "required": ["addresses"],
         "properties": {
           "addresses": {
             "minItems": 1
@@ -655,10 +596,7 @@
           "description": "Gateway IP address for this route."
         }
       },
-      "required": [
-        "to",
-        "via"
-      ]
+      "required": ["to", "via"]
     },
     "Spec.Infrastructure.SSH": {
       "type": "object",
@@ -670,10 +608,6 @@
           "description": "SSH username. Example: core",
           "minLength": 1
         },
-        "keyPath": {
-          "type": "string",
-          "description": "DEPRECATED: Use privateKeyPath instead. Path to the SSH private key. Example: ~/.ssh/id_ed25519_production"
-        },
         "privateKeyPath": {
           "type": "string",
           "description": "Path to the SSH private key. Example: ~/.ssh/id_ed25519_production"
@@ -683,9 +617,7 @@
           "description": "Path to the SSH public key. If not specified, defaults to privateKeyPath + '.pub' (or keyPath + '.pub' if using deprecated keyPath). Example: ~/.ssh/id_ed25519_production.pub"
         }
       },
-      "required": [
-        "username"
-      ],
+      "required": ["username"],
       "oneOf": [
         {
           "required": ["keyPath"]
@@ -704,6 +636,10 @@
           "type": "string",
           "description": "Kubernetes version for sysext packages. Determines versions of containerd, kubernetes, and other components from installer defaults. Example: 1.33.4",
           "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "pkiPath": {
+          "type": "string",
+          "description": "Path to the PKI directory where to find the certificates and keys for Kubernetes Control Plane and etcd. Must have the `master` and `etcd` folders inside."
         },
         "controlPlane": {
           "$ref": "#/$defs/Spec.Kubernetes.ControlPlane"
@@ -728,11 +664,7 @@
           "$ref": "#/$defs/Spec.Kubernetes.Advanced"
         }
       },
-      "required": [
-        "controlPlane",
-        "etcd",
-        "networking"
-      ]
+      "required": ["controlPlane", "networking"]
     },
     "Spec.Kubernetes.ControlPlane": {
       "type": "object",
@@ -754,12 +686,63 @@
           },
           "description": "Control plane member nodes.",
           "minItems": 1
+        },
+        "keepalived": {
+          "description": "This section allows to configure a floating Virtual IP between the Control Plane nodes via Keepalived. This can be used to provide high availability for the Kubernetes API server instead of a load balancer.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Set to install keepalived with a floating virtual IP shared between the load balancer hosts for a deployment in High Availability."
+            },
+            "interface": {
+              "type": "string",
+              "description": "Name of the network interface where to bind the Keepalived virtual IP."
+            },
+            "ip": {
+              "type": "string",
+              "description": "The Virtual floating IP for Keepalived"
+            },
+            "virtualRouterId": {
+              "type": "string",
+              "description": "The virtual router ID of Keepalived, an arbitrary unique number from 1 to 255 used to differentiate multiple instances of vrrpd running on the same network interface and address family and multicast/unicast (and hence same socket)."
+            },
+            "passphrase": {
+              "type": "string",
+              "description": "Password for accessing vrrpd. Make it unique between Keepalived clusters.",
+              "maxLength": 8
+            }
+          },
+          "required": ["enabled"],
+          "if": {
+            "properties": {
+              "enabled": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "required": ["ip"]
+          }
+        },
+        "taints": {
+          "type": ["array", "null"],
+          "items": {
+            "$ref": "#/$defs/Types.KubeTaints"
+          },
+          "description": "Kubernetes taints for the control-plane nodes, follows Kubernetes taints format. Default is `node-role.kubernetes.io/control-plane:NoSchedule`.\n\nExample:\n\n```yaml\n- effect: NoSchedule\n  key: node.kubernetes.io/role\n  value: control-plane\n```\n\nNOTE: Setting an empty list will remove the default control-plane taint.\n\nNOTE2: Takes effect only at cluster creation time."
+        },
+        "labels": {
+          "description": "Optional additional Kubernetes labels that will be added to the control-plane nodes. Follows Kubernetes labels format.\n\nNote: **Existing labels with the same key will be overwritten** and the label setting the `control-plane` role cannot be deleted.",
+          "$ref": "#/$defs/Types.KubeLabels"
+        },
+        "annotations": {
+          "description": "Optional additional Kubernetes annotations that will be added to the control-plane nodes. Follows Kubernetes annotations format. **Existing annotations with the same key will be overwritten**.",
+          "$ref": "#/$defs/Types.KubeAnnotations"
         }
       },
-      "required": [
-        "address",
-        "members"
-      ]
+      "required": ["address", "members"]
     },
     "Spec.Kubernetes.Etcd": {
       "type": "object",
@@ -775,9 +758,7 @@
           "minItems": 1
         }
       },
-      "required": [
-        "members"
-      ]
+      "required": ["members"]
     },
     "Spec.Kubernetes.LoadBalancers": {
       "type": "object",
@@ -802,10 +783,7 @@
           "default": true
         }
       },
-      "required": [
-        "members",
-        "virtualIP"
-      ]
+      "required": ["members", "virtualIP"]
     },
     "Spec.Kubernetes.Member": {
       "type": "object",
@@ -822,9 +800,7 @@
           "description": "Optional IP address. If not specified, it is inferred from the node's network configuration."
         }
       },
-      "required": [
-        "hostname"
-      ]
+      "required": ["hostname"]
     },
     "Spec.Kubernetes.NodeGroup": {
       "type": "object",
@@ -863,10 +839,7 @@
           "$ref": "#/$defs/Spec.Kubernetes.KubeletConfiguration"
         }
       },
-      "required": [
-        "name",
-        "nodes"
-      ]
+      "required": ["name", "nodes"]
     },
     "Spec.Kubernetes.KubeletConfiguration": {
       "type": "object",
@@ -900,10 +873,7 @@
           "description": "Service network CIDR. Example: 10.96.0.0/12"
         }
       },
-      "required": [
-        "podCIDR",
-        "serviceCIDR"
-      ]
+      "required": ["podCIDR", "serviceCIDR"]
     },
     "Spec.Kubernetes.Advanced": {
       "type": "object",
@@ -933,6 +903,17 @@
               },
               "description": "Additional Subject Alternative Names for the API server certificate."
             }
+          }
+        },
+        "kubeProxy": {
+          "description": "Configuration for the kube-proxy component.",
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Setting this option to `false` will skip the installation of the kube-proxy component and install the CNI plugin with the following configuration: Cilium in kube-proxy-replacement mode and Calico in eBPF mode. Default is `true`.\n\nNOTE: Changing this option after the cluster has been created is not currently supported."
+            },
+            "additionalProperties": false
           }
         },
         "kubeletConfiguration": {
@@ -995,11 +976,16 @@
                   "insecureSkipVerify": {
                     "type": "boolean",
                     "description": "Skip TLS verification for this registry."
+                  },
+                  "mirrorEndpoint": {
+                    "type": "array",
+                    "description": "Array of URLs with the mirrors to use for the registry. Example: `[\"http://mymirror.tld:8080\"]`",
+                    "items": {
+                      "type": "string"
+                    }
                   }
                 },
-                "required": [
-                  "registry"
-                ]
+                "required": ["registry"]
               }
             }
           }
@@ -1063,6 +1049,52 @@
               "description": "Cloud provider type. Example: external"
             }
           }
+        },
+        "registry": {
+          "type": "string",
+          "description": "URL of the registry where to pull images from for the Kubernetes phase. (Default is registry.sighup.io/fury/on-premises)."
+        },
+        "controllerManager": {
+          "$ref": "#/$defs/Spec.Kubernetes.Advanced.ControllerManager"
+        },
+        "eventRateLimits": {
+          "type": "array",
+          "description": "Configures the limits of the API Server's EventRateLimit plugin. Each item represents a bucket (Server, Namespace, User, etc).",
+          "items": {
+            "type": "object",
+            "required": ["type", "qps", "burst"],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["Server", "Namespace", "User", "SourceAndObject"],
+                "description": "Type of limit to apply (Server, Namespace, User, SourceAndObject)."
+              },
+              "qps": {
+                "type": "integer",
+                "description": "Maximum allowed queries per second (QPS) for this bucket type."
+              },
+              "burst": {
+                "type": "integer",
+                "description": "Maximum allowed burst for this bucket type."
+              },
+              "cacheSize": {
+                "type": "integer",
+                "description": "Maximum number of cached objects for this bucket. Only for certain types like Namespace or User."
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    "Spec.Kubernetes.Advanced.ControllerManager": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Advanced configuration for the controller-manager.",
+      "properties": {
+        "gcThreshold": {
+          "type": "integer",
+          "description": "Maximum number of terminated Pods retained by the controller-manager before automatic deletion."
         }
       }
     },
@@ -1081,9 +1113,7 @@
           "$ref": "./spec-distribution-custompatches.json"
         }
       },
-      "required": [
-        "modules"
-      ]
+      "required": ["modules"]
     },
     "Spec.Distribution.Common": {
       "type": "object",
@@ -1104,7 +1134,7 @@
         "registry": {
           "type": "string",
           "pattern": "^([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,}(:[0-9]{1,5})?(/[a-z0-9._-]+)*$",
-          "description": "Container registry URL for KFD images. Example: registry.sighup.io/fury"
+          "description": "Container registry URL for SD images. Example: registry.sighup.io/fury"
         }
       }
     },
@@ -1120,17 +1150,11 @@
           "properties": {
             "type": {
               "type": "string",
-              "enum": [
-                "calico",
-                "cilium",
-                "none"
-              ],
+              "enum": ["calico", "cilium", "none"],
               "description": "CNI plugin type."
             }
           },
-          "required": [
-            "type"
-          ]
+          "required": ["type"]
         },
         "ingress": {
           "type": "object",
@@ -1149,11 +1173,7 @@
               "properties": {
                 "type": {
                   "type": "string",
-                  "enum": [
-                    "single",
-                    "dual",
-                    "none"
-                  ],
+                  "enum": ["single", "dual", "none"],
                   "description": "Nginx ingress controller type."
                 },
                 "tls": {
@@ -1162,22 +1182,14 @@
                   "properties": {
                     "provider": {
                       "type": "string",
-                      "enum": [
-                        "certManager",
-                        "secret",
-                        "none"
-                      ],
+                      "enum": ["certManager", "secret", "none"],
                       "description": "TLS certificate provider."
                     }
                   },
-                  "required": [
-                    "provider"
-                  ]
+                  "required": ["provider"]
                 }
               },
-              "required": [
-                "type"
-              ]
+              "required": ["type"]
             },
             "certManager": {
               "type": "object",
@@ -1198,28 +1210,17 @@
                     },
                     "type": {
                       "type": "string",
-                      "enum": [
-                        "http01"
-                      ],
+                      "enum": ["http01"],
                       "description": "Challenge type."
                     }
                   },
-                  "required": [
-                    "name",
-                    "email",
-                    "type"
-                  ]
+                  "required": ["name", "email", "type"]
                 }
               },
-              "required": [
-                "clusterIssuer"
-              ]
+              "required": ["clusterIssuer"]
             }
           },
-          "required": [
-            "baseDomain",
-            "nginx"
-          ]
+          "required": ["baseDomain", "nginx"]
         },
         "logging": {
           "type": "object",
@@ -1228,11 +1229,7 @@
           "properties": {
             "type": {
               "type": "string",
-              "enum": [
-                "loki",
-                "opensearch",
-                "none"
-              ],
+              "enum": ["loki", "opensearch", "none"],
               "description": "Logging backend type."
             },
             "loki": {
@@ -1266,9 +1263,7 @@
               }
             }
           },
-          "required": [
-            "type"
-          ]
+          "required": ["type"]
         },
         "monitoring": {
           "type": "object",
@@ -1277,12 +1272,7 @@
           "properties": {
             "type": {
               "type": "string",
-              "enum": [
-                "prometheus",
-                "prometheusAgent",
-                "mimir",
-                "none"
-              ],
+              "enum": ["prometheus", "prometheusAgent", "mimir", "none"],
               "description": "Monitoring backend type."
             },
             "prometheus": {
@@ -1294,7 +1284,8 @@
                   "description": "Metrics retention time. Example: 15d"
                 },
                 "retentionSize": {
-                  "$ref": "#/$defs/Types.KubernetesQuantity",
+                  "type": "string",
+                  "pattern": "(^0|([0-9]*[.])?[0-9]+((K|M|G|T|E|P)i?)?B)$",
                   "description": "Metrics retention size. Example: 50GB"
                 },
                 "storageSize": {
@@ -1337,9 +1328,7 @@
               }
             }
           },
-          "required": [
-            "type"
-          ]
+          "required": ["type"]
         },
         "tracing": {
           "type": "object",
@@ -1348,10 +1337,7 @@
           "properties": {
             "type": {
               "type": "string",
-              "enum": [
-                "tempo",
-                "none"
-              ],
+              "enum": ["tempo", "none"],
               "description": "Tracing backend type."
             },
             "tempo": {
@@ -1365,9 +1351,7 @@
               }
             }
           },
-          "required": [
-            "type"
-          ]
+          "required": ["type"]
         },
         "policy": {
           "type": "object",
@@ -1376,11 +1360,7 @@
           "properties": {
             "type": {
               "type": "string",
-              "enum": [
-                "kyverno",
-                "gatekeeper",
-                "none"
-              ],
+              "enum": ["kyverno", "gatekeeper", "none"],
               "description": "Policy engine type."
             },
             "kyverno": {
@@ -1389,10 +1369,7 @@
               "properties": {
                 "validationFailureAction": {
                   "type": "string",
-                  "enum": [
-                    "Audit",
-                    "Enforce"
-                  ],
+                  "enum": ["Audit", "Enforce"],
                   "description": "Default action for validation failures."
                 },
                 "installDefaultPolicies": {
@@ -1402,9 +1379,7 @@
               }
             }
           },
-          "required": [
-            "type"
-          ]
+          "required": ["type"]
         },
         "dr": {
           "type": "object",
@@ -1413,10 +1388,7 @@
           "properties": {
             "type": {
               "type": "string",
-              "enum": [
-                "on-premises",
-                "none"
-              ],
+              "enum": ["on-premises", "none"],
               "description": "DR backend type."
             },
             "velero": {
@@ -1425,10 +1397,7 @@
               "properties": {
                 "backend": {
                   "type": "string",
-                  "enum": [
-                    "s3",
-                    "minio"
-                  ],
+                  "enum": ["s3", "minio"],
                   "description": "Backup storage backend."
                 },
                 "s3": {
@@ -1472,19 +1441,13 @@
                         "description": "Backup retention duration. Example: 720h"
                       }
                     },
-                    "required": [
-                      "name",
-                      "schedule",
-                      "ttl"
-                    ]
+                    "required": ["name", "schedule", "ttl"]
                   }
                 }
               }
             }
           },
-          "required": [
-            "type"
-          ]
+          "required": ["type"]
         },
         "auth": {
           "type": "object",
@@ -1497,22 +1460,14 @@
               "properties": {
                 "type": {
                   "type": "string",
-                  "enum": [
-                    "none",
-                    "basicAuth",
-                    "sso"
-                  ],
+                  "enum": ["none", "basicAuth", "sso"],
                   "description": "Authentication provider type."
                 }
               },
-              "required": [
-                "type"
-              ]
+              "required": ["type"]
             }
           },
-          "required": [
-            "provider"
-          ]
+          "required": ["provider"]
         }
       },
       "required": [
@@ -1537,13 +1492,7 @@
     },
     "Types.FilesystemType": {
       "type": "string",
-      "enum": [
-        "ext4",
-        "xfs",
-        "btrfs",
-        "ext3",
-        "vfat"
-      ],
+      "enum": ["ext4", "xfs", "btrfs", "ext3", "vfat"],
       "description": "Filesystem type"
     },
     "Types.BondMode": {
@@ -1593,10 +1542,7 @@
       "pattern": "^(http|https)\\:\\/\\/.+$"
     },
     "Types.KubeLabels": {
-      "type": [
-        "object",
-        "null"
-      ],
+      "type": ["object", "null"],
       "propertyNames": {
         "pattern": "^([a-zA-Z0-9][a-zA-Z0-9-.]*[a-zA-Z0-9]/)?([a-zA-Z0-9][-a-zA-Z0-9_.]*)?[a-zA-Z0-9]$",
         "maxLength": 253
@@ -1608,10 +1554,7 @@
       }
     },
     "Types.KubeAnnotations": {
-      "type": [
-        "object",
-        "null"
-      ],
+      "type": ["object", "null"],
       "propertyNames": {
         "pattern": "^([a-zA-Z0-9][a-zA-Z0-9-.]*[a-zA-Z0-9]/)?([a-zA-Z0-9][-a-zA-Z0-9_.]*)?[a-zA-Z0-9]$",
         "maxLength": 253
@@ -1626,11 +1569,7 @@
       "properties": {
         "effect": {
           "type": "string",
-          "enum": [
-            "NoSchedule",
-            "PreferNoSchedule",
-            "NoExecute"
-          ]
+          "enum": ["NoSchedule", "PreferNoSchedule", "NoExecute"]
         },
         "key": {
           "type": "string"
@@ -1639,17 +1578,10 @@
           "type": "string"
         }
       },
-      "required": [
-        "effect",
-        "key",
-        "value"
-      ]
+      "required": ["effect", "key", "value"]
     },
     "Types.KubeNodeSelector": {
-      "type": [
-        "object",
-        "null"
-      ],
+      "type": ["object", "null"],
       "additionalProperties": {
         "type": "string"
       }
@@ -1660,18 +1592,11 @@
       "properties": {
         "effect": {
           "type": "string",
-          "enum": [
-            "NoSchedule",
-            "PreferNoSchedule",
-            "NoExecute"
-          ]
+          "enum": ["NoSchedule", "PreferNoSchedule", "NoExecute"]
         },
         "operator": {
           "type": "string",
-          "enum": [
-            "Exists",
-            "Equal"
-          ]
+          "enum": ["Exists", "Equal"]
         },
         "key": {
           "type": "string",
@@ -1682,20 +1607,13 @@
           "description": "The value of the toleration"
         }
       },
-      "required": [
-        "effect",
-        "key"
-      ],
+      "required": ["effect", "key"],
       "anyOf": [
         {
-          "required": [
-            "operator"
-          ]
+          "required": ["operator"]
         },
         {
-          "required": [
-            "value"
-          ]
+          "required": ["value"]
         }
       ]
     },
