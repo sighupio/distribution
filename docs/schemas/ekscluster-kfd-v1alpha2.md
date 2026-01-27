@@ -1527,14 +1527,37 @@ Default is `none`.
 
 | Property                                                    | Type     | Required |
 |:------------------------------------------------------------|:---------|:---------|
+| [accessMode](#specdistributionmodulesdrveleroeksaccessmode) | `string` | Optional |
 | [bucketName](#specdistributionmodulesdrveleroeksbucketname) | `string` | Required |
+| [prefixName](#specdistributionmodulesdrveleroeksprefixname) | `string` | Optional |
 | [region](#specdistributionmodulesdrveleroeksregion)         | `string` | Required |
+
+## .spec.distribution.modules.dr.velero.eks.accessMode
+
+### Description
+
+How Velero can access the backup storage location.
+
+### Constraints
+
+**enum**: the value of this property must be equal to one of the following string values:
+
+| Value       |
+|:------------|
+|`"ReadWrite"`|
+|`"ReadOnly"` |
 
 ## .spec.distribution.modules.dr.velero.eks.bucketName
 
 ### Description
 
 The name of the bucket for Velero.
+
+## .spec.distribution.modules.dr.velero.eks.prefixName
+
+### Description
+
+The prefix name to use inside the bucket.
 
 ## .spec.distribution.modules.dr.velero.eks.region
 
