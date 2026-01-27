@@ -5,8 +5,9 @@ This document explains the full schema for the `kind: Immutable` for the `furyct
 An example configuration file can be created by running the following command:
 
 ```bash
-furyctl create config --kind Immutable --version v1.32.1 --name production-cluster
+furyctl create config --kind Immutable --version v1.34.0 --name test-cluster
 ```
 
 > [!NOTE]
-> Replace the version with your desired version of KFD.
+> Replace the version with your desired version of the SIGHUP Distribution.
+
