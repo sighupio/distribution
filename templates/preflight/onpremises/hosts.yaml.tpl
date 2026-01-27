@@ -69,7 +69,7 @@ all:
 
         {{- if and (index .spec.kubernetes "advanced") (index .spec.kubernetes.advanced "users") }}
         {{- if index .spec.kubernetes.advanced.users "names" }}
-        kubernetes_users_names: 
+        kubernetes_users_names:
 {{ .spec.kubernetes.advanced.users.names | toYaml | indent 10 }}
         {{- end }}
         {{- end }}
