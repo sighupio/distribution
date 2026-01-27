@@ -5,23 +5,25 @@ This document explains the full schema for the `kind: Immutable` for the `furyct
 An example configuration file can be created by running the following command:
 
 ```bash
-furyctl create config --kind Immutable --version v1.32.1 --name production-cluster
+furyctl create config --kind Immutable --version v1.34.0 --name test-cluster
 ```
 
 > [!NOTE]
-> Replace the version with your desired version of KFD.
+> Replace the version with your desired version of the SIGHUP Distribution.
+
 ## Properties
 
 | Property                  | Type     | Required |
 |:--------------------------|:---------|:---------|
 | [apiVersion](#apiversion) | `string` | Required |
+| [flags](#flags)           | `object` | Optional |
 | [kind](#kind)             | `string` | Required |
 | [metadata](#metadata)     | `object` | Required |
 | [spec](#spec)             | `object` | Required |
 
 ### Description
 
-A KFD Cluster deployed on bare metal infrastructure with iPXE boot provisioning and immutable OS configuration.
+A SIGHUP Distribution Kubernetes Cluster deployed on bare metal infrastructure with iPXE boot provisioning and immutable OS configuration.
 
 ## .apiVersion
 
@@ -34,6 +36,12 @@ A KFD Cluster deployed on bare metal infrastructure with iPXE boot provisioning 
 ```
 
 [try pattern](https://regexr.com/?expression=^kfd\.sighup\.io\/v\d%2B\(\(alpha|beta\)\d%2B\)?$)
+
+## .flags
+
+### Description
+
+Persistent furyctl command flags, see the documentation for more details: https://docs.sighup.io/furyctl/flags-configuration
 
 ## .kind
 
@@ -115,7 +123,7 @@ Node selector for all KFD module pods.
 
 ### Description
 
-Container registry URL for KFD images. Example: registry.sighup.io/fury
+Container registry URL for SD images. Example: registry.sighup.io/fury
 
 ### Constraints
 
@@ -992,17 +1000,17 @@ Install default alerting rules.
 
 ### Description
 
-Kubernetes resource quantity format. Examples: 50Gi, 100Mi, 1Ti
+Metrics retention size. Example: 50GB
 
 ### Constraints
 
 **pattern**: the string must match the following regular expression:
 
 ```regexp
-^[0-9]+(\.[0-9]+)?(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk])$
+(^0|([0-9]*[.])?[0-9]+((K|M|G|T|E|P)i?)?B)$
 ```
 
-[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk]\)$)
+[try pattern](https://regexr.com/?expression=\(^0|\([0-9]*[.]\)?[0-9]%2B\(\(K|M|G|T|E|P\)i?\)?B\)$)
 
 ## .spec.distribution.modules.monitoring.prometheus.retentionTime
 
@@ -1302,7 +1310,7 @@ Tracing backend type.
 
 ### Description
 
-Defines which KFD version will be installed and, in consequence, the Kubernetes version used to create the cluster. It supports git tags and branches. Example: `v1.32.1`.
+Defines which SD version will be installed and, in consequence, the Kubernetes version used to create the cluster. It supports git tags and branches. Example: `v1.32.1`.
 
 ### Constraints
 
@@ -1462,7 +1470,7 @@ Definition of a bare metal node with storage, network, and hardware configuratio
 
 ### Description
 
-CPU architecture for the node. Determines which sysext packages are downloaded. Example: x86-64, arm64
+CPU architecture for the node. Determines which Flatcar artifacts and sysext packages are downloaded. Supports mixed-architecture clusters where different nodes can run different architectures. Kubernetes automatically labels nodes with kubernetes.io/arch. Examples: x86-64 (Intel/AMD amd64), arm64 (ARM aarch64). See examples/immutable-mixed-arch-example.yaml for mixed-architecture cluster configuration.
 
 ### Constraints
 
@@ -1884,20 +1892,27 @@ Comma-separated list of hosts that should not use the HTTP(S) proxy. Example: lo
 
 ### Properties
 
-| Property                                   | Type     | Required |
-|:-------------------------------------------|:---------|:---------|
-| [keyPath](#specinfrastructuresshkeypath)   | `string` | Required |
-| [username](#specinfrastructuresshusername) | `string` | Required |
+| Property                                               | Type     | Required |
+|:-------------------------------------------------------|:---------|:---------|
+| [privateKeyPath](#specinfrastructuresshprivatekeypath) | `string` | Optional |
+| [publicKeyPath](#specinfrastructuresshpublickeypath)   | `string` | Optional |
+| [username](#specinfrastructuresshusername)             | `string` | Required |
 
 ### Description
 
 SSH credentials for node access.
 
-## .spec.infrastructure.ssh.keyPath
+## .spec.infrastructure.ssh.privateKeyPath
 
 ### Description
 
 Path to the SSH private key. Example: ~/.ssh/id_ed25519_production
+
+## .spec.infrastructure.ssh.publicKeyPath
+
+### Description
+
+Path to the SSH public key. If not specified, defaults to privateKeyPath + '.pub' (or keyPath + '.pub' if using deprecated keyPath). Example: ~/.ssh/id_ed25519_production.pub
 
 ## .spec.infrastructure.ssh.username
 
@@ -1917,10 +1932,11 @@ SSH username. Example: core
 |:----------------------------------------------|:---------|:---------|
 | [advanced](#speckubernetesadvanced)           | `object` | Optional |
 | [controlPlane](#speckubernetescontrolplane)   | `object` | Required |
-| [etcd](#speckubernetesetcd)                   | `object` | Required |
+| [etcd](#speckubernetesetcd)                   | `object` | Optional |
 | [loadBalancers](#speckubernetesloadbalancers) | `object` | Optional |
 | [networking](#speckubernetesnetworking)       | `object` | Required |
 | [nodeGroups](#speckubernetesnodegroups)       | `array`  | Optional |
+| [pkiPath](#speckubernetespkipath)             | `string` | Optional |
 | [version](#speckubernetesversion)             | `string` | Optional |
 
 ### Description
@@ -1936,9 +1952,13 @@ Kubernetes cluster configuration including control plane, etcd, and worker nodes
 | [apiServer](#speckubernetesadvancedapiserver)                       | `object` | Optional |
 | [cloud](#speckubernetesadvancedcloud)                               | `object` | Optional |
 | [containerd](#speckubernetesadvancedcontainerd)                     | `object` | Optional |
+| [controllerManager](#speckubernetesadvancedcontrollermanager)       | `object` | Optional |
 | [encryption](#speckubernetesadvancedencryption)                     | `object` | Optional |
+| [eventRateLimits](#speckubernetesadvancedeventratelimits)           | `array`  | Optional |
+| [kubeProxy](#speckubernetesadvancedkubeproxy)                       | `object` | Optional |
 | [kubeletConfiguration](#speckubernetesadvancedkubeletconfiguration) | `object` | Optional |
 | [oidc](#speckubernetesadvancedoidc)                                 | `object` | Optional |
+| [registry](#speckubernetesadvancedregistry)                         | `string` | Optional |
 | [users](#speckubernetesadvancedusers)                               | `object` | Optional |
 
 ### Description
@@ -1969,29 +1989,96 @@ SAN entry (hostname or IP address). Examples: k8s-api.example.com, 192.168.100.1
 
 | Property                                         | Type     | Required |
 |:-------------------------------------------------|:---------|:---------|
+| [config](#speckubernetesadvancedcloudconfig)     | `string` | Optional |
 | [provider](#speckubernetesadvancedcloudprovider) | `string` | Optional |
 
 ### Description
 
 Cloud provider integration. Ref: https://kubernetes.io/docs/concepts/architecture/cloud-controller/
 
+## .spec.kubernetes.advanced.cloud.config
+
+### Description
+
+Sets cloud config for the Kubelet
+
 ## .spec.kubernetes.advanced.cloud.provider
 
 ### Description
 
-Cloud provider type. Example: external
+Sets the cloud provider for the Kubelet
 
 ## .spec.kubernetes.advanced.containerd
 
 ### Properties
 
-| Property                                                            | Type    | Required |
-|:--------------------------------------------------------------------|:--------|:---------|
-| [registryConfigs](#speckubernetesadvancedcontainerdregistryconfigs) | `array` | Optional |
+| Property                                                                                                  | Type      | Required |
+|:----------------------------------------------------------------------------------------------------------|:----------|:---------|
+| [debugLevel](#speckubernetesadvancedcontainerddebuglevel)                                                 | `string`  | Optional |
+| [deviceOwnershipFromSecurityContext](#speckubernetesadvancedcontainerddeviceownershipfromsecuritycontext) | `boolean` | Optional |
+| [grpcMaxRecvMessageSize](#speckubernetesadvancedcontainerdgrpcmaxrecvmessagesize)                         | `integer` | Optional |
+| [grpcMaxSendMessageSize](#speckubernetesadvancedcontainerdgrpcmaxsendmessagesize)                         | `integer` | Optional |
+| [maxContainerLogLineSize](#speckubernetesadvancedcontainerdmaxcontainerloglinesize)                       | `integer` | Optional |
+| [metricsAddress](#speckubernetesadvancedcontainerdmetricsaddress)                                         | `string`  | Optional |
+| [metricsGrpcHistogram](#speckubernetesadvancedcontainerdmetricsgrpchistogram)                             | `boolean` | Optional |
+| [oomScore](#speckubernetesadvancedcontainerdoomscore)                                                     | `integer` | Optional |
+| [registryConfigs](#speckubernetesadvancedcontainerdregistryconfigs)                                       | `array`   | Optional |
+| [selfmanagedRepositories](#speckubernetesadvancedcontainerdselfmanagedrepositories)                       | `boolean` | Optional |
+| [stateDir](#speckubernetesadvancedcontainerdstatedir)                                                     | `string`  | Optional |
+| [storageDir](#speckubernetesadvancedcontainerdstoragedir)                                                 | `string`  | Optional |
+| [systemdDir](#speckubernetesadvancedcontainerdsystemddir)                                                 | `string`  | Optional |
 
 ### Description
 
-Container runtime registry configuration.
+Advanced configuration for containerd
+
+## .spec.kubernetes.advanced.containerd.debugLevel
+
+### Description
+
+The Containerd debug level used in the config.toml file.
+
+## .spec.kubernetes.advanced.containerd.deviceOwnershipFromSecurityContext
+
+### Description
+
+Set to true to apply device ownership from the container runtime's security context instead of the host's defaults, used in the config.toml file.
+
+## .spec.kubernetes.advanced.containerd.grpcMaxRecvMessageSize
+
+### Description
+
+The Containerd gRPC maximum receive message size in bytes used in the config.toml file.
+
+## .spec.kubernetes.advanced.containerd.grpcMaxSendMessageSize
+
+### Description
+
+The Containerd gRPC maximum send message size in bytes used in the config.toml file.
+
+## .spec.kubernetes.advanced.containerd.maxContainerLogLineSize
+
+### Description
+
+The maximum container log line size in bytes used in the config.toml file.
+
+## .spec.kubernetes.advanced.containerd.metricsAddress
+
+### Description
+
+The Containerd metrics address used in the config.toml file.
+
+## .spec.kubernetes.advanced.containerd.metricsGrpcHistogram
+
+### Description
+
+Enable Containerd metrics gRPC histogram in the config.toml file.
+
+## .spec.kubernetes.advanced.containerd.oomScore
+
+### Description
+
+The Containerd OOM score adjustment used in the config.toml file.
 
 ## .spec.kubernetes.advanced.containerd.registryConfigs
 
@@ -2000,43 +2087,88 @@ Container runtime registry configuration.
 | Property                                                                                 | Type      | Required |
 |:-----------------------------------------------------------------------------------------|:----------|:---------|
 | [insecureSkipVerify](#speckubernetesadvancedcontainerdregistryconfigsinsecureskipverify) | `boolean` | Optional |
+| [mirrorEndpoint](#speckubernetesadvancedcontainerdregistryconfigsmirrorendpoint)         | `array`   | Optional |
 | [password](#speckubernetesadvancedcontainerdregistryconfigspassword)                     | `string`  | Optional |
-| [registry](#speckubernetesadvancedcontainerdregistryconfigsregistry)                     | `string`  | Required |
+| [registry](#speckubernetesadvancedcontainerdregistryconfigsregistry)                     | `string`  | Optional |
 | [username](#speckubernetesadvancedcontainerdregistryconfigsusername)                     | `string`  | Optional |
+
+### Description
+
+Allows specifying custom configuration for a registry at containerd level. You can set authentication details and mirrors for a registry.
+This feature can be used for example to authenticate to a private registry at containerd (container runtime) level, i.e. globally instead of using `imagePullSecrets`. It also can be used to use a mirror for a registry or to enable insecure connections to trusted registries that have self-signed certificates.
 
 ## .spec.kubernetes.advanced.containerd.registryConfigs.insecureSkipVerify
 
 ### Description
 
-Skip TLS verification for this registry.
+Set to `true` to skip TLS verification (e.g. when using self-signed certificates).
+
+## .spec.kubernetes.advanced.containerd.registryConfigs.mirrorEndpoint
+
+### Description
+
+Array of URLs with the mirrors to use for the registry. Example: `["http://mymirror.tld:8080"]`
 
 ## .spec.kubernetes.advanced.containerd.registryConfigs.password
 
 ### Description
 
-Registry password.
+The password containerd will use to authenticate against the registry.
 
 ## .spec.kubernetes.advanced.containerd.registryConfigs.registry
 
 ### Description
 
-Registry hostname and optional path. Example: registry.example.com, registry.example.com:5000/myrepo
-
-### Constraints
-
-**pattern**: the string must match the following regular expression:
-
-```regexp
-^([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}(:[0-9]{1,5})?(/[a-z0-9._-]+)*$
-```
-
-[try pattern](https://regexr.com/?expression=^\([a-z0-9]\([a-z0-9-]{0,61}[a-z0-9]\)?\.\)%2B[a-z]{2,}\(:[0-9]{1,5}\)?\(\/[a-z0-9._-]%2B\)*$)
+Registry address on which you would like to configure authentication or mirror(s). Example: `myregistry.tld:5000`
 
 ## .spec.kubernetes.advanced.containerd.registryConfigs.username
 
 ### Description
 
-Registry username.
+The username containerd will use to authenticate against the registry.
+
+## .spec.kubernetes.advanced.containerd.selfmanagedRepositories
+
+### Description
+
+Set to true if you manage the NVIDIA container toolkit's repositories externally and wish to skip their automatic configuration with furyctl. Default is false (furyctl manages repositories automatically).
+Notice that containerd itself is installed from binaries and does not use a repository. See `.spec.kubernetes.advanced.airGap` for other download options for containerd.
+
+## .spec.kubernetes.advanced.containerd.stateDir
+
+### Description
+
+The Containerd state directory used in the config.toml file.
+
+## .spec.kubernetes.advanced.containerd.storageDir
+
+### Description
+
+The Containerd storage directory used in the config.toml file.
+
+## .spec.kubernetes.advanced.containerd.systemdDir
+
+### Description
+
+The Containerd systemd service directory used in the config.toml file.
+
+## .spec.kubernetes.advanced.controllerManager
+
+### Properties
+
+| Property                                                           | Type      | Required |
+|:-------------------------------------------------------------------|:----------|:---------|
+| [gcThreshold](#speckubernetesadvancedcontrollermanagergcthreshold) | `integer` | Optional |
+
+### Description
+
+Advanced configuration for the controller-manager.
+
+## .spec.kubernetes.advanced.controllerManager.gcThreshold
+
+### Description
+
+Maximum number of terminated Pods retained by the controller-manager before automatic deletion.
 
 ## .spec.kubernetes.advanced.encryption
 
@@ -2048,51 +2180,134 @@ Registry username.
 | [tlsCipherSuites](#speckubernetesadvancedencryptiontlsciphersuites)               | `array`  | Optional |
 | [tlsCipherSuitesKubelet](#speckubernetesadvancedencryptiontlsciphersuiteskubelet) | `array`  | Optional |
 
-### Description
-
-Encryption at rest configuration. Ref: https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/
-
 ## .spec.kubernetes.advanced.encryption.configuration
 
 ### Description
 
-EncryptionConfiguration YAML content (must be valid YAML with proper structure).
+etcd's encryption at rest configuration. Must be a string with the EncryptionConfiguration object in YAML. Example:
 
-### Constraints
+```yaml
 
-**minimum length**: the minimum number of characters for this string is: `50`
+apiVersion: apiserver.config.k8s.io/v1
+kind: EncryptionConfiguration
+resources:
+  - resources:
+    - secrets
+    providers:
+    - aescbc:
+        keys:
+        - name: mykey
+          secret: base64_encoded_secret
+```
+
 
 ## .spec.kubernetes.advanced.encryption.tlsCipherSuites
 
 ### Description
 
-TLS cipher suite name (IANA format). Example: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-
-### Constraints
-
-**pattern**: the string must match the following regular expression:
-
-```regexp
-^TLS_(ECDHE|RSA|DHE)_(ECDSA|RSA|PSK)_WITH_(AES|CHACHA20)_(128|256)_(GCM|CBC|POLY1305)_(SHA256|SHA384)$
+The TLS cipher suites to use for etcd and kubeadm static pods. Example:
+```yaml
+tlsCipherSuites:
+  - "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256"
+  - "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"
+  - "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384"
+  - "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384"
+  - "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256"
+  - "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256"
+  - "TLS_AES_128_GCM_SHA256"
+  - "TLS_AES_256_GCM_SHA384"
+  - "TLS_CHACHA20_POLY1305_SHA256"
 ```
-
-[try pattern](https://regexr.com/?expression=^TLS_\(ECDHE|RSA|DHE\)_\(ECDSA|RSA|PSK\)_WITH_\(AES|CHACHA20\)_\(128|256\)_\(GCM|CBC|POLY1305\)_\(SHA256|SHA384\)$)
+.
 
 ## .spec.kubernetes.advanced.encryption.tlsCipherSuitesKubelet
 
 ### Description
 
-TLS cipher suite name (IANA format). Example: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+The TLS cipher suites to use for the kubelet. Example:
+```yaml
+tlsCipherSuitesKubelet:
+  - "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256"
+  - "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"
+  - "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384"
+ - "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305"
+  - "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305"
+  - "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384"
+```
+. NOTE: to customize the TLS cipher suites of the kubelet, set only this field - do not configure them under the `KubeletConfiguration`.
+
+## .spec.kubernetes.advanced.eventRateLimits
+
+### Properties
+
+| Property                                                     | Type      | Required |
+|:-------------------------------------------------------------|:----------|:---------|
+| [burst](#speckubernetesadvancedeventratelimitsburst)         | `integer` | Required |
+| [cacheSize](#speckubernetesadvancedeventratelimitscachesize) | `integer` | Optional |
+| [qps](#speckubernetesadvancedeventratelimitsqps)             | `integer` | Required |
+| [type](#speckubernetesadvancedeventratelimitstype)           | `string`  | Required |
+
+### Description
+
+Configures the limits of the API Server's EventRateLimit plugin. Each item represents a bucket (Server, Namespace, User, etc).
+
+## .spec.kubernetes.advanced.eventRateLimits.burst
+
+### Description
+
+Maximum allowed burst for this bucket type.
+
+## .spec.kubernetes.advanced.eventRateLimits.cacheSize
+
+### Description
+
+Maximum number of cached objects for this bucket. Only for certain types like Namespace or User.
+
+## .spec.kubernetes.advanced.eventRateLimits.qps
+
+### Description
+
+Maximum allowed queries per second (QPS) for this bucket type.
+
+## .spec.kubernetes.advanced.eventRateLimits.type
+
+### Description
+
+Type of limit to apply (Server, Namespace, User, SourceAndObject).
 
 ### Constraints
 
-**pattern**: the string must match the following regular expression:
+**enum**: the value of this property must be equal to one of the following string values:
 
-```regexp
-^TLS_(ECDHE|RSA|DHE)_(ECDSA|RSA|PSK)_WITH_(AES|CHACHA20)_(128|256)_(GCM|CBC|POLY1305)_(SHA256|SHA384)$
-```
+| Value             |
+|:------------------|
+|`"Server"`         |
+|`"Namespace"`      |
+|`"User"`           |
+|`"SourceAndObject"`|
 
-[try pattern](https://regexr.com/?expression=^TLS_\(ECDHE|RSA|DHE\)_\(ECDSA|RSA|PSK\)_WITH_\(AES|CHACHA20\)_\(128|256\)_\(GCM|CBC|POLY1305\)_\(SHA256|SHA384\)$)
+## .spec.kubernetes.advanced.kubeProxy
+
+### Properties
+
+| Property                                                                     | Type      | Required |
+|:-----------------------------------------------------------------------------|:----------|:---------|
+| [additionalProperties](#speckubernetesadvancedkubeproxyadditionalproperties) | `object`  | Optional |
+| [enabled](#speckubernetesadvancedkubeproxyenabled)                           | `boolean` | Optional |
+
+### Description
+
+Configuration for the kube-proxy component.
+
+## .spec.kubernetes.advanced.kubeProxy.additionalProperties
+
+## .spec.kubernetes.advanced.kubeProxy.enabled
+
+### Description
+
+Setting this option to `false` will skip the installation of the kube-proxy component and install the CNI plugin with the following configuration: Cilium in kube-proxy-replacement mode and Calico in eBPF mode. Default is `true`.
+
+NOTE: Changing this option after the cluster has been created is not currently supported.
 
 ## .spec.kubernetes.advanced.kubeletConfiguration
 
@@ -2125,62 +2340,65 @@ Maximum number of PIDs per pod. Example: 8192
 
 | Property                                                      | Type     | Required |
 |:--------------------------------------------------------------|:---------|:---------|
+| [ca_file](#speckubernetesadvancedoidcca_file)                 | `string` | Optional |
 | [client_id](#speckubernetesadvancedoidcclient_id)             | `string` | Optional |
+| [group_prefix](#speckubernetesadvancedoidcgroup_prefix)       | `string` | Optional |
 | [groups_claim](#speckubernetesadvancedoidcgroups_claim)       | `string` | Optional |
-| [groups_prefix](#speckubernetesadvancedoidcgroups_prefix)     | `string` | Optional |
 | [issuer_url](#speckubernetesadvancedoidcissuer_url)           | `string` | Optional |
 | [username_claim](#speckubernetesadvancedoidcusername_claim)   | `string` | Optional |
 | [username_prefix](#speckubernetesadvancedoidcusername_prefix) | `string` | Optional |
 
 ### Description
 
-OIDC authentication provider configuration. Ref: https://kubernetes.io/docs/reference/access-authn-authz/authentication/#openid-connect-tokens
+OIDC configuration for the Kubernetes API server.
+
+## .spec.kubernetes.advanced.oidc.ca_file
+
+### Description
+
+The path to the certificate for the CA that signed the identity provider's web certificate. Defaults to the host's root CAs. This should be a path available to the API Server.
 
 ## .spec.kubernetes.advanced.oidc.client_id
 
 ### Description
 
-OIDC client ID.
+The client ID the API server will use to authenticate to the OIDC provider.
+
+## .spec.kubernetes.advanced.oidc.group_prefix
+
+### Description
+
+Prefix prepended to group claims to prevent clashes with existing names (such as system: groups).
 
 ## .spec.kubernetes.advanced.oidc.groups_claim
 
 ### Description
 
-OIDC groups claim.
-
-## .spec.kubernetes.advanced.oidc.groups_prefix
-
-### Description
-
-Prefix for OIDC groups.
+JWT claim to use as the user's group.
 
 ## .spec.kubernetes.advanced.oidc.issuer_url
 
 ### Description
 
-OIDC issuer URL.
-
-### Constraints
-
-**pattern**: the string must match the following regular expression:
-
-```regexp
-^(http|https)\:\/\/.+$
-```
-
-[try pattern](https://regexr.com/?expression=^\(http|https\)\:\\/\\/.%2B$)
+The issuer URL of the OIDC provider.
 
 ## .spec.kubernetes.advanced.oidc.username_claim
 
 ### Description
 
-OIDC username claim.
+JWT claim to use as the user name. The default value is `sub`, which is expected to be a unique identifier of the end user.
 
 ## .spec.kubernetes.advanced.oidc.username_prefix
 
 ### Description
 
-Prefix for OIDC usernames.
+Prefix prepended to username claims to prevent clashes with existing names (such as system: users).
+
+## .spec.kubernetes.advanced.registry
+
+### Description
+
+URL of the registry where to pull images from for the Kubernetes phase. (Default is registry.sighup.io/fury/on-premises).
 
 ## .spec.kubernetes.advanced.users
 
@@ -2191,21 +2409,17 @@ Prefix for OIDC usernames.
 | [names](#speckubernetesadvancedusersnames) | `array`  | Optional |
 | [org](#speckubernetesadvancedusersorg)     | `string` | Optional |
 
-### Description
-
-User certificate generation configuration.
-
 ## .spec.kubernetes.advanced.users.names
 
 ### Description
 
-List of user names for certificate generation.
+List of user names to create and get a kubeconfig file. Users will not have any permissions by default, RBAC setup for the new users is needed.
 
 ## .spec.kubernetes.advanced.users.org
 
 ### Description
 
-Organization name for user certificates.
+The organization the users belong to.
 
 ## .spec.kubernetes.controlPlane
 
@@ -2214,8 +2428,12 @@ Organization name for user certificates.
 | Property                                                                | Type     | Required |
 |:------------------------------------------------------------------------|:---------|:---------|
 | [address](#speckubernetescontrolplaneaddress)                           | `string` | Required |
+| [annotations](#speckubernetescontrolplaneannotations)                   | `object` | Optional |
+| [keepalived](#speckubernetescontrolplanekeepalived)                     | `object` | Optional |
 | [kubeletConfiguration](#speckubernetescontrolplanekubeletconfiguration) | `object` | Optional |
+| [labels](#speckubernetescontrolplanelabels)                             | `object` | Optional |
 | [members](#speckubernetescontrolplanemembers)                           | `array`  | Required |
+| [taints](#speckubernetescontrolplanetaints)                             | `array`  | Optional |
 
 ### Description
 
@@ -2236,6 +2454,62 @@ The address for the Kubernetes control plane with port. Example: k8s-api.example
 ```
 
 [try pattern](https://regexr.com/?expression=^[a-zA-Z0-9.-]%2B:[0-9]%2B$)
+
+## .spec.kubernetes.controlPlane.annotations
+
+### Description
+
+Optional additional Kubernetes annotations that will be added to the control-plane nodes. Follows Kubernetes annotations format. **Existing annotations with the same key will be overwritten**.
+
+## .spec.kubernetes.controlPlane.keepalived
+
+### Properties
+
+| Property                                                                | Type      | Required |
+|:------------------------------------------------------------------------|:----------|:---------|
+| [enabled](#speckubernetescontrolplanekeepalivedenabled)                 | `boolean` | Required |
+| [interface](#speckubernetescontrolplanekeepalivedinterface)             | `string`  | Optional |
+| [ip](#speckubernetescontrolplanekeepalivedip)                           | `string`  | Optional |
+| [passphrase](#speckubernetescontrolplanekeepalivedpassphrase)           | `string`  | Optional |
+| [virtualRouterId](#speckubernetescontrolplanekeepalivedvirtualrouterid) | `string`  | Optional |
+
+### Description
+
+This section allows to configure a floating Virtual IP between the Control Plane nodes via Keepalived. This can be used to provide high availability for the Kubernetes API server instead of a load balancer.
+
+## .spec.kubernetes.controlPlane.keepalived.enabled
+
+### Description
+
+Set to install keepalived with a floating virtual IP shared between the load balancer hosts for a deployment in High Availability.
+
+## .spec.kubernetes.controlPlane.keepalived.interface
+
+### Description
+
+Name of the network interface where to bind the Keepalived virtual IP.
+
+## .spec.kubernetes.controlPlane.keepalived.ip
+
+### Description
+
+The Virtual floating IP for Keepalived
+
+## .spec.kubernetes.controlPlane.keepalived.passphrase
+
+### Description
+
+Password for accessing vrrpd. Make it unique between Keepalived clusters.
+
+### Constraints
+
+**maximum length**: the maximum number of characters for this string is: `8`
+
+## .spec.kubernetes.controlPlane.keepalived.virtualRouterId
+
+### Description
+
+The virtual router ID of Keepalived, an arbitrary unique number from 1 to 255 used to differentiate multiple instances of vrrpd running on the same network interface and address family and multicast/unicast (and hence same socket).
 
 ## .spec.kubernetes.controlPlane.kubeletConfiguration
 
@@ -2261,6 +2535,14 @@ Maximum number of pods per node. Example: 200
 ### Description
 
 Maximum number of PIDs per pod. Example: 8192
+
+## .spec.kubernetes.controlPlane.labels
+
+### Description
+
+Optional additional Kubernetes labels that will be added to the control-plane nodes. Follows Kubernetes labels format.
+
+Note: **Existing labels with the same key will be overwritten** and the label setting the `control-plane` role cannot be deleted.
 
 ## .spec.kubernetes.controlPlane.members
 
@@ -2304,6 +2586,48 @@ Optional IP address. If not specified, it is inferred from the node's network co
 ```
 
 [try pattern](https://regexr.com/?expression=^\(\(25[0-5]|\(2[0-4]|1\d|[1-9]|\)\d\)\.\){3}\(25[0-5]|\(2[0-4]|1\d|[1-9]|\)\d\)$)
+
+## .spec.kubernetes.controlPlane.taints
+
+### Properties
+
+| Property                                          | Type     | Required |
+|:--------------------------------------------------|:---------|:---------|
+| [effect](#speckubernetescontrolplanetaintseffect) | `string` | Required |
+| [key](#speckubernetescontrolplanetaintskey)       | `string` | Required |
+| [value](#speckubernetescontrolplanetaintsvalue)   | `string` | Required |
+
+### Description
+
+Kubernetes taints for the control-plane nodes, follows Kubernetes taints format. Default is `node-role.kubernetes.io/control-plane:NoSchedule`.
+
+Example:
+
+```yaml
+- effect: NoSchedule
+  key: node.kubernetes.io/role
+  value: control-plane
+```
+
+NOTE: Setting an empty list will remove the default control-plane taint.
+
+NOTE2: Takes effect only at cluster creation time.
+
+## .spec.kubernetes.controlPlane.taints.effect
+
+### Constraints
+
+**enum**: the value of this property must be equal to one of the following string values:
+
+| Value              |
+|:-------------------|
+|`"NoSchedule"`      |
+|`"PreferNoSchedule"`|
+|`"NoExecute"`       |
+
+## .spec.kubernetes.controlPlane.taints.key
+
+## .spec.kubernetes.controlPlane.taints.value
 
 ## .spec.kubernetes.etcd
 
@@ -2620,6 +2944,12 @@ Kubernetes taints to apply to nodes in this group.
 ## .spec.kubernetes.nodeGroups.taints.key
 
 ## .spec.kubernetes.nodeGroups.taints.value
+
+## .spec.kubernetes.pkiPath
+
+### Description
+
+Path to the PKI directory where to find the certificates and keys for Kubernetes Control Plane and etcd. Must have the `master` and `etcd` folders inside.
 
 ## .spec.kubernetes.version
 

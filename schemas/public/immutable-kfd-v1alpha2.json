@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "description": "A KFD Cluster deployed on bare metal infrastructure with iPXE boot provisioning and immutable OS configuration.",
+  "description": "A SIGHUP Distribution Kubernetes Cluster deployed on bare metal infrastructure with iPXE boot provisioning and immutable OS configuration.",
   "type": "object",
   "properties": {
     "apiVersion": {
@@ -920,135 +920,20 @@
           "$ref": "#/$defs/Spec.Kubernetes.KubeletConfiguration"
         },
         "encryption": {
-          "type": "object",
-          "additionalProperties": false,
-          "description": "Encryption at rest configuration. Ref: https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/",
-          "properties": {
-            "tlsCipherSuites": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "pattern": "^TLS_(ECDHE|RSA|DHE)_(ECDSA|RSA|PSK)_WITH_(AES|CHACHA20)_(128|256)_(GCM|CBC|POLY1305)_(SHA256|SHA384)$",
-                "description": "TLS cipher suite name (IANA format). Example: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"
-              },
-              "description": "TLS cipher suites for the API server. Only secure cipher suites allowed."
-            },
-            "tlsCipherSuitesKubelet": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "pattern": "^TLS_(ECDHE|RSA|DHE)_(ECDSA|RSA|PSK)_WITH_(AES|CHACHA20)_(128|256)_(GCM|CBC|POLY1305)_(SHA256|SHA384)$",
-                "description": "TLS cipher suite name (IANA format). Example: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"
-              },
-              "description": "TLS cipher suites for kubelet. Only secure cipher suites allowed."
-            },
-            "configuration": {
-              "type": "string",
-              "minLength": 50,
-              "description": "EncryptionConfiguration YAML content (must be valid YAML with proper structure)."
-            }
-          }
+          "$ref": "#/$defs/Spec.Kubernetes.Advanced.Encryption"
         },
         "containerd": {
-          "type": "object",
-          "additionalProperties": false,
-          "description": "Container runtime registry configuration.",
-          "properties": {
-            "registryConfigs": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "additionalProperties": false,
-                "properties": {
-                  "registry": {
-                    "type": "string",
-                    "pattern": "^([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,}(:[0-9]{1,5})?(/[a-z0-9._-]+)*$",
-                    "description": "Registry hostname and optional path. Example: registry.example.com, registry.example.com:5000/myrepo"
-                  },
-                  "username": {
-                    "type": "string",
-                    "description": "Registry username."
-                  },
-                  "password": {
-                    "type": "string",
-                    "description": "Registry password."
-                  },
-                  "insecureSkipVerify": {
-                    "type": "boolean",
-                    "description": "Skip TLS verification for this registry."
-                  },
-                  "mirrorEndpoint": {
-                    "type": "array",
-                    "description": "Array of URLs with the mirrors to use for the registry. Example: `[\"http://mymirror.tld:8080\"]`",
-                    "items": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "required": ["registry"]
-              }
-            }
-          }
+          "$ref": "#/$defs/Spec.Kubernetes.Advanced.Containerd"
         },
         "oidc": {
-          "type": "object",
-          "additionalProperties": false,
-          "description": "OIDC authentication provider configuration. Ref: https://kubernetes.io/docs/reference/access-authn-authz/authentication/#openid-connect-tokens",
-          "properties": {
-            "issuer_url": {
-              "$ref": "#/$defs/Types.Uri",
-              "description": "OIDC issuer URL."
-            },
-            "client_id": {
-              "type": "string",
-              "description": "OIDC client ID."
-            },
-            "username_claim": {
-              "type": "string",
-              "description": "OIDC username claim."
-            },
-            "groups_claim": {
-              "type": "string",
-              "description": "OIDC groups claim."
-            },
-            "username_prefix": {
-              "type": "string",
-              "description": "Prefix for OIDC usernames."
-            },
-            "groups_prefix": {
-              "type": "string",
-              "description": "Prefix for OIDC groups."
-            }
-          }
+          "$ref": "#/$defs/Spec.Kubernetes.Advanced.OIDC"
         },
         "users": {
-          "type": "object",
-          "additionalProperties": false,
-          "description": "User certificate generation configuration.",
-          "properties": {
-            "names": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              },
-              "description": "List of user names for certificate generation."
-            },
-            "org": {
-              "type": "string",
-              "description": "Organization name for user certificates."
-            }
-          }
+          "$ref": "#/$defs/Spec.Kubernetes.Advanced.Users"
         },
         "cloud": {
-          "type": "object",
-          "additionalProperties": false,
           "description": "Cloud provider integration. Ref: https://kubernetes.io/docs/concepts/architecture/cloud-controller/",
-          "properties": {
-            "provider": {
-              "type": "string",
-              "description": "Cloud provider type. Example: external"
-            }
-          }
+          "$ref": "#/$defs/Spec.Kubernetes.Advanced.Cloud"
         },
         "registry": {
           "type": "string",
@@ -1084,6 +969,188 @@
             },
             "additionalProperties": false
           }
+        }
+      }
+    },
+    "Spec.Kubernetes.Advanced.Cloud": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "provider": {
+          "type": "string",
+          "description": "Sets the cloud provider for the Kubelet"
+        },
+        "config": {
+          "type": "string",
+          "description": "Sets cloud config for the Kubelet"
+        }
+      }
+    },
+    "Spec.Kubernetes.Advanced.Users": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "names": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of user names to create and get a kubeconfig file. Users will not have any permissions by default, RBAC setup for the new users is needed."
+        },
+        "org": {
+          "type": "string",
+          "description": "The organization the users belong to."
+        }
+      }
+    },
+    "Spec.Kubernetes.Advanced.OIDC": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "OIDC configuration for the Kubernetes API server.",
+      "properties": {
+        "issuer_url": {
+          "type": "string",
+          "description": "The issuer URL of the OIDC provider."
+        },
+        "client_id": {
+          "type": "string",
+          "description": "The client ID the API server will use to authenticate to the OIDC provider."
+        },
+        "ca_file": {
+          "type": "string",
+          "description": "The path to the certificate for the CA that signed the identity provider's web certificate. Defaults to the host's root CAs. This should be a path available to the API Server."
+        },
+        "username_claim": {
+          "type": "string",
+          "description": "JWT claim to use as the user name. The default value is `sub`, which is expected to be a unique identifier of the end user."
+        },
+        "username_prefix": {
+          "type": "string",
+          "description": "Prefix prepended to username claims to prevent clashes with existing names (such as system: users)."
+        },
+        "groups_claim": {
+          "type": "string",
+          "description": "JWT claim to use as the user's group."
+        },
+        "group_prefix": {
+          "type": "string",
+          "description": "Prefix prepended to group claims to prevent clashes with existing names (such as system: groups)."
+        }
+      }
+    },
+    "Spec.Kubernetes.Advanced.Containerd": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Advanced configuration for containerd",
+      "properties": {
+        "registryConfigs": {
+          "$ref": "#/$defs/Spec.Kubernetes.Advanced.Containerd.RegistryConfigs"
+        },
+        "selfmanagedRepositories": {
+          "type": "boolean",
+          "description": "Set to true if you manage the NVIDIA container toolkit's repositories externally and wish to skip their automatic configuration with furyctl. Default is false (furyctl manages repositories automatically).\nNotice that containerd itself is installed from binaries and does not use a repository. See `.spec.kubernetes.advanced.airGap` for other download options for containerd."
+        },
+        "storageDir": {
+          "type": "string",
+          "description": "The Containerd storage directory used in the config.toml file."
+        },
+        "stateDir": {
+          "type": "string",
+          "description": "The Containerd state directory used in the config.toml file."
+        },
+        "systemdDir": {
+          "type": "string",
+          "description": "The Containerd systemd service directory used in the config.toml file."
+        },
+        "oomScore": {
+          "type": "integer",
+          "description": "The Containerd OOM score adjustment used in the config.toml file."
+        },
+        "grpcMaxRecvMessageSize": {
+          "type": "integer",
+          "description": "The Containerd gRPC maximum receive message size in bytes used in the config.toml file."
+        },
+        "grpcMaxSendMessageSize": {
+          "type": "integer",
+          "description": "The Containerd gRPC maximum send message size in bytes used in the config.toml file."
+        },
+        "debugLevel": {
+          "type": "string",
+          "description": "The Containerd debug level used in the config.toml file."
+        },
+        "metricsAddress": {
+          "type": "string",
+          "description": "The Containerd metrics address used in the config.toml file."
+        },
+        "metricsGrpcHistogram": {
+          "type": "boolean",
+          "description": "Enable Containerd metrics gRPC histogram in the config.toml file."
+        },
+        "maxContainerLogLineSize": {
+          "type": "integer",
+          "description": "The maximum container log line size in bytes used in the config.toml file."
+        },
+        "deviceOwnershipFromSecurityContext": {
+          "type": "boolean",
+          "description": "Set to true to apply device ownership from the container runtime's security context instead of the host's defaults, used in the config.toml file."
+        }
+      }
+    },
+    "Spec.Kubernetes.Advanced.Containerd.RegistryConfigs": {
+      "description": "Allows specifying custom configuration for a registry at containerd level. You can set authentication details and mirrors for a registry.\nThis feature can be used for example to authenticate to a private registry at containerd (container runtime) level, i.e. globally instead of using `imagePullSecrets`. It also can be used to use a mirror for a registry or to enable insecure connections to trusted registries that have self-signed certificates.",
+      "type": "array",
+      "additionalProperties": false,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "registry": {
+            "type": "string",
+            "description": "Registry address on which you would like to configure authentication or mirror(s). Example: `myregistry.tld:5000`"
+          },
+          "username": {
+            "type": "string",
+            "description": "The username containerd will use to authenticate against the registry."
+          },
+          "password": {
+            "type": "string",
+            "description": "The password containerd will use to authenticate against the registry."
+          },
+          "insecureSkipVerify": {
+            "type": "boolean",
+            "description": "Set to `true` to skip TLS verification (e.g. when using self-signed certificates)."
+          },
+          "mirrorEndpoint": {
+            "type": "array",
+            "description": "Array of URLs with the mirrors to use for the registry. Example: `[\"http://mymirror.tld:8080\"]`",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "Spec.Kubernetes.Advanced.Encryption": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tlsCipherSuites": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The TLS cipher suites to use for etcd and kubeadm static pods. Example:\n```yaml\ntlsCipherSuites:\n  - \"TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256\"\n  - \"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256\"\n  - \"TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384\"\n  - \"TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384\"\n  - \"TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256\"\n  - \"TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256\"\n  - \"TLS_AES_128_GCM_SHA256\"\n  - \"TLS_AES_256_GCM_SHA384\"\n  - \"TLS_CHACHA20_POLY1305_SHA256\"\n```\n."
+        },
+        "tlsCipherSuitesKubelet": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The TLS cipher suites to use for the kubelet. Example:\n```yaml\ntlsCipherSuitesKubelet:\n  - \"TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256\"\n  - \"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256\"\n  - \"TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384\"\n - \"TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305\"\n  - \"TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305\"\n  - \"TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384\"\n```\n. NOTE: to customize the TLS cipher suites of the kubelet, set only this field - do not configure them under the `KubeletConfiguration`."
+        },
+        "configuration": {
+          "type": "string",
+          "description": "etcd's encryption at rest configuration. Must be a string with the EncryptionConfiguration object in YAML. Example:\n\n```yaml\n\napiVersion: apiserver.config.k8s.io/v1\nkind: EncryptionConfiguration\nresources:\n  - resources:\n    - secrets\n    providers:\n    - aescbc:\n        keys:\n        - name: mykey\n          secret: base64_encoded_secret\n```\n"
         }
       }
     },
