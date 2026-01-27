@@ -7,7 +7,7 @@ modules:
   auth: v0.6.1-rc.0
   aws: v5.2.0-rc.0
   dr: v3.3.0-rc.2
-  ingress: v4.1.1 #CHANGEME
+  ingress: feat/move-out-forecastle-external-dns #CHANGEME
   logging: v5.3.0-rc.0
   monitoring: v4.1.0-rc.0
   opa: v1.16.0-rc.0
