@@ -11,13 +11,13 @@ metadata:
   annotations:
     eks.amazonaws.com/role-arn: {{ .spec.distribution.modules.ingress.externalDns.publicIamRoleArn }}
   name: external-dns-public
-  namespace: ingress-nginx
+  namespace: external-dns
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: external-dns-public
-  namespace: ingress-nginx
+  namespace: external-dns
 spec:
   template:
     spec:
@@ -40,13 +40,13 @@ metadata:
   annotations:
     eks.amazonaws.com/role-arn: {{ .spec.distribution.modules.ingress.externalDns.privateIamRoleArn }}
   name: external-dns-private
-  namespace: ingress-nginx
+  namespace: external-dns
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: external-dns-private
-  namespace: ingress-nginx
+  namespace: external-dns
 spec:
   template:
     spec:
@@ -71,13 +71,13 @@ metadata:
   annotations:
     eks.amazonaws.com/role-arn: {{ .spec.distribution.modules.ingress.externalDns.publicIamRoleArn }}
   name: external-dns-public
-  namespace: ingress-nginx
+  namespace: external-dns
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: external-dns-public
-  namespace: ingress-nginx
+  namespace: external-dns
 spec:
   template:
     spec:

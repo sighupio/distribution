@@ -52,7 +52,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: forecastle
-  namespace: ingress-nginx
+  namespace: forecastle
 spec:
   template:
     spec:
@@ -111,7 +111,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: external-dns-public
-  namespace: ingress-nginx
+  namespace: external-dns
 spec:
   template:
     spec:
@@ -124,7 +124,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: external-dns-private
-  namespace: ingress-nginx
+  namespace: external-dns
 spec:
   template:
     spec:
@@ -138,7 +138,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: external-dns-public
-  namespace: ingress-nginx
+  namespace: external-dns
 spec:
   template:
     spec:

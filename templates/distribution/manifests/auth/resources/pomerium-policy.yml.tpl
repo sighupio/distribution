@@ -63,7 +63,7 @@ routes:
 
   {{- if ne .spec.distribution.modules.ingress.nginx.type "none" }}
   - from: https://{{ template "forecastleUrl" .spec }}
-    to: http://forecastle.ingress-nginx.svc.cluster.local
+    to: http://forecastle.forecastle.svc.cluster.local
     policy:
       {{- if and (index .spec.distribution.modules.auth.pomerium "defaultRoutesPolicy") (index .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy "ingressNgnixForecastle") }}
       {{- .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.ingressNgnixForecastle | toYaml | nindent 6 }}
