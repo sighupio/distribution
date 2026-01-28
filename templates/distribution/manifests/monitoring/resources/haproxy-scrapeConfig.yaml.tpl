@@ -1,6 +1,6 @@
 
-{{- if eq .spec.distribution.common.provider.type "none" }}
-{{- if hasKeyAny .spec "kubernetes" }}
+{{- if eq .spec.distribution.common.provider.type "none" "immutable" }}
+{{- if and (hasKeyAny .spec "kubernetes") (hasKeyAny .spec.kubernetes "loadBalancers") }}
 {{- if .spec.kubernetes.loadBalancers.enabled }}
 ---
 apiVersion: monitoring.coreos.com/v1alpha1

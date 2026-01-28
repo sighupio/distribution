@@ -12,7 +12,7 @@ resources:
   - {{ print $vendorPrefix "/modules/dr/katalog/velero/velero-node-agent" }}
 {{- if eq .spec.distribution.common.provider.type "eks" }}
   - {{ print $vendorPrefix "/modules/dr/katalog/velero/velero-aws" }}
-{{- else if eq .spec.distribution.common.provider.type "none" }}
+{{- else if eq .spec.distribution.common.provider.type "none" "immutable" }}
 
 {{- if eq .spec.distribution.modules.dr.velero.backend "minio" }}
   - {{ print $vendorPrefix "/modules/dr/katalog/velero/velero-on-prem" }}
@@ -60,7 +60,7 @@ patches:
 {{- if eq .spec.distribution.common.provider.type "eks" }}
   - path: patches/eks-velero.yml
 {{- end }}
-{{- if eq .spec.distribution.common.provider.type "none" }}
+{{- if eq .spec.distribution.common.provider.type "none" "immutable" }}
   {{- if ne .spec.distribution.modules.dr.etcdBackup.type "none" }}
   - path: patches/etcd-backup-schedule.yml
     {{- if eq .spec.distribution.modules.dr.etcdBackup.type "all" "pvc" }}
@@ -81,7 +81,7 @@ patches:
   {{- end }}
 {{- end }}
 
-{{- if eq .spec.distribution.common.provider.type "none" }}
+{{- if eq .spec.distribution.common.provider.type "none" "immutable" }}
 {{- if ne .spec.distribution.modules.dr.etcdBackup.type "none" }}
 configMapGenerator:
 {{- if eq .spec.distribution.modules.dr.etcdBackup.type "all" "s3" }}
@@ -118,7 +118,7 @@ configMapGenerator:
 {{- end }}
 {{- end }}
 
-{{- if eq .spec.distribution.common.provider.type "none" }}
+{{- if eq .spec.distribution.common.provider.type "none" "immutable" }}
 secretGenerator:
 {{- if eq .spec.distribution.modules.dr.velero.backend "externalEndpoint" }}
   - name: cloud-credentials

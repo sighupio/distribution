@@ -26,7 +26,7 @@ resources:
 {{- if eq .spec.distribution.common.provider.type "eks" }}
   - networking
 {{- end }}
-{{- if and (ne .spec.distribution.modules.networking.type "none") (eq .spec.distribution.common.provider.type "none" ) }}
+{{- if and (ne .spec.distribution.modules.networking.type "none") (eq .spec.distribution.common.provider.type "none" "immutable" ) }}
   - networking
 {{- end }}
 {{- if ne .spec.distribution.modules.policy.type "none" }}

@@ -246,22 +246,23 @@ data:
         installDefaultPolicies: true
     # dr module configuration
     dr:
-      type: on-premises
+      type: none
       overrides:
         nodeSelector: null
         tolerations: null
       # etcdBackup configuration for bare-metal clusters
       etcdBackup:
-        type: "minio"
-        # minio configuration for etcd backups
-        minio:
-          endpoint: "minio.minio.svc:9000"
-          bucketName: "etcd-backups"
-          secretAccessKey: "minio123"
-          accessKeyId: "minio"
-          insecure: true
-        # schedule for etcd backups
-        schedule: "0 */6 * * *" # Every 6 hours
+        type: "none"
+        pvc:
+          schedule: "0 1 * * *"
+          retentionTime: 10d
+          size: 10G
+          storageClass: null
+          accessModes: ["ReadWriteOnce"]
+        s3:
+          schedule: "0 1 * * *"
+          retentionTime: 10d
+          insecure: false
       # the standard configuration for velero on the dr module
       velero:
         backend: minio
@@ -271,6 +272,14 @@ data:
           secretAccessKey: example
           accessKeyId: example
           bucketName: velerobucket
+          prefixName: ""
+          accessMode: ReadWrite
+        gcs:
+          bucketName: velerobucket
+          prefixName: ""
+          accessMode: ReadWrite
+          clientEmail: "velero-service-account@dummy.iam.gserviceaccount.com"
+          serviceAccountString: "dummy"
         schedules:
           install: true
           definitions:

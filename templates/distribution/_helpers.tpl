@@ -239,8 +239,10 @@ cert-manager.io/cluster-issuer: {{ .spec.distribution.modules.ingress.certManage
   {{- $controlPlanePort := "" }}
   {{- if and (eq .config.spec.distribution.common.provider.type "none") (hasKeyAny .config.spec "kubernetes") }}
     {{- $controlPlaneAddress = .config.spec.kubernetes.controlPlaneAddress }}
+  {{- else if eq .config.spec.distribution.common.provider.type "immutable" }}
+    {{- $controlPlaneAddress = .config.spec.kubernetes.controlPlane.address }}
   {{- else }}
-    {{- fail "controlPlaneAddress is currently only available for OnPremises kind" }}
+    {{- fail "controlPlaneAddress is currently only available for OnPremises and Immutable kinds" }}
   {{- end }}
   {{- if index . "args" }}
     {{- if eq .args "host" }}

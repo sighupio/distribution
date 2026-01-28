@@ -12,7 +12,7 @@ resources:
   - {{ print $vendorPrefix "/modules/networking/katalog/tigera/eks-policy-only" }}
 {{- end }}
 
-{{- if eq .spec.distribution.common.provider.type "none" }}{{/* none == on-prem, kfddistribution */}}
+{{- if eq .spec.distribution.common.provider.type "none" "immutable" }}{{/* none == on-prem, kfddistribution */}}
     {{- if eq .spec.distribution.modules.networking.type "calico" }}
   - {{ print $vendorPrefix "/modules/networking/katalog/tigera/on-prem" }}
   - resources/calico-ns.yml
@@ -34,8 +34,11 @@ patches:
 {{- if eq .spec.distribution.common.provider.type "eks" }}
   - path: patches/tigera/infra-nodes-and-mask.yaml
 {{- end }}
-{{- if eq .spec.distribution.common.provider.type "none" }}
+{{- if eq .spec.distribution.common.provider.type "none" "immutable" }}
   {{- if eq .spec.distribution.modules.networking.type "calico" }}
+    {{- if eq .spec.distribution.common.provider.type "immutable" }}
+  - path: patches/tigera/nfTables-dataplane.yaml
+    {{- end }}
   - path: patches/tigera/infra-nodes-and-mask.yaml
   - target:
       group: apps
@@ -67,7 +70,7 @@ patches:
   {{- end }}
 {{- end }}
 
-{{- if eq .spec.distribution.common.provider.type "none" }}
+{{- if eq .spec.distribution.common.provider.type "none" "immutable" }}
   {{- if eq .spec.distribution.modules.networking.type "cilium" }}
 configMapGenerator:
   - behavior: merge

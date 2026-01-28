@@ -21,9 +21,9 @@ resources:
   - {{ print $vendorPrefix "/modules/monitoring/katalog/node-exporter" }}
   - {{ print $vendorPrefix "/modules/monitoring/katalog/x509-exporter" }}
   - {{ print $vendorPrefix "/modules/monitoring/katalog/blackbox-exporter" }}
-{{- if eq .spec.distribution.common.provider.type "none" }}{{/* none === on-premises and kfddistribution */}}
+{{- if eq .spec.distribution.common.provider.type "none" "immutable" }}{{/* none === on-premises and kfddistribution */}}
   - {{ print $vendorPrefix "/modules/monitoring/katalog/kubeadm-sm" }}
-  {{- if hasKeyAny .spec "kubernetes" }}
+  {{- if and (hasKeyAny .spec "kubernetes") (hasKeyAny .spec.kubernetes "loadBalancers") }}
     {{- if .spec.kubernetes.loadBalancers.enabled }}
   - {{ print $vendorPrefix "/modules/monitoring/katalog/haproxy" }}
   - resources/haproxy-scrapeConfig.yaml
