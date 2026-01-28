@@ -18,7 +18,7 @@ spec:
       tolerations:
         {{ template "tolerations" $veleroArgs }}
 
-{{- if eq .spec.distribution.common.provider.type "none" }}
+{{- if eq .spec.distribution.common.provider.type "none" "immutable" }}
 ---
 apiVersion: apps/v1
 kind: DaemonSet
