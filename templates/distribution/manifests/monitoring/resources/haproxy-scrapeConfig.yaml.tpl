@@ -1,7 +1,18 @@
-
-{{- if eq .spec.distribution.common.provider.type "none" "immutable" }}
-{{- if and (hasKeyAny .spec "kubernetes") (hasKeyAny .spec.kubernetes "loadBalancers") }}
-{{- if .spec.kubernetes.loadBalancers.enabled }}
+{{- $lbEnabled := false }}
+{{- $lbHosts := list }}
+{{- if (.spec | digAny "kubernetes" "loadBalancers" "enabled" false) }}
+  {{- $lbEnabled = true }}
+  {{- range .spec.kubernetes.loadBalancers.hosts }}
+  {{- $lbHosts = append $lbHosts .ip }}
+  {{- end }}
+{{- end }}
+{{- if (.spec | digAny  "infrastructure" "loadBalancers" "enabled" false) }}
+  {{- $lbEnabled = true }}
+  {{- range .spec.infrastructure.loadBalancers.members }}
+  {{- $lbHosts = append $lbHosts .hostname }}
+  {{- end }}
+{{- end }}
+{{- if $lbEnabled }}
 ---
 apiVersion: monitoring.coreos.com/v1alpha1
 kind: ScrapeConfig
@@ -15,9 +26,7 @@ spec:
     - labels:
         job: prometheus
       targets:
-        {{- range $lb := .spec.kubernetes.loadBalancers.hosts }}
-        - {{ $lb.ip }}:8405
+        {{- range $lbHosts }}
+        - {{ . }}:8405
         {{- end }}
-{{- end }}
-{{- end }}
 {{- end }}

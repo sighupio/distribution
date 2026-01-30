@@ -426,12 +426,8 @@ deleteMonitoringCommon() {
   $kustomizebin build $vendorPath/modules/monitoring/katalog/kube-state-metrics | $kubectlbin delete --ignore-not-found --wait --timeout=600s -f -
   $kustomizebin build $vendorPath/modules/monitoring/katalog/node-exporter | $kubectlbin delete --ignore-not-found --wait --timeout=600s -f -
   $kustomizebin build $vendorPath/modules/monitoring/katalog/x509-exporter | $kubectlbin delete --ignore-not-found --wait --timeout=600s -f -
-  {{- if eq .spec.distribution.common.provider.type "none" "immutable" }}
-  {{- if hasKeyAny .spec "kubernetes" }}
-  {{- if .spec.kubernetes.loadBalancers.enabled }}
+  {{- if or (.spec | digAny "kubernetes" "loadBalancers" "enabled" false) (.spec | digAny  "infrastructure" "loadBalancers" "enabled" false) }}
   $kustomizebin build $vendorPath/modules/monitoring/katalog/haproxy | $kubectlbin delete --ignore-not-found --wait --timeout=600s -f -
-  {{- end }}
-  {{- end }}
   {{- end }}
   echo "Monitoring common resources deleted."
 }
