@@ -103,6 +103,9 @@
         },
         "ssh": {
           "$ref": "#/$defs/Spec.Infrastructure.SSH"
+        },
+        "loadBalancers": {
+          "$ref": "#/$defs/Spec.Infrastructure.LoadBalancers"
         }
       },
       "required": [
@@ -188,6 +191,39 @@
       "required": [
         "url"
       ]
+    },
+    "Spec.Infrastructure.LoadBalancers": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Load balancer configuration. Uses HAProxy for load balancing and keepalived for VIP failover between LB nodes.",
+      "properties": {
+        "members": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Spec.Kubernetes.Member"
+          },
+          "description": "Load balancer member nodes. These nodes will run HAProxy and keepalived.",
+          "minItems": 1
+        },
+        "keepalived": {
+          "$ref": "#/$defs/Types.Keepalived"
+        },
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable load balancer configuration. When true, HAProxy and keepalived will be configured.",
+          "default": true
+        }
+      },
+      "if": {
+        "properties": {
+          "enabled": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "required": ["members"]
+      }
     },
     "Spec.Infrastructure.Node": {
       "type": "object",
@@ -721,9 +757,6 @@
         "etcd": {
           "$ref": "#/$defs/Spec.Kubernetes.Etcd"
         },
-        "loadBalancers": {
-          "$ref": "#/$defs/Spec.Kubernetes.LoadBalancers"
-        },
         "nodeGroups": {
           "type": "array",
           "items": {
@@ -766,46 +799,7 @@
         },
         "keepalived": {
           "description": "This section allows to configure a floating Virtual IP between the Control Plane nodes via Keepalived. This can be used to provide high availability for the Kubernetes API server instead of a load balancer.",
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "enabled": {
-              "type": "boolean",
-              "description": "Set to install keepalived with a floating virtual IP shared between the load balancer hosts for a deployment in High Availability."
-            },
-            "interface": {
-              "type": "string",
-              "description": "Name of the network interface where to bind the Keepalived virtual IP."
-            },
-            "ip": {
-              "type": "string",
-              "description": "The Virtual floating IP for Keepalived"
-            },
-            "virtualRouterId": {
-              "type": "string",
-              "description": "The virtual router ID of Keepalived, an arbitrary unique number from 1 to 255 used to differentiate multiple instances of vrrpd running on the same network interface and address family and multicast/unicast (and hence same socket)."
-            },
-            "passphrase": {
-              "type": "string",
-              "description": "Password for accessing vrrpd. Make it unique between Keepalived clusters.",
-              "maxLength": 8
-            }
-          },
-          "required": [
-            "enabled"
-          ],
-          "if": {
-            "properties": {
-              "enabled": {
-                "const": true
-              }
-            }
-          },
-          "then": {
-            "required": [
-              "ip"
-            ]
-          }
+          "$ref": "#/$defs/Types.Keepalived"
         },
         "taints": {
           "type": [
@@ -847,34 +841,6 @@
       },
       "required": [
         "members"
-      ]
-    },
-    "Spec.Kubernetes.LoadBalancers": {
-      "type": "object",
-      "additionalProperties": false,
-      "description": "Load balancer configuration for high-availability API server access. Uses HAProxy for load balancing and keepalived for VIP failover.",
-      "properties": {
-        "members": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/Spec.Kubernetes.Member"
-          },
-          "description": "Load balancer member nodes. These nodes will run HAProxy and keepalived.",
-          "minItems": 1
-        },
-        "virtualIP": {
-          "$ref": "#/$defs/Types.IpAddress",
-          "description": "Virtual IP address managed by keepalived for HA. This IP will be used as the control plane address. Example: 192.168.1.10"
-        },
-        "enabled": {
-          "type": "boolean",
-          "description": "Enable load balancer configuration. When true, HAProxy and keepalived will be configured.",
-          "default": true
-        }
-      },
-      "required": [
-        "members",
-        "virtualIP"
       ]
     },
     "Spec.Kubernetes.Member": {
@@ -3359,6 +3325,49 @@
           "type": "string",
           "description": "Use this ingress class for the ingress instead of the default one."
         }
+      }
+    },
+    "Types.Keepalived": {
+      "description": "This section allows to configure a floating Virtual IP between the nodes via Keepalived. This can be used to provide high availability between 2 or more nodes.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Set to install keepalived with a floating virtual IP shared between the load balancer hosts for a deployment in High Availability."
+        },
+        "interface": {
+          "type": "string",
+          "description": "Name of the network interface where to bind the Keepalived virtual IP."
+        },
+        "ip": {
+          "type": "string",
+          "description": "The Virtual floating IP for Keepalived"
+        },
+        "virtualRouterId": {
+          "type": "string",
+          "description": "The virtual router ID of Keepalived, an arbitrary unique number from 1 to 255 used to differentiate multiple instances of vrrpd running on the same network interface and address family and multicast/unicast (and hence same socket)."
+        },
+        "passphrase": {
+          "type": "string",
+          "description": "Password for accessing vrrpd. Make it unique between Keepalived clusters.",
+          "maxLength": 8
+        }
+      },
+      "required": [
+        "enabled"
+      ],
+      "if": {
+        "properties": {
+          "enabled": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "ip"
+        ]
       }
     }
   }
