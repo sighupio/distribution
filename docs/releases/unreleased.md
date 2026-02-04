@@ -78,7 +78,7 @@ spec:
 
 ### Terraform key deprecation
 
-The `spec.toolsConfiguration.terraform` field is deprecated in favor of `spec.toolsConfiguration.opentofu`. Users are encouraged to migrate to `opentofu` configuration, as the the `terraform` field will be removed in a future version.
+The `spec.toolsConfiguration.terraform` field is deprecated in favor of `spec.toolsConfiguration.opentofu`. Users are encouraged to migrate to `opentofu` configuration, as the `terraform` field will be removed in a future version.
 
 ## Upgrade procedure
 
