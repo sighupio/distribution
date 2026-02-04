@@ -1347,7 +1347,7 @@
         },
         "tls": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.Nginx.TLS",
-          "description": "TLS configuration for the nginx ingress controller."
+          "description": "TLS configuration for the Ingress NGINX Controller."
         },
         "overrides": {
           "$ref": "#/$defs/Types.FuryModuleComponentOverrides"
