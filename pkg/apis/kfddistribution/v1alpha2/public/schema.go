@@ -5,9 +5,8 @@ package public
 import (
 	"encoding/json"
 	"fmt"
-	"reflect"
-
 	"github.com/sighupio/go-jsonschema/pkg/types"
+	"reflect"
 )
 
 // UnmarshalJSON implements json.Unmarshaler.
