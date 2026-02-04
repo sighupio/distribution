@@ -1232,7 +1232,7 @@
     "Spec.Distribution.Modules.Ingress.HAProxy": {
       "type": "object",
       "additionalProperties": false,
-      "description": "Configuration for HAProxy ingress controller.",
+      "description": "Configuration for HAProxy Kubernetes Ingress Controller.",
       "properties": {
         "type": {
           "type": "string",
