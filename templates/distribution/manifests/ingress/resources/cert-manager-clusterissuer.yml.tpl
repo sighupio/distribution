@@ -2,14 +2,9 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-{{- $haproxy := index .spec.distribution.modules.ingress "haproxy" -}}
-{{- $nginxTls := index .spec.distribution.modules.ingress.nginx "tls" -}}
-{{- $tlsProvider := "none" -}}
-{{- if and $nginxTls (index $nginxTls "provider") -}}
-  {{- $tlsProvider = $nginxTls.provider -}}
-{{- end -}}
-{{- if and $haproxy (index $haproxy "type") (ne $haproxy.type "none") (index $haproxy "tls") (index $haproxy.tls "provider") -}}
-  {{- $tlsProvider = $haproxy.tls.provider -}}
+{{- $tlsProvider := .spec.distribution.modules.ingress.nginx.tls.provider -}}
+{{- if ne .spec.distribution.modules.ingress.haproxy.type "none" -}}
+  {{- $tlsProvider = .spec.distribution.modules.ingress.haproxy.tls.provider -}}
 {{- end -}}
 {{ if eq $tlsProvider "certManager" -}}
 
@@ -37,9 +32,9 @@ spec:
           hostedZoneID: {{ .spec.distribution.modules.ingress.certManager.clusterIssuer.route53.hostedZoneId }}
 {{ else if eq .spec.distribution.modules.ingress.certManager.clusterIssuer.type "http01" }}
 {{- $nginxEnabled := ne .spec.distribution.modules.ingress.nginx.type "none" -}}
-{{- $nginxCertManager := and $nginxTls (eq $nginxTls.provider "certManager") -}}
-{{- $haproxyEnabled := and $haproxy (index $haproxy "type") (ne $haproxy.type "none") -}}
-{{- $haproxyCertManager := and $haproxyEnabled (index $haproxy "tls") (eq $haproxy.tls.provider "certManager") -}}
+{{- $nginxCertManager := eq .spec.distribution.modules.ingress.nginx.tls.provider "certManager" -}}
+{{- $haproxyEnabled := ne .spec.distribution.modules.ingress.haproxy.type "none" -}}
+{{- $haproxyCertManager := eq .spec.distribution.modules.ingress.haproxy.tls.provider "certManager" -}}
 {{- /* NGINX solver */}}
 {{- if and $nginxEnabled $nginxCertManager }}
     - http01:
@@ -60,7 +55,7 @@ spec:
 {{- if and $haproxyEnabled $haproxyCertManager }}
     - http01:
         ingress:
-          class: {{ if eq $haproxy.type "dual" }}haproxy-external{{ else }}haproxy{{ end }}
+          class: {{ if eq .spec.distribution.modules.ingress.haproxy.type "dual" }}haproxy-external{{ else }}haproxy{{ end }}
           podTemplate:
             metadata:
               labels:

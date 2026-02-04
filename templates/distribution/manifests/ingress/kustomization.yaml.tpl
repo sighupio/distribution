@@ -3,21 +3,12 @@
 # license that can be found in the LICENSE file.
 
 {{- $vendorPrefix := print "../" .spec.distribution.common.relativeVendorPath }}
-{{- $haproxy := index .spec.distribution.modules.ingress "haproxy" }}
-{{- $haproxyType := "none" }}
-{{- if and $haproxy (index $haproxy "type") }}
-  {{- $haproxyType = $haproxy.type }}
+{{- $haproxyType := .spec.distribution.modules.ingress.haproxy.type }}
+{{- $tlsProvider := .spec.distribution.modules.ingress.nginx.tls.provider }}
+{{- if ne $haproxyType "none" }}
+  {{- $tlsProvider = .spec.distribution.modules.ingress.haproxy.tls.provider }}
 {{- end }}
-{{- $nginxTls := index .spec.distribution.modules.ingress.nginx "tls" }}
-{{- $tlsProvider := "none" }}
-{{- if and $nginxTls (index $nginxTls "provider") }}
-  {{- $tlsProvider = $nginxTls.provider }}
-{{- end }}
-{{- if and $haproxy (index $haproxy "type") (ne $haproxy.type "none") (index $haproxy "tls") (index $haproxy.tls "provider") }}
-  {{- $tlsProvider = $haproxy.tls.provider }}
-{{- end }}
-{{- $byoic := index .spec.distribution.modules.ingress "byoic" }}
-{{- $isBYOIC := and $byoic (index $byoic "enabled") $byoic.enabled }}
+{{- $isBYOIC := .spec.distribution.modules.ingress.byoic.enabled }}
 {{- $hasAnyIngress := or (ne .spec.distribution.modules.ingress.nginx.type "none") (ne $haproxyType "none") $isBYOIC }}
 
 ---
@@ -68,8 +59,8 @@ resources:
   - resources/ingress-infra.yml
 {{- end }}
 
-{{- $nginxUsesSecret := and (ne .spec.distribution.modules.ingress.nginx.type "none") $nginxTls (eq $nginxTls.provider "secret") }}
-{{- $haproxyUsesSecret := and (ne $haproxyType "none") $haproxy (index $haproxy "tls") (eq $haproxy.tls.provider "secret") }}
+{{- $nginxUsesSecret := and (ne .spec.distribution.modules.ingress.nginx.type "none") (eq .spec.distribution.modules.ingress.nginx.tls.provider "secret") }}
+{{- $haproxyUsesSecret := and (ne $haproxyType "none") (eq .spec.distribution.modules.ingress.haproxy.tls.provider "secret") }}
 {{- if or $nginxUsesSecret $haproxyUsesSecret }}
   - secrets/tls.yml
 {{- end }}
@@ -122,7 +113,7 @@ patches:
         value: "--dns01-recursive-nameservers=8.8.8.8:53,1.1.1.1:53"
 {{- end }}
 
-{{- if and (ne .spec.distribution.modules.ingress.nginx.type "none") $nginxTls (eq $nginxTls.provider "secret") }}
+{{- if and (ne .spec.distribution.modules.ingress.nginx.type "none") (eq .spec.distribution.modules.ingress.nginx.tls.provider "secret") }}
   {{- if eq .spec.distribution.modules.ingress.nginx.type "dual" }}
   - target:
       group: apps
@@ -149,7 +140,7 @@ patches:
   {{- end }}
 {{- end }}
 
-{{- if and (ne $haproxyType "none") $haproxy.tls (eq $haproxy.tls.provider "secret") }}
+{{- if and (ne $haproxyType "none") (eq .spec.distribution.modules.ingress.haproxy.tls.provider "secret") }}
   {{- if eq $haproxyType "dual" }}
   - target:
       group: apps

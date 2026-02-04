@@ -5,13 +5,8 @@
 {{- if eq .spec.distribution.modules.auth.provider.type "basicAuth" -}}
 {{- $username := .spec.distribution.modules.auth.provider.basicAuth.username -}}
 {{- $password := .spec.distribution.modules.auth.provider.basicAuth.password -}}
-{{- $haproxy := index .spec.distribution.modules.ingress "haproxy" }}
-{{- $haproxyType := "none" }}
-{{- if and $haproxy (index $haproxy "type") }}
-  {{- $haproxyType = $haproxy.type }}
-{{- end }}
-{{- $byoic := index .spec.distribution.modules.ingress "byoic" }}
-{{- $isBYOIC := and $byoic (index $byoic "enabled") $byoic.enabled }}
+{{- $haproxyType := .spec.distribution.modules.ingress.haproxy.type }}
+{{- $isBYOIC := .spec.distribution.modules.ingress.byoic.enabled }}
 {{- $hasAnyIngress := or (ne .spec.distribution.modules.ingress.nginx.type "none") (ne $haproxyType "none") $isBYOIC }}
 
 {{- /* Check if HAProxy is the active controller for infra ingresses */ -}}

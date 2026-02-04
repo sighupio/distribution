@@ -2,8 +2,7 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-{{- $haproxy := index .spec.distribution.modules.ingress "haproxy" }}
-{{- if and $haproxy (index $haproxy "tls") (eq $haproxy.tls.provider "secret") }}
+{{- if eq .spec.distribution.modules.ingress.haproxy.tls.provider "secret" }}
 # Note: this assumes HAProxy package has --default-ssl-certificate as args/0. If katalog args order changes, this patch will break.
 - op: replace
   path: /spec/template/spec/containers/0/args/0

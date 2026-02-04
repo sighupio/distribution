@@ -2,9 +2,8 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-{{- $haproxy := index .spec.distribution.modules.ingress "haproxy" }}
 {{- if eq .spec.distribution.common.provider.type "eks" }}
-{{- if and $haproxy (eq $haproxy.type "single") }}
+{{- if eq .spec.distribution.modules.ingress.haproxy.type "single" }}
 ---
 apiVersion: v1
 kind: Service

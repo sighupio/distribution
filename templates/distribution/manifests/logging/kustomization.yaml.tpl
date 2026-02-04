@@ -13,13 +13,8 @@ kind: Kustomization
 {{- $fluentdReplicas := index .spec.distribution.modules.logging.operator.fluentd "replicas" }}
 {{- $fluentdResources := index .spec.distribution.modules.logging.operator.fluentd "resources" }}
 {{- $fluentbitResources := index .spec.distribution.modules.logging.operator.fluentbit "resources" }}
-{{- $haproxy := index .spec.distribution.modules.ingress "haproxy" }}
-{{- $haproxyType := "none" }}
-{{- if and $haproxy (index $haproxy "type") }}
-  {{- $haproxyType = $haproxy.type }}
-{{- end }}
-{{- $byoic := index .spec.distribution.modules.ingress "byoic" }}
-{{- $isBYOIC := and $byoic (index $byoic "enabled") $byoic.enabled }}
+{{- $haproxyType := .spec.distribution.modules.ingress.haproxy.type }}
+{{- $isBYOIC := .spec.distribution.modules.ingress.byoic.enabled }}
 {{- $hasAnyIngress := or (ne .spec.distribution.modules.ingress.nginx.type "none") (ne $haproxyType "none") $isBYOIC }}
 
 resources:
