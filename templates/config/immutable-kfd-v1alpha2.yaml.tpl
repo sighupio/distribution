@@ -30,6 +30,20 @@ spec:
     ipxeServer:
       url: https://ipxe.example.com:8080
 
+    # Load balancers (HAProxy) with Keepalived for VIP HA
+    loadBalancers:
+      enabled: true
+      members:
+        - hostname: haproxy1.example.com
+          ip: 192.168.1.200
+        - hostname: haproxy2.example.com
+          ip: 192.168.1.202
+      keepalived:
+        enabled: true
+        interface: eth0
+        ip: 192.168.1.201
+        virtualRouterId: "1"
+
     # Nodes configuration (11 nodes: 2 load balancers + 3 control plane + 3 infra workers + 3 app workers)
     nodes:
       # Load Balancer Nodes (HAProxy + Keepalived for HA)
@@ -232,16 +246,6 @@ spec:
         - hostname: master3.example.com
           ip: 192.168.1.12
 
-    # Load balancers (HAProxy) with Keepalived for VIP HA
-    loadBalancers:
-      enabled: true
-      members:
-        - hostname: haproxy1.example.com
-          ip: 192.168.1.200
-        - hostname: haproxy2.example.com
-          ip: 192.168.1.202
-      virtualIP: 192.168.1.201
-
     # Worker nodes organized in node groups
     nodeGroups:
       # Infrastructure workers (for system components)
@@ -301,10 +305,10 @@ spec:
         type: prometheus
 
       policy:
-        type: kyverno
+        type: none
 
       dr:
-        type: on-premises
+        type: none
 
       auth:
         provider:
