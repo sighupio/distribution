@@ -2,11 +2,7 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-{{- $haproxy := index .spec.distribution.modules.ingress "haproxy" }}
-{{- $haproxyType := "none" }}
-{{- if and $haproxy (index $haproxy "type") }}
-  {{- $haproxyType = $haproxy.type }}
-{{- end }}
+{{- $haproxyType := .spec.distribution.modules.ingress.haproxy.type }}
 {{- $nginxType := .spec.distribution.modules.ingress.nginx.type }}
 {{- $isDual := or (eq $nginxType "dual") (eq $haproxyType "dual") }}
 {{- $isSingle := or (eq $nginxType "single") (eq $haproxyType "single") }}
