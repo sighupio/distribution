@@ -1245,7 +1245,7 @@
         },
         "tls": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.HAProxy.TLS",
-          "description": "TLS configuration for the HAProxy ingress controller."
+          "description": "TLS configuration for the HAProxy Kubernetes Ingress Controller."
         },
         "overrides": {
           "$ref": "#/$defs/Types.FuryModuleComponentOverrides"
