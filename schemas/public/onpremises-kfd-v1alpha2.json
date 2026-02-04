@@ -1241,7 +1241,7 @@
             "single",
             "dual"
           ],
-          "description": "The type of the HAProxy ingress controller, options are:\n- `none`: HAProxy ingress controller will not be installed.\n- `single`: a single HAProxy ingress controller with ingress class `haproxy` will be installed.\n- `dual`: two independent HAProxy ingress controllers will be installed, one for the `haproxy-internal` ingress class and one for the `haproxy-external` ingress class.\n\nDefault is `none`."
+          "description": "The type of the HAProxy Kubernetes Ingress Controller, options are:\n- `none`: HAProxy ingress controller will not be installed.\n- `single`: a single HAProxy ingress controller with ingress class `haproxy` will be installed.\n- `dual`: two independent HAProxy ingress controllers will be installed, one for the `haproxy-internal` ingress class and one for the `haproxy-external` ingress class.\n\nDefault is `none`."
         },
         "tls": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.HAProxy.TLS",
