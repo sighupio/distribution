@@ -1258,7 +1258,7 @@
     "Spec.Distribution.Modules.Ingress.HAProxy.TLS": {
       "type": "object",
       "additionalProperties": false,
-      "description": "TLS configuration for the HAProxy ingress controller.",
+      "description": "TLS configuration for the HAProxy Kubernetes Ingress Controller.",
       "properties": {
         "provider": {
           "type": "string",
