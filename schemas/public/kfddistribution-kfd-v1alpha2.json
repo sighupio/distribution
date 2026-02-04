@@ -335,26 +335,85 @@
         "baseDomain",
         "nginx"
       ],
-      "if": {
-        "properties": {
-          "nginx": {
+      "allOf": [
+        {
+          "if": {
             "properties": {
-              "tls": {
+              "nginx": {
                 "properties": {
-                  "provider": {
-                    "const": "certManager"
+                  "tls": {
+                    "properties": {
+                      "provider": {
+                        "const": "certManager"
+                      }
+                    }
                   }
                 }
               }
             }
+          },
+          "then": {
+            "required": [
+              "certManager"
+            ]
+          }
+        },
+        {
+          "if": {
+            "allOf": [
+              {
+                "properties": {
+                  "byoic": {
+                    "properties": {
+                      "enabled": {
+                        "const": true
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "nginx": {
+                    "properties": {
+                      "type": {
+                        "const": "none"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "anyOf": [
+                  {
+                    "not": {
+                      "required": ["haproxy"]
+                    }
+                  },
+                  {
+                    "properties": {
+                      "haproxy": {
+                        "properties": {
+                          "type": {
+                            "const": "none"
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "then": {
+            "properties": {
+              "byoic": {
+                "required": ["ingressClass"]
+              }
+            }
           }
         }
-      },
-      "then": {
-        "required": [
-          "certManager"
-        ]
-      }
+      ]
     },
     "Spec.Distribution.Modules.Ingress.Overrides": {
       "type": "object",
@@ -494,8 +553,7 @@
         }
       },
       "required": [
-        "enabled",
-        "ingressClass"
+        "enabled"
       ]
     },
     "Spec.Distribution.Modules.Ingress.Nginx": {

@@ -1492,6 +1492,61 @@
               "certManager"
             ]
           }
+        },
+        {
+          "if": {
+            "allOf": [
+              {
+                "properties": {
+                  "byoic": {
+                    "properties": {
+                      "enabled": {
+                        "const": true
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "nginx": {
+                    "properties": {
+                      "type": {
+                        "const": "none"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "anyOf": [
+                  {
+                    "not": {
+                      "required": ["haproxy"]
+                    }
+                  },
+                  {
+                    "properties": {
+                      "haproxy": {
+                        "properties": {
+                          "type": {
+                            "const": "none"
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "then": {
+            "properties": {
+              "byoic": {
+                "required": ["ingressClass"]
+              }
+            }
+          }
         }
       ]
     },
@@ -1633,8 +1688,7 @@
         }
       },
       "required": [
-        "enabled",
-        "ingressClass"
+        "enabled"
       ]
     },
     "Spec.Distribution.Modules.Ingress.Nginx": {

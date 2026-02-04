@@ -1163,31 +1163,90 @@
         },
         "forecastle": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.Forecastle"
-        },
-        "if": {
-          "properties": {
-            "nginx": {
-              "properties": {
-                "tls": {
-                  "properties": {
-                    "provider": {
-                      "const": "certManager"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "then": {
-          "required": [
-            "certManager"
-          ]
         }
       },
       "required": [
         "baseDomain",
         "nginx"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "nginx": {
+                "properties": {
+                  "tls": {
+                    "properties": {
+                      "provider": {
+                        "const": "certManager"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "certManager"
+            ]
+          }
+        },
+        {
+          "if": {
+            "allOf": [
+              {
+                "properties": {
+                  "byoic": {
+                    "properties": {
+                      "enabled": {
+                        "const": true
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "nginx": {
+                    "properties": {
+                      "type": {
+                        "const": "none"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "anyOf": [
+                  {
+                    "not": {
+                      "required": ["haproxy"]
+                    }
+                  },
+                  {
+                    "properties": {
+                      "haproxy": {
+                        "properties": {
+                          "type": {
+                            "const": "none"
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "then": {
+            "properties": {
+              "byoic": {
+                "required": ["ingressClass"]
+              }
+            }
+          }
+        }
       ]
     },
     "Spec.Distribution.Modules.Ingress.Overrides": {
@@ -1328,8 +1387,7 @@
         }
       },
       "required": [
-        "enabled",
-        "ingressClass"
+        "enabled"
       ]
     },
     "Spec.Distribution.Modules.Ingress.Nginx": {
