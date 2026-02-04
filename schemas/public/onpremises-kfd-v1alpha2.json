@@ -1050,6 +1050,88 @@
         "ingress",
         "logging",
         "policy"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "allOf": [
+              {
+                "properties": {
+                  "auth": {
+                    "properties": {
+                      "provider": {
+                        "properties": {
+                          "type": {
+                            "const": "basicAuth"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "ingress": {
+                    "properties": {
+                      "nginx": {
+                        "properties": {
+                          "type": {
+                            "const": "none"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "anyOf": [
+                  {
+                    "properties": {
+                      "ingress": {
+                        "properties": {
+                          "haproxy": {
+                            "properties": {
+                              "type": {
+                                "const": "none"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "ingress": {
+                        "not": {
+                          "required": ["haproxy"]
+                        }
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "properties": {
+                  "ingress": {
+                    "properties": {
+                      "byoic": {
+                        "properties": {
+                          "enabled": {
+                            "const": true
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "then": false
+        }
       ]
     },
     "Spec.Distribution.Modules.Ingress": {
