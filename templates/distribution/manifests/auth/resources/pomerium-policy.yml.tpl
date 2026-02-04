@@ -2,6 +2,15 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
+{{- $haproxy := index .spec.distribution.modules.ingress "haproxy" }}
+{{- $haproxyType := "none" }}
+{{- if and $haproxy (index $haproxy "type") }}
+  {{- $haproxyType = $haproxy.type }}
+{{- end }}
+{{- $byoic := index .spec.distribution.modules.ingress "byoic" }}
+{{- $isBYOIC := and $byoic (index $byoic "enabled") $byoic.enabled }}
+{{- $hasAnyIngress := or (ne .spec.distribution.modules.ingress.nginx.type "none") (ne $haproxyType "none") $isBYOIC }}
+
 {{ if eq .spec.distribution.modules.auth.provider.type "sso" }}
 address: ":8080"
 metrics_address: ":9090"
@@ -61,12 +70,13 @@ routes:
   {{- end }}
   {{- end }}
 
-  {{- if ne .spec.distribution.modules.ingress.nginx.type "none" }}
+  {{/* Forecastle route is enabled if any ingress controller is active or BYOIC */}}
+  {{- if $hasAnyIngress }}
   - from: https://{{ template "forecastleUrl" .spec }}
     to: http://forecastle.forecastle.svc.cluster.local
     policy:
-      {{- if and (index .spec.distribution.modules.auth.pomerium "defaultRoutesPolicy") (index .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy "ingressNgnixForecastle") }}
-      {{- .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.ingressNgnixForecastle | toYaml | nindent 6 }}
+      {{- if and (index .spec.distribution.modules.auth.pomerium "defaultRoutesPolicy") (index .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy "ingressForecastle") }}
+      {{- .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.ingressForecastle | toYaml | nindent 6 }}
       {{- else }}
       - allow:
           and:

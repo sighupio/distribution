@@ -3,6 +3,14 @@
 # license that can be found in the LICENSE file.
 
 {{- $vendorPrefix := print "../" .spec.distribution.common.relativeVendorPath }}
+{{- $haproxy := index .spec.distribution.modules.ingress "haproxy" }}
+{{- $haproxyType := "none" }}
+{{- if and $haproxy (index $haproxy "type") }}
+  {{- $haproxyType = $haproxy.type }}
+{{- end }}
+{{- $byoic := index .spec.distribution.modules.ingress "byoic" }}
+{{- $isBYOIC := and $byoic (index $byoic "enabled") $byoic.enabled }}
+{{- $hasAnyIngress := or (ne .spec.distribution.modules.ingress.nginx.type "none") (ne $haproxyType "none") $isBYOIC }}
 
 ---
 apiVersion: kustomize.config.k8s.io/v1beta1
@@ -13,7 +21,7 @@ resources:
 {{- if eq .spec.distribution.modules.tracing.tempo.backend "minio" }}
   - {{ print $vendorPrefix "/modules/tracing/katalog/minio-ha" }}
 {{- end }}
-{{- if ne .spec.distribution.modules.ingress.nginx.type "none" }}
+{{- if $hasAnyIngress }}
 {{- if eq .spec.distribution.modules.tracing.tempo.backend "minio" }}
   - resources/ingress-infra.yml
 {{- end }}

@@ -2,8 +2,17 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
+{{- $haproxy := index .spec.distribution.modules.ingress "haproxy" }}
+{{- $haproxyType := "none" }}
+{{- if and $haproxy (index $haproxy "type") }}
+  {{- $haproxyType = $haproxy.type }}
+{{- end }}
+
+{{- $isDual := or (eq .spec.distribution.modules.ingress.nginx.type "dual") (eq $haproxyType "dual") }}
+{{- $isSingle := and (not $isDual) (or (eq .spec.distribution.modules.ingress.nginx.type "single") (eq $haproxyType "single")) }}
+
 {{- if eq .spec.distribution.common.provider.type "eks" }}
-{{- if eq .spec.distribution.modules.ingress.nginx.type "dual" }}
+{{- if $isDual }}
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -61,9 +70,7 @@ spec:
           - --provider=$(PROVIDER)
           - --aws-zone-type=private
           - --txt-owner-id={{ .metadata.name}}-private
-
-{{- end }}
-{{- if eq .spec.distribution.modules.ingress.nginx.type "single" }}
+{{- else if $isSingle }}
 ---
 apiVersion: v1
 kind: ServiceAccount

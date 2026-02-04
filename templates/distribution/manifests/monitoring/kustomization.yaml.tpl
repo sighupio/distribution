@@ -5,6 +5,14 @@
 {{- $vendorPrefix := print "../" .spec.distribution.common.relativeVendorPath }}
 {{- $monitoringType := .spec.distribution.modules.monitoring.type }}
 {{- $installEnhancedHPAMetrics := .spec.distribution.modules.monitoring.prometheusAdapter.installEnhancedHPAMetrics }}
+{{- $haproxy := index .spec.distribution.modules.ingress "haproxy" }}
+{{- $haproxyType := "none" }}
+{{- if and $haproxy (index $haproxy "type") }}
+  {{- $haproxyType = $haproxy.type }}
+{{- end }}
+{{- $byoic := index .spec.distribution.modules.ingress "byoic" }}
+{{- $isBYOIC := and $byoic (index $byoic "enabled") $byoic.enabled }}
+{{- $hasAnyIngress := or (ne .spec.distribution.modules.ingress.nginx.type "none") (ne $haproxyType "none") $isBYOIC }}
 # rendering Kustomization file for monitoring type {{ $monitoringType }}
 ---
 apiVersion: kustomize.config.k8s.io/v1beta1
@@ -47,7 +55,7 @@ resources:
             {{- end }}
         {{- end }}
     {{- end }}
-    {{- if and (ne .spec.distribution.modules.ingress.nginx.type "none") }}{{/* we don't need ingresses for Prometheus in Agent mode */}}
+    {{- if $hasAnyIngress }}{{/* we don't need ingresses for Prometheus in Agent mode */}}
   - resources/ingress-infra.yml
     {{- end }}
 {{- end }}

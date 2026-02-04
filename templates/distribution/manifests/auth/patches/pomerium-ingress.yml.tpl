@@ -2,12 +2,21 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
+{{- $haproxy := index .spec.distribution.modules.ingress "haproxy" -}}
+{{- $nginxTls := index .spec.distribution.modules.ingress.nginx "tls" -}}
+{{- $tlsProvider := "none" -}}
+{{- if and $nginxTls (index $nginxTls "provider") -}}
+  {{- $tlsProvider = $nginxTls.provider -}}
+{{- end -}}
+{{- if and $haproxy (index $haproxy "type") (ne $haproxy.type "none") (index $haproxy "tls") (index $haproxy.tls "provider") -}}
+  {{- $tlsProvider = $haproxy.tls.provider -}}
+{{- end -}}
 {{- if eq .spec.distribution.modules.auth.provider.type "sso" -}}
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  {{- if eq .spec.distribution.modules.ingress.nginx.tls.provider "certManager" }}
+  {{- if eq $tlsProvider "certManager" }}
   annotations:
     {{ template "certManagerClusterIssuer" . }}
   {{- end }}
