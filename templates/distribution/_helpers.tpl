@@ -81,11 +81,26 @@
   {{- end -}}
 {{- end -}}
 
+{{/* globalIngressClass returns the ingressClassName for SD infrastructure ingresses.
+     The first in terms of priority is HAProxy.
+*/}}
 {{ define "globalIngressClass" }}
-  {{- if eq .spec.distribution.modules.ingress.nginx.type "single" -}}
-    "nginx"
-  {{- else -}}
-    {{ .type }}
+  {{- $haproxy := index .spec.distribution.modules.ingress "haproxy" -}}
+  {{- $byoic := index .spec.distribution.modules.ingress "byoic" -}}
+  {{- if and $haproxy (index $haproxy "type") (eq $haproxy.type "single") -}}
+    haproxy
+  {{- else if and $haproxy (index $haproxy "type") (eq $haproxy.type "dual") -}}
+    {{- if eq .type "internal" -}}
+      haproxy-internal
+    {{- else -}}
+      haproxy-external
+    {{- end -}}
+  {{- else if eq .spec.distribution.modules.ingress.nginx.type "single" -}}
+    nginx
+  {{- else if eq .spec.distribution.modules.ingress.nginx.type "dual" -}}
+    {{- .type -}}
+  {{- else if and $byoic (index $byoic "enabled") $byoic.enabled -}}
+    {{- $byoic.ingressClass -}}
   {{- end -}}
 {{ end }}
 
@@ -127,12 +142,20 @@
 
 {{/* ingressTls { module: <module>, package: <package>, prefix: <prefix>, spec: "." } */}}
 {{- define "ingressTls" -}}
-{{ if eq .spec.distribution.modules.ingress.nginx.tls.provider "none" -}}
-  {{ else }}
+{{- $haproxy := index .spec.distribution.modules.ingress "haproxy" -}}
+{{- $nginxTls := index .spec.distribution.modules.ingress.nginx "tls" -}}
+{{- $tlsProvider := "none" -}}
+{{- if and $nginxTls (index $nginxTls "provider") -}}
+  {{- $tlsProvider = $nginxTls.provider -}}
+{{- end -}}
+{{- if and $haproxy (index $haproxy "type") (ne $haproxy.type "none") (index $haproxy "tls") (index $haproxy.tls "provider") -}}
+  {{- $tlsProvider = $haproxy.tls.provider -}}
+{{- end -}}
+{{- if ne $tlsProvider "none" }}
   tls:
     - hosts:
       - {{ template "ingressHost" . }}
-    {{- if eq .spec.distribution.modules.ingress.nginx.tls.provider "certManager" }}
+    {{- if eq $tlsProvider "certManager" }}
       secretName: {{ lower .prefix | trimSuffix "." }}-tls
     {{- end }}
 {{- end }}
@@ -140,12 +163,20 @@
 
 {{/* ingressTlsAuth { module: <module>, package: <package>, prefix: <prefix>, spec: "." } */}}
 {{- define "ingressTlsAuth" -}}
-{{ if eq .spec.distribution.modules.ingress.nginx.tls.provider "none" -}}
-  {{ else }}
+{{- $haproxy := index .spec.distribution.modules.ingress "haproxy" -}}
+{{- $nginxTls := index .spec.distribution.modules.ingress.nginx "tls" -}}
+{{- $tlsProvider := "none" -}}
+{{- if and $nginxTls (index $nginxTls "provider") -}}
+  {{- $tlsProvider = $nginxTls.provider -}}
+{{- end -}}
+{{- if and $haproxy (index $haproxy "type") (ne $haproxy.type "none") (index $haproxy "tls") (index $haproxy.tls "provider") -}}
+  {{- $tlsProvider = $haproxy.tls.provider -}}
+{{- end -}}
+{{- if ne $tlsProvider "none" }}
   tls:
     - hosts:
       - {{ template "ingressHostAuth" . }}
-    {{- if eq .spec.distribution.modules.ingress.nginx.tls.provider "certManager" }}
+    {{- if eq $tlsProvider "certManager" }}
       secretName: {{ lower .package }}-tls
     {{- end }}
 {{- end }}
@@ -153,14 +184,32 @@
 
 {{ define "ingressAuth" }}
 {{- if eq .spec.distribution.modules.auth.provider.type "basicAuth" -}}
+  {{- $haproxy := index .spec.distribution.modules.ingress "haproxy" -}}
+  {{- if and $haproxy (index $haproxy "type") (ne $haproxy.type "none") -}}
+    {{/* HAProxy basicAuth annotations */}}
+    haproxy.org/auth-type: basic-auth
+    haproxy.org/auth-secret: basic-auth
+    haproxy.org/auth-realm: Authentication Required
+  {{- else if ne .spec.distribution.modules.ingress.nginx.type "none" -}}
+    {{/* NGINX basicAuth annotations */}}
     nginx.ingress.kubernetes.io/auth-type: basic
     nginx.ingress.kubernetes.io/auth-secret: basic-auth
     nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required'
+  {{- end -}}
 {{- end -}}
 {{ end }}
 
 {{ define "certManagerClusterIssuer" }}
-{{- if eq .spec.distribution.modules.ingress.nginx.tls.provider "certManager" -}}
+{{- $haproxy := index .spec.distribution.modules.ingress "haproxy" -}}
+{{- $nginxTls := index .spec.distribution.modules.ingress.nginx "tls" -}}
+{{- $tlsProvider := "none" -}}
+{{- if and $nginxTls (index $nginxTls "provider") -}}
+  {{- $tlsProvider = $nginxTls.provider -}}
+{{- end -}}
+{{- if and $haproxy (index $haproxy "type") (ne $haproxy.type "none") (index $haproxy "tls") (index $haproxy.tls "provider") -}}
+  {{- $tlsProvider = $haproxy.tls.provider -}}
+{{- end -}}
+{{- if eq $tlsProvider "certManager" -}}
 cert-manager.io/cluster-issuer: {{ .spec.distribution.modules.ingress.certManager.clusterIssuer.name }}
 {{- end -}}
 {{ end }}
