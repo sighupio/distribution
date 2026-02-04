@@ -6,26 +6,36 @@ The distribution is maintained with ❤️ by the team [SIGHUP by ReeVo](https:/
 
 ## New features 🌟
 
-- [[#468](https://github.com/sighupio/distribution/pull/468)] Added OpenTofu as an alternative to Terraform, with compatibility for existing Terraform state files:
-  - New `spec.toolsConfiguration.opentofu` field for state backend configuration
-  - Under the hood furyctl will use the OpenTofu binary
-  - Existing `terraform` configurations continue to work
+- [[#483](https://github.com/sighupio/distribution/pull/483)] Added support for HAProxy ingress controller and BYOIC (Bring Your Own Ingress Controller) mode. HAProxy is adopted as the new reference ingress controller following the official NGINX retirement announcement. When both NGINX and HAProxy are enabled, HAProxy takes priority for infrastructure ingresses, while the cluster-wide default IngressClass remains `nginx`. BYOIC mode allows using a custom ingress controller deployed as a distribution plugin, not managed by the SD lifecycle.
+- [[#468](https://github.com/sighupio/distribution/pull/468)] Replaced Terraform with OpenTofu: furyctl now uses the OpenTofu v1.10.0 binary instead of Terraform. A new `spec.toolsConfiguration.opentofu` field is available for state backend configuration. The `spec.toolsConfiguration.terraform` field is deprecated and will be removed in a future version. To use the new field, add the `opentofu` key to your furyctl.yaml file with the same S3 backend:
+
+  ```yaml
+  spec:
+    toolsConfiguration:
+      opentofu:     # Before was terraform
+        state:
+          s3:
+            bucketName: your-bucket-name       # Same as terraform
+            keyPrefix: your-key-prefix          # Same as terraform
+            region: your-region                 # Same as terraform
+  ```
+
 - [[#479](https://github.com/sighupio/distribution/pull/479)] Add `vpn_furyagent_path` to infrastructure terraform template for EKSCluster provider to avoid re-download.
 - [[#482](https://github.com/sighupio/distribution/pull/482)] Added `kubeadmDownloadUrl`, `kubeadmChecksum`, and `kubeadmBinaryDir` fields to `spec.kubernetes.advanced.airGap` for air-gapped on-premises clusters, used on dedicated etcd nodes for certificate management.
 - [[#459](https://github.com/sighupio/distribution/pull/459)] Support for kube-proxy-less clusters: on-premises clusters can be now created without kube-proxy. Disabling kube-proxy will enable Calico in eBPF mode and Cilium's kube-proxy-replacement mode in the networking module. You can disable the kube-proxy like so:
 
-```yaml
-apiVersion: kfd.sighup.io/v1alpha2
-kind: OnPremises
-metadata:
-  name: kube-proxy-less
-spec:
-  kubernetes:
-    advanced:
-      kubeProxy:
-        enabled: false
-    ...
-```
+  ```yaml
+  apiVersion: kfd.sighup.io/v1alpha2
+  kind: OnPremises
+  metadata:
+    name: kube-proxy-less
+  spec:
+    kubernetes:
+      advanced:
+        kubeProxy:
+          enabled: false
+      ...
+  ```
 
 - [[#442](https://github.com/sighupio/distribution/pull/442)] Added GCS (Google Cloud Storage) as a supported backend for the DR module configuration and added support for new fields. 
 
@@ -38,27 +48,37 @@ spec:
 
 ## Breaking Changes 💔
 
-None, but the `spec.toolsConfiguration.terraform` field is deprecated in favor of `spec.toolsConfiguration.opentofu`
+### Pomerium policy key renaming
 
-- Users are encouraged to migrate to `opentofu` configuration
-- The `terraform` field will be removed in a future version
+The Pomerium default route policy key for Forecastle has been renamed from `ingressNgnixForecastle` to `ingressForecastle` to reflect that Forecastle is no longer tied to NGINX (now supports also HAProxy and BYOIC mode).
 
-## Migration Guide
-
-If you're currently using Terraform and want to migrate to OpenTofu field:
-
-1. Add the `opentofu` field to your furyctl.yaml file with the same S3 backend:
-
+Before:
 ```yaml
 spec:
-  toolsConfiguration:
-    opentofu:     # Before was terraform
-      state:
-        s3:
-          bucketName: your-bucket-name       # Same as terraform
-          keyPrefix: your-key-prefix          # Same as terraform
-          region: your-region                 # Same as terraform
+  distribution:
+    modules:
+      auth:
+        pomerium:
+          defaultRoutesPolicy:
+            ingressNgnixForecastle:  # Old key
+              - allow:
 ```
+
+After:
+```yaml
+spec:
+  distribution:
+    modules:
+      auth:
+        pomerium:
+          defaultRoutesPolicy:
+            ingressForecastle:  # New key
+              - allow:
+```
+
+### Terraform key deprecation
+
+The `spec.toolsConfiguration.terraform` field is deprecated in favor of `spec.toolsConfiguration.opentofu`. Users are encouraged to migrate to `opentofu` configuration, as the the `terraform` field will be removed in a future version.
 
 ## Upgrade procedure
 
