@@ -2653,16 +2653,17 @@ The value of the toleration
 
 ### Properties
 
-| Property                                                                   | Type     | Required |
-|:---------------------------------------------------------------------------|:---------|:---------|
-| [audit](#specdistributionmodulesloggingcustomoutputsaudit)                 | `string` | Required |
-| [errors](#specdistributionmodulesloggingcustomoutputserrors)               | `string` | Required |
-| [events](#specdistributionmodulesloggingcustomoutputsevents)               | `string` | Required |
-| [infra](#specdistributionmodulesloggingcustomoutputsinfra)                 | `string` | Required |
-| [ingressNginx](#specdistributionmodulesloggingcustomoutputsingressnginx)   | `string` | Required |
-| [kubernetes](#specdistributionmodulesloggingcustomoutputskubernetes)       | `string` | Required |
-| [systemdCommon](#specdistributionmodulesloggingcustomoutputssystemdcommon) | `string` | Required |
-| [systemdEtcd](#specdistributionmodulesloggingcustomoutputssystemdetcd)     | `string` | Required |
+| Property                                                                     | Type     | Required |
+|:-----------------------------------------------------------------------------|:---------|:---------|
+| [audit](#specdistributionmodulesloggingcustomoutputsaudit)                   | `string` | Required |
+| [errors](#specdistributionmodulesloggingcustomoutputserrors)                 | `string` | Required |
+| [events](#specdistributionmodulesloggingcustomoutputsevents)                 | `string` | Required |
+| [infra](#specdistributionmodulesloggingcustomoutputsinfra)                   | `string` | Required |
+| [ingressHaproxy](#specdistributionmodulesloggingcustomoutputsingresshaproxy) | `string` | Required |
+| [ingressNginx](#specdistributionmodulesloggingcustomoutputsingressnginx)     | `string` | Required |
+| [kubernetes](#specdistributionmodulesloggingcustomoutputskubernetes)         | `string` | Required |
+| [systemdCommon](#specdistributionmodulesloggingcustomoutputssystemdcommon)   | `string` | Required |
+| [systemdEtcd](#specdistributionmodulesloggingcustomoutputssystemdetcd)       | `string` | Required |
 
 ### Description
 
@@ -2691,6 +2692,12 @@ This value defines where the output from the `events` Flow will be sent. This wi
 ### Description
 
 This value defines where the output from the `infra` Flow will be sent. This will be the `spec` section of the `Output` object. It must be a string (and not a YAML object) following the OutputSpec definition. Use the `nullout` output to discard the flow: `nullout: {}`
+
+## .spec.distribution.modules.logging.customOutputs.ingressHaproxy
+
+### Description
+
+This value defines where the output from the `ingressHaproxy` Flow will be sent. This will be the `spec` section of the `Output` object. It must be a string (and not a YAML object) following the OutputSpec definition. Use the `nullout` output to discard the flow: `nullout: {}`
 
 ## .spec.distribution.modules.logging.customOutputs.ingressNginx
 
