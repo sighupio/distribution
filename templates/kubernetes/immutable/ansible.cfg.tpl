@@ -9,6 +9,4 @@ roles_path = ../vendor/installers/immutable/roles
 timeout = 90
 callback_result_format = yaml
 bin_ansible_callbacks = True
-{{- if and (index .spec.kubernetes "advancedAnsible") (index .spec.kubernetes.advancedAnsible "config") }}
-{{ .spec.kubernetes.advancedAnsible.config }}
-{{- end }}
+{{ .spec | digAny "toolsConfiguration" "ansible" "config" "" }}
