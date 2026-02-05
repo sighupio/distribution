@@ -8,35 +8,35 @@ infrastructure:
   - path: .spec.infrastructure.flatcarVersion
     immutable: true
     description: "Flatcar Container Linux version cannot be changed after cluster creation"
-  
+
   - path: .spec.infrastructure.installDisk
     immutable: true
     description: "Installation disk cannot be changed after cluster creation"
-  
+
   - path: .spec.infrastructure.ssh.keyPath
     immutable: true
     description: "SSH key path cannot be changed after cluster creation"
-  
+
   - path: .spec.infrastructure.ssh.username
     immutable: true
     description: "SSH username cannot be changed after cluster creation"
-  
+
   - path: .spec.infrastructure.ipxeServer.url
     immutable: true
     description: "iPXE server URL cannot be changed after cluster creation"
-  
+
   - path: .spec.infrastructure.nodes.*.macAddress
     immutable: true
     description: "Node MAC addresses are immutable and define the physical hardware"
-  
+
   - path: .spec.infrastructure.nodes.*.hostname
     immutable: true
     description: "Node hostnames cannot be changed after cluster creation"
-  
+
   - path: .spec.infrastructure.nodes.*.network.ethernets.*.addresses.*
     immutable: true
     description: "Node IP addresses cannot be changed after cluster creation"
-  
+
   - path: .spec.infrastructure.nodes.*.network.ethernets.*.gateway
     immutable: true
     description: "Node gateway cannot be changed after cluster creation"
@@ -46,27 +46,27 @@ kubernetes:
   - path: .spec.kubernetes.dnsZone
     immutable: true
     description: "DNS zone cannot be changed after cluster creation"
-  
-  - path: .spec.kubernetes.controlPlaneAddress
+
+  - path: .spec.kubernetes.controlPlane.address
     immutable: true
     description: "Control plane address cannot be changed after cluster creation"
-  
+
   - path: .spec.kubernetes.podCidr
     immutable: true
     description: "Pod CIDR cannot be changed after cluster creation"
-  
+
   - path: .spec.kubernetes.svcCidr
     immutable: true
     description: "Service CIDR cannot be changed after cluster creation"
-  
+
   - path: .spec.kubernetes.etcd.members.*
     immutable: true
     description: "etcd member configuration cannot be changed after cluster creation"
-  
+
   - path: .spec.kubernetes.controlPlane.members.*
     immutable: true
     description: "Control plane member configuration cannot be changed after cluster creation"
-  
+
   - path: .spec.kubernetes.version
     immutable: false
     description: "Kubernetes version can be upgraded following supported upgrade paths"
@@ -89,19 +89,19 @@ distribution:
     reducers:
       - key: distributionCommonNetworkPoliciesEnabled
         lifecycle: pre-apply
-  
+
   - path: .spec.distribution.modules.networking.type
     immutable: true
     description: "Networking module type cannot be changed after cluster creation"
-  
+
   - path: .spec.distribution.modules.networking.tigeraOperator.blockSize
     immutable: true
     description: "Tigera Operator block size cannot be changed after cluster creation"
-  
+
   - path: .spec.distribution.modules.networking.tigeraOperator.podCidr
     immutable: true
     description: "Tigera Operator pod CIDR cannot be changed after cluster creation"
-  
+
   - path: .spec.distribution.modules.logging.type
     immutable: false
     description: "changes to the logging module type have been detected. This will cause the reconfiguration or deletion of the current logging stack."
@@ -110,21 +110,21 @@ distribution:
     reducers:
       - key: distributionModulesLoggingType
         lifecycle: pre-apply
-  
+
   - path: .spec.distribution.modules.logging.loki.tsdbStartDate
     immutable: true
     description: "changes to Loki's TSDB start date have been detected. This parameter cannot be changed once set."
     safe:
       - fromNodes:
-        - path: ".spec.distribution.modules.logging.type"
-          from: "none"
-        - path: ".spec.distribution.modules.logging.type"
-          to: "none"
-        - path: ".spec.distribution.modules.logging.type"
-          from: "opensearch"
-        - path: ".spec.distribution.modules.logging.type"
-          to: "opensearch"
-  
+          - path: ".spec.distribution.modules.logging.type"
+            from: "none"
+          - path: ".spec.distribution.modules.logging.type"
+            to: "none"
+          - path: ".spec.distribution.modules.logging.type"
+            from: "opensearch"
+          - path: ".spec.distribution.modules.logging.type"
+            to: "opensearch"
+
   - path: .spec.distribution.modules.monitoring.alertmanager.installDefaultRules
     immutable: false
     description: "changes to the monitoring alertmanager configs have been detected. This will cause the reconfiguration, creation or deletion of the default alertmanager configs."
@@ -134,7 +134,7 @@ distribution:
     reducers:
       - key: distributionModulesMonitoringAlertmanagerInstalldefaultrules
         lifecycle: pre-apply
-  
+
   - path: .spec.distribution.modules.policy.type
     immutable: false
     description: "changes to the policy module type have been detected. This will cause the reconfiguration or deletion of the current policy stack."
@@ -147,7 +147,7 @@ distribution:
       - to: kyverno
         from: gatekeeper
         reason: "currently, switching from gatekeeper to kyverno is not supported. You need to first remove the current stack with type: none."
-  
+
   - path: .spec.distribution.modules.tracing.type
     immutable: false
     description: "changes to the tracing module type have been detected. This will cause the reconfiguration or deletion of the current tracing stack."
@@ -156,7 +156,7 @@ distribution:
     reducers:
       - key: distributionModulesTracingType
         lifecycle: pre-apply
-  
+
   - path: .spec.distribution.modules.dr.type
     immutable: false
     description: "changes to the disaster recovery module type have been detected. This will cause the reconfiguration or deletion of the current DR stack."
@@ -165,7 +165,7 @@ distribution:
     reducers:
       - key: distributionModulesDrType
         lifecycle: pre-apply
-  
+
   - path: .spec.distribution.modules.ingress.nginx.type
     immutable: false
     description: "changes to the ingress nginx type have been detected. This will cause the reconfiguration or deletion of the current ingress stack."
@@ -174,7 +174,7 @@ distribution:
     reducers:
       - key: distributionModulesIngressNginxType
         lifecycle: pre-apply
-  
+
   - path: .spec.distribution.modules.auth.provider.type
     immutable: false
     description: "changes to the auth provider type have been detected. This will cause the reconfiguration or deletion of the current auth stack."
