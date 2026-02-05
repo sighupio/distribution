@@ -1541,7 +1541,9 @@
                 "anyOf": [
                   {
                     "not": {
-                      "required": ["haproxy"]
+                      "required": [
+                        "haproxy"
+                      ]
                     }
                   },
                   {
@@ -1562,7 +1564,9 @@
           "then": {
             "properties": {
               "byoic": {
-                "required": ["ingressClass"]
+                "required": [
+                  "ingressClass"
+                ]
               }
             }
           }

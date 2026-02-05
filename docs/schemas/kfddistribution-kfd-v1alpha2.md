@@ -1460,7 +1460,7 @@ The base domain used for all the KFD infrastructural ingresses. If using the ngi
 | Property                                                         | Type      | Required |
 |:-----------------------------------------------------------------|:----------|:---------|
 | [enabled](#specdistributionmodulesingressbyoicenabled)           | `boolean` | Required |
-| [ingressClass](#specdistributionmodulesingressbyoicingressclass) | `string`  | Required |
+| [ingressClass](#specdistributionmodulesingressbyoicingressclass) | `string`  | Optional |
 
 ### Description
 

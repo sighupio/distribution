@@ -1720,7 +1720,6 @@ Whether to install or not the snapshotController component in the cluster. Befor
 | [haproxy](#specdistributionmodulesingresshaproxy)         | `object` | Optional |
 | [nginx](#specdistributionmodulesingressnginx)             | `object` | Required |
 | [overrides](#specdistributionmodulesingressoverrides)     | `object` | Optional |
-| [then](#specdistributionmodulesingressthen)               | `object` | Optional |
 
 ## .spec.distribution.modules.ingress.baseDomain
 
@@ -1735,7 +1734,7 @@ The base domain used for all the KFD infrastructural ingresses. If using the ngi
 | Property                                                         | Type      | Required |
 |:-----------------------------------------------------------------|:----------|:---------|
 | [enabled](#specdistributionmodulesingressbyoicenabled)           | `boolean` | Required |
-| [ingressClass](#specdistributionmodulesingressbyoicingressclass) | `string`  | Required |
+| [ingressClass](#specdistributionmodulesingressbyoicingressclass) | `string`  | Optional |
 
 ### Description
 
@@ -1963,7 +1962,7 @@ The value of the toleration
 
 ### Description
 
-Configuration for HAProxy ingress controller.
+Configuration for HAProxy Kubernetes Ingress Controller.
 
 ## .spec.distribution.modules.ingress.haproxy.overrides
 
@@ -2041,7 +2040,7 @@ The value of the toleration
 
 ### Description
 
-TLS configuration for the HAProxy ingress controller.
+TLS configuration for the HAProxy Kubernetes Ingress Controller.
 
 ## .spec.distribution.modules.ingress.haproxy.tls.provider
 
@@ -2095,7 +2094,7 @@ The signing key file's content. You can use the `"{file://<path>}"` notation to 
 
 ### Description
 
-The type of the HAProxy ingress controller, options are:
+The type of the HAProxy Kubernetes Ingress Controller, options are:
 - `none`: HAProxy ingress controller will not be installed.
 - `single`: a single HAProxy ingress controller with ingress class `haproxy` will be installed.
 - `dual`: two independent HAProxy ingress controllers will be installed, one for the `haproxy-internal` ingress class and one for the `haproxy-external` ingress class.
@@ -2124,7 +2123,7 @@ Default is `none`.
 
 ### Description
 
-Configurations for the Ingress nginx controller package.
+Configurations for the Ingress NGINX Controller package.
 
 ## .spec.distribution.modules.ingress.nginx.overrides
 
@@ -2202,7 +2201,7 @@ The value of the toleration
 
 ### Description
 
-TLS configuration for the nginx ingress controller.
+TLS configuration for the Ingress NGINX Controller.
 
 ## .spec.distribution.modules.ingress.nginx.tls.provider
 
@@ -2378,8 +2377,6 @@ The key of the toleration
 ### Description
 
 The value of the toleration
-
-## .spec.distribution.modules.ingress.then
 
 ## .spec.distribution.modules.logging
 

@@ -720,7 +720,7 @@ type SpecDistributionModulesIngressBYOIC struct {
 
 	// The IngressClass to use for infrastructure ingresses (Prometheus, Grafana,
 	// etc.) when both nginx and haproxy are disabled.
-	IngressClass string `json:"ingressClass" yaml:"ingressClass" mapstructure:"ingressClass"`
+	IngressClass *string `json:"ingressClass,omitempty" yaml:"ingressClass,omitempty" mapstructure:"ingressClass,omitempty"`
 }
 
 // Configuration for the cert-manager package. Required even if
@@ -2538,9 +2538,6 @@ func (j *SpecDistributionModulesIngressBYOIC) UnmarshalJSON(b []byte) error {
 	}
 	if v, ok := raw["enabled"]; !ok || v == nil {
 		return fmt.Errorf("field enabled in SpecDistributionModulesIngressBYOIC: required")
-	}
-	if v, ok := raw["ingressClass"]; !ok || v == nil {
-		return fmt.Errorf("field ingressClass in SpecDistributionModulesIngressBYOIC: required")
 	}
 	type Plain SpecDistributionModulesIngressBYOIC
 	var plain Plain

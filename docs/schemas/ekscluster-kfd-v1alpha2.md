@@ -1783,7 +1783,7 @@ The base domain used for all the KFD infrastructural ingresses. If in the nginx 
 | Property                                                         | Type      | Required |
 |:-----------------------------------------------------------------|:----------|:---------|
 | [enabled](#specdistributionmodulesingressbyoicenabled)           | `boolean` | Required |
-| [ingressClass](#specdistributionmodulesingressbyoicingressclass) | `string`  | Required |
+| [ingressClass](#specdistributionmodulesingressbyoicingressclass) | `string`  | Optional |
 
 ### Description
 

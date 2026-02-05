@@ -851,20 +851,14 @@ type SpecDistributionModulesIngress struct {
 	// Forecastle corresponds to the JSON schema field "forecastle".
 	Forecastle *SpecDistributionModulesIngressForecastle `json:"forecastle,omitempty" yaml:"forecastle,omitempty" mapstructure:"forecastle,omitempty"`
 
-	// Configurations for the HAProxy ingress controller package.
+	// Configurations for the HAProxy Kubernetes Ingress Controller package.
 	Haproxy *SpecDistributionModulesIngressHAProxy `json:"haproxy,omitempty" yaml:"haproxy,omitempty" mapstructure:"haproxy,omitempty"`
 
-	// If corresponds to the JSON schema field "if".
-	If interface{} `json:"if,omitempty" yaml:"if,omitempty" mapstructure:"if,omitempty"`
-
-	// Configurations for the Ingress nginx controller package.
+	// Configurations for the Ingress NGINX Controller package.
 	Nginx SpecDistributionModulesIngressNginx `json:"nginx" yaml:"nginx" mapstructure:"nginx"`
 
 	// Overrides corresponds to the JSON schema field "overrides".
 	Overrides *SpecDistributionModulesIngressOverrides `json:"overrides,omitempty" yaml:"overrides,omitempty" mapstructure:"overrides,omitempty"`
-
-	// Then corresponds to the JSON schema field "then".
-	Then interface{} `json:"then,omitempty" yaml:"then,omitempty" mapstructure:"then,omitempty"`
 }
 
 // Configuration for Bring Your Own Ingress Controller mode. The ingressClass is
@@ -875,7 +869,7 @@ type SpecDistributionModulesIngressBYOIC struct {
 
 	// The IngressClass to use for infrastructure ingresses (Prometheus, Grafana,
 	// etc.) when both nginx and haproxy are disabled.
-	IngressClass string `json:"ingressClass" yaml:"ingressClass" mapstructure:"ingressClass"`
+	IngressClass *string `json:"ingressClass,omitempty" yaml:"ingressClass,omitempty" mapstructure:"ingressClass,omitempty"`
 }
 
 // Configuration for the cert-manager package. Required even if
@@ -919,15 +913,15 @@ type SpecDistributionModulesIngressForecastle struct {
 	Overrides *TypesFuryModuleComponentOverrides `json:"overrides,omitempty" yaml:"overrides,omitempty" mapstructure:"overrides,omitempty"`
 }
 
-// Configuration for HAProxy ingress controller.
+// Configuration for HAProxy Kubernetes Ingress Controller.
 type SpecDistributionModulesIngressHAProxy struct {
 	// Overrides corresponds to the JSON schema field "overrides".
 	Overrides *TypesFuryModuleComponentOverrides `json:"overrides,omitempty" yaml:"overrides,omitempty" mapstructure:"overrides,omitempty"`
 
-	// TLS configuration for the HAProxy ingress controller.
+	// TLS configuration for the HAProxy Kubernetes Ingress Controller.
 	Tls *SpecDistributionModulesIngressHAProxyTLS `json:"tls,omitempty" yaml:"tls,omitempty" mapstructure:"tls,omitempty"`
 
-	// The type of the HAProxy ingress controller, options are:
+	// The type of the HAProxy Kubernetes Ingress Controller, options are:
 	// - `none`: HAProxy ingress controller will not be installed.
 	// - `single`: a single HAProxy ingress controller with ingress class `haproxy`
 	// will be installed.
@@ -939,7 +933,7 @@ type SpecDistributionModulesIngressHAProxy struct {
 	Type SpecDistributionModulesIngressHAProxyType `json:"type" yaml:"type" mapstructure:"type"`
 }
 
-// TLS configuration for the HAProxy ingress controller.
+// TLS configuration for the HAProxy Kubernetes Ingress Controller.
 type SpecDistributionModulesIngressHAProxyTLS struct {
 	// The provider of the TLS certificates for the ingresses, one of: `none`,
 	// `certManager`, or `secret`.
@@ -980,7 +974,7 @@ type SpecDistributionModulesIngressNginx struct {
 	// Overrides corresponds to the JSON schema field "overrides".
 	Overrides *TypesFuryModuleComponentOverrides `json:"overrides,omitempty" yaml:"overrides,omitempty" mapstructure:"overrides,omitempty"`
 
-	// TLS configuration for the nginx ingress controller.
+	// TLS configuration for the Ingress NGINX Controller.
 	Tls *SpecDistributionModulesIngressNginxTLS `json:"tls,omitempty" yaml:"tls,omitempty" mapstructure:"tls,omitempty"`
 
 	// The type of the Ingress nginx controller, options are:
@@ -998,7 +992,7 @@ type SpecDistributionModulesIngressNginx struct {
 	Type SpecDistributionModulesIngressNginxType `json:"type" yaml:"type" mapstructure:"type"`
 }
 
-// TLS configuration for the nginx ingress controller.
+// TLS configuration for the Ingress NGINX Controller.
 type SpecDistributionModulesIngressNginxTLS struct {
 	// The provider of the TLS certificates for the ingresses, one of: `none`,
 	// `certManager`, or `secret`.
@@ -3195,9 +3189,6 @@ func (j *SpecDistributionModulesIngressBYOIC) UnmarshalJSON(b []byte) error {
 	}
 	if v, ok := raw["enabled"]; !ok || v == nil {
 		return fmt.Errorf("field enabled in SpecDistributionModulesIngressBYOIC: required")
-	}
-	if v, ok := raw["ingressClass"]; !ok || v == nil {
-		return fmt.Errorf("field ingressClass in SpecDistributionModulesIngressBYOIC: required")
 	}
 	type Plain SpecDistributionModulesIngressBYOIC
 	var plain Plain
