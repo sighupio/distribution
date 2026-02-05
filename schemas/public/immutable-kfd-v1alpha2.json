@@ -66,6 +66,9 @@
         },
         "plugins": {
           "$ref": "./spec-plugins.json"
+        },
+        "toolsConfiguration": {
+          "$ref": "#/$defs/Spec.ToolsConfiguration"
         }
       },
       "required": [
@@ -74,6 +77,28 @@
         "kubernetes",
         "distribution"
       ]
+    },
+    "Spec.ToolsConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configuration for tools used by furyctl.",
+      "properties": {
+        "ansible": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Ansible configuration.",
+          "properties": {
+            "config": {
+              "type": "string",
+              "description": "Additional content to append to the generated ansible.cfg file."
+            },
+            "pythonInterpreter": {
+              "type": "string",
+              "description": "Path to the Python interpreter to be used by Ansible on the remote nodes. Example: /usr/bin/python3"
+            }
+          }
+        }
+      }
     },
     "Spec.Infrastructure": {
       "type": "object",
@@ -202,16 +227,33 @@
           "items": {
             "$ref": "#/$defs/Spec.Kubernetes.Member"
           },
-          "description": "Load balancer member nodes. These nodes will run HAProxy and keepalived.",
+          "description": "Load balancer member nodes. These nodes will run HAProxy and keepalived. If no members are specified it will be assumed some other solution for load balancing is in place.",
           "minItems": 1
         },
         "keepalived": {
           "$ref": "#/$defs/Types.Keepalived"
         },
-        "enabled": {
-          "type": "boolean",
-          "description": "Enable load balancer configuration. When true, HAProxy and keepalived will be configured.",
-          "default": true
+        "containerd": {
+          "$ref": "#/$defs/Spec.Kubernetes.Advanced.Containerd"
+        },
+        "haproxy": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "HAProxy container configuration for load balancing.",
+          "properties": {
+            "configuration": {
+              "type": "string",
+              "description": "Custom HAProxy configuration content. If not provided, a default configuration will be generated for load balancing Kubernetes control plane."
+            },
+            "image": {
+              "type": "string",
+              "description": "Container image for HAProxy. Example: haproxy"
+            },
+            "tag": {
+              "type": "string",
+              "description": "Container tag for HAProxy. Example: 2.8-alpine"
+            }
+          }
         }
       },
       "if": {
