@@ -187,8 +187,8 @@ all:
             {{- end -}}
       {{- end }}
   vars:
-    {{- if and (index .spec.kubernetes "advancedAnsible") (index .spec.kubernetes.advancedAnsible "pythonInterpreter") }}
-    ansible_python_interpreter: "{{ .spec.kubernetes.advancedAnsible.pythonInterpreter }}"
+    {{- if and (index .spec.toolsConfiguration "ansible") (index .spec.toolsConfiguration.ansible "pythonInterpreter") }}
+    ansible_python_interpreter: "{{ .spec.toolsConfiguration.ansible.pythonInterpreter }}"
     {{- else }}
     ansible_python_interpreter: python3
     {{- end }}
