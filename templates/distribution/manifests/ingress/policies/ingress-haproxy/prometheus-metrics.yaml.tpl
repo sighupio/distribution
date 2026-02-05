@@ -28,4 +28,4 @@ spec:
               app.kubernetes.io/name: prometheus
       ports:
         - protocol: TCP
-          port: 10254
+          port: 1024
