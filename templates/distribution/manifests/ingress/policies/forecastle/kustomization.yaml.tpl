@@ -8,5 +8,4 @@ kind: Kustomization
 
 resources:
   - common.yaml
-  - nginx-ingress-controller.yaml
-  - prometheus-metrics.yaml
+  - forecastle.yaml
