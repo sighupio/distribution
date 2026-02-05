@@ -83,13 +83,13 @@ spec:
     - Ingress
   ingress:
     - from:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: ingress-haproxy
-          podSelector:
-            matchLabels:
-              app.kubernetes.io/name: kubernetes-ingress
-              app.kubernetes.io/instance: haproxy-ingress
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: ingress-haproxy
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/name: kubernetes-ingress
+            app.kubernetes.io/instance: haproxy-ingress
       ports:
         - port: 3000
           protocol: TCP
