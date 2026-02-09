@@ -317,7 +317,7 @@
         },
         "haproxy": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.HAProxy",
-          "description": "Configurations for the HAProxy ingress controller package."
+          "description": "Configurations for the HAProxy Kubernetes Ingress Controller package."
         },
         "byoic": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.BYOIC",
