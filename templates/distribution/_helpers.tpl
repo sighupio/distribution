@@ -228,6 +228,25 @@ cert-manager.io/cluster-issuer: {{ .spec.distribution.modules.ingress.certManage
 {{- end -}}
 {{ end }}
 
+{{ define "byoicAnnotations" }}
+{{- $byoic := .spec.distribution.modules.ingress.byoic -}}
+{{- if $byoic.enabled -}}
+  {{- $commonAnnotations := default dict (index $byoic "commonAnnotations") -}}
+  {{- $infrastructureIngressClass := index .spec.distribution.modules.ingress "infrastructureIngressClass" -}}
+  {{- $isByoicActive := false -}}
+  {{- if $infrastructureIngressClass -}}
+    {{- $isByoicActive = eq $infrastructureIngressClass $byoic.ingressClass -}}
+  {{- else if and (eq .spec.distribution.modules.ingress.nginx.type "none") (eq .spec.distribution.modules.ingress.haproxy.type "none") -}}
+    {{- $isByoicActive = true -}}
+  {{- end -}}
+  {{- if $isByoicActive }}
+{{- range $key, $value := $commonAnnotations }}
+    {{ $key }}: {{ $value | quote }}
+{{- end }}
+  {{- end }}
+{{- end }}
+{{ end }}
+
 {{ define "alertmanagerUrl" }}
   {{- template "ingressHost" (dict "module" "monitoring" "package" "alertmanager" "prefix" "alertmanager." "spec" .) -}}
 {{ end }}

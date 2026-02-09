@@ -11,10 +11,11 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  {{- if eq $tlsProvider "certManager" }}
   annotations:
+    {{- if eq $tlsProvider "certManager" }}
     {{ template "certManagerClusterIssuer" . }}
-  {{- end }}
+    {{- end }}
+    {{ template "byoicAnnotations" . }}
   name: pomerium
   namespace: pomerium
 spec:
