@@ -1428,6 +1428,10 @@
         "forecastle": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.Forecastle"
         },
+        "infrastructureIngressClass": {
+          "type": "string",
+          "description": "Overrides the default ingress class for the SD infrastructure ingresses. Accepts any valid ingress class name (e.g., `nginx`, `internal`, `external`, `haproxy`, `haproxy-internal`, `haproxy-external`, or a custom class). Useful during migrations to keep infrastructure ingresses on one controller while testing another."
+        },
         "externalDns": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.ExternalDNS"
         }
