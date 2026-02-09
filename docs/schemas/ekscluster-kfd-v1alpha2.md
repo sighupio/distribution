@@ -1781,14 +1781,21 @@ The base domain used for all the KFD infrastructural ingresses. If in the nginx 
 
 ### Properties
 
-| Property                                                         | Type      | Required |
-|:-----------------------------------------------------------------|:----------|:---------|
-| [enabled](#specdistributionmodulesingressbyoicenabled)           | `boolean` | Required |
-| [ingressClass](#specdistributionmodulesingressbyoicingressclass) | `string`  | Optional |
+| Property                                                                   | Type      | Required |
+|:---------------------------------------------------------------------------|:----------|:---------|
+| [commonAnnotations](#specdistributionmodulesingressbyoiccommonannotations) | `object`  | Optional |
+| [enabled](#specdistributionmodulesingressbyoicenabled)                     | `boolean` | Required |
+| [ingressClass](#specdistributionmodulesingressbyoicingressclass)           | `string`  | Optional |
 
 ### Description
 
 Configuration for Bring Your Own Ingress Controller mode. The ingressClass is used for infrastructure ingresses when both controllers are disabled.
+
+## .spec.distribution.modules.ingress.byoic.commonAnnotations
+
+### Description
+
+Annotations to apply to all infrastructure ingresses when using this BYOIC ingress class. Useful for controller-specific configuration (TLS, auth middlewares, etc.).
 
 ## .spec.distribution.modules.ingress.byoic.enabled
 
