@@ -1147,7 +1147,7 @@
         },
         "nginx": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.Nginx",
-          "description": "Configurations for the Ingress NGINX Controller package."
+          "description": "(DEPRECATED) Configurations for the Ingress NGINX Controller package."
         },
         "haproxy": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.HAProxy",
