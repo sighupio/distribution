@@ -1437,15 +1437,16 @@ Whether to install or not the snapshotController component in the cluster. Befor
 
 ### Properties
 
-| Property                                                  | Type     | Required |
-|:----------------------------------------------------------|:---------|:---------|
-| [baseDomain](#specdistributionmodulesingressbasedomain)   | `string` | Required |
-| [byoic](#specdistributionmodulesingressbyoic)             | `object` | Optional |
-| [certManager](#specdistributionmodulesingresscertmanager) | `object` | Optional |
-| [forecastle](#specdistributionmodulesingressforecastle)   | `object` | Optional |
-| [haproxy](#specdistributionmodulesingresshaproxy)         | `object` | Optional |
-| [nginx](#specdistributionmodulesingressnginx)             | `object` | Required |
-| [overrides](#specdistributionmodulesingressoverrides)     | `object` | Optional |
+| Property                                                                                | Type     | Required |
+|:----------------------------------------------------------------------------------------|:---------|:---------|
+| [baseDomain](#specdistributionmodulesingressbasedomain)                                 | `string` | Required |
+| [byoic](#specdistributionmodulesingressbyoic)                                           | `object` | Optional |
+| [certManager](#specdistributionmodulesingresscertmanager)                               | `object` | Optional |
+| [forecastle](#specdistributionmodulesingressforecastle)                                 | `object` | Optional |
+| [haproxy](#specdistributionmodulesingresshaproxy)                                       | `object` | Optional |
+| [infrastructureIngressClass](#specdistributionmodulesingressinfrastructureingressclass) | `string` | Optional |
+| [nginx](#specdistributionmodulesingressnginx)                                           | `object` | Required |
+| [overrides](#specdistributionmodulesingressoverrides)                                   | `object` | Optional |
 
 ## .spec.distribution.modules.ingress.baseDomain
 
@@ -1688,7 +1689,7 @@ The value of the toleration
 
 ### Description
 
-Configuration for HAProxy ingress controller.
+Configuration for HAProxy Kubernetes Ingress Controller.
 
 ## .spec.distribution.modules.ingress.haproxy.overrides
 
@@ -1836,6 +1837,12 @@ Default is `none`.
 |`"none"`  |
 |`"single"`|
 |`"dual"`  |
+
+## .spec.distribution.modules.ingress.infrastructureIngressClass
+
+### Description
+
+Overrides the default ingress class for the SD infrastructure ingresses. Accepts any valid ingress class name (e.g., `nginx`, `internal`, `external`, `haproxy`, `haproxy-internal`, `haproxy-external`, or a custom class). Useful during migrations to keep infrastructure ingresses on one controller while testing another.
 
 ## .spec.distribution.modules.ingress.nginx
 

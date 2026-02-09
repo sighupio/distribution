@@ -854,7 +854,14 @@ type SpecDistributionModulesIngress struct {
 	// Configurations for the HAProxy Kubernetes Ingress Controller package.
 	Haproxy *SpecDistributionModulesIngressHAProxy `json:"haproxy,omitempty" yaml:"haproxy,omitempty" mapstructure:"haproxy,omitempty"`
 
-	// Configurations for the Ingress NGINX Controller package.
+	// Overrides the default ingress class for the SD infrastructure ingresses.
+	// Accepts any valid ingress class name (e.g., `nginx`, `internal`, `external`,
+	// `haproxy`, `haproxy-internal`, `haproxy-external`, or a custom class). Useful
+	// during migrations to keep infrastructure ingresses on one controller while
+	// testing another.
+	InfrastructureIngressClass *string `json:"infrastructureIngressClass,omitempty" yaml:"infrastructureIngressClass,omitempty" mapstructure:"infrastructureIngressClass,omitempty"`
+
+	// (DEPRECATED) Configurations for the Ingress NGINX Controller package.
 	Nginx SpecDistributionModulesIngressNginx `json:"nginx" yaml:"nginx" mapstructure:"nginx"`
 
 	// Overrides corresponds to the JSON schema field "overrides".
