@@ -11,5 +11,5 @@ metadata:
 data:
   config.json: |
     {
-      "prepareQueueLength": {{ .spec | digAny "distribution" "modules" dr" "velero" "nodeAgent" "prepareQueueLength" "0" }}
+      "prepareQueueLength": {{ .spec | digAny "distribution" "modules" "dr" "velero" "nodeAgent" "prepareQueueLength" "0" }}
     }
