@@ -3,8 +3,6 @@
 # license that can be found in the LICENSE file.
 
 
-{{- if index .spec.distribution.modules.dr.velero "nodeAgent" }}
-{{- if index .spec.distribution.modules.dr.velero.nodeAgent "prepareQueueLength" }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -13,7 +11,5 @@ metadata:
 data:
   config.json: |
     {
-      "prepareQueueLength": {{ .spec.distribution.modules.dr.velero.nodeAgent.prepareQueueLength }}
+      "prepareQueueLength": {{ .spec | digAny "distribution" "modules" dr" "velero" "nodeAgent" "prepareQueueLength" "0" }}
     }
-{{- end }}
-{{- end }}
