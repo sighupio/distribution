@@ -1387,6 +1387,7 @@ Default is `none`.
 | [backend](#specdistributionmodulesdrvelerobackend)                       | `string` | Optional |
 | [externalEndpoint](#specdistributionmodulesdrveleroexternalendpoint)     | `object` | Optional |
 | [gcs](#specdistributionmodulesdrvelerogcs)                               | `object` | Optional |
+| [nodeAgent](#specdistributionmodulesdrveleronodeagent)                   | `object` | Optional |
 | [overrides](#specdistributionmodulesdrvelerooverrides)                   | `object` | Optional |
 | [schedules](#specdistributionmodulesdrveleroschedules)                   | `object` | Optional |
 | [snapshotController](#specdistributionmodulesdrvelerosnapshotcontroller) | `object` | Optional |
@@ -1534,6 +1535,24 @@ The prefix name to use inside the gcs bucket.
 ### Description
 
 Service gcs account JSON string.
+
+## .spec.distribution.modules.dr.velero.nodeAgent
+
+### Properties
+
+| Property                                                                          | Type      | Required |
+|:----------------------------------------------------------------------------------|:----------|:---------|
+| [prepareQueueLength](#specdistributionmodulesdrveleronodeagentpreparequeuelength) | `integer` | Optional |
+
+### Description
+
+Configuration for Velero's node-agent DaemonSet.
+
+## .spec.distribution.modules.dr.velero.nodeAgent.prepareQueueLength
+
+### Description
+
+Defines the maximum number of DataUpload/DataDownload/PodVolumeBackup/PodVolumeRestore CRs under preparation statuses but not yet processed by any node. This constrains the number of intermediate objects (PVCs, VolumeSnapshots, etc.) to prevent unnecessary resource usage when cluster parallelism is limited.
 
 ## .spec.distribution.modules.dr.velero.overrides
 

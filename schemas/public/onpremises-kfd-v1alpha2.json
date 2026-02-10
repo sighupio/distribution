@@ -2924,6 +2924,17 @@
             }
           }
         },
+        "nodeAgent": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Configuration for Velero's node-agent DaemonSet.",
+          "properties": {
+            "prepareQueueLength": {
+              "type": "integer",
+              "description": "Defines the maximum number of DataUpload/DataDownload/PodVolumeBackup/PodVolumeRestore CRs under preparation statuses but not yet processed by any node. This constrains the number of intermediate objects (PVCs, VolumeSnapshots, etc.) to prevent unnecessary resource usage when cluster parallelism is limited."
+            }
+          }
+        },
         "overrides": {
           "$ref": "#/$defs/Types.FuryModuleComponentOverrides"
         }

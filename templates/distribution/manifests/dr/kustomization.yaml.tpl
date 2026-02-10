@@ -60,6 +60,7 @@ patches:
 {{- if eq .spec.distribution.common.provider.type "eks" }}
   - path: patches/eks-velero.yml
 {{- end }}
+  - path: patches/node-agent-config.yml
 {{- if eq .spec.distribution.common.provider.type "none" }}
   {{- if ne .spec.distribution.modules.dr.etcdBackup.type "none" }}
   - path: patches/etcd-backup-schedule.yml
