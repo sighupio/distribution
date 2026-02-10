@@ -1044,6 +1044,12 @@ type SpecDistributionModulesLoggingCustomOutputs struct {
 	// discard the flow: `nullout: {}`
 	Infra string `json:"infra" yaml:"infra" mapstructure:"infra"`
 
+	// This value defines where the output from the `ingressHaproxy` Flow will be
+	// sent. This will be the `spec` section of the `Output` object. It must be a
+	// string (and not a YAML object) following the OutputSpec definition. Use the
+	// `nullout` output to discard the flow: `nullout: {}`
+	IngressHaproxy string `json:"ingressHaproxy" yaml:"ingressHaproxy" mapstructure:"ingressHaproxy"`
+
 	// This value defines where the output from the `ingressNginx` Flow will be sent.
 	// This will be the `spec` section of the `Output` object. It must be a string
 	// (and not a YAML object) following the OutputSpec definition. Use the `nullout`
@@ -2166,9 +2172,47 @@ type SpecPluginsKustomize []struct {
 	Name string `json:"name" yaml:"name" mapstructure:"name"`
 }
 
-type SpecToolsConfiguration struct {
-	// Configuration for storing the OpenTofu state of the cluster.
-	Opentofu *SpecToolsConfigurationOpenTofu `json:"opentofu,omitempty" yaml:"opentofu,omitempty" mapstructure:"opentofu,omitempty"`
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *SpecDistributionModulesLoggingCustomOutputs) UnmarshalJSON(b []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return err
+	}
+	if v, ok := raw["audit"]; !ok || v == nil {
+		return fmt.Errorf("field audit in SpecDistributionModulesLoggingCustomOutputs: required")
+	}
+	if v, ok := raw["errors"]; !ok || v == nil {
+		return fmt.Errorf("field errors in SpecDistributionModulesLoggingCustomOutputs: required")
+	}
+	if v, ok := raw["events"]; !ok || v == nil {
+		return fmt.Errorf("field events in SpecDistributionModulesLoggingCustomOutputs: required")
+	}
+	if v, ok := raw["infra"]; !ok || v == nil {
+		return fmt.Errorf("field infra in SpecDistributionModulesLoggingCustomOutputs: required")
+	}
+	if v, ok := raw["ingressHaproxy"]; !ok || v == nil {
+		return fmt.Errorf("field ingressHaproxy in SpecDistributionModulesLoggingCustomOutputs: required")
+	}
+	if v, ok := raw["ingressNginx"]; !ok || v == nil {
+		return fmt.Errorf("field ingressNginx in SpecDistributionModulesLoggingCustomOutputs: required")
+	}
+	if v, ok := raw["kubernetes"]; !ok || v == nil {
+		return fmt.Errorf("field kubernetes in SpecDistributionModulesLoggingCustomOutputs: required")
+	}
+	if v, ok := raw["systemdCommon"]; !ok || v == nil {
+		return fmt.Errorf("field systemdCommon in SpecDistributionModulesLoggingCustomOutputs: required")
+	}
+	if v, ok := raw["systemdEtcd"]; !ok || v == nil {
+		return fmt.Errorf("field systemdEtcd in SpecDistributionModulesLoggingCustomOutputs: required")
+	}
+	type Plain SpecDistributionModulesLoggingCustomOutputs
+	var plain Plain
+	if err := json.Unmarshal(b, &plain); err != nil {
+		return err
+	}
+	*j = SpecDistributionModulesLoggingCustomOutputs(plain)
+	return nil
+}
 
 	// DEPRECATED: Configuration for storing the Terraform state of the cluster. Use
 	// 'opentofu' instead. This field will be removed in the next versions.
@@ -2458,30 +2502,15 @@ func (j *SpecDistributionModulesMonitoringType) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-var enumValues_SpecKubernetesLogRetentionDays = []interface{}{
-	0,
-	1,
-	3,
-	5,
-	7,
-	14,
-	30,
-	60,
-	90,
-	120,
-	150,
-	180,
-	365,
-	400,
-	545,
-	731,
-	1096,
-	1827,
-	2192,
-	2557,
-	2922,
-	3288,
-	3653,
+var enumValues_SpecDistributionModulesIngressCertManagerClusterIssuerType = []interface{}{
+	"dns01",
+	"http01",
+}
+
+var enumValues_SpecDistributionModulesPolicyGatekeeperEnforcementAction = []interface{}{
+	"deny",
+	"dryrun",
+	"warn",
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
@@ -2559,10 +2588,11 @@ func (j *SpecDistributionModulesMonitoringMimirBackend) UnmarshalJSON(b []byte) 
 	return nil
 }
 
-var enumValues_SpecDistributionModulesMonitoringMimirBackend = []interface{}{
-	"minio",
-	"externalEndpoint",
-}
+const (
+	TypesAwsRegionUsWest1    TypesAwsRegion = "us-west-1"
+	TypesAwsRegionUsGovWest1 TypesAwsRegion = "us-gov-west-1"
+	TypesAwsRegionUsGovEast1 TypesAwsRegion = "us-gov-east-1"
+)
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *SpecDistributionModulesLogging) UnmarshalJSON(b []byte) error {
@@ -2602,12 +2632,12 @@ func (j *SpecDistributionModulesLoggingType) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-var enumValues_SpecDistributionModulesLoggingType = []interface{}{
-	"none",
-	"opensearch",
-	"loki",
-	"customOutputs",
-}
+const (
+	TypesAwsRegionUsEast1    TypesAwsRegion = "us-east-1"
+	TypesAwsRegionSaEast1    TypesAwsRegion = "sa-east-1"
+	TypesAwsRegionMeSouth1   TypesAwsRegion = "me-south-1"
+	TypesAwsRegionMeCentral1 TypesAwsRegion = "me-central-1"
+)
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *SpecDistributionModulesLoggingOpensearch) UnmarshalJSON(b []byte) error {
@@ -2627,8 +2657,15 @@ func (j *SpecDistributionModulesLoggingOpensearch) UnmarshalJSON(b []byte) error
 	return nil
 }
 
-var enumValues_SpecKubernetesNodePoolGlobalAmiType = []interface{}{
-	"alinux2023",
+const (
+	TypesAwsRegionEuWest3 TypesAwsRegion = "eu-west-3"
+	TypesAwsRegionEuWest2 TypesAwsRegion = "eu-west-2"
+	TypesAwsRegionEuWest1 TypesAwsRegion = "eu-west-1"
+)
+
+var enumValues_SpecDistributionModulesTracingTempoBackend = []interface{}{
+	"minio",
+	"externalEndpoint",
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
@@ -2651,6 +2688,19 @@ func (j *SpecKubernetesNodePoolGlobalAmiType) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
+const (
+	TypesAwsRegionEuSouth2   TypesAwsRegion = "eu-south-2"
+	TypesAwsRegionEuSouth1   TypesAwsRegion = "eu-south-1"
+	TypesAwsRegionEuNorth1   TypesAwsRegion = "eu-north-1"
+	TypesAwsRegionEuCentral2 TypesAwsRegion = "eu-central-2"
+	TypesAwsRegionEuCentral1 TypesAwsRegion = "eu-central-1"
+)
+
+var enumValues_SpecDistributionModulesTracingType = []interface{}{
+	"none",
+	"tempo",
+}
+
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *SpecDistributionModulesLoggingOpensearchType) UnmarshalJSON(b []byte) error {
 	var v string
@@ -2671,31 +2721,11 @@ func (j *SpecDistributionModulesLoggingOpensearchType) UnmarshalJSON(b []byte) e
 	return nil
 }
 
-var enumValues_SpecDistributionModulesLoggingOpensearchType = []interface{}{
-	"single",
-	"triple",
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecKubernetesNodePoolAdditionalFirewallRulePorts) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if v, ok := raw["from"]; !ok || v == nil {
-		return fmt.Errorf("field from in SpecKubernetesNodePoolAdditionalFirewallRulePorts: required")
-	}
-	if v, ok := raw["to"]; !ok || v == nil {
-		return fmt.Errorf("field to in SpecKubernetesNodePoolAdditionalFirewallRulePorts: required")
-	}
-	type Plain SpecKubernetesNodePoolAdditionalFirewallRulePorts
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = SpecKubernetesNodePoolAdditionalFirewallRulePorts(plain)
-	return nil
-}
+const (
+	TypesAwsRegionCaCentral1   TypesAwsRegion = "ca-central-1"
+	TypesAwsRegionApSoutheast4 TypesAwsRegion = "ap-southeast-4"
+	TypesAwsRegionApSoutheast3 TypesAwsRegion = "ap-southeast-3"
+)
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *SpecDistributionModulesTracing) UnmarshalJSON(b []byte) error {
@@ -2931,6 +2961,11 @@ func (j *SpecDistributionModulesIngress) UnmarshalJSON(b []byte) error {
 	*j = SpecDistributionModulesIngress(plain)
 	return nil
 }
+
+const (
+	TypesAwsRegionApEast1  TypesAwsRegion = "ap-east-1"
+	TypesAwsRegionAfSouth1 TypesAwsRegion = "af-south-1"
+)
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *SpecDistributionModulesIngressNginx) UnmarshalJSON(b []byte) error {
@@ -3531,6 +3566,20 @@ func (j *SpecKubernetesNodePoolSize) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
+const (
+	SpecKubernetesNodePoolContainerRuntimeDocker     SpecKubernetesNodePoolContainerRuntime = "docker"
+	SpecKubernetesNodePoolContainerRuntimeContainerd SpecKubernetesNodePoolContainerRuntime = "containerd"
+)
+
+type SpecKubernetesNodePoolInstanceVolumeType string
+
+var enumValues_SpecKubernetesNodePoolInstanceVolumeType = []interface{}{
+	"gp2",
+	"gp3",
+	"io1",
+	"standard",
+}
+
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *SpecDistributionModulesPolicyKyvernoValidationFailureAction) UnmarshalJSON(b []byte) error {
 	var v string
@@ -3545,10 +3594,39 @@ func (j *SpecDistributionModulesPolicyKyvernoValidationFailureAction) UnmarshalJ
 		}
 	}
 	if !ok {
-		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_SpecDistributionModulesPolicyKyvernoValidationFailureAction, v)
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_SpecKubernetesNodePoolInstanceVolumeType, v)
 	}
-	*j = SpecDistributionModulesPolicyKyvernoValidationFailureAction(v)
+	*j = SpecKubernetesNodePoolInstanceVolumeType(v)
 	return nil
+}
+
+const (
+	SpecKubernetesNodePoolInstanceVolumeTypeGp2      SpecKubernetesNodePoolInstanceVolumeType = "gp2"
+	SpecKubernetesNodePoolInstanceVolumeTypeGp3      SpecKubernetesNodePoolInstanceVolumeType = "gp3"
+	SpecKubernetesNodePoolInstanceVolumeTypeIo1      SpecKubernetesNodePoolInstanceVolumeType = "io1"
+	SpecKubernetesNodePoolInstanceVolumeTypeStandard SpecKubernetesNodePoolInstanceVolumeType = "standard"
+)
+
+// Configuration for the instances that will be used in the node pool.
+type SpecKubernetesNodePoolInstance struct {
+	// Set the maximum pods per node to a custom value. If not set will use EKS
+	// default value that depends on the instance type.
+	//
+	// Ref:
+	// https://github.com/awslabs/amazon-eks-ami/blob/main/templates/shared/runtime/eni-max-pods.txt
+	MaxPods *int `json:"maxPods,omitempty" yaml:"maxPods,omitempty" mapstructure:"maxPods,omitempty"`
+
+	// If `true`, the nodes will be created as spot instances. Default is `false`.
+	Spot *bool `json:"spot,omitempty" yaml:"spot,omitempty" mapstructure:"spot,omitempty"`
+
+	// The instance type to use for the nodes.
+	Type string `json:"type" yaml:"type" mapstructure:"type"`
+
+	// The size of the disk in GB.
+	VolumeSize *int `json:"volumeSize,omitempty" yaml:"volumeSize,omitempty" mapstructure:"volumeSize,omitempty"`
+
+	// Volume type for the instance disk. Default is `gp2`.
+	VolumeType *SpecKubernetesNodePoolInstanceVolumeType `json:"volumeType,omitempty" yaml:"volumeType,omitempty" mapstructure:"volumeType,omitempty"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
@@ -3618,41 +3696,10 @@ func (j *SpecKubernetesNodePoolType) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionModulesDr) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if v, ok := raw["type"]; !ok || v == nil {
-		return fmt.Errorf("field type in SpecDistributionModulesDr: required")
-	}
-	type Plain SpecDistributionModulesDr
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = SpecDistributionModulesDr(plain)
-	return nil
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionModulesDrVelero) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if v, ok := raw["eks"]; !ok || v == nil {
-		return fmt.Errorf("field eks in SpecDistributionModulesDrVelero: required")
-	}
-	type Plain SpecDistributionModulesDrVelero
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = SpecDistributionModulesDrVelero(plain)
-	return nil
-}
+const (
+	SpecKubernetesNodePoolTypeEksManaged  SpecKubernetesNodePoolType = "eks-managed"
+	SpecKubernetesNodePoolTypeSelfManaged SpecKubernetesNodePoolType = "self-managed"
+)
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *SpecDistributionModulesDrVeleroEks) UnmarshalJSON(b []byte) error {
@@ -3722,10 +3769,10 @@ func (j *SpecKubernetesNodePoolsCommonMetadataHttpEndpoint) UnmarshalJSON(b []by
 	return nil
 }
 
-var enumValues_SpecKubernetesNodePoolsCommonMetadataHttpEndpoint = []interface{}{
-	"enabled",
-	"disabled",
-}
+const (
+	SpecKubernetesNodePoolsCommonMetadataHttpEndpointEnabled  SpecKubernetesNodePoolsCommonMetadataHttpEndpoint = "enabled"
+	SpecKubernetesNodePoolsCommonMetadataHttpEndpointDisabled SpecKubernetesNodePoolsCommonMetadataHttpEndpoint = "disabled"
+)
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *SpecDistributionModulesPolicyKyverno) UnmarshalJSON(b []byte) error {
@@ -3807,25 +3854,10 @@ func (j *SpecKubernetesNodePoolsCommonMetadataHttpTokens) UnmarshalJSON(b []byte
 	return nil
 }
 
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *SpecDistributionModulesDrVeleroEksAccessMode) UnmarshalJSON(b []byte) error {
-	var v string
-	if err := json.Unmarshal(b, &v); err != nil {
-		return err
-	}
-	var ok bool
-	for _, expected := range enumValues_SpecDistributionModulesDrVeleroEksAccessMode {
-		if reflect.DeepEqual(v, expected) {
-			ok = true
-			break
-		}
-	}
-	if !ok {
-		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_SpecDistributionModulesDrVeleroEksAccessMode, v)
-	}
-	*j = SpecDistributionModulesDrVeleroEksAccessMode(v)
-	return nil
-}
+const (
+	SpecKubernetesNodePoolsCommonMetadataHttpTokensOptional SpecKubernetesNodePoolsCommonMetadataHttpTokens = "optional"
+	SpecKubernetesNodePoolsCommonMetadataHttpTokensRequired SpecKubernetesNodePoolsCommonMetadataHttpTokens = "required"
+)
 
 var enumValues_SpecDistributionModulesDrVeleroEksAccessMode = []interface{}{
 	"ReadWrite",
@@ -3933,7 +3965,13 @@ func (j *SpecDistributionModulesPolicyType) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-type TypesTcpPort int
+const (
+	SpecKubernetesNodePoolsLaunchKindLaunchConfigurations SpecKubernetesNodePoolsLaunchKind = "launch_configurations"
+	SpecKubernetesNodePoolsLaunchKindLaunchTemplates      SpecKubernetesNodePoolsLaunchKind = "launch_templates"
+	SpecKubernetesNodePoolsLaunchKindBoth                 SpecKubernetesNodePoolsLaunchKind = "both"
+)
+
+type TypesKubeLabels map[string]string
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *SpecKubernetes) UnmarshalJSON(b []byte) error {

@@ -31,6 +31,9 @@ resources:
   - {{ print $vendorPrefix "/modules/logging/katalog/configs/audit" }}
   - {{ print $vendorPrefix "/modules/logging/katalog/configs/events" }}
   - {{ print $vendorPrefix "/modules/logging/katalog/configs/infra" }}
+  {{- if ne $haproxyType "none" }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/configs/ingress-haproxy" }}
+  {{- end }}
   {{- if ne .spec.distribution.modules.ingress.nginx.type "none" }}
   - {{ print $vendorPrefix "/modules/logging/katalog/configs/ingress-nginx" }}
   {{- end }}
@@ -48,6 +51,9 @@ resources:
   - {{ print $vendorPrefix "/modules/logging/katalog/loki-configs/audit" }}
   - {{ print $vendorPrefix "/modules/logging/katalog/loki-configs/events" }}
   - {{ print $vendorPrefix "/modules/logging/katalog/loki-configs/infra" }}
+  {{- if ne $haproxyType "none" }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/loki-configs/ingress-haproxy" }}
+  {{- end }}
   {{- if ne .spec.distribution.modules.ingress.nginx.type "none" }}
   - {{ print $vendorPrefix "/modules/logging/katalog/loki-configs/ingress-nginx" }}
   {{- end }}
@@ -116,6 +122,16 @@ patches:
         path: /spec
         value:
 {{ $customOutputs.ingressNginx | indent 10 }}
+  - target:
+      kind: Output
+      group: logging.banzaicloud.io
+      version: v1beta1
+      name: ingress-haproxy
+    patch: |-
+      - op: replace
+        path: /spec
+        value:
+{{ $customOutputs.ingressHaproxy | indent 10 }}
   - target:
       kind: ClusterOutput
       group: logging.banzaicloud.io

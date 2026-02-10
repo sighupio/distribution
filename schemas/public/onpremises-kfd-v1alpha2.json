@@ -2028,6 +2028,10 @@
           "type": "string",
           "description": "This value defines where the output from the `ingressNginx` Flow will be sent. This will be the `spec` section of the `Output` object. It must be a string (and not a YAML object) following the OutputSpec definition. Use the `nullout` output to discard the flow: `nullout: {}`"
         },
+        "ingressHaproxy": {
+          "type": "string",
+          "description": "This value defines where the output from the `ingressHaproxy` Flow will be sent. This will be the `spec` section of the `Output` object. It must be a string (and not a YAML object) following the OutputSpec definition. Use the `nullout` output to discard the flow: `nullout: {}`"
+        },
         "kubernetes": {
           "type": "string",
           "description": "This value defines where the output from the `kubernetes` Flow will be sent. This will be the `spec` section of the `Output` object. It must be a string (and not a YAML object) following the OutputSpec definition. Use the `nullout` output to discard the flow: `nullout: {}`"
@@ -2049,6 +2053,7 @@
         "audit",
         "events",
         "infra",
+        "ingressHaproxy",
         "ingressNginx",
         "kubernetes",
         "systemdCommon",

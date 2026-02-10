@@ -1084,6 +1084,12 @@ type SpecDistributionModulesLoggingCustomOutputs struct {
 	// discard the flow: `nullout: {}`
 	Infra string `json:"infra" yaml:"infra" mapstructure:"infra"`
 
+	// This value defines where the output from the `ingressHaproxy` Flow will be
+	// sent. This will be the `spec` section of the `Output` object. It must be a
+	// string (and not a YAML object) following the OutputSpec definition. Use the
+	// `nullout` output to discard the flow: `nullout: {}`
+	IngressHaproxy string `json:"ingressHaproxy" yaml:"ingressHaproxy" mapstructure:"ingressHaproxy"`
+
 	// This value defines where the output from the `ingressNginx` Flow will be sent.
 	// This will be the `spec` section of the `Output` object. It must be a string
 	// (and not a YAML object) following the OutputSpec definition. Use the `nullout`
@@ -2141,6 +2147,9 @@ func (j *SpecDistributionModulesLoggingCustomOutputs) UnmarshalJSON(b []byte) er
 	}
 	if v, ok := raw["infra"]; !ok || v == nil {
 		return fmt.Errorf("field infra in SpecDistributionModulesLoggingCustomOutputs: required")
+	}
+	if v, ok := raw["ingressHaproxy"]; !ok || v == nil {
+		return fmt.Errorf("field ingressHaproxy in SpecDistributionModulesLoggingCustomOutputs: required")
 	}
 	if v, ok := raw["ingressNginx"]; !ok || v == nil {
 		return fmt.Errorf("field ingressNginx in SpecDistributionModulesLoggingCustomOutputs: required")
