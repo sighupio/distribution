@@ -13,6 +13,9 @@ kind: Kustomization
 {{- $fluentdReplicas := index .spec.distribution.modules.logging.operator.fluentd "replicas" }}
 {{- $fluentdResources := index .spec.distribution.modules.logging.operator.fluentd "resources" }}
 {{- $fluentbitResources := index .spec.distribution.modules.logging.operator.fluentbit "resources" }}
+{{- $haproxyType := .spec.distribution.modules.ingress.haproxy.type }}
+{{- $isBYOIC := .spec.distribution.modules.ingress.byoic.enabled }}
+{{- $hasAnyIngress := or (ne .spec.distribution.modules.ingress.nginx.type "none") (ne $haproxyType "none") $isBYOIC }}
 
 resources:
   - {{ print $vendorPrefix "/modules/logging/katalog/logging-operator" }}
@@ -20,7 +23,7 @@ resources:
   - kapp-configs/logging-operator-crd.yaml
 {{- if eq $loggingType "loki" "opensearch" }}
   - {{ print $vendorPrefix "/modules/logging/katalog/minio-ha" }}
-  {{- if ne .spec.distribution.modules.ingress.nginx.type "none" }}
+  {{- if $hasAnyIngress }}
   - resources/ingress-infra.yml
   {{- end }}
 {{- end }}
@@ -28,6 +31,9 @@ resources:
   - {{ print $vendorPrefix "/modules/logging/katalog/configs/audit" }}
   - {{ print $vendorPrefix "/modules/logging/katalog/configs/events" }}
   - {{ print $vendorPrefix "/modules/logging/katalog/configs/infra" }}
+  {{- if ne $haproxyType "none" }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/configs/ingress-haproxy" }}
+  {{- end }}
   {{- if ne .spec.distribution.modules.ingress.nginx.type "none" }}
   - {{ print $vendorPrefix "/modules/logging/katalog/configs/ingress-nginx" }}
   {{- end }}
@@ -45,6 +51,9 @@ resources:
   - {{ print $vendorPrefix "/modules/logging/katalog/loki-configs/audit" }}
   - {{ print $vendorPrefix "/modules/logging/katalog/loki-configs/events" }}
   - {{ print $vendorPrefix "/modules/logging/katalog/loki-configs/infra" }}
+  {{- if ne $haproxyType "none" }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/loki-configs/ingress-haproxy" }}
+  {{- end }}
   {{- if ne .spec.distribution.modules.ingress.nginx.type "none" }}
   - {{ print $vendorPrefix "/modules/logging/katalog/loki-configs/ingress-nginx" }}
   {{- end }}
@@ -113,6 +122,16 @@ patches:
         path: /spec
         value:
 {{ $customOutputs.ingressNginx | indent 10 }}
+  - target:
+      kind: Output
+      group: logging.banzaicloud.io
+      version: v1beta1
+      name: ingress-haproxy
+    patch: |-
+      - op: replace
+        path: /spec
+        value:
+{{ $customOutputs.ingressHaproxy | indent 10 }}
   - target:
       kind: ClusterOutput
       group: logging.banzaicloud.io

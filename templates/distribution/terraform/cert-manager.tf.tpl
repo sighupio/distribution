@@ -3,8 +3,11 @@
 # license that can be found in the LICENSE file.
 
 {{ if and (.spec.distribution.modules.ingress.certManager) (.spec.distribution.modules.ingress.certManager.clusterIssuer) }}
-
-{{ if and (eq .spec.distribution.modules.ingress.nginx.tls.provider "certManager") (eq .spec.distribution.modules.ingress.certManager.clusterIssuer.type "dns01") -}}
+{{- $tlsProvider := .spec.distribution.modules.ingress.nginx.tls.provider -}}
+{{- if ne .spec.distribution.modules.ingress.haproxy.type "none" -}}
+  {{- $tlsProvider = .spec.distribution.modules.ingress.haproxy.tls.provider -}}
+{{- end -}}
+{{ if and (eq $tlsProvider "certManager") (eq .spec.distribution.modules.ingress.certManager.clusterIssuer.type "dns01") -}}
 module "cert_manager_iam_role" {
   source          = "{{ print .spec.distribution.common.relativeVendorPath "/modules/ingress/modules/aws-cert-manager" }}"
   cluster_name    = "{{ .metadata.name }}"

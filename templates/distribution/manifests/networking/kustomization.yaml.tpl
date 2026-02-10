@@ -3,6 +3,9 @@
 # license that can be found in the LICENSE file.
 
 {{- $vendorPrefix := print "../" .spec.distribution.common.relativeVendorPath }}
+{{- $haproxyType := .spec.distribution.modules.ingress.haproxy.type }}
+{{- $isBYOIC := .spec.distribution.modules.ingress.byoic.enabled }}
+{{- $hasAnyIngress := or (ne .spec.distribution.modules.ingress.nginx.type "none") (ne $haproxyType "none") $isBYOIC }}
 ---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
@@ -24,7 +27,7 @@ resources:
     {{- end }}
     {{- if eq .spec.distribution.modules.networking.type "cilium" }}
   - {{ print $vendorPrefix "/modules/networking/katalog/cilium" }}
-      {{- if ne .spec.distribution.modules.ingress.nginx.type "none" }}
+      {{- if $hasAnyIngress }}
   - resources/ingress-infra.yml
       {{- end }}
     {{- end }}

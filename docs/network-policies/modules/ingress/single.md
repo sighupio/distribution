@@ -5,13 +5,19 @@ graph TD
     %% Namespaces
     subgraph ingress-nginx
         nginx[Nginx Controller<br/>app: ingress-nginx]
-        fc[Forecastle<br/>app: forecastle]
-        edns[ExternalDNS<br/>app: external-dns]
     end
 
     subgraph cert-manager
         cm[Cert Manager<br/>app: cert-manager]
         cmw[Cert Manager Webhook]
+    end
+
+    subgraph forecastle
+        fc[Forecastle<br/>app: forecastle]
+    end
+
+    subgraph external-dns
+        edns[ExternalDNS<br/>app: external-dns]
     end
 
     %% External and K8s Core Components
@@ -33,3 +39,5 @@ graph TD
     nginx -->|"3000/TCP"| fc
     edns --> |"egress: all"| ext
 ```
+
+> Note: when HAProxy is enabled the same flows apply in the `ingress-haproxy` namespace with ports `6060/8080/8443/1024`.

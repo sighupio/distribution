@@ -2,15 +2,20 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
+{{- $tlsProvider := .spec.distribution.modules.ingress.nginx.tls.provider -}}
+{{- if ne .spec.distribution.modules.ingress.haproxy.type "none" -}}
+  {{- $tlsProvider = .spec.distribution.modules.ingress.haproxy.tls.provider -}}
+{{- end -}}
 {{- if eq .spec.distribution.modules.auth.provider.type "sso" -}}
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  {{- if eq .spec.distribution.modules.ingress.nginx.tls.provider "certManager" }}
   annotations:
+    {{- if eq $tlsProvider "certManager" }}
     {{ template "certManagerClusterIssuer" . }}
-  {{- end }}
+    {{- end }}
+    {{ template "byoicAnnotations" . }}
   name: pomerium
   namespace: pomerium
 spec:

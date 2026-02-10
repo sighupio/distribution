@@ -48,7 +48,7 @@ data:
           vpcId: ""
       # common configuration for nginx ingress controller
       nginx:
-        # can be single or dual
+        # can be none, single or dual
         type: single
         tls:
           # can be certManager, secret or none
@@ -60,6 +60,26 @@ data:
               value
             ca: |
               value
+      # configuration for HAProxy ingress controller
+      haproxy:
+        # can be none, single or dual. Default is none.
+        type: none
+        tls:
+          # can be certManager, secret or none
+          provider: certManager
+          secret:
+            cert: |
+              value
+            key: |
+              value
+            ca: |
+              value
+      # configuration for Bring Your Own Ingress Controller mode
+      byoic:
+        # enable BYOIC mode. Default is false.
+        enabled: false
+        # the IngressClass to use for infrastructure ingresses when both nginx and haproxy are disabled
+        ingressClass: ""
       # the standard configuration for cert-manager on the ingress module
       certManager:
         # to create the clusterIssuer, this is an additional clusterIssuer than the two provided by cert-manager, for simplicity

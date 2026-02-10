@@ -2,7 +2,11 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-{{ if eq .spec.distribution.modules.ingress.nginx.tls.provider "certManager" -}}
+{{- $tlsProvider := .spec.distribution.modules.ingress.nginx.tls.provider -}}
+{{- if ne .spec.distribution.modules.ingress.haproxy.type "none" -}}
+  {{- $tlsProvider = .spec.distribution.modules.ingress.haproxy.tls.provider -}}
+{{- end -}}
+{{ if eq $tlsProvider "certManager" -}}
 
 {{ if and (.spec.distribution.modules.ingress.certManager) (.spec.distribution.modules.ingress.certManager.clusterIssuer) }}
 
@@ -27,9 +31,15 @@ spec:
           region: {{ .spec.distribution.modules.ingress.certManager.clusterIssuer.route53.region }}
           hostedZoneID: {{ .spec.distribution.modules.ingress.certManager.clusterIssuer.route53.hostedZoneId }}
 {{ else if eq .spec.distribution.modules.ingress.certManager.clusterIssuer.type "http01" }}
+{{- $nginxEnabled := ne .spec.distribution.modules.ingress.nginx.type "none" -}}
+{{- $nginxCertManager := eq .spec.distribution.modules.ingress.nginx.tls.provider "certManager" -}}
+{{- $haproxyEnabled := ne .spec.distribution.modules.ingress.haproxy.type "none" -}}
+{{- $haproxyCertManager := eq .spec.distribution.modules.ingress.haproxy.tls.provider "certManager" -}}
+{{- /* NGINX solver */}}
+{{- if and $nginxEnabled $nginxCertManager }}
     - http01:
         ingress:
-          class: {{ template "globalIngressClass" (dict "type" "external" "spec" .spec) }}
+          class: {{ if eq .spec.distribution.modules.ingress.nginx.type "dual" }}external{{ else }}nginx{{ end }}
           podTemplate:
             metadata:
               labels:
@@ -40,6 +50,23 @@ spec:
                 {{ template "nodeSelector" ( merge (dict "returnEmptyInsteadOfNull" true) $certManagerArgs )  }}
               tolerations:
                 {{ template "tolerations" ( merge (dict "indent" 16 "returnEmptyInsteadOfNull" true) $certManagerArgs ) }}
+{{- end }}
+{{- /* HAProxy solver */}}
+{{- if and $haproxyEnabled $haproxyCertManager }}
+    - http01:
+        ingress:
+          class: {{ if eq .spec.distribution.modules.ingress.haproxy.type "dual" }}haproxy-external{{ else }}haproxy{{ end }}
+          podTemplate:
+            metadata:
+              labels:
+                app: cert-manager
+            spec:
+              nodeSelector:
+                {{- /* NOTE!: merge order is important below */}}
+                {{ template "nodeSelector" ( merge (dict "returnEmptyInsteadOfNull" true) $certManagerArgs )  }}
+              tolerations:
+                {{ template "tolerations" ( merge (dict "indent" 16 "returnEmptyInsteadOfNull" true) $certManagerArgs ) }}
+{{- end }}
 {{- end -}}
 {{- else if index .spec.distribution.modules.ingress.certManager.clusterIssuer "solvers" }}
     solvers:
