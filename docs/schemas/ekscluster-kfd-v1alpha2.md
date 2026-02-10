@@ -1759,16 +1759,17 @@ Whether to install or not the default `manifests` and `full` backups schedules. 
 
 ### Properties
 
-| Property                                                  | Type     | Required |
-|:----------------------------------------------------------|:---------|:---------|
-| [baseDomain](#specdistributionmodulesingressbasedomain)   | `string` | Required |
-| [byoic](#specdistributionmodulesingressbyoic)             | `object` | Optional |
-| [certManager](#specdistributionmodulesingresscertmanager) | `object` | Optional |
-| [dns](#specdistributionmodulesingressdns)                 | `object` | Optional |
-| [forecastle](#specdistributionmodulesingressforecastle)   | `object` | Optional |
-| [haproxy](#specdistributionmodulesingresshaproxy)         | `object` | Optional |
-| [nginx](#specdistributionmodulesingressnginx)             | `object` | Required |
-| [overrides](#specdistributionmodulesingressoverrides)     | `object` | Optional |
+| Property                                                                                | Type     | Required |
+|:----------------------------------------------------------------------------------------|:---------|:---------|
+| [baseDomain](#specdistributionmodulesingressbasedomain)                                 | `string` | Required |
+| [byoic](#specdistributionmodulesingressbyoic)                                           | `object` | Optional |
+| [certManager](#specdistributionmodulesingresscertmanager)                               | `object` | Optional |
+| [dns](#specdistributionmodulesingressdns)                                               | `object` | Optional |
+| [forecastle](#specdistributionmodulesingressforecastle)                                 | `object` | Optional |
+| [haproxy](#specdistributionmodulesingresshaproxy)                                       | `object` | Optional |
+| [infrastructureIngressClass](#specdistributionmodulesingressinfrastructureingressclass) | `string` | Optional |
+| [nginx](#specdistributionmodulesingressnginx)                                           | `object` | Required |
+| [overrides](#specdistributionmodulesingressoverrides)                                   | `object` | Optional |
 
 ## .spec.distribution.modules.ingress.baseDomain
 
@@ -1780,14 +1781,21 @@ The base domain used for all the KFD infrastructural ingresses. If in the nginx 
 
 ### Properties
 
-| Property                                                         | Type      | Required |
-|:-----------------------------------------------------------------|:----------|:---------|
-| [enabled](#specdistributionmodulesingressbyoicenabled)           | `boolean` | Required |
-| [ingressClass](#specdistributionmodulesingressbyoicingressclass) | `string`  | Optional |
+| Property                                                                   | Type      | Required |
+|:---------------------------------------------------------------------------|:----------|:---------|
+| [commonAnnotations](#specdistributionmodulesingressbyoiccommonannotations) | `object`  | Optional |
+| [enabled](#specdistributionmodulesingressbyoicenabled)                     | `boolean` | Required |
+| [ingressClass](#specdistributionmodulesingressbyoicingressclass)           | `string`  | Optional |
 
 ### Description
 
 Configuration for Bring Your Own Ingress Controller mode. The ingressClass is used for infrastructure ingresses when both controllers are disabled.
+
+## .spec.distribution.modules.ingress.byoic.commonAnnotations
+
+### Description
+
+Annotations to apply to all infrastructure ingresses when using this BYOIC ingress class. Useful for controller-specific configuration (TLS, auth middlewares, etc.).
 
 ## .spec.distribution.modules.ingress.byoic.enabled
 
@@ -2285,6 +2293,12 @@ Default is `none`.
 |`"none"`  |
 |`"single"`|
 |`"dual"`  |
+
+## .spec.distribution.modules.ingress.infrastructureIngressClass
+
+### Description
+
+Overrides the default ingress class for the SD infrastructure ingresses. Accepts any valid ingress class name (e.g., `nginx`, `internal`, `external`, `haproxy`, `haproxy-internal`, `haproxy-external`, or a custom class). Useful during migrations to keep infrastructure ingresses on one controller while testing another.
 
 ## .spec.distribution.modules.ingress.nginx
 

@@ -873,7 +873,14 @@ type SpecDistributionModulesIngress struct {
 	// Configurations for the HAProxy Kubernetes Ingress Controller package.
 	Haproxy *SpecDistributionModulesIngressHAProxy `json:"haproxy,omitempty" yaml:"haproxy,omitempty" mapstructure:"haproxy,omitempty"`
 
-	// Configurations for the Ingress NGINX Controller package.
+	// Overrides the default ingress class for the SD infrastructure ingresses.
+	// Accepts any valid ingress class name (e.g., `nginx`, `internal`, `external`,
+	// `haproxy`, `haproxy-internal`, `haproxy-external`, or a custom class). Useful
+	// during migrations to keep infrastructure ingresses on one controller while
+	// testing another.
+	InfrastructureIngressClass *string `json:"infrastructureIngressClass,omitempty" yaml:"infrastructureIngressClass,omitempty" mapstructure:"infrastructureIngressClass,omitempty"`
+
+	// (DEPRECATED) Configurations for the Ingress NGINX Controller package.
 	Nginx SpecDistributionModulesIngressNginx `json:"nginx" yaml:"nginx" mapstructure:"nginx"`
 
 	// Overrides corresponds to the JSON schema field "overrides".
@@ -883,6 +890,11 @@ type SpecDistributionModulesIngress struct {
 // Configuration for Bring Your Own Ingress Controller mode. The ingressClass is
 // used for infrastructure ingresses when both controllers are disabled.
 type SpecDistributionModulesIngressBYOIC struct {
+	// Annotations to apply to all infrastructure ingresses when using this BYOIC
+	// ingress class. Useful for controller-specific configuration (TLS, auth
+	// middlewares, etc.).
+	CommonAnnotations SpecDistributionModulesIngressBYOICCommonAnnotations `json:"commonAnnotations,omitempty" yaml:"commonAnnotations,omitempty" mapstructure:"commonAnnotations,omitempty"`
+
 	// Enable BYOIC mode.
 	Enabled bool `json:"enabled" yaml:"enabled" mapstructure:"enabled"`
 
@@ -890,6 +902,11 @@ type SpecDistributionModulesIngressBYOIC struct {
 	// etc.) when both nginx and haproxy are disabled.
 	IngressClass *string `json:"ingressClass,omitempty" yaml:"ingressClass,omitempty" mapstructure:"ingressClass,omitempty"`
 }
+
+// Annotations to apply to all infrastructure ingresses when using this BYOIC
+// ingress class. Useful for controller-specific configuration (TLS, auth
+// middlewares, etc.).
+type SpecDistributionModulesIngressBYOICCommonAnnotations map[string]string
 
 // Configuration for the cert-manager package. Required even if
 // `ingress.nginx.type` is `none`, cert-manager is used for managing other

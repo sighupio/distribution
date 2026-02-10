@@ -1120,7 +1120,247 @@
                       "byoic": {
                         "properties": {
                           "enabled": {
+                            "const": false
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "then": false
+        },
+        {
+          "if": {
+            "allOf": [
+              {
+                "properties": {
+                  "auth": {
+                    "properties": {
+                      "provider": {
+                        "properties": {
+                          "type": {
+                            "const": "basicAuth"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "ingress": {
+                    "properties": {
+                      "nginx": {
+                        "properties": {
+                          "type": {
+                            "const": "none"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "anyOf": [
+                  {
+                    "properties": {
+                      "ingress": {
+                        "properties": {
+                          "haproxy": {
+                            "properties": {
+                              "type": {
+                                "const": "none"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "ingress": {
+                        "not": {
+                          "required": ["haproxy"]
+                        }
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "properties": {
+                  "ingress": {
+                    "properties": {
+                      "byoic": {
+                        "properties": {
+                          "enabled": {
                             "const": true
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "then": false
+        },
+        {
+          "if": {
+            "allOf": [
+              {
+                "properties": {
+                  "auth": {
+                    "properties": {
+                      "provider": {
+                        "properties": {
+                          "type": {
+                            "const": "sso"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "ingress": {
+                    "properties": {
+                      "nginx": {
+                        "properties": {
+                          "type": {
+                            "const": "none"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "anyOf": [
+                  {
+                    "properties": {
+                      "ingress": {
+                        "properties": {
+                          "haproxy": {
+                            "properties": {
+                              "type": {
+                                "const": "none"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "ingress": {
+                        "not": {
+                          "required": ["haproxy"]
+                        }
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "properties": {
+                  "ingress": {
+                    "properties": {
+                      "byoic": {
+                        "properties": {
+                          "enabled": {
+                            "const": false
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "then": false
+        },
+        {
+          "if": {
+            "allOf": [
+              {
+                "properties": {
+                  "auth": {
+                    "properties": {
+                      "oidcKubernetesAuth": {
+                        "properties": {
+                          "enabled": {
+                            "const": true
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "ingress": {
+                    "properties": {
+                      "nginx": {
+                        "properties": {
+                          "type": {
+                            "const": "none"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "anyOf": [
+                  {
+                    "properties": {
+                      "ingress": {
+                        "properties": {
+                          "haproxy": {
+                            "properties": {
+                              "type": {
+                                "const": "none"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "ingress": {
+                        "not": {
+                          "required": ["haproxy"]
+                        }
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "properties": {
+                  "ingress": {
+                    "properties": {
+                      "byoic": {
+                        "properties": {
+                          "enabled": {
+                            "const": false
                           }
                         }
                       }
@@ -1147,7 +1387,7 @@
         },
         "nginx": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.Nginx",
-          "description": "Configurations for the Ingress NGINX Controller package."
+          "description": "(DEPRECATED) Configurations for the Ingress NGINX Controller package."
         },
         "haproxy": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.HAProxy",
@@ -1163,6 +1403,10 @@
         },
         "forecastle": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.Forecastle"
+        },
+        "infrastructureIngressClass": {
+          "type": "string",
+          "description": "Overrides the default ingress class for the SD infrastructure ingresses. Accepts any valid ingress class name (e.g., `nginx`, `internal`, `external`, `haproxy`, `haproxy-internal`, `haproxy-external`, or a custom class). Useful during migrations to keep infrastructure ingresses on one controller while testing another."
         }
       },
       "required": [
@@ -1384,6 +1628,13 @@
         "ingressClass": {
           "type": "string",
           "description": "The IngressClass to use for infrastructure ingresses (Prometheus, Grafana, etc.) when both nginx and haproxy are disabled."
+        },
+        "commonAnnotations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Annotations to apply to all infrastructure ingresses when using this BYOIC ingress class. Useful for controller-specific configuration (TLS, auth middlewares, etc.)."
         }
       },
       "required": [

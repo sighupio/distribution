@@ -6,7 +6,7 @@ The distribution is maintained with ❤️ by the team [SIGHUP by ReeVo](https:/
 
 ## New features 🌟
 
-- [[#483](https://github.com/sighupio/distribution/pull/483)] Added support for HAProxy ingress controller and BYOIC (Bring Your Own Ingress Controller) mode. HAProxy is adopted as the new reference ingress controller following the official NGINX retirement announcement. When both NGINX and HAProxy are enabled, HAProxy takes priority for infrastructure ingresses, while the cluster-wide default IngressClass remains `nginx`. BYOIC mode allows using a custom ingress controller deployed as a distribution plugin, not managed by the SD lifecycle.
+- [[#483](https://github.com/sighupio/distribution/pull/483)] Added support for HAProxy ingress controller and BYOIC (Bring Your Own Ingress Controller) mode. HAProxy Kubernetes Ingress Controller is adopted as the new reference ingress controller following the official retirement announcement of the Ingress NGINX Controller. When both Ingress NGINX Controller and HAProxy KIC are enabled, HAProxy KIC takes priority for infrastructure ingresses, while the cluster-wide default IngressClass remains `nginx`. BYOIC mode allows using a custom ingress controller deployed as a distribution plugin, not managed by the SD lifecycle.
 - [[#468](https://github.com/sighupio/distribution/pull/468)] Replaced Terraform with OpenTofu: furyctl now uses the OpenTofu v1.10.0 binary instead of Terraform. A new `spec.toolsConfiguration.opentofu` field is available for state backend configuration. The `spec.toolsConfiguration.terraform` field is deprecated and will be removed in a future version. To use the new field, add the `opentofu` key to your furyctl.yaml file with the same S3 backend:
 
   ```yaml

@@ -3,9 +3,6 @@
 # license that can be found in the LICENSE file.
 
 {{- $vendorPrefix := print "../" .spec.distribution.common.relativeVendorPath }}
-{{- $haproxyType := .spec.distribution.modules.ingress.haproxy.type }}
-{{- $isBYOIC := .spec.distribution.modules.ingress.byoic.enabled }}
-{{- $hasAnyIngress := or (ne .spec.distribution.modules.ingress.nginx.type "none") (ne $haproxyType "none") $isBYOIC }}
 
 ---
 apiVersion: kustomize.config.k8s.io/v1beta1
@@ -18,9 +15,7 @@ resources:
 {{- if .spec.distribution.modules.auth.oidcKubernetesAuth.enabled }}
   - {{ print $vendorPrefix "/modules/auth/katalog/gangplank" }}
 {{- end }}
-{{- if $hasAnyIngress }}
   - resources/ingress-infra.yml
-{{- end }}
 {{- if ne .spec.distribution.modules.auth.oidcTrustedCA "" }}
   - secrets/oidc-trusted-ca.yml
   - secrets/overlays/kube-system-ca
@@ -75,9 +70,7 @@ resources:
 {{- if .spec.distribution.modules.auth.oidcKubernetesAuth.enabled }}
   - {{ print $vendorPrefix "/modules/auth/katalog/dex" }}
   - {{ print $vendorPrefix "/modules/auth/katalog/gangplank" }}
-{{- if $hasAnyIngress }}
   - resources/ingress-infra.yml
-{{- end }}
 {{- if ne .spec.distribution.modules.auth.oidcTrustedCA "" }}
   - secrets/overlays/kube-system-ca
 {{- end }}
@@ -110,9 +103,7 @@ patches:
 resources:
   - {{ print $vendorPrefix "/modules/auth/katalog/dex" }}
   - {{ print $vendorPrefix "/modules/auth/katalog/gangplank" }}
-{{- if $hasAnyIngress }}
   - resources/ingress-infra.yml
-{{- end }}
 {{- if ne .spec.distribution.modules.auth.oidcTrustedCA "" }}
   - secrets/overlays/kube-system-ca
 {{- end }}
