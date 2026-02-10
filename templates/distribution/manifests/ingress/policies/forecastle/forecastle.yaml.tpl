@@ -2,55 +2,24 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-{{- $monitoringType := .spec.distribution.modules.monitoring.type }}
-
-# source: https://github.com/prometheus-operator/kube-prometheus/blob/main/manifests/grafana-networkPolicy.yaml
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: grafana
-  namespace: monitoring
-  labels:
-    cluster.kfd.sighup.io/module: monitoring
-spec:
-  egress:
-  - {}
-  ingress:
-  - from:
-    - podSelector:
-        matchLabels:
-          app.kubernetes.io/name: prometheus
-    ports:
-    - port: 3000
-      protocol: TCP
-  podSelector:
-    matchLabels:
-      app.kubernetes.io/component: grafana
-      app.kubernetes.io/name: grafana
-      app.kubernetes.io/part-of: kube-prometheus
-  policyTypes:
-  - Egress
-  - Ingress
----
-{{- $nginxType := .spec.distribution.modules.ingress.nginx.type }}
 {{- $haproxyType := .spec.distribution.modules.ingress.haproxy.type }}
+{{- $nginxType := .spec.distribution.modules.ingress.nginx.type }}
 {{- $isSSO := eq .spec.distribution.modules.auth.provider.type "sso" }}
 {{- $isBYOIC := .spec.distribution.modules.ingress.byoic.enabled }}
 
 {{- if $isSSO }}
+---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: grafana-ingress-pomerium
-  namespace: monitoring
+  name: forecastle-ingress-pomerium
+  namespace: forecastle
   labels:
-    cluster.kfd.sighup.io/module: monitoring
+    cluster.kfd.sighup.io/module: ingress
 spec:
   podSelector:
     matchLabels:
-      app.kubernetes.io/component: grafana
-      app.kubernetes.io/name: grafana
-      app.kubernetes.io/part-of: kube-prometheus
+      app: forecastle
   policyTypes:
     - Ingress
   ingress:
@@ -70,16 +39,14 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: grafana-ingress-nginx
-  namespace: monitoring
+  name: forecastle-ingress-nginx
+  namespace: forecastle
   labels:
-    cluster.kfd.sighup.io/module: monitoring
+    cluster.kfd.sighup.io/module: ingress
 spec:
   podSelector:
     matchLabels:
-      app.kubernetes.io/component: grafana
-      app.kubernetes.io/name: grafana
-      app.kubernetes.io/part-of: kube-prometheus
+      app: forecastle
   policyTypes:
     - Ingress
   ingress:
@@ -98,21 +65,20 @@ spec:
         - port: 3000
           protocol: TCP
   {{- end }}
+
   {{- if ne $haproxyType "none" }}
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: grafana-ingress-haproxy
-  namespace: monitoring
+  name: forecastle-ingress-haproxy
+  namespace: forecastle
   labels:
-    cluster.kfd.sighup.io/module: monitoring
+    cluster.kfd.sighup.io/module: ingress
 spec:
   podSelector:
     matchLabels:
-      app.kubernetes.io/component: grafana
-      app.kubernetes.io/name: grafana
-      app.kubernetes.io/part-of: kube-prometheus
+      app: forecastle
   policyTypes:
     - Ingress
   ingress:
@@ -128,21 +94,20 @@ spec:
         - port: 3000
           protocol: TCP
   {{- end }}
+
   {{- if $isBYOIC }}
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: grafana-ingress-byoic
-  namespace: monitoring
+  name: forecastle-ingress-byoic
+  namespace: forecastle
   labels:
-    cluster.kfd.sighup.io/module: monitoring
+    cluster.kfd.sighup.io/module: ingress
 spec:
   podSelector:
     matchLabels:
-      app.kubernetes.io/component: grafana
-      app.kubernetes.io/name: grafana
-      app.kubernetes.io/part-of: kube-prometheus
+      app: forecastle
   policyTypes:
     - Ingress
   ingress:
@@ -152,3 +117,20 @@ spec:
   {{- end }}
 {{- end }}
 ---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: forecastle-egress-kube-apiserver
+  namespace: forecastle
+  labels:
+    cluster.kfd.sighup.io/module: ingress
+spec:
+  podSelector:
+    matchLabels:
+      app: forecastle
+  policyTypes:
+    - Egress
+  egress:
+  - ports:
+    - port: 6443
+      protocol: TCP
