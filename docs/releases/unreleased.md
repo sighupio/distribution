@@ -37,7 +37,8 @@ The distribution is maintained with ❤️ by the team [SIGHUP by ReeVo](https:/
       ...
   ```
 
-- [[#442](https://github.com/sighupio/distribution/pull/442)] Added GCS (Google Cloud Storage) as a supported backend for the DR module configuration and added support for new fields. 
+- [[#442](https://github.com/sighupio/distribution/pull/442)] Added GCS (Google Cloud Storage) as a supported backend for the DR module configuration and added support for new fields.
+- [[#490](https://github.com/sighupio/distribution/pull/490)] Added support for Velero's node-agent [`prepareQueueLength`](https://velero.io/docs/v1.17/node-agent-prepare-queue-length/) configuration via `spec.distribution.modules.dr.velero.nodeAgent.prepareQueueLength`.
 
 ## Bug Fixes 🐛
 
