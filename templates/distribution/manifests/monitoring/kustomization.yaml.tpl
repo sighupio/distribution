@@ -23,7 +23,7 @@ resources:
   - {{ print $vendorPrefix "/modules/monitoring/katalog/blackbox-exporter" }}
 {{- if eq .spec.distribution.common.provider.type "none" "immutable" }}{{/* none === on-premises and kfddistribution */}}
   - {{ print $vendorPrefix "/modules/monitoring/katalog/kubeadm-sm" }}
-  {{- if or (.spec | digAny "kubernetes" "loadBalancers" "enabled" false) (.spec | digAny "infrastructure" "loadBalancers" "enabled" false) }}
+  {{- if or (.spec | digAny "kubernetes" "loadBalancers" "enabled" false) (gt (.spec | digAny "infrastructure" "loadBalancers" "members" list | len) 0) }}
   - {{ print $vendorPrefix "/modules/monitoring/katalog/haproxy" }}
   - resources/haproxy-scrapeConfig.yaml
   {{- end }}

@@ -6,7 +6,7 @@
   {{- $lbHosts = append $lbHosts .ip }}
   {{- end }}
 {{- end }}
-{{- if (.spec | digAny  "infrastructure" "loadBalancers" "enabled" false) }}
+{{- if gt (.spec | digAny  "infrastructure" "loadBalancers" "members" list | len) 0 }}
   {{- $lbEnabled = true }}
   {{- range .spec.infrastructure.loadBalancers.members }}
   {{- $lbHosts = append $lbHosts .hostname }}
