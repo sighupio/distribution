@@ -6,7 +6,7 @@ version: v1.34.0
 modules:
   auth: v0.6.1-rc.0
   aws: v5.2.0-rc.0
-  dr: v3.3.0-rc.2
+  dr: feat/manage-velero-PrepareQueueLength
   ingress: main #CHANGEME
   logging: v5.3.0-rc.1
   monitoring: v4.1.0-rc.0
