@@ -6,7 +6,7 @@
 inventory = hosts.yaml
 host_key_checking = False
 roles_path = ../vendor/installers/immutable/roles
-timeout = 90
+timeout = 10
 callback_result_format = yaml
 bin_ansible_callbacks = True
 {{ .spec | digAny "toolsConfiguration" "ansible" "config" "" }}
