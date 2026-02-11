@@ -1,14 +1,7 @@
-{{- /* Template for control plane nodes */ -}}
-{{- range .data.nodes }}
-{{- if eq .Role "controlplane" }}
+{{- if eq .data.role "controlplane" -}}
+{{- with .data -}}
 ---
 # yaml-language-server: $schema=https://relativ-it.github.io/Butane-Schemas/Butane-Schema.json
-# =============================================================================
-# BUTANE TEMPLATE - Control Plane Node: {{ .Hostname }}
-# =============================================================================
-# This template is rendered by furyctl from fury-distribution
-# Architecture: {{ .Arch }}
-# =============================================================================
 variant: flatcar
 version: 1.1.0
 
@@ -16,12 +9,9 @@ passwd:
   users:
     - name: {{ .SSHUser }}
       ssh_authorized_keys:
-{{- range .SSHKeys }}
-        - {{ . }}
-{{- end }}
+        - {{ .SSHPublicKey | quote }}
       groups:
         - sudo
-        - docker
 
 storage:
   files:
@@ -29,25 +19,20 @@ storage:
       mode: 0644
       overwrite: true
       contents:
-        inline: {{ .Hostname }}
-
-    - path: /etc/hosts
-      overwrite: false
-      append:
-        - inline: |
-            {{ .IP }}   {{ .Hostname }}
+        inline: {{ .node.hostname }}
 
     - path: /etc/systemd/network/10-static.network
       mode: 0644
       contents:
         inline: |
-          [Match]
-          Name=eth0
+{{- template "networkdConfig" . }}
 
-          [Network]
-          Address={{ .IP }}/{{ .Netmask }}
-          Gateway={{ .Gateway }}
-          DNS={{ .DNS }}
+    # Enable bundled Python sysext needed by Ansible
+    - path: /etc/flatcar/enabled-sysext.conf
+      mode: 0644
+      contents:
+        inline: |
+          python
 
     # =========================================================================
     # Sysext: Common noop
@@ -66,11 +51,10 @@ storage:
     # =========================================================================
     # Sysext: Containerd
     # =========================================================================
-    - path: /opt/extensions/containerd/containerd-{{ $.data.sysext.containerd.version }}-{{ .Arch }}.raw
+    - path: /opt/extensions/containerd/containerd-{{ $.data.sysext.containerd.version }}-{{ .node.arch }}.raw
       mode: 0644
       contents:
-        source: {{ $.data.ipxeServerURL }}/assets/extensions/containerd-{{ $.data.sysext.containerd.version }}-{{ .Arch }}.raw
-
+        source: {{ $.data.ipxeServerURL }}/assets/extensions/containerd-{{ $.data.sysext.containerd.version }}-{{ .node.arch }}.raw
     - path: /etc/sysupdate.containerd.d/containerd.conf
       contents:
         inline: |
@@ -89,13 +73,37 @@ storage:
           CurrentSymlink=/etc/extensions/containerd.raw
 
     # =========================================================================
-    # Sysext: Kubernetes
+    # Sysext: keepalived
     # =========================================================================
-    - path: /opt/extensions/kubernetes/kubernetes-{{ $.data.sysext.kubernetes.version }}-{{ .Arch }}.raw
+    - path: /opt/extensions/keepalived/keepalived-{{ $.data.sysext.keepalived.version }}-{{ .node.arch }}.raw
       mode: 0644
       contents:
-        source: {{ $.data.ipxeServerURL }}/assets/extensions/kubernetes-{{ $.data.sysext.kubernetes.version }}-{{ .Arch }}.raw
+        source: {{ $.data.ipxeServerURL }}/assets/extensions/keepalived-{{ $.data.sysext.keepalived.version }}-{{ .node.arch }}.raw
 
+    - path: /etc/sysupdate.keepalived.d/keepalived.conf
+      contents:
+        inline: |
+          [Transfer]
+          ProtectVersion=%A
+
+          [Source]
+          Type=regular-file
+          Path=/opt/extensions/keepalived
+          MatchPattern=keepalived-@v-@u.raw
+
+          [Target]
+          Type=regular-file
+          Path=/etc/extensions
+          MatchPattern=keepalived-@v
+          CurrentSymlink=/etc/extensions/keepalived.raw
+
+    # =========================================================================
+    # Sysext: Kubernetes
+    # =========================================================================
+    - path: /opt/extensions/kubernetes/kubernetes-{{ $.data.sysext.kubernetes.version }}-{{ .node.arch }}.raw
+      mode: 0644
+      contents:
+        source: {{ $.data.ipxeServerURL }}/assets/extensions/kubernetes-{{ $.data.sysext.kubernetes.version }}-{{ .node.arch }}.raw
     - path: /etc/sysupdate.kubernetes.d/kubernetes.conf
       contents:
         inline: |
@@ -113,13 +121,14 @@ storage:
           MatchPattern=kubernetes-@v
           CurrentSymlink=/etc/extensions/kubernetes.raw
 
+    # TODO: Should we include this sysext always or only if etcd runs on the control plane?: yes because flatcar has also etcd baked in
     # =========================================================================
     # Sysext: etcd
     # =========================================================================
-    - path: /opt/extensions/etcd/etcd-{{ $.data.sysext.etcd.version }}-{{ .Arch }}.raw
+    - path: /opt/extensions/etcd/etcd-{{ $.data.sysext.etcd.version }}-{{ .node.arch }}.raw
       mode: 0644
       contents:
-        source: {{ $.data.ipxeServerURL }}/assets/extensions/etcd-{{ $.data.sysext.etcd.version }}-{{ .Arch }}.raw
+        source: {{ $.data.ipxeServerURL }}/assets/extensions/etcd-{{ $.data.sysext.etcd.version }}-{{ .node.arch }}.raw
 
     - path: /etc/sysupdate.etcd.d/etcd.conf
       contents:
@@ -151,21 +160,27 @@ storage:
 
     # Enable containerd sysext
     - path: /etc/extensions/containerd.raw
-      target: /opt/extensions/containerd/containerd-{{ $.data.sysext.containerd.version }}-{{ .Arch }}.raw
+      target: /opt/extensions/containerd/containerd-{{ $.data.sysext.containerd.version }}-{{ .node.arch }}.raw
+      hard: false
+
+    # Enable keepalived sysext
+    - path: /etc/extensions/keepalived.raw
+      target: /opt/extensions/keepalived/keepalived-{{ $.data.sysext.keepalived.version }}-{{ .node.arch }}.raw
       hard: false
 
     # Enable kubernetes sysext
     - path: /etc/extensions/kubernetes.raw
-      target: /opt/extensions/kubernetes/kubernetes-{{ $.data.sysext.kubernetes.version }}-{{ .Arch }}.raw
+      target: /opt/extensions/kubernetes/kubernetes-{{ $.data.sysext.kubernetes.version }}-{{ .node.arch }}.raw
       hard: false
 
     # Enable etcd sysext
     - path: /etc/extensions/etcd.raw
-      target: /opt/extensions/etcd/etcd-{{ $.data.sysext.etcd.version }}-{{ .Arch }}.raw
+      target: /opt/extensions/etcd/etcd-{{ $.data.sysext.etcd.version }}-{{ .node.arch }}.raw
       hard: false
 
 systemd:
   units:
+    # TODO: should we disable locksmithd too?
     - name: systemd-sysupdate.timer
       enabled: true
 
@@ -195,6 +210,27 @@ systemd:
             ExecStartPost=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/etcd.raw > /tmp/etcd-new"
             ExecStartPost=/usr/bin/sh -c "if ! cmp --silent /tmp/etcd /tmp/etcd-new; then touch /run/reboot-required; fi"
 
+        - name: keepalived.conf
+          contents: |
+            [Service]
+            ExecStartPre=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/keepalived.raw > /tmp/keepalived"
+            ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C keepalived update
+            ExecStartPost=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/keepalived.raw > /tmp/keepalived-new"
+            ExecStartPost=/usr/bin/sh -c "if ! cmp --silent /tmp/keepalived /tmp/keepalived-new; then touch /run/reboot-required; fi"
+
+    # =========================================================================
+    # Keepalived service - Fix binary path
+    # This issue is present only on LTS, on stable /usr/sbin is linked to /usr/bin
+    # =========================================================================
+    - name: keepalived.service
+      enabled: true
+      dropins:
+        - name: 20-fix-binary-path.conf
+          contents: |
+            [Service]
+            ExecStart=
+            ExecStart=/usr/bin/keepalived --use-file /etc/keepalived/keepalived.conf $KEEPALIVED_OPTIONS
+
     - name: containerd.service
       dropins:
         - name: 00-config-path.conf
@@ -202,5 +238,10 @@ systemd:
             [Service]
             ExecStartPre=/bin/bash -c 'set -e; mkdir -p /etc/containerd/; if ! [ -e /etc/containerd/config.toml ]; then containerd config default > /etc/containerd/config.toml; fi'
             Environment="CONTAINERD_CONFIG=/etc/containerd/config.toml"
+    # TODO: in my butanes I'm also masking etcd.service so it does not start
+    # automatically before configuring it.
+    # Should we do it here too?
 {{- end }}
+{{- else }}
+{{ fail "Attempting to apply control plane configuration to a non-control plane node" }}
 {{- end }}

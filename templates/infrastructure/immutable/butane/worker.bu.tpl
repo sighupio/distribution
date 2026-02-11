@@ -1,14 +1,7 @@
-{{- /* Template for worker nodes */ -}}
-{{- range .data.nodes }}
-{{- if eq .Role "worker" }}
+{{- if eq .data.role "worker" -}}
+{{- with .data -}}
 ---
 # yaml-language-server: $schema=https://relativ-it.github.io/Butane-Schemas/Butane-Schema.json
-# =============================================================================
-# BUTANE TEMPLATE - Worker Node: {{ .Hostname }}
-# =============================================================================
-# This template is rendered by furyctl from fury-distribution
-# Architecture: {{ .Arch }}
-# =============================================================================
 variant: flatcar
 version: 1.1.0
 
@@ -16,12 +9,9 @@ passwd:
   users:
     - name: {{ .SSHUser }}
       ssh_authorized_keys:
-{{- range .SSHKeys }}
-        - {{ . }}
-{{- end }}
+        - {{ .SSHPublicKey | quote }}
       groups:
         - sudo
-        - docker
 
 storage:
   files:
@@ -29,25 +19,20 @@ storage:
       mode: 0644
       overwrite: true
       contents:
-        inline: {{ .Hostname }}
-
-    - path: /etc/hosts
-      overwrite: false
-      append:
-        - inline: |
-            {{ .IP }}   {{ .Hostname }}
+        inline: {{ .node.hostname }}
 
     - path: /etc/systemd/network/10-static.network
       mode: 0644
       contents:
         inline: |
-          [Match]
-          Name=eth0
+{{- template "networkdConfig" . }}
 
-          [Network]
-          Address={{ .IP }}/{{ .Netmask }}
-          Gateway={{ .Gateway }}
-          DNS={{ .DNS }}
+    # Enable bundled Python sysext needed by Ansible
+    - path: /etc/flatcar/enabled-sysext.conf
+      mode: 0644
+      contents:
+        inline: |
+          python
 
     # =========================================================================
     # Sysext: Common noop
@@ -66,11 +51,10 @@ storage:
     # =========================================================================
     # Sysext: Containerd
     # =========================================================================
-    - path: /opt/extensions/containerd/containerd-{{ $.data.sysext.containerd.version }}-{{ .Arch }}.raw
+    - path: /opt/extensions/containerd/containerd-{{ $.data.sysext.containerd.version }}-{{ .node.arch }}.raw
       mode: 0644
       contents:
-        source: {{ $.data.ipxeServerURL }}/assets/extensions/containerd-{{ $.data.sysext.containerd.version }}-{{ .Arch }}.raw
-
+        source: {{ $.data.ipxeServerURL }}/assets/extensions/containerd-{{ $.data.sysext.containerd.version }}-{{ .node.arch }}.raw
     - path: /etc/sysupdate.containerd.d/containerd.conf
       contents:
         inline: |
@@ -91,11 +75,10 @@ storage:
     # =========================================================================
     # Sysext: Kubernetes
     # =========================================================================
-    - path: /opt/extensions/kubernetes/kubernetes-{{ $.data.sysext.kubernetes.version }}-{{ .Arch }}.raw
+    - path: /opt/extensions/kubernetes/kubernetes-{{ $.data.sysext.kubernetes.version }}-{{ .node.arch }}.raw
       mode: 0644
       contents:
-        source: {{ $.data.ipxeServerURL }}/assets/extensions/kubernetes-{{ $.data.sysext.kubernetes.version }}-{{ .Arch }}.raw
-
+        source: {{ $.data.ipxeServerURL }}/assets/extensions/kubernetes-{{ $.data.sysext.kubernetes.version }}-{{ .node.arch }}.raw
     - path: /etc/sysupdate.kubernetes.d/kubernetes.conf
       contents:
         inline: |
@@ -126,12 +109,12 @@ storage:
 
     # Enable containerd sysext
     - path: /etc/extensions/containerd.raw
-      target: /opt/extensions/containerd/containerd-{{ $.data.sysext.containerd.version }}-{{ .Arch }}.raw
+      target: /opt/extensions/containerd/containerd-{{ $.data.sysext.containerd.version }}-{{ .node.arch }}.raw
       hard: false
 
     # Enable kubernetes sysext
     - path: /etc/extensions/kubernetes.raw
-      target: /opt/extensions/kubernetes/kubernetes-{{ $.data.sysext.kubernetes.version }}-{{ .Arch }}.raw
+      target: /opt/extensions/kubernetes/kubernetes-{{ $.data.sysext.kubernetes.version }}-{{ .node.arch }}.raw
       hard: false
 
 systemd:
@@ -165,4 +148,6 @@ systemd:
             ExecStartPre=/bin/bash -c 'set -e; mkdir -p /etc/containerd/; if ! [ -e /etc/containerd/config.toml ]; then containerd config default > /etc/containerd/config.toml; fi'
             Environment="CONTAINERD_CONFIG=/etc/containerd/config.toml"
 {{- end }}
+{{- else }}
+{{ fail "Attempting to apply worker configuration to a non-worker node" }}
 {{- end }}
