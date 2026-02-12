@@ -37,7 +37,7 @@
     - haproxy
 
 - name: Kubernetes node preparation
-  hosts: master,nodes,etcd
+  hosts: master,nodes
   become: true
   roles:
     - kube-node-common
