@@ -34,9 +34,11 @@ resources:
   {{- $isDual := or (eq .spec.distribution.modules.ingress.nginx.type "dual") (eq $haproxyType "dual") }}
   {{- $isSingle := and (not $isDual) (or (eq .spec.distribution.modules.ingress.nginx.type "single") (eq $haproxyType "single")) }}
   {{- if $isDual }}
+  - {{ print $vendorPrefix "/modules/ingress/katalog/external-dns/namespace" }}
   - {{ print $vendorPrefix "/modules/ingress/katalog/external-dns/private" }}
   - {{ print $vendorPrefix "/modules/ingress/katalog/external-dns/public" }}
   {{- else if $isSingle }}
+  - {{ print $vendorPrefix "/modules/ingress/katalog/external-dns/namespace" }}
   - {{ print $vendorPrefix "/modules/ingress/katalog/external-dns/public" }}
   {{- end }}
 {{- end }}
