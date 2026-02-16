@@ -14,7 +14,7 @@ show buildarch
 kernel ${base-url}/assets/flatcar/${buildarch}/flatcar_production_pxe.vmlinuz \
     initrd=flatcar_production_pxe_image.cpio.gz \
     flatcar.first_boot=1 \
-    ignition.config.url=${base-url}/ignition/${mac:hexhyp}/ignition.json \
+    ignition.config.url=${base-url}/ignition/${mac:hexhyp}/install-flatcar.json \
     console=ttyAMA0,115200
 
 # 4. Load the Initrd (RAM disk)
