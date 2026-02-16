@@ -2,11 +2,10 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-{{- $tlsProvider := .spec.distribution.modules.ingress.nginx.tls.provider -}}
-{{- if ne .spec.distribution.modules.ingress.haproxy.type "none" -}}
-  {{- $tlsProvider = .spec.distribution.modules.ingress.haproxy.tls.provider -}}
-{{- end -}}
-{{ if eq $tlsProvider "certManager" -}}
+{{- $nginxUsesCertManager := and (ne .spec.distribution.modules.ingress.nginx.type "none") (eq .spec.distribution.modules.ingress.nginx.tls.provider "certManager") -}}
+{{- $haproxyUsesCertManager := and (ne .spec.distribution.modules.ingress.haproxy.type "none") (eq .spec.distribution.modules.ingress.haproxy.tls.provider "certManager") -}}
+{{- $usesCertManager := or $nginxUsesCertManager $haproxyUsesCertManager -}}
+{{ if $usesCertManager -}}
 
 {{ if and (.spec.distribution.modules.ingress.certManager) (.spec.distribution.modules.ingress.certManager.clusterIssuer) }}
 

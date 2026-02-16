@@ -4,10 +4,9 @@
 
 {{- $vendorPrefix := print "../" .spec.distribution.common.relativeVendorPath }}
 {{- $haproxyType := .spec.distribution.modules.ingress.haproxy.type }}
-{{- $tlsProvider := .spec.distribution.modules.ingress.nginx.tls.provider }}
-{{- if ne $haproxyType "none" }}
-  {{- $tlsProvider = .spec.distribution.modules.ingress.haproxy.tls.provider }}
-{{- end }}
+{{- $nginxUsesCertManager := and (ne .spec.distribution.modules.ingress.nginx.type "none") (eq .spec.distribution.modules.ingress.nginx.tls.provider "certManager") }}
+{{- $haproxyUsesCertManager := and (ne $haproxyType "none") (eq .spec.distribution.modules.ingress.haproxy.tls.provider "certManager") }}
+{{- $usesCertManager := or $nginxUsesCertManager $haproxyUsesCertManager }}
 {{- $isBYOIC := .spec.distribution.modules.ingress.byoic.enabled }}
 {{- $hasAnyIngress := or (ne .spec.distribution.modules.ingress.nginx.type "none") (ne $haproxyType "none") $isBYOIC }}
 
@@ -43,7 +42,7 @@ resources:
   {{- end }}
 {{- end }}
 
-{{- if and (eq .spec.distribution.common.networkPoliciesEnabled true) (or (eq $tlsProvider "certManager") $hasAnyIngress) }}
+{{- if and (eq .spec.distribution.common.networkPoliciesEnabled true) (or $usesCertManager $hasAnyIngress) }}
   - policies
 {{- end }}
 
@@ -53,7 +52,7 @@ resources:
 {{- end }}
   - {{ print $vendorPrefix "/modules/ingress/katalog/cert-manager" }}
 
-{{- if eq $tlsProvider "certManager" }}
+{{- if $usesCertManager }}
   - resources/cert-manager-clusterissuer.yml
 {{- end }}
 
@@ -70,7 +69,7 @@ resources:
 {{/* This patches section can probably be refactored */}}
 patches:
 {{- if and .spec.distribution.modules.ingress.certManager .spec.distribution.modules.ingress.certManager.clusterIssuer }}
-  {{- if and (eq $tlsProvider "certManager") (eq .spec.distribution.modules.ingress.certManager.clusterIssuer.type "dns01") }}
+  {{- if and $usesCertManager (eq .spec.distribution.modules.ingress.certManager.clusterIssuer.type "dns01") }}
   - path: patches/cert-manager-sa-route53-role-arn.yml
   {{- end }}
   - path: patches/cert-manager-kapp-group.yml
@@ -99,7 +98,7 @@ patches:
   {{- end }}
 {{- end }}
 
-{{- if eq $tlsProvider "certManager" }}
+{{- if $usesCertManager }}
   - target:
       group: apps
       version: v1
