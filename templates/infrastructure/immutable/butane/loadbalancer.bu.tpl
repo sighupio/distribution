@@ -161,6 +161,7 @@ systemd:
             [Service]
             ExecStartPre=/bin/bash -c 'set -e; mkdir -p /etc/containerd/; if ! [ -e /etc/containerd/config.toml ]; then containerd config default > /etc/containerd/config.toml; fi'
             Environment="CONTAINERD_CONFIG=/etc/containerd/config.toml"
+{{ template "statusReporterBooted" . }}
 {{- end }}
 {{- else }}
 {{ fail "Attempting to apply load balancer configuration to a non-load balancer node" }}
