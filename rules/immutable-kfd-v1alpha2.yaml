@@ -22,7 +22,7 @@ infrastructure:
     description: "SSH username cannot be changed after cluster creation"
 
   - path: .spec.infrastructure.ipxeServer.url
-    immutable: true
+    immutable: false
     description: "iPXE server URL cannot be changed after cluster creation"
 
   - path: .spec.infrastructure.nodes.*.macAddress

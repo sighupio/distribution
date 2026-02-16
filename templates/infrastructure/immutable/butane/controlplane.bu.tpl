@@ -241,6 +241,7 @@ systemd:
     # TODO: in my butanes I'm also masking etcd.service so it does not start
     # automatically before configuring it.
     # Should we do it here too?
+{{ template "statusReporterBooted" . }}
 {{- end }}
 {{- else }}
 {{ fail "Attempting to apply control plane configuration to a non-control plane node" }}
