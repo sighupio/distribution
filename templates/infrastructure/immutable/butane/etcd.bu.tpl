@@ -96,7 +96,12 @@ storage:
           Path=/etc/extensions
           MatchPattern=etcd-@v
           CurrentSymlink=/etc/extensions/etcd.raw
-    # TODO: missing kubeadm sysext
+
+    # kubeadm - needed for configuring etcd
+    - path: /opt/extensions/kubeadm/kubeadm-{{ $.data.sysext.kubeadm.version }}-{{ .node.arch }}.raw
+      contents:
+        source: {{ $.data.ipxeServerURL }}/assets/extensions/kubeadm-{{ $.data.sysext.kubeadm.version }}-{{ .node.arch }}.raw
+
   links:
     # Disable Docker from Flatcar base OS
     - path: /etc/extensions/docker-flatcar.raw
@@ -117,9 +122,14 @@ storage:
     - path: /etc/extensions/etcd.raw
       target: /opt/extensions/etcd/etcd-{{ $.data.sysext.etcd.version }}-{{ .node.arch }}.raw
       hard: false
+    # Kubeadm
+    - target: /opt/extensions/kubeadm/kubeadm-{{ $.data.sysext.kubeadm.version }}-{{ .node.arch }}.raw
+      path: /etc/extensions/kubeadm.raw
+      hard: false
 
 systemd:
   units:
+    # TODO: should we disable locksmithd too?
     - name: systemd-sysupdate.timer
       enabled: true
 
@@ -148,6 +158,11 @@ systemd:
             [Service]
             ExecStartPre=/bin/bash -c 'set -e; mkdir -p /etc/containerd/; if ! [ -e /etc/containerd/config.toml ]; then containerd config default > /etc/containerd/config.toml; fi'
             Environment="CONTAINERD_CONFIG=/etc/containerd/config.toml"
+    # TODO: in my butanes I'm also masking etcd.service so it does not start
+    # automatically before configuring it.
+    # Should we do it here too?
 {{ template "statusReporterBooted" . }}
 {{- end }}
+{{- else }}
+{{ fail "Attempting to apply control plane configuration to a non-control plane node" }}
 {{- end }}
