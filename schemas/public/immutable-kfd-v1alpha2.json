@@ -188,29 +188,13 @@
           "$ref": "#/$defs/Types.Uri",
           "description": "The URL of the iPXE boot server. Example: https://ipxe.internal.example.com:8080"
         },
-        "advanced": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "logLevel": {
-              "type": "string",
-              "description": "Log level for the iPXE server. Example: info",
-              "enum": [
-                "debug",
-                "info",
-                "warning",
-                "error"
-              ]
-            },
-            "dataPath": {
-              "type": "string",
-              "description": "Path to the iPXE server data directory. Example: /var/lib/ipxe-server"
-            },
-            "assetsPath": {
-              "type": "string",
-              "description": "Path to the iPXE server assets directory. Example: /var/lib/ipxe-server/assets"
-            }
-          }
+        "bindAddress": {
+          "type": "string",
+          "description": "The address where the iPXE server will listen for incoming requests. Default is the address from the URL"
+        },
+        "bindPort": {
+          "type": "integer",
+          "description": "The port where the iPXE server will listen for incoming requests. Default is the port from the URL or 80 if not specified."
         }
       },
       "required": [
@@ -264,7 +248,9 @@
         }
       },
       "then": {
-        "required": ["members"]
+        "required": [
+          "members"
+        ]
       }
     },
     "Spec.Infrastructure.Node": {
