@@ -10,7 +10,15 @@
 {{- $hasAnyIngress := or (ne .spec.distribution.modules.ingress.nginx.type "none") (ne $haproxyType "none") $isBYOIC }}
 
 {{- /* Check if HAProxy is the active controller for infra ingresses */ -}}
-{{- $useHAProxyFormat := ne $haproxyType "none" -}}
+{{- $infrastructureIngressClass := index .spec.distribution.modules.ingress "infrastructureIngressClass" -}}
+{{- $useHAProxyFormat := false -}}
+{{- if $infrastructureIngressClass -}}
+  {{- $useHAProxyFormat = hasPrefix "haproxy" $infrastructureIngressClass -}}
+{{- else if ne .spec.distribution.modules.ingress.nginx.type "none" -}}
+  {{- $useHAProxyFormat = false -}}
+{{- else if ne $haproxyType "none" -}}
+  {{- $useHAProxyFormat = true -}}
+{{- end -}}
 
 {{- $htpasswdFull := htpasswd $username $password -}}
 {{- $hashOnly := index (splitList ":" $htpasswdFull) 1 -}}

@@ -1,8 +1,17 @@
 # Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
+{{- $infrastructureIngressClass := index .spec.distribution.modules.ingress "infrastructureIngressClass" -}}
+{{- $isHaproxy := false -}}
+{{- if $infrastructureIngressClass -}}
+  {{- $isHaproxy = hasPrefix "haproxy" $infrastructureIngressClass -}}
+{{- else if ne .spec.distribution.modules.ingress.nginx.type "none" -}}
+  {{- $isHaproxy = false -}}
+{{- else if ne .spec.distribution.modules.ingress.haproxy.type "none" -}}
+  {{- $isHaproxy = true -}}
+{{- end -}}
 {{- $tlsProvider := .spec.distribution.modules.ingress.nginx.tls.provider -}}
-{{- if ne .spec.distribution.modules.ingress.haproxy.type "none" -}}
+{{- if $isHaproxy -}}
   {{- $tlsProvider = .spec.distribution.modules.ingress.haproxy.tls.provider -}}
 {{- end -}}
 {{- if or (ne .spec.distribution.modules.auth.provider.type "none") .spec.distribution.modules.auth.oidcKubernetesAuth.enabled -}}
