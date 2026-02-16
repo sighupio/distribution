@@ -25,8 +25,8 @@ spec:
           type: single
           tls:
             provider: certManager
-        nginx:
-          type: haproxy
+        haproxy:
+          type: single
           tls:
             provider: certManager
         certManager:
