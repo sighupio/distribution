@@ -27,7 +27,7 @@ spec:
           tls:
             provider: certManager
         haproxy:
-          type: single
+          type: none
           tls:
             provider: certManager
         certManager:
