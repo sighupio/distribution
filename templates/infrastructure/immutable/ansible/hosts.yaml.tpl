@@ -2,10 +2,13 @@ all:
   children:
     load_balancers:
       hosts:
+        {{- if hasKeyAny .spec.infrastructure "loadBalancers" }}
         {{- range $h := .spec.infrastructure.loadBalancers.members }}
         {{ $h.hostname }}:
         {{- end }}
+        {{- end }}
       vars:
+        {{- if hasKeyAny .spec.infrastructure "loadBalancers" }}
         {{- if index .spec.infrastructure.loadBalancers "keepalived" }}
         keepalived_cluster: {{ .spec.infrastructure.loadBalancers.keepalived.enabled }}
         keepalived_on_controlplane: false
@@ -105,6 +108,7 @@ all:
         {{- end }}
         {{- if hasKeyAny $containerd "deviceOwnershipFromSecurityContext" }}
         containerd_device_ownership_from_security_context: {{ $containerd.deviceOwnershipFromSecurityContext }}
+        {{- end }}
         {{- end }}
         {{- end }}
     nodes:
