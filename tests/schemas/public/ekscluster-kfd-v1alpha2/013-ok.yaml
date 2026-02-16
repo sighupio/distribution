@@ -78,6 +78,11 @@ spec:
           type: single
           tls:
             provider: certManager
+        certManager:
+          clusterIssuer:
+            name: letsencrypt-fury
+            email: sighup@sighup.cc
+            type: http01
         haproxy:
           type: single
           tls:
