@@ -71,7 +71,7 @@ load ./helper
 @test "HAProxy Ingress Controller is Running" {
     info
     test() {
-        kubectl get pods -l app.kubernetes.io/name=haproxy-ingress -o json -n ingress-haproxy |jq '.items[].status.containerStatuses[].ready' | uniq | grep -q true
+        kubectl get pods -l app.kubernetes.io/name=kubernetes-ingress -o json -n ingress-haproxy |jq '.items[].status.containerStatuses[].ready' | uniq | grep -q true
     }
     loop_it test 60 10
     status=${loop_it_result}
