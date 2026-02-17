@@ -29,7 +29,7 @@
         commit_sha: "{{ lookup('env', 'DRONE_COMMIT_SHA') | default('main') }}"
 
     - name: Upgrade cluster with furyctl
-      ansible.builtin.shell: furyctl apply cluster -o $PWD -D --distro-location /tmp/fury-distribution --force upgrades
+      ansible.builtin.shell: furyctl apply cluster -o $PWD -D --distro-location /tmp/fury-distribution --force upgrades --config furyctl_upgrade.yaml
       args:
         chdir: /root
       register: furyctl_kubernetes
