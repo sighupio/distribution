@@ -18,7 +18,7 @@ kind: OnPremises
 metadata:
   name: reevo
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.33.1
   kubernetes:
     pkiFolder: ./pki
     ssh:
@@ -168,7 +168,7 @@ kind: OnPremises
 metadata:
   name: reevo
 spec:
-  distributionVersion: v1.33.1
+  distributionVersion: v1.34.0
   kubernetes:
     pkiFolder: ./pki
     ssh:
@@ -239,6 +239,14 @@ spec:
       ingress:
         baseDomain: ingress.${replace(hcloud_server.haproxy.ipv4_address, ".", "-")}.nip.io
         nginx:
+          type: single
+          tls:
+            provider: secret
+            secret:
+              cert: "{file://tls.crt}"
+              key: "{file://tls.key}"
+              ca: "{file://ca.crt}"
+        haproxy:
           type: single
           tls:
             provider: secret
