@@ -699,6 +699,7 @@ deleteInfraIngresses() {
   $kubectlbin delete --ignore-not-found --wait --timeout=600s ingress -n monitoring --all
   $kubectlbin delete --ignore-not-found --wait --timeout=600s ingress -n tracing --all
   $kubectlbin delete --ignore-not-found --wait --timeout=600s ingress -n logging --all
+  $kubectlbin delete --ignore-not-found --wait --timeout=600s ingress -n forecastle --all
   $kubectlbin delete --ignore-not-found --wait --timeout=600s ingress -n gatekeeper-system --all
   $kubectlbin delete --ignore-not-found --wait --timeout=600s ingress -n ingress-nginx --all
   $kubectlbin delete --ignore-not-found --wait --timeout=600s ingress -n kube-system --all # hubble, dex, gangplank
