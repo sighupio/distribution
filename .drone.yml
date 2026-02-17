@@ -333,7 +333,7 @@ steps: # e2e-kfddistribution-1.33.1-to-1.34.0
         - failure
 
 ---
-name: e2e-ekscluster-1.33.1
+name: e2e-ekscluster-1.34.0
 kind: pipeline
 type: docker
 
@@ -352,7 +352,7 @@ trigger:
 
 environment:
   MISE_DATA_DIR: /mise-data
-  DISTRIBUTION_VERSION: "v1.33.1"
+  DISTRIBUTION_VERSION: "v1.34.0"
   CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}
 
 volumes:
@@ -362,7 +362,7 @@ volumes:
   - name: furyctl-outdir-eks
     temp: {}
 
-steps: # e2e-ekscluster-1.33.1
+steps: # e2e-ekscluster-1.34.0
   - name: install-tools
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
@@ -489,7 +489,7 @@ steps: # e2e-ekscluster-1.33.1
         - success
 
 ---
-name: e2e-ekscluster-selfmanaged-alinux2023-1.33.1
+name: e2e-ekscluster-selfmanaged-alinux2023-1.34.0
 kind: pipeline
 type: docker
 
@@ -509,7 +509,7 @@ trigger:
 
 environment:
   MISE_DATA_DIR: /mise-data
-  DISTRIBUTION_VERSION: "v1.33.1"
+  DISTRIBUTION_VERSION: "v1.34.0"
   CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-selfmanaged
 
 volumes:
@@ -519,7 +519,7 @@ volumes:
   - name: furyctl-outdir-eks-selfmanaged
     temp: {}
 
-steps: # e2e-ekscluster-selfmanaged-alinux2023-1.33.1
+steps: # e2e-ekscluster-selfmanaged-alinux2023-1.34.0
   - name: install-tools
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
@@ -646,7 +646,7 @@ steps: # e2e-ekscluster-selfmanaged-alinux2023-1.33.1
         - success
 
 ---
-name: e2e-ekscluster-upgrades-1.32.0-1.33.1
+name: e2e-ekscluster-upgrades-1.33.1-1.34.0
 kind: pipeline
 type: docker
 
@@ -665,7 +665,7 @@ trigger:
 
 environment:
   MISE_DATA_DIR: /mise-data
-  DISTRIBUTION_VERSION: "v1.33.1"
+  DISTRIBUTION_VERSION: "v1.34.0"
   CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-upgrades
 
 volumes:
@@ -703,7 +703,7 @@ steps: #e2e-eks-upgrades
         path: /furyctl-outdir
     commands:
       - eval "$(mise activate bash --shims)"
-      - ./tests/e2e/ekscluster-upgrades/e2e-ekscluster-upgrades.sh
+      - ./tests/e2e/ekscluster-upgrades/e2e-ekscluster-upgrades-1.33.1-1.34.0.sh
 
   - name: furyctl-delete
     image: quay.io/sighup/mise:v2025.4.4
@@ -750,13 +750,13 @@ steps: #e2e-eks-upgrades
         path: /furyctl-outdir
     commands:
       - eval "$(mise activate bash --shims)"
-      - tests/e2e/ekscluster/replace_variables.sh --cluster-name "$CLUSTER_NAME" --furyctl-yaml tests/e2e/ekscluster-upgrades/manifests/furyctl-upgrade-version-1.33.1.yaml
+      - tests/e2e/ekscluster/replace_variables.sh --cluster-name "$CLUSTER_NAME" --furyctl-yaml tests/e2e/ekscluster-upgrades/manifests/furyctl-upgrade-version-1.34.0.yaml
       - |
         furyctl delete cluster \
           --outdir /furyctl-outdir \
           --debug \
           --disable-analytics \
-          --config tests/e2e/ekscluster-upgrades/manifests/furyctl-upgrade-version-1.33.1.yaml \
+          --config tests/e2e/ekscluster-upgrades/manifests/furyctl-upgrade-version-1.34.0.yaml \
           --distro-location ./ \
           --phase kubernetes \
           --force \
@@ -766,7 +766,7 @@ steps: #e2e-eks-upgrades
           --outdir /furyctl-outdir \
           --debug \
           --disable-analytics \
-          --config tests/e2e/ekscluster-upgrades/manifests/furyctl-upgrade-version-1.33.1.yaml \
+          --config tests/e2e/ekscluster-upgrades/manifests/furyctl-upgrade-version-1.34.0.yaml \
           --distro-location ./ \
           --phase infrastructure \
           --force \
@@ -819,7 +819,7 @@ trigger:
 
 environment:
   MISE_DATA_DIR: /mise-data
-  FURYCTL_VERSION: "v0.33.2-rc.1"
+  FURYCTL_VERSION: "v0.34.0-rc.2"
   TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
 
 volumes:
@@ -952,8 +952,8 @@ steps: # e2e-onpremises
         - failure
 
 ---
-# On-premises upgrade pipeline - v1.32.0 to v1.33.1
-name: e2e-onpremises-upgrades-1.32.0-1.33.1
+# On-premises upgrade pipeline - v1.33.1 to v1.34.0
+name: e2e-onpremises-upgrades-1.33.1-1.34.0
 kind: pipeline
 type: docker
 
@@ -975,7 +975,7 @@ trigger:
 
 environment:
   MISE_DATA_DIR: /mise-data
-  FURYCTL_VERSION: "v0.33.2-rc.1"
+  FURYCTL_VERSION: "v0.34.0-rc.2"
   TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
   KUBECONFIG: /cache/kubeconfig
 
@@ -986,7 +986,7 @@ volumes:
     host:
       path: /root/mise_data_dir
 
-steps: # e2e-onpremises-upgrades-1.32.0-1.33.1
+steps: # e2e-onpremises-upgrades-1.33.1-1.34.0
   - name: install-tools
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
@@ -1001,7 +1001,7 @@ steps: # e2e-onpremises-upgrades-1.32.0-1.33.1
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
     environment:
-      DISTRIBUTION_VERSION: "v1.32.0"
+      DISTRIBUTION_VERSION: "v1.33.1"
       AWS_ACCESS_KEY_ID:
         from_secret: aws_access_key_id
       AWS_SECRET_ACCESS_KEY:
@@ -1023,11 +1023,11 @@ steps: # e2e-onpremises-upgrades-1.32.0-1.33.1
       - export TF_VAR_private_key=$(cat /cache/ci-ssh-key)
       - ansible-playbook 0.local-tofu-run.yaml
 
-  - name: install-cluster-1.32.0-with-furyctl
+  - name: install-cluster-1.33.1-with-furyctl
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
     environment:
-      DISTRIBUTION_VERSION: "v1.32.0" # distribution version is hardcoded in the tofu outputs
+      DISTRIBUTION_VERSION: "v1.33.1" # distribution version is hardcoded in the tofu outputs
       AWS_ACCESS_KEY_ID:
         from_secret: aws_access_key_id
       AWS_SECRET_ACCESS_KEY:
@@ -1058,11 +1058,11 @@ steps: # e2e-onpremises-upgrades-1.32.0-1.33.1
       - eval "$(mise activate bash --shims)"
       - ./tests/e2e/onpremises-upgrades/e2e-onpremises.sh
 
-  - name: upgrade-cluster-to-1.33.1-with-furyctl
+  - name: upgrade-cluster-to-1.34.0-with-furyctl
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
     environment:
-      DISTRIBUTION_VERSION: "v1.33.1" # distribution version is hardcoded in the tofu outputs
+      DISTRIBUTION_VERSION: "v1.34.0" # distribution version is hardcoded in the tofu outputs
       AWS_ACCESS_KEY_ID:
         from_secret: aws_access_key_id
       AWS_SECRET_ACCESS_KEY:
@@ -1091,13 +1091,13 @@ steps: # e2e-onpremises-upgrades-1.32.0-1.33.1
         path: /mise-data
     commands:
       - eval "$(mise activate bash --shims)"
-      - ./tests/e2e/onpremises-upgrades/e2e-onpremises.sh
+      - ./tests/e2e/onpremises-upgrades/e2e-onpremises-upgrades.sh
 
   - name: delete
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
     environment:
-      DISTRIBUTION_VERSION: "v1.33.1"
+      DISTRIBUTION_VERSION: "v1.34.0"
       AWS_ACCESS_KEY_ID:
         from_secret: aws_access_key_id
       AWS_SECRET_ACCESS_KEY:
@@ -1170,10 +1170,10 @@ type: docker
 depends_on:
   - e2e-kfddistribution-1.34
   - e2e-kfddistribution-1.33.1-to-1.34.0
-  - e2e-ekscluster-1.33.1
-  - e2e-ekscluster-upgrades-1.32.0-1.33.1
+  - e2e-ekscluster-1.34.0
+  - e2e-ekscluster-upgrades-1.33.1-1.34.0
   - e2e-onpremises
-  - e2e-onpremises-upgrades-1.32.0-1.33.1
+  - e2e-onpremises-upgrades-1.33.1-1.34.0
 
 platform:
   os: linux

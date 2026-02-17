@@ -14,7 +14,7 @@
       args:
         creates: /usr/local/bin/furyctl
       vars:
-        furyctl_version: "{{ lookup('env', 'FURYCTL_VERSION') | default('v0.33.0-rc.0') }}"
+        furyctl_version: "{{ lookup('env', 'FURYCTL_VERSION') | default('v0.34.0-rc.2') }}"
 
     - name: Clone current commit distribution
       ansible.builtin.shell: git clone https://github.com/sighupio/distribution.git /tmp/fury-distribution
@@ -29,10 +29,13 @@
         commit_sha: "{{ lookup('env', 'DRONE_COMMIT_SHA') | default('main') }}"
 
     - name: Upgrade cluster with furyctl
-      ansible.builtin.shell: furyctl apply cluster -o $PWD -D --distro-location /tmp/fury-distribution --force upgrades
+      ansible.builtin.shell: furyctl apply cluster -o $PWD -D --distro-location /tmp/fury-distribution --upgrade --force upgrades --config furyctl_upgrade.yaml
       args:
         chdir: /root
       register: furyctl_kubernetes
+      retries: 2
+      delay: 60
+      until: furyctl_kubernetes.rc == 0
 
     - name: Debug furyctl kubernetes phase
       debug:

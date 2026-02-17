@@ -8,6 +8,11 @@
   gather_facts: false
 
   tasks:
+    - name: Wait for haproxy node to be reachable via SSH
+      ansible.builtin.wait_for_connection:
+        timeout: 300
+        sleep: 15
+
     - name: Install required packages
       apt:
         name:
@@ -29,7 +34,7 @@
       args:
         creates: /usr/local/bin/furyctl
       vars:
-        furyctl_version: "{{ lookup('env', 'FURYCTL_VERSION') | default('v0.33.0-rc.0') }}"
+        furyctl_version: "{{ lookup('env', 'FURYCTL_VERSION') | default('v0.34.0-rc.2') }}"
 
     - name: Create furyctl pki
       ansible.builtin.shell: furyctl create pki -p ./pki
@@ -59,11 +64,48 @@
       vars:
         commit_sha: "{{ lookup('env', 'DRONE_COMMIT_SHA') | default('main') }}"
 
+    # Ubuntu runs unattended-upgrades automatically on fresh nodes,
+    # which holds the dpkg lock and can restart sshd. Wait for all nodes
+    # to be reachable, then disable the service before furyctl runs.
+    - name: Wait for all cluster nodes to be reachable via SSH
+      ansible.builtin.shell: >
+        ANSIBLE_HOST_KEY_CHECKING=False
+        ansible all
+        -i "10.10.1.2,10.10.1.3,10.10.1.4,10.10.1.5,10.10.1.6,10.10.1.7,10.10.1.8,10.10.1.9,10.10.1.10,"
+        -m wait_for_connection
+        -a "timeout=300 sleep=15"
+        -u root
+
+    - name: Disable unattended-upgrades on all cluster nodes before kubernetes installation
+      ansible.builtin.shell: >
+        ANSIBLE_HOST_KEY_CHECKING=False
+        ansible all
+        -i "10.10.1.2,10.10.1.3,10.10.1.4,10.10.1.5,10.10.1.6,10.10.1.7,10.10.1.8,10.10.1.9,10.10.1.10,"
+        -m service
+        -a "name=unattended-upgrades state=stopped enabled=false"
+        -u root
+        -e "ansible_python_interpreter=/usr/bin/python3"
+      ignore_errors: yes
+
+    - name: Stop apt daily timers on all cluster nodes to prevent unattended-upgrades from re-triggering
+      ansible.builtin.shell: >
+        ANSIBLE_HOST_KEY_CHECKING=False
+        ansible all
+        -i "10.10.1.2,10.10.1.3,10.10.1.4,10.10.1.5,10.10.1.6,10.10.1.7,10.10.1.8,10.10.1.9,10.10.1.10,"
+        -m shell
+        -a "systemctl stop apt-daily.timer apt-daily-upgrade.timer && systemctl disable apt-daily.timer apt-daily-upgrade.timer"
+        -u root
+        -e "ansible_python_interpreter=/usr/bin/python3"
+      ignore_errors: yes
+
     - name: Create cluster with furyctl - Kubernetes phase
-      ansible.builtin.shell: furyctl apply cluster -o $PWD -D --phase kubernetes --distro-location /tmp/fury-distribution
+      ansible.builtin.shell: furyctl apply cluster -o $PWD -D --phase kubernetes --force migrations --distro-location /tmp/fury-distribution
       args:
         chdir: /root
       register: furyctl_kubernetes
+      retries: 2
+      delay: 60
+      until: furyctl_kubernetes.rc == 0
 
     - name: Debug furyctl kubernetes phase
       debug:
@@ -80,10 +122,13 @@
         chdir: /root/.furyctl/reevo/kubernetes
 
     - name: Complete furyctl installation , all phases + post apply phase
-      ansible.builtin.shell: furyctl apply cluster -o $PWD -D --post-apply-phases distribution --distro-location /tmp/fury-distribution
+      ansible.builtin.shell: furyctl apply cluster -o $PWD -D --post-apply-phases distribution --force migrations --distro-location /tmp/fury-distribution
       args:
         chdir: /root
       register: furyctl_post_apply
+      retries: 2
+      delay: 60
+      until: furyctl_post_apply.rc == 0
 
     - name: Debug furyctl with post apply phase
       ansible.builtin.debug:

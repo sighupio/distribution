@@ -5,15 +5,14 @@
 
 set -e
 
-LAST_FURYCTL_YAML=tests/e2e/ekscluster/manifests/furyctl-init-cluster.yaml
-tests/e2e/ekscluster/replace_variables.sh --distribution-version "$DISTRIBUTION_VERSION" --cluster-name "$CLUSTER_NAME" --furyctl-yaml "$LAST_FURYCTL_YAML"
 echo "----------------------------------------------------------------------------"
-echo "Executing furyctl for the initial setup"
+echo "Executing furyctl for the initial setup 1.33.1 with alinux2023"
+FURYCTL_YAML=tests/e2e/ekscluster-upgrades/manifests/furyctl-upgrade-version-1.33.1.yaml
+tests/e2e/ekscluster/replace_variables.sh --cluster-name "$CLUSTER_NAME" --furyctl-yaml "$FURYCTL_YAML"
 if ! furyctl apply \
   --outdir /furyctl-outdir \
-  --config "$LAST_FURYCTL_YAML" \
+  --config "$FURYCTL_YAML" \
   --disable-analytics \
-  --distro-location ./ \
   --force all \
   --skip-vpn-confirmation \
   --no-tty; then
@@ -45,45 +44,23 @@ if ! furyctl apply \
 
   furyctl apply \
     --outdir /furyctl-outdir \
-    --config "$LAST_FURYCTL_YAML" \
+    --config "$FURYCTL_YAML" \
     --disable-analytics \
-    --distro-location ./ \
     --force all \
     --skip-vpn-confirmation \
     --no-tty
 fi
-echo "$LAST_FURYCTL_YAML" > last_furyctl_yaml.txt
 
-echo ""
-echo "============================================================================"
-echo "Cluster state after successful furyctl apply:"
-echo "============================================================================"
-echo ""
-echo "--- Nodes ---"
-kubectl --kubeconfig=./kubeconfig get nodes -o wide
-echo ""
-echo "--- All Pods ---"
-kubectl --kubeconfig=./kubeconfig get pods -A -o wide
-echo ""
-echo "============================================================================"
-echo "Testing that the components are running"
-echo "============================================================================"
-echo ""
-
-bats -t tests/e2e/ekscluster/e2e-ekscluster-init-cluster.sh
-
-
-LAST_FURYCTL_YAML=tests/e2e/ekscluster/manifests/furyctl-cleanup-all.yaml
-tests/e2e/ekscluster/replace_variables.sh --distribution-version "$DISTRIBUTION_VERSION" --cluster-name "$CLUSTER_NAME" --furyctl-yaml "$LAST_FURYCTL_YAML"
 echo "----------------------------------------------------------------------------"
-echo "Executing furyctl cleanup all modules and configurations"
-furyctl apply \
+echo "Executing version upgrade to 1.34.0 (with alinux2023)"
+FURYCTL_YAML=tests/e2e/ekscluster-upgrades/manifests/furyctl-upgrade-version-1.34.0.yaml
+tests/e2e/ekscluster/replace_variables.sh --cluster-name "$CLUSTER_NAME" --furyctl-yaml "$FURYCTL_YAML"
+furyctl apply --upgrade \
   --outdir /furyctl-outdir \
-  --config "$LAST_FURYCTL_YAML" \
+  --config "$FURYCTL_YAML" \
   --disable-analytics \
   --distro-location ./ \
-  --force all \
+  --force upgrades \
   --skip-vpn-confirmation \
   --no-tty
-echo "$LAST_FURYCTL_YAML" > last_furyctl_yaml.txt
-bats -t tests/e2e/ekscluster/e2e-ekscluster-cleanup-all.sh
+echo "$FURYCTL_YAML" > last_furyctl_yaml.txt
