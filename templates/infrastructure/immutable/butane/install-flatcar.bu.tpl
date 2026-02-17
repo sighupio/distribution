@@ -29,7 +29,7 @@ systemd:
         After=network-online.target
         [Service]
         Type=oneshot
-        ExecStart=/usr/bin/curl '{{ .ipxeServerURL }}/status?node={{ .hostname }}&status=installing'
+        ExecStart=/usr/bin/curl -X POST '{{ .ipxeServerURL }}/status?node={{ .hostname }}&status=installing'
         RemainAfterExit=yes
 
         [Install]
