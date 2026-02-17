@@ -915,7 +915,7 @@ Configuration for Pomerium, an identity-aware reverse proxy used for SSO.
 |:------------------------------------------------------------------------------------------------------------------|:--------|:---------|
 | [gatekeeperPolicyManager](#specdistributionmodulesauthpomeriumdefaultroutespolicygatekeeperpolicymanager)         | `array` | Optional |
 | [hubbleUi](#specdistributionmodulesauthpomeriumdefaultroutespolicyhubbleui)                                       | `array` | Optional |
-| [ingressNgnixForecastle](#specdistributionmodulesauthpomeriumdefaultroutespolicyingressngnixforecastle)           | `array` | Optional |
+| [ingressForecastle](#specdistributionmodulesauthpomeriumdefaultroutespolicyingressforecastle)                     | `array` | Optional |
 | [loggingMinioConsole](#specdistributionmodulesauthpomeriumdefaultroutespolicyloggingminioconsole)                 | `array` | Optional |
 | [loggingOpensearchDashboards](#specdistributionmodulesauthpomeriumdefaultroutespolicyloggingopensearchdashboards) | `array` | Optional |
 | [monitoringAlertmanager](#specdistributionmodulesauthpomeriumdefaultroutespolicymonitoringalertmanager)           | `array` | Optional |
@@ -932,7 +932,7 @@ override default routes for KFD components
 
 ## .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.hubbleUi
 
-## .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.ingressNgnixForecastle
+## .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.ingressForecastle
 
 ## .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.loggingMinioConsole
 

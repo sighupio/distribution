@@ -436,9 +436,8 @@ type SpecDistributionModulesAuthPomeriumDefaultRoutesPolicy struct {
 	// HubbleUi corresponds to the JSON schema field "hubbleUi".
 	HubbleUi []SpecDistributionModulesAuthPomeriumDefaultRoutesPolicyHubbleUiElem `json:"hubbleUi,omitempty" yaml:"hubbleUi,omitempty" mapstructure:"hubbleUi,omitempty"`
 
-	// IngressNgnixForecastle corresponds to the JSON schema field
-	// "ingressNgnixForecastle".
-	IngressNgnixForecastle []SpecDistributionModulesAuthPomeriumDefaultRoutesPolicyIngressNgnixForecastleElem `json:"ingressNgnixForecastle,omitempty" yaml:"ingressNgnixForecastle,omitempty" mapstructure:"ingressNgnixForecastle,omitempty"`
+	// IngressForecastle corresponds to the JSON schema field "ingressForecastle".
+	IngressForecastle []SpecDistributionModulesAuthPomeriumDefaultRoutesPolicyIngressForecastleElem `json:"ingressForecastle,omitempty" yaml:"ingressForecastle,omitempty" mapstructure:"ingressForecastle,omitempty"`
 
 	// LoggingMinioConsole corresponds to the JSON schema field "loggingMinioConsole".
 	LoggingMinioConsole []SpecDistributionModulesAuthPomeriumDefaultRoutesPolicyLoggingMinioConsoleElem `json:"loggingMinioConsole,omitempty" yaml:"loggingMinioConsole,omitempty" mapstructure:"loggingMinioConsole,omitempty"`
@@ -470,7 +469,7 @@ type SpecDistributionModulesAuthPomeriumDefaultRoutesPolicyGatekeeperPolicyManag
 
 type SpecDistributionModulesAuthPomeriumDefaultRoutesPolicyHubbleUiElem map[string]interface{}
 
-type SpecDistributionModulesAuthPomeriumDefaultRoutesPolicyIngressNgnixForecastleElem map[string]interface{}
+type SpecDistributionModulesAuthPomeriumDefaultRoutesPolicyIngressForecastleElem map[string]interface{}
 
 type SpecDistributionModulesAuthPomeriumDefaultRoutesPolicyLoggingMinioConsoleElem map[string]interface{}
 
