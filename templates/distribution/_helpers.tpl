@@ -82,13 +82,32 @@
 {{- end -}}
 
 {{/* globalIngressClass returns the ingressClassName for SD infrastructure ingresses.
-     If infrastructureIngressClass field is set, it overrides the default.
-     Otherwise, the first in terms of priority is NGINX.
+     If infrastructureIngressController field is set, it identifies the controller family
+     (nginx, haproxy, or custom) and applies the dual/single logic from the controller's
+     type setting. Otherwise, the first in terms of priority is NGINX.
 */}}
 {{ define "globalIngressClass" }}
-  {{- $infrastructureIngressClass := index .spec.distribution.modules.ingress "infrastructureIngressClass" -}}
-  {{- if $infrastructureIngressClass -}}
-    {{- $infrastructureIngressClass -}}
+  {{- $infrastructureIngressController := index .spec.distribution.modules.ingress "infrastructureIngressController" -}}
+  {{- if $infrastructureIngressController -}}
+    {{- if eq $infrastructureIngressController "nginx" -}}
+      {{- if eq .spec.distribution.modules.ingress.nginx.type "dual" -}}
+        {{- .type -}}
+      {{- else -}}
+        nginx
+      {{- end -}}
+    {{- else if eq $infrastructureIngressController "haproxy" -}}
+      {{- if eq .spec.distribution.modules.ingress.haproxy.type "dual" -}}
+        {{- if eq .type "internal" -}}
+          haproxy-internal
+        {{- else -}}
+          haproxy-external
+        {{- end -}}
+      {{- else -}}
+        haproxy
+      {{- end -}}
+    {{- else -}}
+      {{- $infrastructureIngressController -}}
+    {{- end -}}
   {{- else if eq .spec.distribution.modules.ingress.nginx.type "single" -}}
     nginx
   {{- else if eq .spec.distribution.modules.ingress.nginx.type "dual" -}}
@@ -144,10 +163,10 @@
 
 {{/* ingressTls { module: <module>, package: <package>, prefix: <prefix>, spec: "." } */}}
 {{- define "ingressTls" -}}
-{{- $infrastructureIngressClass := index .spec.distribution.modules.ingress "infrastructureIngressClass" -}}
+{{- $infrastructureIngressController := index .spec.distribution.modules.ingress "infrastructureIngressController" -}}
 {{- $isHaproxy := false -}}
-{{- if $infrastructureIngressClass -}}
-  {{- $isHaproxy = hasPrefix "haproxy" $infrastructureIngressClass -}}
+{{- if $infrastructureIngressController -}}
+  {{- $isHaproxy = hasPrefix "haproxy" $infrastructureIngressController -}}
 {{- else if ne .spec.distribution.modules.ingress.nginx.type "none" -}}
   {{- $isHaproxy = false -}}
 {{- else if ne .spec.distribution.modules.ingress.haproxy.type "none" -}}
@@ -169,10 +188,10 @@
 
 {{/* ingressTlsAuth { module: <module>, package: <package>, prefix: <prefix>, spec: "." } */}}
 {{- define "ingressTlsAuth" -}}
-{{- $infrastructureIngressClass := index .spec.distribution.modules.ingress "infrastructureIngressClass" -}}
+{{- $infrastructureIngressController := index .spec.distribution.modules.ingress "infrastructureIngressController" -}}
 {{- $isHaproxy := false -}}
-{{- if $infrastructureIngressClass -}}
-  {{- $isHaproxy = hasPrefix "haproxy" $infrastructureIngressClass -}}
+{{- if $infrastructureIngressController -}}
+  {{- $isHaproxy = hasPrefix "haproxy" $infrastructureIngressController -}}
 {{- else if ne .spec.distribution.modules.ingress.nginx.type "none" -}}
   {{- $isHaproxy = false -}}
 {{- else if ne .spec.distribution.modules.ingress.haproxy.type "none" -}}
@@ -194,10 +213,10 @@
 
 {{ define "ingressAuth" }}
 {{- if eq .spec.distribution.modules.auth.provider.type "basicAuth" -}}
-  {{- $infrastructureIngressClass := index .spec.distribution.modules.ingress "infrastructureIngressClass" -}}
+  {{- $infrastructureIngressController := index .spec.distribution.modules.ingress "infrastructureIngressController" -}}
   {{- $isHaproxy := false -}}
-  {{- if $infrastructureIngressClass -}}
-    {{- $isHaproxy = hasPrefix "haproxy" $infrastructureIngressClass -}}
+  {{- if $infrastructureIngressController -}}
+    {{- $isHaproxy = hasPrefix "haproxy" $infrastructureIngressController -}}
   {{- else if ne .spec.distribution.modules.ingress.nginx.type "none" -}}
     {{- $isHaproxy = false -}}
   {{- else if ne .spec.distribution.modules.ingress.haproxy.type "none" -}}
@@ -218,10 +237,10 @@
 {{ end }}
 
 {{ define "certManagerClusterIssuer" }}
-{{- $infrastructureIngressClass := index .spec.distribution.modules.ingress "infrastructureIngressClass" -}}
+{{- $infrastructureIngressController := index .spec.distribution.modules.ingress "infrastructureIngressController" -}}
 {{- $isHaproxy := false -}}
-{{- if $infrastructureIngressClass -}}
-  {{- $isHaproxy = hasPrefix "haproxy" $infrastructureIngressClass -}}
+{{- if $infrastructureIngressController -}}
+  {{- $isHaproxy = hasPrefix "haproxy" $infrastructureIngressController -}}
 {{- else if ne .spec.distribution.modules.ingress.nginx.type "none" -}}
   {{- $isHaproxy = false -}}
 {{- else if ne .spec.distribution.modules.ingress.haproxy.type "none" -}}
@@ -240,10 +259,10 @@ cert-manager.io/cluster-issuer: {{ .spec.distribution.modules.ingress.certManage
 {{- $byoic := .spec.distribution.modules.ingress.byoic -}}
 {{- if $byoic.enabled -}}
   {{- $commonAnnotations := default dict (index $byoic "commonAnnotations") -}}
-  {{- $infrastructureIngressClass := index .spec.distribution.modules.ingress "infrastructureIngressClass" -}}
+  {{- $infrastructureIngressController := index .spec.distribution.modules.ingress "infrastructureIngressController" -}}
   {{- $isByoicActive := false -}}
-  {{- if $infrastructureIngressClass -}}
-    {{- $isByoicActive = eq $infrastructureIngressClass $byoic.ingressClass -}}
+  {{- if $infrastructureIngressController -}}
+    {{- $isByoicActive = eq $infrastructureIngressController $byoic.ingressClass -}}
   {{- else if and (eq .spec.distribution.modules.ingress.nginx.type "none") (eq .spec.distribution.modules.ingress.haproxy.type "none") -}}
     {{- $isByoicActive = true -}}
   {{- end -}}

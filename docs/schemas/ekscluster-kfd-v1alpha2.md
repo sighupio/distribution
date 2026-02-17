@@ -1778,17 +1778,17 @@ Whether to install or not the default `manifests` and `full` backups schedules. 
 
 ### Properties
 
-| Property                                                                                | Type     | Required |
-|:----------------------------------------------------------------------------------------|:---------|:---------|
-| [baseDomain](#specdistributionmodulesingressbasedomain)                                 | `string` | Required |
-| [byoic](#specdistributionmodulesingressbyoic)                                           | `object` | Optional |
-| [certManager](#specdistributionmodulesingresscertmanager)                               | `object` | Optional |
-| [dns](#specdistributionmodulesingressdns)                                               | `object` | Optional |
-| [forecastle](#specdistributionmodulesingressforecastle)                                 | `object` | Optional |
-| [haproxy](#specdistributionmodulesingresshaproxy)                                       | `object` | Optional |
-| [infrastructureIngressClass](#specdistributionmodulesingressinfrastructureingressclass) | `string` | Optional |
-| [nginx](#specdistributionmodulesingressnginx)                                           | `object` | Required |
-| [overrides](#specdistributionmodulesingressoverrides)                                   | `object` | Optional |
+| Property                                                                                          | Type     | Required |
+|:--------------------------------------------------------------------------------------------------|:---------|:---------|
+| [baseDomain](#specdistributionmodulesingressbasedomain)                                           | `string` | Required |
+| [byoic](#specdistributionmodulesingressbyoic)                                                     | `object` | Optional |
+| [certManager](#specdistributionmodulesingresscertmanager)                                         | `object` | Optional |
+| [dns](#specdistributionmodulesingressdns)                                                         | `object` | Optional |
+| [forecastle](#specdistributionmodulesingressforecastle)                                           | `object` | Optional |
+| [haproxy](#specdistributionmodulesingresshaproxy)                                                 | `object` | Optional |
+| [infrastructureIngressController](#specdistributionmodulesingressinfrastructureingresscontroller) | `string` | Optional |
+| [nginx](#specdistributionmodulesingressnginx)                                                     | `object` | Required |
+| [overrides](#specdistributionmodulesingressoverrides)                                             | `object` | Optional |
 
 ## .spec.distribution.modules.ingress.baseDomain
 
@@ -2313,11 +2313,11 @@ Default is `none`.
 |`"single"`|
 |`"dual"`  |
 
-## .spec.distribution.modules.ingress.infrastructureIngressClass
+## .spec.distribution.modules.ingress.infrastructureIngressController
 
 ### Description
 
-Overrides the default ingress class for the SD infrastructure ingresses. Accepts any valid ingress class name (e.g., `nginx`, `internal`, `external`, `haproxy`, `haproxy-internal`, `haproxy-external`, or a custom class). Useful during migrations to keep infrastructure ingresses on one controller while testing another.
+Overrides the default ingress controller for SD infrastructure ingresses. Set to `nginx` or `haproxy` to select the controller family; the dual/single class mapping (e.g., `haproxy-internal`/`haproxy-external`) is applied automatically based on the controller's type setting. Any other value is used as a literal ingress class name (e.g., for BYOIC). Useful during migrations to keep infrastructure ingresses on one controller while testing another.
 
 ## .spec.distribution.modules.ingress.nginx
 
