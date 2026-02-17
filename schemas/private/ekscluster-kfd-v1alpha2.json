@@ -1563,10 +1563,14 @@
               {
                 "properties": {
                   "auth": {
-                    "required": ["oidcKubernetesAuth"],
+                    "required": [
+                      "oidcKubernetesAuth"
+                    ],
                     "properties": {
                       "oidcKubernetesAuth": {
-                        "required": ["enabled"],
+                        "required": [
+                          "enabled"
+                        ],
                         "properties": {
                           "enabled": {
                             "const": true
