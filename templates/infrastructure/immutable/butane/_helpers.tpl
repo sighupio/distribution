@@ -23,7 +23,7 @@
 
         [Service]
         Type=oneshot
-        ExecStart=/usr/bin/curl '{{ .ipxeServerURL }}/status?node={{ .node.hostname }}&status=booted'
+        ExecStart=/usr/bin/curl -X POST '{{ .ipxeServerURL }}/status?node={{ .node.hostname }}&status=booted'
         RemainAfterExit=yes
         
 
