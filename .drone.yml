@@ -1091,7 +1091,7 @@ steps: # e2e-onpremises-upgrades-1.33.1-1.34.0
         path: /mise-data
     commands:
       - eval "$(mise activate bash --shims)"
-      - ./tests/e2e/onpremises-upgrades/e2e-onpremises.sh
+      - ./tests/e2e/onpremises-upgrades/e2e-onpremises-upgrades.sh
 
   - name: delete
     image: quay.io/sighup/mise:v2025.4.4

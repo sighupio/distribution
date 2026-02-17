@@ -60,7 +60,7 @@ load ./helper
 @test "Forecastle is Running" {
     info
     test() {
-        kubectl get pods -l app=forecastle -o json -n ingress-nginx |jq '.items[].status.containerStatuses[].ready' | uniq | grep -q true
+        kubectl get pods -l app=forecastle -o json -n forecastle |jq '.items[].status.containerStatuses[].ready' | uniq | grep -q true
     }
     loop_it test 60 10
     status=${loop_it_result}
