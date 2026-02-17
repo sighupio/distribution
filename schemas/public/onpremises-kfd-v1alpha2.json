@@ -1298,8 +1298,10 @@
               {
                 "properties": {
                   "auth": {
+                    "required": ["oidcKubernetesAuth"],
                     "properties": {
                       "oidcKubernetesAuth": {
+                        "required": ["enabled"],
                         "properties": {
                           "enabled": {
                             "const": true
