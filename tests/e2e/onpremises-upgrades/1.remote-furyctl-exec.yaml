@@ -47,6 +47,29 @@
       args:
         chdir: /root
 
+    # Ubuntu runs unattended-upgrades automatically on fresh nodes,
+    # which holds the dpkg lock and can restart sshd. Wait for all nodes
+    # to be reachable, then disable the service before furyctl runs.
+    - name: Wait for all cluster nodes to be reachable via SSH
+      ansible.builtin.shell: >
+        ANSIBLE_HOST_KEY_CHECKING=False
+        ansible all
+        -i "10.10.1.3,10.10.1.4,10.10.1.5,10.10.1.6,10.10.1.7,10.10.1.8,10.10.1.9,10.10.1.10,"
+        -m wait_for_connection
+        -a "timeout=300 sleep=15"
+        -u root
+
+    - name: Disable unattended-upgrades on all cluster nodes before kubernetes installation
+      ansible.builtin.shell: >
+        ANSIBLE_HOST_KEY_CHECKING=False
+        ansible all
+        -i "10.10.1.3,10.10.1.4,10.10.1.5,10.10.1.6,10.10.1.7,10.10.1.8,10.10.1.9,10.10.1.10,"
+        -m service
+        -a "name=unattended-upgrades state=stopped enabled=false"
+        -u root
+        -e "ansible_python_interpreter=/usr/bin/python3"
+      ignore_errors: yes
+
     - name: Create cluster with furyctl - Kubernetes phase
       ansible.builtin.shell: furyctl apply cluster -o $PWD -D --phase kubernetes --force migrations
       args:
