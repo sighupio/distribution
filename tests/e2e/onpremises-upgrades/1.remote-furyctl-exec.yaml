@@ -48,7 +48,7 @@
         chdir: /root
 
     - name: Create cluster with furyctl - Kubernetes phase
-      ansible.builtin.shell: furyctl apply cluster -o $PWD -D --phase kubernetes
+      ansible.builtin.shell: furyctl apply cluster -o $PWD -D --phase kubernetes --force migrations
       args:
         chdir: /root
       register: furyctl_kubernetes
@@ -71,7 +71,7 @@
         chdir: /root/.furyctl/reevo/kubernetes
 
     - name: Complete furyctl installation , all phases + post apply phase
-      ansible.builtin.shell: furyctl apply cluster -o $PWD -D --post-apply-phases distribution
+      ansible.builtin.shell: furyctl apply cluster -o $PWD -D --post-apply-phases distribution --force migrations
       args:
         chdir: /root
       register: furyctl_post_apply

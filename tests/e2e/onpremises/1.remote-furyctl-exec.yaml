@@ -74,7 +74,7 @@
       ignore_errors: yes
 
     - name: Create cluster with furyctl - Kubernetes phase
-      ansible.builtin.shell: furyctl apply cluster -o $PWD -D --phase kubernetes --distro-location /tmp/fury-distribution
+      ansible.builtin.shell: furyctl apply cluster -o $PWD -D --phase kubernetes --force migrations --distro-location /tmp/fury-distribution
       args:
         chdir: /root
       register: furyctl_kubernetes
@@ -97,7 +97,7 @@
         chdir: /root/.furyctl/reevo/kubernetes
 
     - name: Complete furyctl installation , all phases + post apply phase
-      ansible.builtin.shell: furyctl apply cluster -o $PWD -D --post-apply-phases distribution --distro-location /tmp/fury-distribution
+      ansible.builtin.shell: furyctl apply cluster -o $PWD -D --post-apply-phases distribution --force migrations --distro-location /tmp/fury-distribution
       args:
         chdir: /root
       register: furyctl_post_apply
