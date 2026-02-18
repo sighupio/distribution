@@ -59,11 +59,28 @@
       vars:
         commit_sha: "{{ lookup('env', 'DRONE_COMMIT_SHA') | default('main') }}"
 
+    # Ubuntu runs unattended-upgrades automatically on fresh nodes,
+    # which holds the dpkg lock. If furyctl tries to install packages while the lock is held, 
+    # the task fails. Disabling unattended-upgrades should prevent the race condition.
+    - name: Disable unattended-upgrades on all cluster nodes before kubernetes installation
+      ansible.builtin.shell: >
+        ANSIBLE_HOST_KEY_CHECKING=False
+        ansible all
+        -i "10.10.1.3,10.10.1.4,10.10.1.5,10.10.1.6,10.10.1.7,10.10.1.8,10.10.1.9,10.10.1.10,"
+        -m service
+        -a "name=unattended-upgrades state=stopped enabled=false"
+        -u root
+        -e "ansible_python_interpreter=/usr/bin/python3"
+      ignore_errors: yes
+
     - name: Create cluster with furyctl - Kubernetes phase
       ansible.builtin.shell: furyctl apply cluster -o $PWD -D --phase kubernetes --distro-location /tmp/fury-distribution
       args:
         chdir: /root
       register: furyctl_kubernetes
+      retries: 2
+      delay: 60
+      until: furyctl_kubernetes.rc == 0
 
     - name: Debug furyctl kubernetes phase
       debug:
@@ -84,6 +101,9 @@
       args:
         chdir: /root
       register: furyctl_post_apply
+      retries: 2
+      delay: 60
+      until: furyctl_post_apply.rc == 0
 
     - name: Debug furyctl with post apply phase
       ansible.builtin.debug:
