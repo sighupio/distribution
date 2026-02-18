@@ -605,7 +605,14 @@ deleteNginx() {
 {{- end }}
   $kubectlbin delete --ignore-not-found --wait --timeout=600s -f delete-external-dns-public.yaml
   $kubectlbin delete --ignore-not-found --wait --timeout=600s -f delete-external-dns-private.yaml
-  $kubectlbin delete --ignore-not-found --wait --timeout=600s -f delete-forecastle.yaml
+  # Delete all forecastle CRs before deleting the CRD and namespace.
+  # If the CRD is deleted concurrently with the namespace going "terminating" and the namespace gets stuck.
+  if $kubectlbin get crd forecastleapps.forecastle.stakater.com > /dev/null 2>&1; then
+    $kubectlbin delete --ignore-not-found --wait --timeout=600s forecastleapp --all -A
+  fi
+  < delete-forecastle.yaml $yqbin 'select(.kind != "CustomResourceDefinition" and .kind != "Namespace")' | $kubectlbin delete --ignore-not-found --wait --timeout=600s -f -
+  < delete-forecastle.yaml $yqbin 'select(.kind == "CustomResourceDefinition")' | $kubectlbin delete --ignore-not-found --wait --timeout=600s -f -
+  < delete-forecastle.yaml $yqbin 'select(.kind == "Namespace")' | $kubectlbin delete --ignore-not-found --wait --timeout=600s -f -
   $kubectlbin delete --ignore-not-found --wait --timeout=600s -f delete-dual-nginx.yaml
   $kubectlbin delete --ignore-not-found --wait --timeout=600s -f delete-nginx.yaml
   echo "nginx or dual nginx have been deleted from the cluster"
@@ -617,6 +624,7 @@ deleteNginxIngresses() {
   $kubectlbin delete --ignore-not-found --wait --timeout=600s ingress -n monitoring --all
   $kubectlbin delete --ignore-not-found --wait --timeout=600s ingress -n tracing --all
   $kubectlbin delete --ignore-not-found --wait --timeout=600s ingress -n logging --all
+  $kubectlbin delete --ignore-not-found --wait --timeout=600s ingress -n forecastle --all
   $kubectlbin delete --ignore-not-found --wait --timeout=600s ingress -n gatekeeper-system --all
   $kubectlbin delete --ignore-not-found --wait --timeout=600s ingress -n ingress-nginx --all
   $kubectlbin delete --ignore-not-found --wait --timeout=600s ingress -n kube-system --all # hubble, gangplank, dex
