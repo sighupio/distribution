@@ -15,6 +15,9 @@
         - '"Error from server (NotFound): secrets \"furyctl-config\" not found" not in previous_state.stderr'
       # This is common for all the nodes, just run it once.
       run_once: true
+      # Sometimes loadbalancers take some time to realize that the API server is ready, so we retry a few times.
+      retries: 3
+      delay: 5
 
     - name: Deserialize previous cluster configuration into a variable
       delegate_to: localhost
