@@ -71,7 +71,7 @@
       ansible.builtin.shell: >
         ANSIBLE_HOST_KEY_CHECKING=False
         ansible all
-        -i "10.10.1.3,10.10.1.4,10.10.1.5,10.10.1.6,10.10.1.7,10.10.1.8,10.10.1.9,10.10.1.10,"
+        -i "10.10.1.2,10.10.1.3,10.10.1.4,10.10.1.5,10.10.1.6,10.10.1.7,10.10.1.8,10.10.1.9,10.10.1.10,"
         -m wait_for_connection
         -a "timeout=300 sleep=15"
         -u root
@@ -80,7 +80,7 @@
       ansible.builtin.shell: >
         ANSIBLE_HOST_KEY_CHECKING=False
         ansible all
-        -i "10.10.1.3,10.10.1.4,10.10.1.5,10.10.1.6,10.10.1.7,10.10.1.8,10.10.1.9,10.10.1.10,"
+        -i "10.10.1.2,10.10.1.3,10.10.1.4,10.10.1.5,10.10.1.6,10.10.1.7,10.10.1.8,10.10.1.9,10.10.1.10,"
         -m service
         -a "name=unattended-upgrades state=stopped enabled=false"
         -u root
@@ -91,7 +91,7 @@
       ansible.builtin.shell: >
         ANSIBLE_HOST_KEY_CHECKING=False
         ansible all
-        -i "10.10.1.3,10.10.1.4,10.10.1.5,10.10.1.6,10.10.1.7,10.10.1.8,10.10.1.9,10.10.1.10,"
+        -i "10.10.1.2,10.10.1.3,10.10.1.4,10.10.1.5,10.10.1.6,10.10.1.7,10.10.1.8,10.10.1.9,10.10.1.10,"
         -m shell
         -a "systemctl stop apt-daily.timer apt-daily-upgrade.timer && systemctl disable apt-daily.timer apt-daily-upgrade.timer"
         -u root
