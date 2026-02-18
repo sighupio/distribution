@@ -747,9 +747,10 @@ type SpecDistributionModulesIngress struct {
 	// Overrides the default ingress controller for SD infrastructure ingresses. Set
 	// to `nginx` or `haproxy` to select the controller family; the dual/single class
 	// mapping (e.g., `haproxy-internal`/`haproxy-external`) is applied automatically
-	// based on the controller's type setting. Any other value is used as a literal
-	// ingress class name (e.g., for BYOIC). Useful during migrations to keep
-	// infrastructure ingresses on one controller while testing another.
+	// based on the controller's type setting. Useful during migrations to keep
+	// infrastructure ingresses on one controller while testing another. Do not use
+	// this field when both `nginx.type` and `haproxy.type` are `none`: in that case
+	// rely on `byoic.ingressClass` to define the ingress class for SD ingresses.
 	InfrastructureIngressController *string `json:"infrastructureIngressController,omitempty" yaml:"infrastructureIngressController,omitempty" mapstructure:"infrastructureIngressController,omitempty"`
 
 	// Configurations for the Ingress nginx controller package.
