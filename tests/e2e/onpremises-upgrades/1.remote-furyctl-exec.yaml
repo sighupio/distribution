@@ -8,6 +8,11 @@
   gather_facts: false
 
   tasks:
+    - name: Wait for haproxy node to be reachable via SSH
+      ansible.builtin.wait_for_connection:
+        timeout: 300
+        sleep: 15
+
     - name: Install required packages
       apt:
         name:
