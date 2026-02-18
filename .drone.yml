@@ -333,7 +333,7 @@ steps: # e2e-kfddistribution-1.33.1-to-1.34.0
         - failure
 
 ---
-name: e2e-ekscluster-1.33.1
+name: e2e-ekscluster-1.34.0
 kind: pipeline
 type: docker
 
@@ -352,7 +352,7 @@ trigger:
 
 environment:
   MISE_DATA_DIR: /mise-data
-  DISTRIBUTION_VERSION: "v1.33.1"
+  DISTRIBUTION_VERSION: "v1.34.0"
   CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}
 
 volumes:
@@ -362,7 +362,7 @@ volumes:
   - name: furyctl-outdir-eks
     temp: {}
 
-steps: # e2e-ekscluster-1.33.1
+steps: # e2e-ekscluster-1.34.0
   - name: install-tools
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
@@ -489,7 +489,7 @@ steps: # e2e-ekscluster-1.33.1
         - success
 
 ---
-name: e2e-ekscluster-selfmanaged-alinux2023-1.33.1
+name: e2e-ekscluster-selfmanaged-alinux2023-1.34.0
 kind: pipeline
 type: docker
 
@@ -509,7 +509,7 @@ trigger:
 
 environment:
   MISE_DATA_DIR: /mise-data
-  DISTRIBUTION_VERSION: "v1.33.1"
+  DISTRIBUTION_VERSION: "v1.34.0"
   CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-selfmanaged
 
 volumes:
@@ -519,7 +519,7 @@ volumes:
   - name: furyctl-outdir-eks-selfmanaged
     temp: {}
 
-steps: # e2e-ekscluster-selfmanaged-alinux2023-1.33.1
+steps: # e2e-ekscluster-selfmanaged-alinux2023-1.34.0
   - name: install-tools
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
@@ -646,7 +646,7 @@ steps: # e2e-ekscluster-selfmanaged-alinux2023-1.33.1
         - success
 
 ---
-name: e2e-ekscluster-upgrades-1.32.0-1.33.1
+name: e2e-ekscluster-upgrades-1.33.1-1.34.0
 kind: pipeline
 type: docker
 
@@ -665,7 +665,7 @@ trigger:
 
 environment:
   MISE_DATA_DIR: /mise-data
-  DISTRIBUTION_VERSION: "v1.33.1"
+  DISTRIBUTION_VERSION: "v1.34.0"
   CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-upgrades
 
 volumes:
@@ -703,7 +703,7 @@ steps: #e2e-eks-upgrades
         path: /furyctl-outdir
     commands:
       - eval "$(mise activate bash --shims)"
-      - ./tests/e2e/ekscluster-upgrades/e2e-ekscluster-upgrades.sh
+      - ./tests/e2e/ekscluster-upgrades/e2e-ekscluster-upgrades-1.33.1-1.34.0.sh
 
   - name: furyctl-delete
     image: quay.io/sighup/mise:v2025.4.4
@@ -750,13 +750,13 @@ steps: #e2e-eks-upgrades
         path: /furyctl-outdir
     commands:
       - eval "$(mise activate bash --shims)"
-      - tests/e2e/ekscluster/replace_variables.sh --cluster-name "$CLUSTER_NAME" --furyctl-yaml tests/e2e/ekscluster-upgrades/manifests/furyctl-upgrade-version-1.33.1.yaml
+      - tests/e2e/ekscluster/replace_variables.sh --cluster-name "$CLUSTER_NAME" --furyctl-yaml tests/e2e/ekscluster-upgrades/manifests/furyctl-upgrade-version-1.34.0.yaml
       - |
         furyctl delete cluster \
           --outdir /furyctl-outdir \
           --debug \
           --disable-analytics \
-          --config tests/e2e/ekscluster-upgrades/manifests/furyctl-upgrade-version-1.33.1.yaml \
+          --config tests/e2e/ekscluster-upgrades/manifests/furyctl-upgrade-version-1.34.0.yaml \
           --distro-location ./ \
           --phase kubernetes \
           --force \
@@ -766,7 +766,7 @@ steps: #e2e-eks-upgrades
           --outdir /furyctl-outdir \
           --debug \
           --disable-analytics \
-          --config tests/e2e/ekscluster-upgrades/manifests/furyctl-upgrade-version-1.33.1.yaml \
+          --config tests/e2e/ekscluster-upgrades/manifests/furyctl-upgrade-version-1.34.0.yaml \
           --distro-location ./ \
           --phase infrastructure \
           --force \
@@ -1170,8 +1170,8 @@ type: docker
 depends_on:
   - e2e-kfddistribution-1.34
   - e2e-kfddistribution-1.33.1-to-1.34.0
-  - e2e-ekscluster-1.33.1
-  - e2e-ekscluster-upgrades-1.32.0-1.33.1
+  - e2e-ekscluster-1.34.0
+  - e2e-ekscluster-upgrades-1.33.1-1.34.0
   - e2e-onpremises
   - e2e-onpremises-upgrades-1.33.1-1.34.0
 
