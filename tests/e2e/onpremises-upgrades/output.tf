@@ -156,7 +156,7 @@ spec:
           version: '1.8.1'
           set:
             - name: persistence.defaultClassReplicaCount
-              value: "1"
+              value: "2"
 EOF
 }
 
@@ -314,7 +314,7 @@ spec:
           version: '1.8.1'
           set:
             - name: persistence.defaultClassReplicaCount
-              value: "1"
+              value: "2"
 EOF
 }
 
