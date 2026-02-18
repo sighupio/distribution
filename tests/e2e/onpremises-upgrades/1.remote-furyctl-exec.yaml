@@ -52,6 +52,9 @@
       args:
         chdir: /root
       register: furyctl_kubernetes
+      retries: 2
+      delay: 60
+      until: furyctl_kubernetes.rc == 0
 
     - name: Debug furyctl kubernetes phase
       debug:
@@ -72,6 +75,9 @@
       args:
         chdir: /root
       register: furyctl_post_apply
+      retries: 2
+      delay: 60
+      until: furyctl_post_apply.rc == 0
 
     - name: Debug furyctl with post apply phase
       ansible.builtin.debug:
