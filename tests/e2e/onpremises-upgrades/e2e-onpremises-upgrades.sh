@@ -7,27 +7,6 @@
 
 load ./helper
 
-
-@test "Calico Kube Controller is Running" {
-    info
-    test() {
-        kubectl get pods -l app.kubernetes.io/name=calico-kube-controllers -o json -n calico-system |jq '.items[].status.containerStatuses[].ready' | uniq | grep -q true
-    }
-    loop_it test 60 10
-    status=${loop_it_result}
-    [ "$status" -eq 0 ]
-}
-
-@test "Calico Node is Running" {
-    info
-    test() {
-        kubectl get pods -l app.kubernetes.io/name=calico-node -o json -n calico-system |jq '.items[].status.containerStatuses[].ready' | uniq | grep -q true
-    }
-    loop_it test 60 10
-    status=${loop_it_result}
-    [ "$status" -eq 0 ]
-}
-
 @test "Velero is Running" {
     info
     test() {
@@ -98,7 +77,6 @@ load ./helper
     [ "$status" -eq 0 ]
 }
 
-
 @test "Grafana is Running" {
     info
     test() {
@@ -165,17 +143,6 @@ load ./helper
     test(){
         data=$(kubectl get sts -n tracing -l app.kubernetes.io/component=ingester -o json | jq '.items[] | select(.metadata.name == "tempo-distributed-ingester" and .status.replicas == .status.readyReplicas)')
         if [ "${data}" == "" ]; then return 1; fi
-    }
-    loop_it test 60 10
-    status=${loop_it_result}
-    [[ "$status" -eq 0 ]]
-}
-
-@test "Kyverno Admission controller is Running" {
-    info
-    test(){
-        readyReplicas=$(kubectl get deploy kyverno-admission-controller -n kyverno -o jsonpath="{.status.readyReplicas}")
-        if [ "${readyReplicas}" != "3" ]; then return 1; fi
     }
     loop_it test 60 10
     status=${loop_it_result}

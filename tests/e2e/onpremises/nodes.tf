@@ -4,8 +4,8 @@
 resource "hcloud_server" "haproxy" {
   name        = "haproxy-0-${var.ci_number}"
   image       = "ubuntu-24.04"
-  server_type = "cpx31"
-  location    = "hel1"
+  server_type = "cx33"
+  location    = "fsn1"
 
   ssh_keys = [hcloud_ssh_key.ssh_key.id]
   network {
@@ -42,8 +42,8 @@ resource "hcloud_server" "controlplane" {
   count       = 3
   name        = "controlplane-${count.index}-${var.ci_number}"
   image       = "ubuntu-24.04"
-  server_type = "cpx31"
-  location    = "hel1"
+  server_type = "cx33"
+  location    = "fsn1"
   ssh_keys    = [hcloud_ssh_key.ssh_key.id]
   network {
     network_id = hcloud_network.network.id
@@ -59,8 +59,8 @@ resource "hcloud_server" "infra" {
   count       = 3
   name        = "infra-${count.index}-${var.ci_number}"
   image       = "ubuntu-24.04"
-  server_type = "cpx41"
-  location    = "hel1"
+  server_type = "cx43"
+  location    = "fsn1"
   ssh_keys    = [hcloud_ssh_key.ssh_key.id]
   network {
     network_id = hcloud_network.network.id
@@ -76,8 +76,8 @@ resource "hcloud_server" "worker" {
   count       = 2
   name        = "worker-${count.index}-${var.ci_number}"
   image       = "ubuntu-24.04"
-  server_type = "cpx41"
-  location    = "hel1"
+  server_type = "cx43"
+  location    = "fsn1"
   ssh_keys    = [hcloud_ssh_key.ssh_key.id]
   network {
     network_id = hcloud_network.network.id

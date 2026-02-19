@@ -22,6 +22,21 @@ load ./helper
     [ "$status" -eq 0 ]
 }
 
+@test "Ingress HAProxy NS has been deleted" {
+    info
+    test() {
+        kubectl get namespace > check.txt
+        if ! grep -q "ingress-haproxy" check.txt; then
+            exit 0
+        else
+            exit 1
+        fi
+    }
+    loop_it test 20 10
+    status=${loop_it_result}
+    [ "$status" -eq 0 ]
+}
+
 @test "Pomerium NS is NOT present" {
     info
     test() {
