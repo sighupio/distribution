@@ -11,12 +11,28 @@ passwd:
 
 storage:
   files:
+    - path: /etc/hostname
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: {{ .hostname }}
+
     - path: /opt/ignition/config.ign
       mode: 0644
       overwrite: true
       contents:
         compression: gzip
         source: data:;base64,{{ .base64EncodedIgnition }}
+
+    - path: /etc/issue
+      overwrite: true
+      contents:
+        inline: |
+           ╭───────────────────────────────────────────────────────────────────╮
+           │                                                                   │
+           │  FLATCAR WILL BE INSTALLED TO DISK AND THEN REBOOTED PLEASE WAIT  │
+           │                                                                   │
+           ╰───────────────────────────────────────────────────────────────────╯
 
 systemd:
   units:
