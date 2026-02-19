@@ -137,8 +137,8 @@ Current supported versions of SD are:
 |                                  SD Version                               | Kubernetes Version |
 | :-----------------------------------------------------------------------: | :----------------: |
 | [`1.34.0`](https://github.com/sighupio/distribution/releases/tag/v1.34.0) |      `1.34.x`      |
-| [`1.33.1`](https://github.com/sighupio/distribution/releases/tag/v1.33.1) |      `1.33.x`      |
-| [`1.32.1`](https://github.com/sighupio/distribution/releases/tag/v1.32.1) |      `1.32.x`      |
+| [`1.33.2`](https://github.com/sighupio/distribution/releases/tag/v1.33.2) |      `1.33.x`      |
+| [`1.32.2`](https://github.com/sighupio/distribution/releases/tag/v1.32.2) |      `1.32.x`      |
 
 Check the [compatibility matrix][compatibility-matrix] for additional information about previous releases of the Distribution and the compatibility with `furyctl`.
 
