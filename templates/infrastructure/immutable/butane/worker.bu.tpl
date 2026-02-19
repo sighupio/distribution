@@ -21,10 +21,6 @@ storage:
       contents:
         inline: {{ .node.hostname }}
 
-    - path: /etc/systemd/network/10-static.network
-      mode: 0644
-      contents:
-        inline: |
 {{- template "networkdConfig" . }}
 
     # Enable bundled Python sysext needed by Ansible
@@ -96,6 +92,10 @@ storage:
           MatchPattern=kubernetes-@v
           CurrentSymlink=/etc/extensions/kubernetes.raw
 
+{{- if hasKeyAny .node.storage "files" }}
+{{ .node.storage.files | toYaml | indent 4 }}
+{{- end }}
+
   links:
     # Disable Docker from Flatcar base OS
     - path: /etc/extensions/docker-flatcar.raw
@@ -117,8 +117,13 @@ storage:
       target: /opt/extensions/kubernetes/kubernetes-{{ $.data.sysext.kubernetes.version }}-{{ .node.arch }}.raw
       hard: false
 
+{{- if hasKeyAny .node.storage "links" }}
+{{ .node.storage.links | toYaml | indent 4 }}
+{{- end }}
+
 systemd:
   units:
+    # TODO: should we disable locksmithd too?
     - name: systemd-sysupdate.timer
       enabled: true
 
@@ -148,6 +153,9 @@ systemd:
             ExecStartPre=/bin/bash -c 'set -e; mkdir -p /etc/containerd/; if ! [ -e /etc/containerd/config.toml ]; then containerd config default > /etc/containerd/config.toml; fi'
             Environment="CONTAINERD_CONFIG=/etc/containerd/config.toml"
 {{ template "statusReporterBooted" . }}
+{{- if (.node | digAny "systemd" "units" false) }}
+{{ .node.systemd.units | toYaml | indent 4 }}
+{{- end }}
 
 {{- end }}
 {{- else }}

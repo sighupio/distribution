@@ -21,10 +21,6 @@ storage:
       contents:
         inline: {{ .node.hostname }}
 
-    - path: /etc/systemd/network/10-static.network
-      mode: 0644
-      contents:
-        inline: |
 {{- template "networkdConfig" . }}
 
     # Enable bundled Python sysext needed by Ansible
@@ -102,6 +98,10 @@ storage:
       contents:
         source: {{ $.data.ipxeServerURL }}/assets/extensions/kubeadm-{{ $.data.sysext.kubeadm.version }}-{{ .node.arch }}.raw
 
+{{- if hasKeyAny .node.storage "files" }}
+{{ .node.storage.files | toYaml | indent 4 }}
+{{- end }}
+
   links:
     # Disable Docker from Flatcar base OS
     - path: /etc/extensions/docker-flatcar.raw
@@ -126,6 +126,10 @@ storage:
     - target: /opt/extensions/kubeadm/kubeadm-{{ $.data.sysext.kubeadm.version }}-{{ .node.arch }}.raw
       path: /etc/extensions/kubeadm.raw
       hard: false
+
+{{- if hasKeyAny .node.storage "links" }}
+{{ .node.storage.links | toYaml | indent 4 }}
+{{- end }}
 
 systemd:
   units:
@@ -162,6 +166,10 @@ systemd:
     # automatically before configuring it.
     # Should we do it here too?
 {{ template "statusReporterBooted" . }}
+{{- if (.node | digAny "systemd" "units" false) }}
+{{ .node.systemd.units | toYaml | indent 4 }}
+{{- end }}
+
 {{- end }}
 {{- else }}
 {{ fail "Attempting to apply control plane configuration to a non-control plane node" }}

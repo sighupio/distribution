@@ -231,7 +231,7 @@
             },
             "image": {
               "type": "string",
-              "description": "Container image for HAProxy. Example: haproxy"
+              "description": "Container image for HAProxy. Example: docker.io/library/haproxy"
             },
             "tag": {
               "type": "string",
@@ -295,6 +295,9 @@
         },
         "network": {
           "$ref": "#/$defs/Spec.Infrastructure.Node.Network"
+        },
+        "systemd": {
+          "$ref": "#/$defs/Spec.Infrastructure.Node.Systemd"
         }
       },
       "required": [
@@ -319,6 +322,14 @@
             "$ref": "#/$defs/Spec.Infrastructure.Node.Storage.Disk"
           },
           "description": "Additional disks to partition and mount."
+        },
+        "files": {
+          "type": "array",
+          "description": "The content of this field will be appended to the node's configuration butane file under the `storage.files` path.\n\nNOTE: this field won't be validated. See specification at https://www.flatcar.org/docs/latest/provisioning/config-transpiler/configuration/"
+        },
+        "links": {
+          "type": "array",
+          "description": "The content of this field will be appended to the node's configuration butane file under the `storage.links` path.\n\nNOTE: this field won't be validated. See specification at https://www.flatcar.org/docs/latest/provisioning/config-transpiler/configuration/"
         }
       },
       "required": [
@@ -729,6 +740,48 @@
         "to",
         "via"
       ]
+    },
+    "Spec.Infrastructure.Node.Systemd": {
+      "description": "Describes the desired state of the systemd units.",
+      "additionalProperties": false,
+      "properties": {
+        "units": {
+          "type": "array",
+          "description": "the list of systemd units. Every unit must have a unique name.",
+          "items": {
+            "name": {
+              "type": "string",
+              "description": "The name of the unit. This must be suffixed with a valid unit type (e.g. \"thing.service\")"
+            },
+            "enabled": {
+              "type": "boolean",
+              "description": "Whether or not the service shall be enabled. When true, the service is enabled. When false, the service is disabled. When omitted, the service is unmodified. In order for this to have any effect, the unit must have an install section."
+            },
+            "mask": {
+              "type": "boolean",
+              "description": "Whether or not the service shall be masked. When true, the service is masked by symlinking it to /dev/null."
+            },
+            "contents": {
+              "type": "string",
+              "description": "The content of the Unit file"
+            },
+            "dropins": {
+              "type": "array",
+              "description": "The list of drop-ins for the unit. Every drop-in must have a unique name.",
+              "items": {
+                "name": {
+                  "type": "string",
+                  "description": "The name of the the drop-in. This must be suffixed with \".conf\""
+                },
+                "contents": {
+                  "type": "string",
+                  "description": "The content of the drop-in"
+                }
+              }
+            }
+          }
+        }
+      }
     },
     "Spec.Infrastructure.SSH": {
       "type": "object",
