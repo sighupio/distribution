@@ -21,10 +21,6 @@ storage:
       contents:
         inline: {{ .node.hostname }}
 
-    - path: /etc/systemd/network/10-static.network
-      mode: 0644
-      contents:
-        inline: |
 {{- template "networkdConfig" . }}
 
     # Enable bundled Python sysext needed by Ansible
@@ -147,6 +143,10 @@ storage:
           MatchPattern=etcd-@v
           CurrentSymlink=/etc/extensions/etcd.raw
 
+{{- if hasKeyAny .node.storage "files" }}
+{{ .node.storage.files | toYaml | indent 4 }}
+{{- end }}
+
   links:
     # Disable Docker from Flatcar base OS
     - path: /etc/extensions/docker-flatcar.raw
@@ -177,6 +177,10 @@ storage:
     - path: /etc/extensions/etcd.raw
       target: /opt/extensions/etcd/etcd-{{ $.data.sysext.etcd.version }}-{{ .node.arch }}.raw
       hard: false
+
+{{- if hasKeyAny .node.storage "links" }}
+{{ .node.storage.links | toYaml | indent 4 }}
+{{- end }}
 
 systemd:
   units:
@@ -242,6 +246,10 @@ systemd:
     # automatically before configuring it.
     # Should we do it here too?
 {{ template "statusReporterBooted" . }}
+{{- if (.node | digAny "systemd" "units" false) }}
+{{ .node.systemd.units | toYaml | indent 4 }}
+{{- end }}
+
 {{- end }}
 {{- else }}
 {{ fail "Attempting to apply control plane configuration to a non-control plane node" }}
