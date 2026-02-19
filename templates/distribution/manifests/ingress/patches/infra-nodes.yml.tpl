@@ -135,12 +135,38 @@ spec:
         {{ template "nodeSelector" $haproxyArgs }}
       tolerations:
         {{ template "tolerations" $haproxyArgs }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: haproxy-ingress-internal-crdjob-1
+  namespace: ingress-haproxy
+spec:
+  template:
+    spec:
+      nodeSelector:
+        {{ template "nodeSelector" $haproxyArgs }}
+      tolerations:
+        {{ template "tolerations" $haproxyArgs }}
 {{- else if eq $haproxyType "single" -}}
 ---
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: haproxy-ingress
+  namespace: ingress-haproxy
+spec:
+  template:
+    spec:
+      nodeSelector:
+        {{ template "nodeSelector" $haproxyArgs }}
+      tolerations:
+        {{ template "tolerations" $haproxyArgs }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: haproxy-ingress-crdjob-1
   namespace: ingress-haproxy
 spec:
   template:
