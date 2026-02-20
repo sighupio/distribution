@@ -1297,6 +1297,330 @@
         "ingress",
         "logging",
         "policy"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "allOf": [
+              {
+                "properties": {
+                  "auth": {
+                    "properties": {
+                      "provider": {
+                        "properties": {
+                          "type": {
+                            "const": "basicAuth"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "ingress": {
+                    "properties": {
+                      "nginx": {
+                        "properties": {
+                          "type": {
+                            "const": "none"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "anyOf": [
+                  {
+                    "properties": {
+                      "ingress": {
+                        "properties": {
+                          "haproxy": {
+                            "properties": {
+                              "type": {
+                                "const": "none"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "ingress": {
+                        "not": {
+                          "required": ["haproxy"]
+                        }
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "properties": {
+                  "ingress": {
+                    "properties": {
+                      "byoic": {
+                        "properties": {
+                          "enabled": {
+                            "const": false
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "then": false
+        },
+        {
+          "if": {
+            "allOf": [
+              {
+                "properties": {
+                  "auth": {
+                    "properties": {
+                      "provider": {
+                        "properties": {
+                          "type": {
+                            "const": "basicAuth"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "ingress": {
+                    "properties": {
+                      "nginx": {
+                        "properties": {
+                          "type": {
+                            "const": "none"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "anyOf": [
+                  {
+                    "properties": {
+                      "ingress": {
+                        "properties": {
+                          "haproxy": {
+                            "properties": {
+                              "type": {
+                                "const": "none"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "ingress": {
+                        "not": {
+                          "required": ["haproxy"]
+                        }
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "properties": {
+                  "ingress": {
+                    "properties": {
+                      "byoic": {
+                        "properties": {
+                          "enabled": {
+                            "const": true
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "then": false
+        },
+        {
+          "if": {
+            "allOf": [
+              {
+                "properties": {
+                  "auth": {
+                    "properties": {
+                      "provider": {
+                        "properties": {
+                          "type": {
+                            "const": "sso"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "ingress": {
+                    "properties": {
+                      "nginx": {
+                        "properties": {
+                          "type": {
+                            "const": "none"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "anyOf": [
+                  {
+                    "properties": {
+                      "ingress": {
+                        "properties": {
+                          "haproxy": {
+                            "properties": {
+                              "type": {
+                                "const": "none"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "ingress": {
+                        "not": {
+                          "required": ["haproxy"]
+                        }
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "properties": {
+                  "ingress": {
+                    "properties": {
+                      "byoic": {
+                        "properties": {
+                          "enabled": {
+                            "const": false
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "then": false
+        },
+        {
+          "if": {
+            "allOf": [
+              {
+                "properties": {
+                  "auth": {
+                    "required": ["oidcKubernetesAuth"],
+                    "properties": {
+                      "oidcKubernetesAuth": {
+                        "required": ["enabled"],
+                        "properties": {
+                          "enabled": {
+                            "const": true
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "ingress": {
+                    "properties": {
+                      "nginx": {
+                        "properties": {
+                          "type": {
+                            "const": "none"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "anyOf": [
+                  {
+                    "properties": {
+                      "ingress": {
+                        "properties": {
+                          "haproxy": {
+                            "properties": {
+                              "type": {
+                                "const": "none"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "ingress": {
+                        "not": {
+                          "required": ["haproxy"]
+                        }
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "properties": {
+                  "ingress": {
+                    "properties": {
+                      "byoic": {
+                        "properties": {
+                          "enabled": {
+                            "const": false
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "then": false
+        }
       ]
     },
     "Spec.Distribution.Modules.Ingress": {
@@ -1314,6 +1638,14 @@
           "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.Nginx",
           "description": "Configurations for the Ingress nginx controller package."
         },
+        "haproxy": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.HAProxy",
+          "description": "Configurations for the HAProxy ingress controller package."
+        },
+        "byoic": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.BYOIC",
+          "description": "Configuration for Bring Your Own Ingress Controller mode. Can coexist with nginx and haproxy. The ingressClass is used when both controllers are disabled."
+        },
         "certManager": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.CertManager",
           "description": "Configuration for the cert-manager package. Required even if `ingress.nginx.type` is `none`, cert-manager is used for managing other certificates in the cluster besides the TLS termination certificates for the ingresses."
@@ -1323,6 +1655,10 @@
         },
         "forecastle": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.Forecastle"
+        },
+        "infrastructureIngressController": {
+          "type": "string",
+          "description": "Overrides the default ingress controller for SD infrastructure ingresses. Set to `nginx` or `haproxy` to select the controller family; the dual/single class mapping (e.g., `haproxy-internal`/`haproxy-external`) is applied automatically based on the controller's type setting. Useful during migrations to keep infrastructure ingresses on one controller while testing another. Do not use this field when both `nginx.type` and `haproxy.type` are `none`: in that case rely on `byoic.ingressClass` to define the ingress class for SD ingresses."
         }
       },
       "required": [
@@ -1402,6 +1738,61 @@
               "certManager"
             ]
           }
+        },
+        {
+          "if": {
+            "allOf": [
+              {
+                "properties": {
+                  "byoic": {
+                    "properties": {
+                      "enabled": {
+                        "const": true
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "nginx": {
+                    "properties": {
+                      "type": {
+                        "const": "none"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "anyOf": [
+                  {
+                    "not": {
+                      "required": ["haproxy"]
+                    }
+                  },
+                  {
+                    "properties": {
+                      "haproxy": {
+                        "properties": {
+                          "type": {
+                            "const": "none"
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "then": {
+            "properties": {
+              "byoic": {
+                "required": ["ingressClass"]
+              }
+            }
+          }
         }
       ]
     },
@@ -1444,6 +1835,115 @@
         }
       }
     },
+    "Spec.Distribution.Modules.Ingress.HAProxy": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configuration for HAProxy ingress controller.",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "none",
+            "single",
+            "dual"
+          ],
+          "description": "The type of the HAProxy ingress controller, options are:\n- `none`: HAProxy ingress controller will not be installed.\n- `single`: a single HAProxy ingress controller with ingress class `haproxy` will be installed.\n- `dual`: two independent HAProxy ingress controllers will be installed, one for the `haproxy-internal` ingress class and one for the `haproxy-external` ingress class.\n\nDefault is `none`."
+        },
+        "tls": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.HAProxy.TLS",
+          "description": "TLS configuration for the HAProxy ingress controller."
+        },
+        "overrides": {
+          "$ref": "#/$defs/Types.FuryModuleComponentOverrides"
+        }
+      },
+      "required": [
+        "type"
+      ]
+    },
+    "Spec.Distribution.Modules.Ingress.HAProxy.TLS": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "TLS configuration for the HAProxy ingress controller.",
+      "properties": {
+        "provider": {
+          "type": "string",
+          "enum": [
+            "certManager",
+            "secret",
+            "none"
+          ],
+          "description": "The provider of the TLS certificates for the ingresses, one of: `none`, `certManager`, or `secret`."
+        },
+        "secret": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.HAProxy.TLS.Secret"
+        }
+      },
+      "required": [
+        "provider"
+      ],
+      "if": {
+        "properties": {
+          "provider": {
+            "const": "secret"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "secret"
+        ]
+      }
+    },
+    "Spec.Distribution.Modules.Ingress.HAProxy.TLS.Secret": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Kubernetes TLS secret for the HAProxy ingresses TLS certificate.",
+      "properties": {
+        "cert": {
+          "type": "string",
+          "description": "The certificate file's content. You can use the `\"{file://<path>}\"` notation to get the content from a file."
+        },
+        "key": {
+          "type": "string",
+          "description": "The signing key file's content. You can use the `\"{file://<path>}\"` notation to get the content from a file."
+        },
+        "ca": {
+          "type": "string",
+          "description": "The Certificate Authority certificate file's content. You can use the `\"{file://<path>}\"` notation to get the content from a file."
+        }
+      },
+      "required": [
+        "ca",
+        "cert",
+        "key"
+      ]
+    },
+    "Spec.Distribution.Modules.Ingress.BYOIC": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configuration for Bring Your Own Ingress Controller mode. The ingressClass is used for infrastructure ingresses when both controllers are disabled.",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable BYOIC mode."
+        },
+        "ingressClass": {
+          "type": "string",
+          "description": "The IngressClass to use for infrastructure ingresses (Prometheus, Grafana, etc.) when both nginx and haproxy are disabled."
+        },
+        "commonAnnotations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Annotations to apply to all infrastructure ingresses when using this BYOIC ingress class. Useful for controller-specific configuration (TLS, auth middlewares, etc.)."
+        }
+      },
+      "required": [
+        "enabled"
+      ]
+    },
     "Spec.Distribution.Modules.Ingress.Nginx": {
       "type": "object",
       "additionalProperties": false,
@@ -1458,7 +1958,8 @@
           "description": "The type of the Ingress nginx controller, options are:\n- `none`: no ingress controller will be installed and no infrastructural ingresses will be created.\n- `single`: a single ingress controller with ingress class `nginx` will be installed to manage all the ingress resources, infrastructural ingresses will be created.\n- `dual`: two independent ingress controllers will be installed, one for the `internal` ingress class intended for private ingresses and one for the `external` ingress class intended for public ingresses. KFD infrastructural ingresses wil use the `internal` ingress class when using the dual type.\n\nDefault is `single`."
         },
         "tls": {
-          "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.Nginx.TLS"
+          "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.Nginx.TLS",
+          "description": "TLS configuration for the nginx ingress controller."
         },
         "overrides": {
           "$ref": "#/$defs/Types.FuryModuleComponentOverrides"
@@ -1471,6 +1972,7 @@
     "Spec.Distribution.Modules.Ingress.Nginx.TLS": {
       "type": "object",
       "additionalProperties": false,
+      "description": "TLS configuration for the nginx ingress controller.",
       "properties": {
         "provider": {
           "type": "string",
@@ -1859,6 +2361,10 @@
           "type": "string",
           "description": "This value defines where the output from the `ingressNginx` Flow will be sent. This will be the `spec` section of the `Output` object. It must be a string (and not a YAML object) following the OutputSpec definition. Use the `nullout` output to discard the flow: `nullout: {}`"
         },
+        "ingressHaproxy": {
+          "type": "string",
+          "description": "This value defines where the output from the `ingressHaproxy` Flow will be sent. This will be the `spec` section of the `Output` object. It must be a string (and not a YAML object) following the OutputSpec definition. Use the `nullout` output to discard the flow: `nullout: {}`"
+        },
         "kubernetes": {
           "type": "string",
           "description": "This value defines where the output from the `kubernetes` Flow will be sent. This will be the `spec` section of the `Output` object. It must be a string (and not a YAML object) following the OutputSpec definition. Use the `nullout` output to discard the flow: `nullout: {}`"
@@ -1880,6 +2386,7 @@
         "audit",
         "events",
         "infra",
+        "ingressHaproxy",
         "ingressNginx",
         "kubernetes",
         "systemdCommon",
@@ -2483,6 +2990,17 @@
         "eks": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Dr.Velero.Eks"
         },
+        "nodeAgent": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Configuration for Velero's node-agent DaemonSet.",
+          "properties": {
+            "prepareQueueLength": {
+              "type": "integer",
+              "description": "Defines the maximum number of DataUpload/DataDownload/PodVolumeBackup/PodVolumeRestore CRs under preparation statuses but not yet processed by any node. This constrains the number of intermediate objects (PVCs, VolumeSnapshots, etc.) to prevent unnecessary resource usage when cluster parallelism is limited."
+            }
+          }
+        },
         "overrides": {
           "$ref": "#/$defs/Types.FuryModuleComponentOverrides"
         }
@@ -2503,6 +3021,18 @@
           "$ref": "#/$defs/Types.AwsS3BucketName",
           "maxLength": 49,
           "description": "The name of the bucket for Velero."
+        },
+        "prefixName": {
+          "type": "string",
+          "description": "The prefix name to use inside the bucket."
+        },
+        "accessMode": {
+          "type": "string",
+          "description": "How Velero can access the backup storage location.",
+          "enum": [
+            "ReadWrite",
+            "ReadOnly"
+          ]
         }
       },
       "required": [

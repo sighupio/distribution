@@ -18,6 +18,10 @@ kubernetes:
     immutable: true
   - path: .spec.kubernetes.masters.hosts.*
     immutable: true
+  # kubeProxy can be disabled and reenabled in a live cluster, but requires manual intervention
+  # to reconfigure the kube-proxy DaemonSet. We could automate this in the future.
+  - path: .spec.kubernetes.advanced.kubeProxy.enabled
+    immutable: true
 distribution:
   - path: .spec.distribution.common.networkPoliciesEnabled
     immutable: false
@@ -46,14 +50,14 @@ distribution:
     description: "changes to Loki's TSDB start date have been detected. This parameter cannot be changed once set."
     safe:
       - fromNodes:
-        - path: ".spec.distribution.modules.logging.type"
-          from: "none"
-        - path: ".spec.distribution.modules.logging.type"
-          to: "none"
-        - path: ".spec.distribution.modules.logging.type"
-          from: "opensearch"
-        - path: ".spec.distribution.modules.logging.type"
-          to: "opensearch"
+          - path: ".spec.distribution.modules.logging.type"
+            from: "none"
+          - path: ".spec.distribution.modules.logging.type"
+            to: "none"
+          - path: ".spec.distribution.modules.logging.type"
+            from: "opensearch"
+          - path: ".spec.distribution.modules.logging.type"
+            to: "opensearch"
     unsupported:
       - to: opensearch
         from: loki
@@ -166,6 +170,21 @@ distribution:
         reason: "currently, switching Ingress from single to dual nginx is not supported. You need to first remove the current stack with type: none."
     reducers:
       - key: distributionModulesIngressNginxType
+        lifecycle: pre-apply
+  - path: .spec.distribution.modules.ingress.haproxy.type
+    immutable: false
+    description: "changes to the HAProxy type in the Ingress module have been detected. This will cause the reconfiguration or deletion of the current HAProxy ingress stack."
+    safe:
+      - from: none
+    unsupported:
+      - to: single
+        from: dual
+        reason: "currently, switching Ingress from dual to single HAProxy is not supported. You need to first remove the current stack with type: none."
+      - to: dual
+        from: single
+        reason: "currently, switching Ingress from single to dual HAProxy is not supported. You need to first remove the current stack with type: none."
+    reducers:
+      - key: distributionModulesIngressHAProxyType
         lifecycle: pre-apply
   - path: .spec.distribution.modules.auth.provider.type
     immutable: false

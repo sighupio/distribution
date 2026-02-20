@@ -33,8 +33,11 @@ output "aws_route53_zone_public_id" {
 
 {{- end }}
 
-# Create private DNS if nginx is dual and create is true
-{{- if and (.spec.distribution.modules.ingress.dns.private.create) (eq .spec.distribution.modules.ingress.nginx.type "dual") }}
+# Create private DNS if ingress is dual and create is true
+{{- $haproxyType := .spec.distribution.modules.ingress.haproxy.type }}
+{{- $nginxType := .spec.distribution.modules.ingress.nginx.type }}
+{{- $isDual := or (eq $nginxType "dual") (eq $haproxyType "dual") }}
+{{- if and (.spec.distribution.modules.ingress.dns.private.create) $isDual }}
 
 resource "aws_route53_zone" "private" {
   name = "{{ .spec.distribution.modules.ingress.dns.private.name }}"
@@ -48,8 +51,8 @@ output "aws_route53_zone_private_id" {
 }
 
 {{- end }}
-# Get private DNS as data if nginx is dual and create is false
-{{- if and (not .spec.distribution.modules.ingress.dns.private.create) (eq .spec.distribution.modules.ingress.nginx.type "dual") }}
+# Get private DNS as data if ingress is dual and create is false
+{{- if and (not .spec.distribution.modules.ingress.dns.private.create) $isDual }}
 
 data "aws_route53_zone" "private" {
   name = "{{ .spec.distribution.modules.ingress.dns.private.name }}"

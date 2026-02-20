@@ -801,7 +801,7 @@ Configuration for Pomerium, an identity-aware reverse proxy used for SSO.
 |:------------------------------------------------------------------------------------------------------------------|:--------|:---------|
 | [gatekeeperPolicyManager](#specdistributionmodulesauthpomeriumdefaultroutespolicygatekeeperpolicymanager)         | `array` | Optional |
 | [hubbleUi](#specdistributionmodulesauthpomeriumdefaultroutespolicyhubbleui)                                       | `array` | Optional |
-| [ingressNgnixForecastle](#specdistributionmodulesauthpomeriumdefaultroutespolicyingressngnixforecastle)           | `array` | Optional |
+| [ingressForecastle](#specdistributionmodulesauthpomeriumdefaultroutespolicyingressforecastle)                     | `array` | Optional |
 | [loggingMinioConsole](#specdistributionmodulesauthpomeriumdefaultroutespolicyloggingminioconsole)                 | `array` | Optional |
 | [loggingOpensearchDashboards](#specdistributionmodulesauthpomeriumdefaultroutespolicyloggingopensearchdashboards) | `array` | Optional |
 | [monitoringAlertmanager](#specdistributionmodulesauthpomeriumdefaultroutespolicymonitoringalertmanager)           | `array` | Optional |
@@ -818,7 +818,7 @@ override default routes for KFD components
 
 ## .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.hubbleUi
 
-## .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.ingressNgnixForecastle
+## .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.ingressForecastle
 
 ## .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.loggingMinioConsole
 
@@ -1112,6 +1112,8 @@ Default is `none`.
 |:-------------------------------------------------------------------------|:---------|:---------|
 | [backend](#specdistributionmodulesdrvelerobackend)                       | `string` | Optional |
 | [externalEndpoint](#specdistributionmodulesdrveleroexternalendpoint)     | `object` | Optional |
+| [gcs](#specdistributionmodulesdrvelerogcs)                               | `object` | Optional |
+| [nodeAgent](#specdistributionmodulesdrveleronodeagent)                   | `object` | Optional |
 | [overrides](#specdistributionmodulesdrvelerooverrides)                   | `object` | Optional |
 | [schedules](#specdistributionmodulesdrveleroschedules)                   | `object` | Optional |
 | [snapshotController](#specdistributionmodulesdrvelerosnapshotcontroller) | `object` | Optional |
@@ -1124,7 +1126,7 @@ Configuration for the Velero package.
 
 ### Description
 
-The storage backend type for Velero. `minio` will use an in-cluster MinIO deployment for object storage, `externalEndpoint` can be used to point to an external S3-compatible object storage instead of deploying an in-cluster MinIO.
+The storage backend type for Velero. `minio` will use an in-cluster MinIO deployment for object storage, `externalEndpoint` can be used to point to an external S3-compatible object storage instead of deploying an in-cluster MinIO, `gcs` can be used to point to gcs object storage instead of deploying an in-cluster MinIO.
 
 ### Constraints
 
@@ -1134,6 +1136,7 @@ The storage backend type for Velero. `minio` will use an in-cluster MinIO deploy
 |:-------------------|
 |`"minio"`           |
 |`"externalEndpoint"`|
+|`"gcs"`             |
 
 ## .spec.distribution.modules.dr.velero.externalEndpoint
 
@@ -1142,9 +1145,11 @@ The storage backend type for Velero. `minio` will use an in-cluster MinIO deploy
 | Property                                                                           | Type      | Required |
 |:-----------------------------------------------------------------------------------|:----------|:---------|
 | [accessKeyId](#specdistributionmodulesdrveleroexternalendpointaccesskeyid)         | `string`  | Optional |
+| [accessMode](#specdistributionmodulesdrveleroexternalendpointaccessmode)           | `string`  | Optional |
 | [bucketName](#specdistributionmodulesdrveleroexternalendpointbucketname)           | `string`  | Optional |
 | [endpoint](#specdistributionmodulesdrveleroexternalendpointendpoint)               | `string`  | Optional |
 | [insecure](#specdistributionmodulesdrveleroexternalendpointinsecure)               | `boolean` | Optional |
+| [prefixName](#specdistributionmodulesdrveleroexternalendpointprefixname)           | `string`  | Optional |
 | [secretAccessKey](#specdistributionmodulesdrveleroexternalendpointsecretaccesskey) | `string`  | Optional |
 
 ### Description
@@ -1157,11 +1162,26 @@ Configuration for Velero's external storage backend.
 
 The access key ID (username) for the external S3-compatible bucket.
 
+## .spec.distribution.modules.dr.velero.externalEndpoint.accessMode
+
+### Description
+
+How Velero can access the backup storage location.
+
+### Constraints
+
+**enum**: the value of this property must be equal to one of the following string values:
+
+| Value       |
+|:------------|
+|`"ReadWrite"`|
+|`"ReadOnly"` |
+
 ## .spec.distribution.modules.dr.velero.externalEndpoint.bucketName
 
 ### Description
 
-The bucket name of the external S3-compatible object storage.
+The bucket name of the external object storage.
 
 ## .spec.distribution.modules.dr.velero.externalEndpoint.endpoint
 
@@ -1175,11 +1195,90 @@ External S3-compatible endpoint for Velero's storage.
 
 If true, will use HTTP as protocol instead of HTTPS.
 
+## .spec.distribution.modules.dr.velero.externalEndpoint.prefixName
+
+### Description
+
+The prefix name to use inside the bucket.
+
 ## .spec.distribution.modules.dr.velero.externalEndpoint.secretAccessKey
 
 ### Description
 
 The secret access key (password) for the external S3-compatible bucket.
+
+## .spec.distribution.modules.dr.velero.gcs
+
+### Properties
+
+| Property                                                                        | Type     | Required |
+|:--------------------------------------------------------------------------------|:---------|:---------|
+| [accessMode](#specdistributionmodulesdrvelerogcsaccessmode)                     | `string` | Optional |
+| [bucketName](#specdistributionmodulesdrvelerogcsbucketname)                     | `string` | Optional |
+| [clientEmail](#specdistributionmodulesdrvelerogcsclientemail)                   | `string` | Optional |
+| [prefixName](#specdistributionmodulesdrvelerogcsprefixname)                     | `string` | Optional |
+| [serviceAccountString](#specdistributionmodulesdrvelerogcsserviceaccountstring) | `string` | Optional |
+
+### Description
+
+Configuration for Velero's gcs storage backend.
+
+## .spec.distribution.modules.dr.velero.gcs.accessMode
+
+### Description
+
+How Velero can access the backup storage location.
+
+### Constraints
+
+**enum**: the value of this property must be equal to one of the following string values:
+
+| Value       |
+|:------------|
+|`"ReadWrite"`|
+|`"ReadOnly"` |
+
+## .spec.distribution.modules.dr.velero.gcs.bucketName
+
+### Description
+
+The bucket name of the gcs object storage.
+
+## .spec.distribution.modules.dr.velero.gcs.clientEmail
+
+### Description
+
+Full gcs client email.
+
+## .spec.distribution.modules.dr.velero.gcs.prefixName
+
+### Description
+
+The prefix name to use inside the gcs bucket.
+
+## .spec.distribution.modules.dr.velero.gcs.serviceAccountString
+
+### Description
+
+Service gcs account JSON string.
+
+## .spec.distribution.modules.dr.velero.nodeAgent
+
+### Properties
+
+| Property                                                                          | Type      | Required |
+|:----------------------------------------------------------------------------------|:----------|:---------|
+| [prepareQueueLength](#specdistributionmodulesdrveleronodeagentpreparequeuelength) | `integer` | Optional |
+
+### Description
+
+Configuration for Velero's node-agent DaemonSet.
+
+## .spec.distribution.modules.dr.velero.nodeAgent.prepareQueueLength
+
+### Description
+
+Defines the maximum number of DataUpload/DataDownload/PodVolumeBackup/PodVolumeRestore CRs under preparation statuses but not yet processed by any node. This constrains the number of intermediate objects (PVCs, VolumeSnapshots, etc.) to prevent unnecessary resource usage when cluster parallelism is limited.
 
 ## .spec.distribution.modules.dr.velero.overrides
 
@@ -1357,19 +1456,54 @@ Whether to install or not the snapshotController component in the cluster. Befor
 
 ### Properties
 
-| Property                                                  | Type     | Required |
-|:----------------------------------------------------------|:---------|:---------|
-| [baseDomain](#specdistributionmodulesingressbasedomain)   | `string` | Required |
-| [certManager](#specdistributionmodulesingresscertmanager) | `object` | Optional |
-| [forecastle](#specdistributionmodulesingressforecastle)   | `object` | Optional |
-| [nginx](#specdistributionmodulesingressnginx)             | `object` | Required |
-| [overrides](#specdistributionmodulesingressoverrides)     | `object` | Optional |
+| Property                                                                                          | Type     | Required |
+|:--------------------------------------------------------------------------------------------------|:---------|:---------|
+| [baseDomain](#specdistributionmodulesingressbasedomain)                                           | `string` | Required |
+| [byoic](#specdistributionmodulesingressbyoic)                                                     | `object` | Optional |
+| [certManager](#specdistributionmodulesingresscertmanager)                                         | `object` | Optional |
+| [forecastle](#specdistributionmodulesingressforecastle)                                           | `object` | Optional |
+| [haproxy](#specdistributionmodulesingresshaproxy)                                                 | `object` | Optional |
+| [infrastructureIngressController](#specdistributionmodulesingressinfrastructureingresscontroller) | `string` | Optional |
+| [nginx](#specdistributionmodulesingressnginx)                                                     | `object` | Required |
+| [overrides](#specdistributionmodulesingressoverrides)                                             | `object` | Optional |
 
 ## .spec.distribution.modules.ingress.baseDomain
 
 ### Description
 
 The base domain used for all the KFD infrastructural ingresses. If using the nginx `dual` type, this value should be the same as the domain associated with the `internal` ingress class.
+
+## .spec.distribution.modules.ingress.byoic
+
+### Properties
+
+| Property                                                                   | Type      | Required |
+|:---------------------------------------------------------------------------|:----------|:---------|
+| [commonAnnotations](#specdistributionmodulesingressbyoiccommonannotations) | `object`  | Optional |
+| [enabled](#specdistributionmodulesingressbyoicenabled)                     | `boolean` | Required |
+| [ingressClass](#specdistributionmodulesingressbyoicingressclass)           | `string`  | Optional |
+
+### Description
+
+Configuration for Bring Your Own Ingress Controller mode. The ingressClass is used for infrastructure ingresses when both controllers are disabled.
+
+## .spec.distribution.modules.ingress.byoic.commonAnnotations
+
+### Description
+
+Annotations to apply to all infrastructure ingresses when using this BYOIC ingress class. Useful for controller-specific configuration (TLS, auth middlewares, etc.).
+
+## .spec.distribution.modules.ingress.byoic.enabled
+
+### Description
+
+Enable BYOIC mode.
+
+## .spec.distribution.modules.ingress.byoic.ingressClass
+
+### Description
+
+The IngressClass to use for infrastructure ingresses (Prometheus, Grafana, etc.) when both nginx and haproxy are disabled.
 
 ## .spec.distribution.modules.ingress.certManager
 
@@ -1569,6 +1703,173 @@ The key of the toleration
 
 The value of the toleration
 
+## .spec.distribution.modules.ingress.haproxy
+
+### Properties
+
+| Property                                                     | Type     | Required |
+|:-------------------------------------------------------------|:---------|:---------|
+| [overrides](#specdistributionmodulesingresshaproxyoverrides) | `object` | Optional |
+| [tls](#specdistributionmodulesingresshaproxytls)             | `object` | Optional |
+| [type](#specdistributionmodulesingresshaproxytype)           | `string` | Required |
+
+### Description
+
+Configuration for HAProxy Kubernetes Ingress Controller.
+
+## .spec.distribution.modules.ingress.haproxy.overrides
+
+### Properties
+
+| Property                                                                    | Type     | Required |
+|:----------------------------------------------------------------------------|:---------|:---------|
+| [nodeSelector](#specdistributionmodulesingresshaproxyoverridesnodeselector) | `object` | Optional |
+| [tolerations](#specdistributionmodulesingresshaproxyoverridestolerations)   | `array`  | Optional |
+
+## .spec.distribution.modules.ingress.haproxy.overrides.nodeSelector
+
+### Description
+
+Set to override the node selector used to place the pods of the package.
+
+## .spec.distribution.modules.ingress.haproxy.overrides.tolerations
+
+### Properties
+
+| Property                                                                       | Type     | Required |
+|:-------------------------------------------------------------------------------|:---------|:---------|
+| [effect](#specdistributionmodulesingresshaproxyoverridestolerationseffect)     | `string` | Required |
+| [key](#specdistributionmodulesingresshaproxyoverridestolerationskey)           | `string` | Required |
+| [operator](#specdistributionmodulesingresshaproxyoverridestolerationsoperator) | `string` | Optional |
+| [value](#specdistributionmodulesingresshaproxyoverridestolerationsvalue)       | `string` | Optional |
+
+### Description
+
+Set to override the tolerations that will be added to the pods of the package.
+
+## .spec.distribution.modules.ingress.haproxy.overrides.tolerations.effect
+
+### Constraints
+
+**enum**: the value of this property must be equal to one of the following string values:
+
+| Value              |
+|:-------------------|
+|`"NoSchedule"`      |
+|`"PreferNoSchedule"`|
+|`"NoExecute"`       |
+
+## .spec.distribution.modules.ingress.haproxy.overrides.tolerations.key
+
+### Description
+
+The key of the toleration
+
+## .spec.distribution.modules.ingress.haproxy.overrides.tolerations.operator
+
+### Constraints
+
+**enum**: the value of this property must be equal to one of the following string values:
+
+| Value    |
+|:---------|
+|`"Exists"`|
+|`"Equal"` |
+
+## .spec.distribution.modules.ingress.haproxy.overrides.tolerations.value
+
+### Description
+
+The value of the toleration
+
+## .spec.distribution.modules.ingress.haproxy.tls
+
+### Properties
+
+| Property                                                      | Type     | Required |
+|:--------------------------------------------------------------|:---------|:---------|
+| [provider](#specdistributionmodulesingresshaproxytlsprovider) | `string` | Required |
+| [secret](#specdistributionmodulesingresshaproxytlssecret)     | `object` | Optional |
+
+### Description
+
+TLS configuration for the HAProxy ingress controller.
+
+## .spec.distribution.modules.ingress.haproxy.tls.provider
+
+### Description
+
+The provider of the TLS certificates for the ingresses, one of: `none`, `certManager`, or `secret`.
+
+### Constraints
+
+**enum**: the value of this property must be equal to one of the following string values:
+
+| Value         |
+|:--------------|
+|`"certManager"`|
+|`"secret"`     |
+|`"none"`       |
+
+## .spec.distribution.modules.ingress.haproxy.tls.secret
+
+### Properties
+
+| Property                                                    | Type     | Required |
+|:------------------------------------------------------------|:---------|:---------|
+| [ca](#specdistributionmodulesingresshaproxytlssecretca)     | `string` | Required |
+| [cert](#specdistributionmodulesingresshaproxytlssecretcert) | `string` | Required |
+| [key](#specdistributionmodulesingresshaproxytlssecretkey)   | `string` | Required |
+
+### Description
+
+Kubernetes TLS secret for the HAProxy ingresses TLS certificate.
+
+## .spec.distribution.modules.ingress.haproxy.tls.secret.ca
+
+### Description
+
+The Certificate Authority certificate file's content. You can use the `"{file://<path>}"` notation to get the content from a file.
+
+## .spec.distribution.modules.ingress.haproxy.tls.secret.cert
+
+### Description
+
+The certificate file's content. You can use the `"{file://<path>}"` notation to get the content from a file.
+
+## .spec.distribution.modules.ingress.haproxy.tls.secret.key
+
+### Description
+
+The signing key file's content. You can use the `"{file://<path>}"` notation to get the content from a file.
+
+## .spec.distribution.modules.ingress.haproxy.type
+
+### Description
+
+The type of the HAProxy ingress controller, options are:
+- `none`: HAProxy ingress controller will not be installed.
+- `single`: a single HAProxy ingress controller with ingress class `haproxy` will be installed.
+- `dual`: two independent HAProxy ingress controllers will be installed, one for the `haproxy-internal` ingress class and one for the `haproxy-external` ingress class.
+
+Default is `none`.
+
+### Constraints
+
+**enum**: the value of this property must be equal to one of the following string values:
+
+| Value    |
+|:---------|
+|`"none"`  |
+|`"single"`|
+|`"dual"`  |
+
+## .spec.distribution.modules.ingress.infrastructureIngressController
+
+### Description
+
+Overrides the default ingress controller for SD infrastructure ingresses. Set to `nginx` or `haproxy` to select the controller family; the dual/single class mapping (e.g., `haproxy-internal`/`haproxy-external`) is applied automatically based on the controller's type setting. Useful during migrations to keep infrastructure ingresses on one controller while testing another. Do not use this field when both `nginx.type` and `haproxy.type` are `none`: in that case rely on `byoic.ingressClass` to define the ingress class for SD ingresses.
+
 ## .spec.distribution.modules.ingress.nginx
 
 ### Properties
@@ -1656,6 +1957,10 @@ The value of the toleration
 |:------------------------------------------------------------|:---------|:---------|
 | [provider](#specdistributionmodulesingressnginxtlsprovider) | `string` | Required |
 | [secret](#specdistributionmodulesingressnginxtlssecret)     | `object` | Optional |
+
+### Description
+
+TLS configuration for the nginx ingress controller.
 
 ## .spec.distribution.modules.ingress.nginx.tls.provider
 
@@ -1932,16 +2237,17 @@ The value of the toleration
 
 ### Properties
 
-| Property                                                                   | Type     | Required |
-|:---------------------------------------------------------------------------|:---------|:---------|
-| [audit](#specdistributionmodulesloggingcustomoutputsaudit)                 | `string` | Required |
-| [errors](#specdistributionmodulesloggingcustomoutputserrors)               | `string` | Required |
-| [events](#specdistributionmodulesloggingcustomoutputsevents)               | `string` | Required |
-| [infra](#specdistributionmodulesloggingcustomoutputsinfra)                 | `string` | Required |
-| [ingressNginx](#specdistributionmodulesloggingcustomoutputsingressnginx)   | `string` | Required |
-| [kubernetes](#specdistributionmodulesloggingcustomoutputskubernetes)       | `string` | Required |
-| [systemdCommon](#specdistributionmodulesloggingcustomoutputssystemdcommon) | `string` | Required |
-| [systemdEtcd](#specdistributionmodulesloggingcustomoutputssystemdetcd)     | `string` | Required |
+| Property                                                                     | Type     | Required |
+|:-----------------------------------------------------------------------------|:---------|:---------|
+| [audit](#specdistributionmodulesloggingcustomoutputsaudit)                   | `string` | Required |
+| [errors](#specdistributionmodulesloggingcustomoutputserrors)                 | `string` | Required |
+| [events](#specdistributionmodulesloggingcustomoutputsevents)                 | `string` | Required |
+| [infra](#specdistributionmodulesloggingcustomoutputsinfra)                   | `string` | Required |
+| [ingressHaproxy](#specdistributionmodulesloggingcustomoutputsingresshaproxy) | `string` | Required |
+| [ingressNginx](#specdistributionmodulesloggingcustomoutputsingressnginx)     | `string` | Required |
+| [kubernetes](#specdistributionmodulesloggingcustomoutputskubernetes)         | `string` | Required |
+| [systemdCommon](#specdistributionmodulesloggingcustomoutputssystemdcommon)   | `string` | Required |
+| [systemdEtcd](#specdistributionmodulesloggingcustomoutputssystemdetcd)       | `string` | Required |
 
 ### Description
 
@@ -1970,6 +2276,12 @@ This value defines where the output from the `events` Flow will be sent. This wi
 ### Description
 
 This value defines where the output from the `infra` Flow will be sent. This will be the `spec` section of the `Output` object. It must be a string (and not a YAML object) following the OutputSpec definition. Use the `nullout` output to discard the flow: `nullout: {}`
+
+## .spec.distribution.modules.logging.customOutputs.ingressHaproxy
+
+### Description
+
+This value defines where the output from the `ingressHaproxy` Flow will be sent. This will be the `spec` section of the `Output` object. It must be a string (and not a YAML object) following the OutputSpec definition. Use the `nullout` output to discard the flow: `nullout: {}`
 
 ## .spec.distribution.modules.logging.customOutputs.ingressNginx
 

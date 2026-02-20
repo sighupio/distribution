@@ -101,6 +101,10 @@ spec:
           type: dual
           tls:
             provider: certManager
+        haproxy:
+          type: dual
+          tls:
+            provider: certManager
         certManager:
           clusterIssuer:
             name: letsencrypt-fury

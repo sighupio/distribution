@@ -39,6 +39,10 @@ if ! furyctl apply \
   echo "Retrying furyctl apply..."
   echo "============================================================================"
 
+  # Remove cached binaries to avoid "text file busy" (ETXTBSY) errors when
+  # the retry tries to overwrite binaries still held open from the first attempt.
+  rm -rf /furyctl-outdir/.furyctl/bin/ 2>/dev/null || true
+
   furyctl apply \
     --outdir /furyctl-outdir \
     --config "$LAST_FURYCTL_YAML" \

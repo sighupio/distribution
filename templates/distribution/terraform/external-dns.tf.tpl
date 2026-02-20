@@ -2,7 +2,12 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-{{- if (eq .spec.distribution.modules.ingress.nginx.type "single") }}
+{{- $haproxyType := .spec.distribution.modules.ingress.haproxy.type }}
+{{- $nginxType := .spec.distribution.modules.ingress.nginx.type }}
+{{- $isDual := or (eq $nginxType "dual") (eq $haproxyType "dual") }}
+{{- $isSingle := or (eq $nginxType "single") (eq $haproxyType "single") }}
+
+{{- if and $isSingle (not $isDual) }}
 module "external_dns" {
     source = "{{ print .spec.distribution.common.relativeVendorPath "/modules/ingress/modules/aws-external-dns" }}"
 {{- if (.spec.distribution.modules.ingress.dns.public.create)}}
@@ -19,7 +24,7 @@ output "external_dns_public_iam_role_arn" {
 
 {{- end }}
 
-{{- if (eq .spec.distribution.modules.ingress.nginx.type "dual") }}
+{{- if $isDual }}
 
 module "external_dns" {
     source = "{{ print .spec.distribution.common.relativeVendorPath "/modules/ingress/modules/aws-external-dns" }}"
