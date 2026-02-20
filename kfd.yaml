@@ -4,19 +4,19 @@
 
 version: v1.34.0
 modules:
-  auth: v0.6.1-rc.0
-  aws: v5.2.0-rc.0
-  dr: v3.3.0-rc.3
-  ingress: v5.0.0-rc.2
-  logging: v5.3.0-rc.3
-  monitoring: v4.1.0-rc.0
-  opa: v1.16.0-rc.1
-  networking: v3.1.0-rc.1
-  tracing: v1.4.0-rc.1
+  auth: v0.6.1
+  aws: v5.2.0
+  dr: v3.3.0
+  ingress: v5.0.0
+  logging: v5.3.0
+  monitoring: v4.1.0
+  opa: v1.16.0
+  networking: v3.1.0
+  tracing: v1.4.0
 kubernetes:
   eks:
     version: 1.34
-    installer: v3.4.0-rc.0
+    installer: v3.4.0
   onpremises:
     version: 1.34.3
     installer: v1.34.3
