@@ -5,13 +5,7 @@
 variant: flatcar
 version: 1.1.0
 
-passwd:
-  users:
-    - name: {{ .SSHUser }}
-      ssh_authorized_keys:
-        - {{ .SSHPublicKey | quote }}
-      groups:
-        - sudo
+{{ template "passwd" . }}
 
 storage:
   files:
