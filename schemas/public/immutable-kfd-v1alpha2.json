@@ -298,6 +298,9 @@
         },
         "systemd": {
           "$ref": "#/$defs/Spec.Infrastructure.Node.Systemd"
+        },
+        "passwd": {
+          "$ref": "#/$defs/Spec.Infrastructure.Node.Passwd"
         }
       },
       "required": [
@@ -325,11 +328,243 @@
         },
         "files": {
           "type": "array",
-          "description": "The content of this field will be appended to the node's configuration butane file under the `storage.files` path.\n\nNOTE: this field won't be validated. See specification at https://www.flatcar.org/docs/latest/provisioning/config-transpiler/configuration/"
+          "description": "The list of files to be written. Every file, directory and link must have a unique path. See https://www.flatcar.org/docs/latest/provisioning/config-transpiler/configuration/",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "Represents a file to be created on the filesystem.",
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "The absolute path to the file."
+              },
+              "overwrite": {
+                "type": "boolean",
+                "description": "Whether to delete preexisting nodes at the path. Contents must be specified if overwrite is true. Defaults to false."
+              },
+              "contents": {
+                "type": "object",
+                "additionalProperties": false,
+                "description": "Options related to the contents of the file.",
+                "properties": {
+                  "compression": {
+                    "type": "string",
+                    "description": "The type of compression used on the contents (null or gzip). Compression cannot be used with S3.",
+                    "enum": [
+                      "gzip"
+                    ]
+                  },
+                  "source": {
+                    "type": "string",
+                    "description": "The URL of the file contents. Supported schemes are http, https, tftp, s3, gs, and data. When using http, it is advisable to use the verification option. Mutually exclusive with inline and local."
+                  },
+                  "inline": {
+                    "type": "string",
+                    "description": "The contents of the file. Mutually exclusive with source and local."
+                  },
+                  "local": {
+                    "type": "string",
+                    "description": "A local path to the contents of the file, relative to the directory specified by the --files-dir command-line argument. Mutually exclusive with source and inline."
+                  },
+                  "http_headers": {
+                    "type": "array",
+                    "description": "A list of HTTP headers to be added to the request. Available for http and https source schemes only.",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "description": "The header name."
+                        },
+                        "value": {
+                          "type": "string",
+                          "description": "The header contents."
+                        }
+                      },
+                      "required": [
+                        "name",
+                        "value"
+                      ]
+                    }
+                  },
+                  "verification": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "description": "Options related to the verification of the file contents.",
+                    "properties": {
+                      "hash": {
+                        "type": "string",
+                        "description": "The hash of the content, in the form <type>-<value> where type is either sha512 or sha256. Example: sha256-abcd1234..."
+                      }
+                    }
+                  }
+                }
+              },
+              "append": {
+                "type": "array",
+                "description": "List of contents to be appended to the file. Follows the same structure as contents.",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "compression": {
+                      "type": "string",
+                      "description": "The type of compression used on the contents (null or gzip).",
+                      "enum": [
+                        "gzip"
+                      ]
+                    },
+                    "source": {
+                      "type": "string",
+                      "description": "The URL of the contents to append. Supported schemes are http, https, tftp, s3, gs, and data. Mutually exclusive with inline and local."
+                    },
+                    "inline": {
+                      "type": "string",
+                      "description": "The contents to append. Mutually exclusive with source and local."
+                    },
+                    "local": {
+                      "type": "string",
+                      "description": "A local path to the contents to append, relative to the directory specified by the --files-dir command-line argument. Mutually exclusive with source and inline."
+                    },
+                    "http_headers": {
+                      "type": "array",
+                      "description": "A list of HTTP headers to be added to the request. Available for http and https source schemes only.",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "description": "The header name."
+                          },
+                          "value": {
+                            "type": "string",
+                            "description": "The header contents."
+                          }
+                        },
+                        "required": [
+                          "name",
+                          "value"
+                        ]
+                      }
+                    },
+                    "verification": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "description": "Options related to the verification of the appended contents.",
+                      "properties": {
+                        "hash": {
+                          "type": "string",
+                          "description": "The hash of the content, in the form <type>-<value> where type is either sha512 or sha256."
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "mode": {
+                "type": "integer",
+                "description": "The file's permission mode (in octal, e.g. 0644). Setuid/setgid/sticky bits are not supported. If not specified, the permission mode for files defaults to 0644 or the existing file's permissions if overwrite is false and a file already exists.",
+                "minimum": 0,
+                "maximum": 511
+              },
+              "user": {
+                "type": "object",
+                "additionalProperties": false,
+                "description": "Specifies the file's owner.",
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "description": "The user ID of the owner."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "The user name of the owner."
+                  }
+                }
+              },
+              "group": {
+                "type": "object",
+                "additionalProperties": false,
+                "description": "Specifies the file's group.",
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "description": "The group ID of the group."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "The group name of the group."
+                  }
+                }
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
         },
         "links": {
           "type": "array",
-          "description": "The content of this field will be appended to the node's configuration butane file under the `storage.links` path.\n\nNOTE: this field won't be validated. See specification at https://www.flatcar.org/docs/latest/provisioning/config-transpiler/configuration/"
+          "description": "The list of links to be created. Every link must have a unique path. See https://www.flatcar.org/docs/latest/provisioning/config-transpiler/configuration/",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "Represents a symbolic or hard link to be created.",
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "The absolute path to the link."
+              },
+              "overwrite": {
+                "type": "boolean",
+                "description": "Whether to delete preexisting nodes at the path. If overwrite is false and a matching link exists at the path, Ignition will only set the owner and group. Defaults to false."
+              },
+              "target": {
+                "type": "string",
+                "description": "The target path of the link."
+              },
+              "hard": {
+                "type": "boolean",
+                "description": "A symbolic link is created if this is false, a hard one if this is true."
+              },
+              "user": {
+                "type": "object",
+                "additionalProperties": false,
+                "description": "Specifies the owner for a symbolic link. Ignored for hard links.",
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "description": "The user ID of the owner."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "The user name of the owner."
+                  }
+                }
+              },
+              "group": {
+                "type": "object",
+                "additionalProperties": false,
+                "description": "Specifies the group for a symbolic link. Ignored for hard links.",
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "description": "The group ID of the group."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "The group name of the group."
+                  }
+                }
+              }
+            },
+            "required": [
+              "path",
+              "target"
+            ]
+          }
         }
       },
       "required": [
@@ -779,6 +1014,123 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "Spec.Infrastructure.Node.Passwd": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Describes the desired additions to the passwd database. See https://www.flatcar.org/docs/latest/provisioning/config-transpiler/configuration/",
+      "properties": {
+        "users": {
+          "type": "array",
+          "description": "The list of accounts that shall exist. All users must have a unique name.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "Represents a user account to be created in the system.",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The username for the account."
+              },
+              "password_hash": {
+                "type": "string",
+                "description": "The hashed password for the account."
+              },
+              "ssh_authorized_keys": {
+                "type": "array",
+                "description": "A list of SSH keys to be added as an SSH key fragment at `.ssh/authorized_keys.d/ignition` in the user's home directory. All SSH keys must be unique.",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "uid": {
+                "type": "integer",
+                "description": "The user ID of the account."
+              },
+              "gecos": {
+                "type": "string",
+                "description": "The GECOS field of the account."
+              },
+              "home_dir": {
+                "type": "string",
+                "description": "The home directory of the account."
+              },
+              "no_create_home": {
+                "type": "boolean",
+                "description": "Whether or not to create the user's home directory. This only has an effect if the account doesn't exist yet."
+              },
+              "primary_group": {
+                "type": "string",
+                "description": "The name of the primary group of the account."
+              },
+              "groups": {
+                "type": "array",
+                "description": "The list of supplementary groups of the account.",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "no_user_group": {
+                "type": "boolean",
+                "description": "Whether or not to create a group with the same name as the user. This only has an effect if the account doesn't exist yet."
+              },
+              "no_log_init": {
+                "type": "boolean",
+                "description": "Whether or not to add the user to the lastlog and faillog databases. This only has an effect if the account doesn't exist yet."
+              },
+              "shell": {
+                "type": "string",
+                "description": "The login shell of the new account."
+              },
+              "should_exist": {
+                "type": "boolean",
+                "description": "Whether or not the user with the specified name should exist. If omitted, it defaults to true. If false, then Ignition will delete the specified user."
+              },
+              "system": {
+                "type": "boolean",
+                "description": "Whether or not this account should be a system account. This only has an effect if the account doesn't exist yet."
+              }
+            },
+            "required": [
+              "name"
+            ]
+          }
+        },
+        "groups": {
+          "type": "array",
+          "description": "The list of groups to be added. All groups must have a unique name.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "Represents a group to be created in the system.",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The name of the group."
+              },
+              "gid": {
+                "type": "integer",
+                "description": "The group ID of the new group."
+              },
+              "password_hash": {
+                "type": "string",
+                "description": "The hashed password of the new group."
+              },
+              "should_exist": {
+                "type": "boolean",
+                "description": "Whether or not the group with the specified name should exist. If omitted, it defaults to true. If false, then Ignition will delete the specified group."
+              },
+              "system": {
+                "type": "boolean",
+                "description": "Whether or not the group should be a system group. This only has an effect if the group doesn't exist yet."
+              }
+            },
+            "required": [
+              "name"
+            ]
           }
         }
       }

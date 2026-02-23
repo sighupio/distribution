@@ -1,3 +1,22 @@
+{{- define "passwd" }}
+passwd:
+  users:
+    - name: {{ .SSHUser }}
+      ssh_authorized_keys:
+        - {{ .SSHPublicKey | quote }}
+      groups:
+        - sudo
+  {{- if hasKeyAny .node "passwd" }}
+    {{- if hasKeyAny .node.passwd "users" }}
+{{ .node.passwd.users | toYaml | indent 4 }}
+    {{- end }}
+    {{- if hasKeyAny .node.passwd "groups" }}
+  groups:
+{{ .node.passwd.groups | toYaml | indent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+
 {{- define "networkdConfig" }}
 {{- range $name, $iface := .node.network.ethernets }}
     - path: /etc/systemd/network/10-{{ $name }}.network
