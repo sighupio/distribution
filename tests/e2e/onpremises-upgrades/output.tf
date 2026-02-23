@@ -136,9 +136,9 @@ spec:
           snapshotController:
             install: true
       tracing: 
-        type: tempo
-        tempo: 
-          backend: minio
+        type: none
+        # tempo: 
+        #   backend: minio
       auth:
         provider:
           type: none
@@ -294,9 +294,9 @@ spec:
           snapshotController:
             install: true
       tracing: 
-        type: tempo
-        tempo: 
-          backend: minio
+        type: none
+        # tempo: 
+        #   backend: minio
       auth:
         provider:
           type: none
