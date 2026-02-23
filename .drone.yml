@@ -220,117 +220,117 @@ steps: # e2e-kfddistribution-1.34
         - failure
 
 ---
-# # We test 1.33.1 -> 1.34.0 upgrade pipeline
-# name: e2e-kfddistribution-1.33.1-to-1.34.0
-# kind: pipeline
-# type: docker
+# We test 1.33.1 -> 1.34.0 upgrade pipeline
+name: e2e-kfddistribution-1.33.1-to-1.34.0
+kind: pipeline
+type: docker
 
-# depends_on:
-#   - qa
+depends_on:
+  - qa
 
-# clone:
-#   depth: 1
+clone:
+  depth: 1
 
-# platform:
-#   os: linux
-#   arch: amd64
+platform:
+  os: linux
+  arch: amd64
 
-# trigger:
-#   ref:
-#     include:
-#       - refs/tags/e2e-kfddistribution-**
-#       - refs/tags/e2e-all-**
-#       - refs/tags/v*
-#     exclude:
-#       - refs/tags/**-docs*
+trigger:
+  ref:
+    include:
+      - refs/tags/e2e-kfddistribution-**
+      - refs/tags/e2e-all-**
+      - refs/tags/v*
+    exclude:
+      - refs/tags/**-docs*
 
-# environment:
-#   MISE_DATA_DIR: /mise-data
-#   CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-upgrades
-#   KUBECONFIG: /drone/src/kubeconfig-upgrades
-#   KUBECTL_VERSION: "1.33.0"
-#   CLUSTER_VERSION: v1.33.0
+environment:
+  MISE_DATA_DIR: /mise-data
+  CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-upgrades
+  KUBECONFIG: /drone/src/kubeconfig-upgrades
+  KUBECTL_VERSION: "1.33.0"
+  CLUSTER_VERSION: v1.33.0
 
-# volumes:
-#   - name: dockersock
-#     host:
-#       path: /var/run/docker.sock
-#   - name: mise-cache
-#     host:
-#       path: /root/mise_data_dir
+volumes:
+  - name: dockersock
+    host:
+      path: /var/run/docker.sock
+  - name: mise-cache
+    host:
+      path: /root/mise_data_dir
 
-# steps: # e2e-kfddistribution-1.33.1-to-1.34.0
-#   - name: install-tools
-#     image: quay.io/sighup/mise:v2025.4.4
-#     pull: always
-#     volumes:
-#       - name: mise-cache
-#         path: /mise-data
-#     commands:
-#       - mise install
-#       - eval "$(mise activate bash --shims)"
+steps: # e2e-kfddistribution-1.33.1-to-1.34.0
+  - name: install-tools
+    image: quay.io/sighup/mise:v2025.4.4
+    pull: always
+    volumes:
+      - name: mise-cache
+        path: /mise-data
+    commands:
+      - mise install
+      - eval "$(mise activate bash --shims)"
 
-#   - name: create Kind cluster
-#     image: quay.io/sighup/mise:v2025.4.4
-#     pull: always
-#     depends_on:
-#       - install-tools
-#     volumes:
-#       - name: dockersock
-#         path: /var/run/docker.sock
-#       - name: mise-cache
-#         path: /mise-data
-#     commands:
-#       - |
-#         mise use kubectl@$${KUBECTL_VERSION}
-#         eval "$(mise activate bash --shims)"
-#       - |
-#         cat <<EOF > kind-config.yaml
-#         kind: Cluster
-#         apiVersion: kind.x-k8s.io/v1alpha4
-#         networking:
-#           disableDefaultCNI: true
-#         nodes:
-#           - role: control-plane
-#           - role: worker
-#           - role: worker
-#         EOF
-#       - kind create cluster --name $${CLUSTER_NAME} --image registry.sighup.io/fury/kindest/node:$${CLUSTER_VERSION} --config kind-config.yaml
-#       - kind get kubeconfig --name $${CLUSTER_NAME} > $${KUBECONFIG}
+  - name: create Kind cluster
+    image: quay.io/sighup/mise:v2025.4.4
+    pull: always
+    depends_on:
+      - install-tools
+    volumes:
+      - name: dockersock
+        path: /var/run/docker.sock
+      - name: mise-cache
+        path: /mise-data
+    commands:
+      - |
+        mise use kubectl@$${KUBECTL_VERSION}
+        eval "$(mise activate bash --shims)"
+      - |
+        cat <<EOF > kind-config.yaml
+        kind: Cluster
+        apiVersion: kind.x-k8s.io/v1alpha4
+        networking:
+          disableDefaultCNI: true
+        nodes:
+          - role: control-plane
+          - role: worker
+          - role: worker
+        EOF
+      - kind create cluster --name $${CLUSTER_NAME} --image registry.sighup.io/fury/kindest/node:$${CLUSTER_VERSION} --config kind-config.yaml
+      - kind get kubeconfig --name $${CLUSTER_NAME} > $${KUBECONFIG}
 
-#   - name: e2e-kfddistribution
-#     image: quay.io/sighup/mise:v2025.4.4
-#     pull: always
-#     network_mode: host
-#     volumes:
-#       - name: mise-cache
-#         path: /mise-data
-#     depends_on: [create Kind cluster]
-#     commands:
-#       - |
-#         mise use kubectl@$${KUBECTL_VERSION}
-#         eval "$(mise activate bash --shims)"
-#       - export KUBECONFIG=/drone/src/kubeconfig-upgrades
-#       - until kubectl get serviceaccount default > /dev/null 2>&1; do echo "waiting for control-plane" && sleep 1; done
-#       - tests/e2e/kfddistribution/e2e-kfddistribution-upgrades.sh
+  - name: e2e-kfddistribution
+    image: quay.io/sighup/mise:v2025.4.4
+    pull: always
+    network_mode: host
+    volumes:
+      - name: mise-cache
+        path: /mise-data
+    depends_on: [create Kind cluster]
+    commands:
+      - |
+        mise use kubectl@$${KUBECTL_VERSION}
+        eval "$(mise activate bash --shims)"
+      - export KUBECONFIG=/drone/src/kubeconfig-upgrades
+      - until kubectl get serviceaccount default > /dev/null 2>&1; do echo "waiting for control-plane" && sleep 1; done
+      - tests/e2e/kfddistribution/e2e-kfddistribution-upgrades.sh
 
-#   - name: delete-kind-cluster
-#     image: quay.io/sighup/mise:v2025.4.4
-#     pull: always
-#     volumes:
-#       - name: dockersock
-#         path: /var/run/docker.sock
-#       - name: mise-cache
-#         path: /mise-data
-#     commands:
-#       - eval "$(mise activate bash --shims)"
-#       - kind delete cluster --name $${CLUSTER_NAME} || true
-#     depends_on:
-#       - e2e-kfddistribution
-#     when:
-#       status:
-#         - success
-#         - failure
+  - name: delete-kind-cluster
+    image: quay.io/sighup/mise:v2025.4.4
+    pull: always
+    volumes:
+      - name: dockersock
+        path: /var/run/docker.sock
+      - name: mise-cache
+        path: /mise-data
+    commands:
+      - eval "$(mise activate bash --shims)"
+      - kind delete cluster --name $${CLUSTER_NAME} || true
+    depends_on:
+      - e2e-kfddistribution
+    when:
+      status:
+        - success
+        - failure
 
 # ---
 # name: e2e-ekscluster-1.34.0
@@ -1162,7 +1162,7 @@ steps: # e2e-kfddistribution-1.34
 #       - aws-nuke nuke -c ./aws-nuke-config.yml --force --no-dry-run
 #       - aws s3 rm s3://e2e-drone-eks --recursive
 
-# ---
+---
 name: release
 kind: pipeline
 type: docker
