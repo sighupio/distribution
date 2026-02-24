@@ -15,9 +15,7 @@ resources:
 {{- if .spec.distribution.modules.auth.oidcKubernetesAuth.enabled }}
   - {{ print $vendorPrefix "/modules/auth/katalog/gangplank" }}
 {{- end }}
-{{- if ne .spec.distribution.modules.ingress.nginx.type "none" }}
   - resources/ingress-infra.yml
-{{- end }}
 {{- if ne .spec.distribution.modules.auth.oidcTrustedCA "" }}
   - secrets/oidc-trusted-ca.yml
   - secrets/overlays/kube-system-ca

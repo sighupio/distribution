@@ -5,8 +5,10 @@
 {{- $vendorPrefix := print "../" .spec.distribution.common.relativeVendorPath }}
 {{- $monitoringType := .spec.distribution.modules.monitoring.type }}
 {{- $installEnhancedHPAMetrics := .spec.distribution.modules.monitoring.prometheusAdapter.installEnhancedHPAMetrics }}
+{{- $haproxyType := .spec.distribution.modules.ingress.haproxy.type }}
+{{- $isBYOIC := .spec.distribution.modules.ingress.byoic.enabled }}
+{{- $hasAnyIngress := or (ne .spec.distribution.modules.ingress.nginx.type "none") (ne $haproxyType "none") $isBYOIC }}
 # rendering Kustomization file for monitoring type {{ $monitoringType }}
-
 ---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
@@ -15,7 +17,9 @@ resources:
 {{- /* common components for all the monitoring types */}}
   - kapp-configs/prometheus-operator-crd.yaml
   - {{ print $vendorPrefix "/modules/monitoring/katalog/prometheus-operator" }}
+{{- if .spec | digAny "kubernetes" "advanced" "kubeProxy" "enabled" true }}
   - {{ print $vendorPrefix "/modules/monitoring/katalog/kube-proxy-metrics" }}
+{{- end }}
   - {{ print $vendorPrefix "/modules/monitoring/katalog/kube-state-metrics" }}
   - {{ print $vendorPrefix "/modules/monitoring/katalog/node-exporter" }}
   - {{ print $vendorPrefix "/modules/monitoring/katalog/x509-exporter" }}
@@ -46,7 +50,7 @@ resources:
             {{- end }}
         {{- end }}
     {{- end }}
-    {{- if and (ne .spec.distribution.modules.ingress.nginx.type "none") }}{{/* we don't need ingresses for Prometheus in Agent mode */}}
+    {{- if $hasAnyIngress }}{{/* we don't need ingresses for Prometheus in Agent mode */}}
   - resources/ingress-infra.yml
     {{- end }}
 {{- end }}

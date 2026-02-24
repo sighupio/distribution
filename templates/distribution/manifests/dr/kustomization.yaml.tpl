@@ -17,9 +17,18 @@ resources:
 {{- if eq .spec.distribution.modules.dr.velero.backend "minio" }}
   - {{ print $vendorPrefix "/modules/dr/katalog/velero/velero-on-prem" }}
 {{- else }}
+{{- if eq .spec.distribution.modules.dr.velero.backend "externalEndpoint" }}
   - {{ print $vendorPrefix "/modules/dr/katalog/velero/velero-aws" }}
-  - resources/storageLocation.yaml
-  - resources/volumeSnapshotLocation.yaml
+  - resources/storageLocation.s3.yaml
+  - resources/volumeSnapshotLocation.s3.yaml
+{{- end }}
+
+{{- if eq .spec.distribution.modules.dr.velero.backend "gcs" }}
+  - {{ print $vendorPrefix "/modules/dr/katalog/velero/velero-gcp" }}
+  - resources/storageLocation.gcs.yaml
+  - resources/volumeSnapshotLocation.gcs.yaml
+{{- end }}
+
 {{- end }}
 {{- if .spec.distribution.modules.dr.velero.snapshotController.install }}
   - {{ print $vendorPrefix "/modules/dr/katalog/velero/snapshot-controller" }}
@@ -51,6 +60,7 @@ patches:
 {{- if eq .spec.distribution.common.provider.type "eks" }}
   - path: patches/eks-velero.yml
 {{- end }}
+  - path: patches/node-agent-config.yml
 {{- if eq .spec.distribution.common.provider.type "none" }}
   {{- if ne .spec.distribution.modules.dr.etcdBackup.type "none" }}
   - path: patches/etcd-backup-schedule.yml
@@ -116,6 +126,12 @@ secretGenerator:
     namespace: kube-system
     files:
       - cloud=secrets/cloud-credentials.config
+{{- end }}
+{{- if eq .spec.distribution.modules.dr.velero.backend "gcs" }}
+  - name: cloud-credentials
+    namespace: kube-system
+    files:
+      - cloud=secrets/cloud-credentials-gcp.json
 {{- end }}
 {{- if eq .spec.distribution.modules.dr.etcdBackup.type "all" "s3" }}
   - name: etcd-backup-s3-rclone-conf

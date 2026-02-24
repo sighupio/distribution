@@ -4,7 +4,7 @@ This documentation describes all Network Policies of the SD components for the O
 
 ## Modules
 - [Auth](modules/auth/README.md) - Pomerium SSO
-- [Ingress](modules/ingress/README.md) - Nginx (single/dual) + Cert-manager
+- [Ingress](modules/ingress/README.md) - Kubernetes Ingress Controller (single/dual) + Cert-manager
 - [Logging](modules/logging/README.md) - OpenSearch/Loki
 - [Monitoring](modules/monitoring/README.md) - Prometheus/Mimir
 - [OPA](modules/opa/README.md) - Gatekeeper/Kyverno

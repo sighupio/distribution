@@ -18,7 +18,7 @@ kind: OnPremises
 metadata:
   name: reevo
 spec:
-  distributionVersion: v1.33.1-non-existent # to be sure we are not patching via furyctl patches
+  distributionVersion: v1.34.0-non-existent # to be sure we are not patching via furyctl patches
   kubernetes:
     pkiFolder: ./pki
     ssh:
@@ -93,6 +93,14 @@ spec:
       ingress:
         baseDomain: ingress.${replace(hcloud_server.haproxy.ipv4_address, ".", "-")}.nip.io
         nginx:
+          type: single
+          tls:
+            provider: secret
+            secret:
+              cert: "{file://tls.crt}"
+              key: "{file://tls.key}"
+              ca: "{file://ca.crt}"
+        haproxy:
           type: single
           tls:
             provider: secret

@@ -7,10 +7,9 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: external-dns-egress-all
-  namespace: ingress-nginx
+  namespace: external-dns
   labels:
     cluster.kfd.sighup.io/module: ingress
-    cluster.kfd.sighup.io/ingress-type: nginx
 spec:
   podSelector:
     matchLabels:
@@ -19,4 +18,3 @@ spec:
   - Egress
   egress:
   - {}
----

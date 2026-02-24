@@ -1,15 +1,29 @@
 # Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
+{{- $infrastructureIngressController := index .spec.distribution.modules.ingress "infrastructureIngressController" -}}
+{{- $isHaproxy := false -}}
+{{- if $infrastructureIngressController -}}
+  {{- $isHaproxy = hasPrefix "haproxy" $infrastructureIngressController -}}
+{{- else if ne .spec.distribution.modules.ingress.nginx.type "none" -}}
+  {{- $isHaproxy = false -}}
+{{- else if ne .spec.distribution.modules.ingress.haproxy.type "none" -}}
+  {{- $isHaproxy = true -}}
+{{- end -}}
+{{- $tlsProvider := .spec.distribution.modules.ingress.nginx.tls.provider -}}
+{{- if $isHaproxy -}}
+  {{- $tlsProvider = .spec.distribution.modules.ingress.haproxy.tls.provider -}}
+{{- end -}}
 {{- if or (ne .spec.distribution.modules.auth.provider.type "none") .spec.distribution.modules.auth.oidcKubernetesAuth.enabled -}}
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  {{- if eq .spec.distribution.modules.ingress.nginx.tls.provider "certManager" }}
   annotations:
+    {{- if eq $tlsProvider "certManager" }}
     {{ template "certManagerClusterIssuer" . }}
-  {{- end }}
+    {{- end }}
+    {{ template "byoicAnnotations" . }}
   name: dex
   namespace: kube-system
 spec:
@@ -42,9 +56,10 @@ metadata:
     forecastle.stakater.com/expose: "true"
     forecastle.stakater.com/appName: "Gangplank - SSO Kubeconfig"
     forecastle.stakater.com/icon: "https://raw.githubusercontent.com/sighupio/distribution/refs/heads/main/docs/assets/black-logo.png"
-  {{- if eq .spec.distribution.modules.ingress.nginx.tls.provider "certManager" }}
+  {{- if eq $tlsProvider "certManager" }}
     {{ template "certManagerClusterIssuer" . }}
   {{- end }}
+    {{ template "byoicAnnotations" . }}
   name: gangplank
   namespace: kube-system
 spec:

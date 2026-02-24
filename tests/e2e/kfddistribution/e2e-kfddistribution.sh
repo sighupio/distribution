@@ -82,6 +82,11 @@ furyctl create cluster --config tests/e2e/kfddistribution/manifests/furyctl-9-mi
 bats -t tests/e2e/kfddistribution/e2e-kfddistribution-9-migrate-from-nginx-to-none.sh
 
 echo "----------------------------------------------------------------------------"
+echo "Executing furyctl with the haproxy migration to none"
+furyctl create cluster --config tests/e2e/kfddistribution/manifests/furyctl-13-migrate-from-haproxy-to-none.yaml --outdir "$PWD" --distro-location ./ --force all --skip-deps-download --disable-analytics
+bats -t tests/e2e/kfddistribution/e2e-kfddistribution-13-migrate-from-haproxy-to-none.sh
+
+echo "----------------------------------------------------------------------------"
 echo "Executing furyctl testing migrations from none (SAFE)"
 furyctl create cluster --config tests/e2e/kfddistribution/manifests/furyctl-10-migrate-from-none-to-safe-values.yaml --outdir "$PWD" --distro-location ./ --skip-deps-download --disable-analytics
 

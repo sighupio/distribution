@@ -19,6 +19,7 @@ metadata:
     forecastle.stakater.com/icon: "https://github.com/stakater/ForecastleIcons/raw/master/alert-manager.png"
     {{ if not .spec.distribution.modules.ingress.overrides.ingresses.forecastle.disableAuth }}{{ template "ingressAuth" . }}{{ end }}
     {{ template "certManagerClusterIssuer" . }}
+    {{ template "byoicAnnotations" . }}
   name: alertmanager
   {{ if and (not .spec.distribution.modules.monitoring.overrides.ingresses.alertmanager.disableAuth) (eq .spec.distribution.modules.auth.provider.type "sso") }}
   namespace: pomerium
@@ -63,6 +64,7 @@ metadata:
     forecastle.stakater.com/icon: "https://github.com/stakater/ForecastleIcons/raw/master/grafana.png"
     {{ if not .spec.distribution.modules.ingress.overrides.ingresses.forecastle.disableAuth }}{{ template "ingressAuth" . }}{{ end }}
     {{ template "certManagerClusterIssuer" . }}
+    {{ template "byoicAnnotations" . }}
   name: grafana
   {{ if and (not .spec.distribution.modules.monitoring.overrides.ingresses.grafana.disableAuth) (eq .spec.distribution.modules.auth.provider.type "sso") }}
   namespace: pomerium
@@ -107,6 +109,7 @@ metadata:
     forecastle.stakater.com/icon: "https://github.com/stakater/ForecastleIcons/raw/master/prometheus.png"
     {{ if not .spec.distribution.modules.ingress.overrides.ingresses.forecastle.disableAuth }}{{ template "ingressAuth" . }}{{ end }}
     {{ template "certManagerClusterIssuer" . }}
+    {{ template "byoicAnnotations" . }}
   name: prometheus
   {{ if and (not .spec.distribution.modules.monitoring.overrides.ingresses.prometheus.disableAuth) (eq .spec.distribution.modules.auth.provider.type "sso") }}
   namespace: pomerium
@@ -154,6 +157,7 @@ metadata:
     forecastle.stakater.com/icon: "https://min.io/resources/img/logo/MINIO_Bird.png"
     {{ if not .spec.distribution.modules.monitoring.overrides.ingresses.minio.disableAuth }}{{ template "ingressAuth" . }}{{ end }}
     {{ template "certManagerClusterIssuer" . }}
+    {{ template "byoicAnnotations" . }}
   {{ if and (not .spec.distribution.modules.monitoring.overrides.ingresses.minio.disableAuth) (eq .spec.distribution.modules.auth.provider.type "sso") }}
   name: minio-monitoring
   namespace: pomerium
@@ -193,6 +197,7 @@ kind: Ingress
 metadata:
   annotations:
     {{ template "certManagerClusterIssuer" . }}
+    {{ template "byoicAnnotations" . }}
   name: grafana-basic-auth
   namespace: monitoring
 spec:

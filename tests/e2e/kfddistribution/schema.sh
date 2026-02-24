@@ -353,3 +353,24 @@ test_schema() {
     test_schema "private" "ekscluster-kfd-v1alpha2" "011-no" expect
     test_schema "public" "ekscluster-kfd-v1alpha2" "011-no" expect
 }
+
+@test "013 - ok" {
+    info
+
+    test_schema "private" "ekscluster-kfd-v1alpha2" "013-ok" expect_ok
+    test_schema "public" "ekscluster-kfd-v1alpha2" "013-ok" expect_ok
+}
+
+@test "013 - no" {
+    info
+
+    expect() {
+        expect_no "${1}"
+
+        assert_error_contains "/spec/distribution/modules/ingress/haproxy/tls" "missing property" || return $?
+        assert_error_contains "/spec/distribution/modules/ingress/haproxy/tls" "'secret'" || return $?
+    }
+
+    test_schema "private" "ekscluster-kfd-v1alpha2" "013-no" expect
+    test_schema "public" "ekscluster-kfd-v1alpha2" "013-no" expect
+}

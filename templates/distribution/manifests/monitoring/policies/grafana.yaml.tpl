@@ -32,7 +32,41 @@ spec:
   - Egress
   - Ingress
 ---
-{{- if ne .spec.distribution.modules.ingress.nginx.type "none" }}
+{{- $nginxType := .spec.distribution.modules.ingress.nginx.type }}
+{{- $haproxyType := .spec.distribution.modules.ingress.haproxy.type }}
+{{- $isSSO := eq .spec.distribution.modules.auth.provider.type "sso" }}
+{{- $isBYOIC := .spec.distribution.modules.ingress.byoic.enabled }}
+
+{{- if $isSSO }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: grafana-ingress-pomerium
+  namespace: monitoring
+  labels:
+    cluster.kfd.sighup.io/module: monitoring
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: grafana
+      app.kubernetes.io/name: grafana
+      app.kubernetes.io/part-of: kube-prometheus
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: pomerium
+          podSelector:
+            matchLabels:
+              app: pomerium
+      ports:
+        - port: 3000
+          protocol: TCP
+{{- else }}
+  {{- if ne $nginxType "none" }}
+---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -49,36 +83,72 @@ spec:
   policyTypes:
     - Ingress
   ingress:
-# single nginx, no sso
-{{if and (eq .spec.distribution.modules.ingress.nginx.type "single") (ne .spec.distribution.modules.auth.provider.type "sso") }}
     - from:
-      - namespaceSelector:
-          matchLabels:
-            kubernetes.io/metadata.name: ingress-nginx
-        podSelector:
-          matchLabels:
-            app: ingress-nginx
-# dual nginx, no sso
-{{ else if and (eq .spec.distribution.modules.ingress.nginx.type "dual") (ne .spec.distribution.modules.auth.provider.type "sso") }}
-    - from:
-      - namespaceSelector:
-          matchLabels:
-            kubernetes.io/metadata.name: ingress-nginx
-        podSelector:
-          matchLabels:
-            app: ingress
-# sso
-{{ else if (eq .spec.distribution.modules.auth.provider.type "sso") }}
-    - from:
-      - namespaceSelector:
-          matchLabels:
-            kubernetes.io/metadata.name: pomerium
-        podSelector:
-          matchLabels:
-            app: pomerium
-{{ end }}
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+          podSelector:
+            matchLabels:
+    {{- if eq $nginxType "dual" }}
+              app: ingress
+    {{- else }}
+              app: ingress-nginx
+    {{- end }}
       ports:
         - port: 3000
           protocol: TCP
+  {{- end }}
+  {{- if ne $haproxyType "none" }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: grafana-ingress-haproxy
+  namespace: monitoring
+  labels:
+    cluster.kfd.sighup.io/module: monitoring
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: grafana
+      app.kubernetes.io/name: grafana
+      app.kubernetes.io/part-of: kube-prometheus
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: ingress-haproxy
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/name: kubernetes-ingress
+            app.kubernetes.io/instance: haproxy-ingress
+      ports:
+        - port: 3000
+          protocol: TCP
+  {{- end }}
+  {{- if $isBYOIC }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: grafana-ingress-byoic
+  namespace: monitoring
+  labels:
+    cluster.kfd.sighup.io/module: monitoring
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: grafana
+      app.kubernetes.io/name: grafana
+      app.kubernetes.io/part-of: kube-prometheus
+  policyTypes:
+    - Ingress
+  ingress:
+    - ports:
+        - port: 3000
+          protocol: TCP
+  {{- end }}
 {{- end }}
 ---

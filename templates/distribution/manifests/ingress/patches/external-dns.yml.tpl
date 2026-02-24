@@ -2,8 +2,13 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
+{{- $haproxyType := .spec.distribution.modules.ingress.haproxy.type }}
+
+{{- $isDual := or (eq .spec.distribution.modules.ingress.nginx.type "dual") (eq $haproxyType "dual") }}
+{{- $isSingle := and (not $isDual) (or (eq .spec.distribution.modules.ingress.nginx.type "single") (eq $haproxyType "single")) }}
+
 {{- if eq .spec.distribution.common.provider.type "eks" }}
-{{- if eq .spec.distribution.modules.ingress.nginx.type "dual" }}
+{{- if $isDual }}
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -11,13 +16,13 @@ metadata:
   annotations:
     eks.amazonaws.com/role-arn: {{ .spec.distribution.modules.ingress.externalDns.publicIamRoleArn }}
   name: external-dns-public
-  namespace: ingress-nginx
+  namespace: external-dns
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: external-dns-public
-  namespace: ingress-nginx
+  namespace: external-dns
 spec:
   template:
     spec:
@@ -40,13 +45,13 @@ metadata:
   annotations:
     eks.amazonaws.com/role-arn: {{ .spec.distribution.modules.ingress.externalDns.privateIamRoleArn }}
   name: external-dns-private
-  namespace: ingress-nginx
+  namespace: external-dns
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: external-dns-private
-  namespace: ingress-nginx
+  namespace: external-dns
 spec:
   template:
     spec:
@@ -61,9 +66,7 @@ spec:
           - --provider=$(PROVIDER)
           - --aws-zone-type=private
           - --txt-owner-id={{ .metadata.name}}-private
-
-{{- end }}
-{{- if eq .spec.distribution.modules.ingress.nginx.type "single" }}
+{{- else if $isSingle }}
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -71,13 +74,13 @@ metadata:
   annotations:
     eks.amazonaws.com/role-arn: {{ .spec.distribution.modules.ingress.externalDns.publicIamRoleArn }}
   name: external-dns-public
-  namespace: ingress-nginx
+  namespace: external-dns
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: external-dns-public
-  namespace: ingress-nginx
+  namespace: external-dns
 spec:
   template:
     spec:

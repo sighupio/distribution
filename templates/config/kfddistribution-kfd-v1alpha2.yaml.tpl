@@ -39,24 +39,30 @@ spec:
         type: none
       # This section contains all the configurations for the ingress module
       ingress:
-        # the base domain used for all the KFD ingresses, if in the nginx dual configuration, it should be the same as the .spec.distribution.modules.ingress.dns.private.name zone
+        # the base domain used for all the KFD ingresses, if in the HAProxy dual configuration, it should be the same as the .spec.distribution.modules.ingress.dns.private.name zone
         baseDomain: internal.example.dev
-        # configurations for the nginx ingress controller package
-        nginx:
-          # type defines if the nginx should be configured as single or dual (internal + external) or none, with none no ingress controller will be deployed and also no ingress resource will be created
+        # configurations for the haproxy ingress controller package
+        haproxy:
+          # type defines if haproxy should be configured as single or dual (internal + external) or none
           type: dual
           # the tls section defines how the tls for the ingresses should be managed
           tls:
-            # provider can be certManager, secret
+            # provider can be certManager, secret, or none
             provider: certManager
             # if provider is set as secret, this key will be used to create the certificate in the cluster
             # secret:
-              # the certificate file content or you can use the file notation to get the content from a file
-              # cert: "{file://relative/path/to/ssl.crt}"
-              # the key file, a file notation can be used to get the content from a file
-              # key: "{file://relative/path/to/ssl.key}"
-              # the ca file, a file notation can be used to get the content from a file
-              # ca: "{file://relative/path/to/ssl.ca}"
+            #   # the certificate file content or you can use the file notation to get the content from a file
+            #   cert: "{file://relative/path/to/ssl.crt}"
+            #   # the key file, a file notation can be used to get the content from a file
+            #   key: "{file://relative/path/to/ssl.key}"
+            #   # the ca file, a file notation can be used to get the content from a file
+            #   ca: "{file://relative/path/to/ssl.ca}"
+        # Bring Your Own Ingress Controller (BYOIC) used when you want to use an external ingress controller
+        # byoic:
+        #   # enable BYOIC mode
+        #   enabled: false
+        #   # the ingressClass to use for infrastructure ingresses when BYOIC is enabled
+        #   ingressClass: ""
         # configuration for the cert-manager package
         certManager:
           # the configuration for the clusterIssuer that will be created
@@ -71,7 +77,7 @@ spec:
             # solvers:
             #   - http01:
             #       ingress:
-            #         class: nginx
+            #         class: haproxy
       # This section contains all the configurations for the logging module
       logging:
         # can be opensearch, loki, customOutput or none. With none, the logging module won't be installed
@@ -116,7 +122,7 @@ spec:
         provider:
           # The authentication type used for the infrastructure ingresses (all the ingress for the distribution) can be none, basicAuth, sso
           type: none
-        # The base domain used for all the auth ingresses, if in the nginx dual configuration, it should be the same as the .spec.distribution.modules.ingress.dns.public.name zone
+        # The base domain used for all the auth ingresses, if in the HAProxy dual configuration, it should be the same as the .spec.distribution.modules.ingress.dns.public.name zone
         baseDomain: example.dev
     # Custom Patches to add or override fields in the generated manifests
     #customPatches: {}

@@ -6,6 +6,20 @@
   gather_facts: false
 
   tasks:
+    - name: Disable unattended-upgrades to prevent unexpected SSH disruptions
+      ansible.builtin.service:
+        name: unattended-upgrades
+        state: stopped
+        enabled: false
+      ignore_errors: yes
+
+    - name: Configure needrestart to list-only mode to prevent SSH restarts during apt
+      ansible.builtin.replace:
+        path: /etc/needrestart/needrestart.conf
+        regexp: '^#?\$nrconf\{restart\}.*'
+        replace: "$nrconf{restart} = 'l';"
+      ignore_errors: yes
+
     - name: Install required packages using package module
       apt:
         name:
@@ -13,7 +27,7 @@
           - open-iscsi
           - cryptsetup
         state: present
-        update_cache: yes #
+        update_cache: yes
 
     - name: Load dm_crypt module
       command: modprobe dm_crypt
