@@ -1122,45 +1122,45 @@ steps: # e2e-kfddistribution-1.33.1-to-1.34.0
 #         - success
 #         - failure
 
-# ---
-# kind: pipeline
-# type: docker
-# name: scheduled-aws-nuke
+---
+kind: pipeline
+type: docker
+name: scheduled-aws-nuke
 
-# trigger:
-#   cron:
-#     - "scheduled-aws-nuke"
+trigger:
+  cron:
+    - "scheduled-aws-nuke"
 
-# clone:
-#   depth: 1
+clone:
+  depth: 1
 
-# steps: # scheduled-aws-nuke
-#   - name: run-aws-nuke
-#     image: amazon/aws-cli:latest
-#     environment:
-#       AWS_ACCESS_KEY_ID:
-#         from_secret: aws_access_key_id
-#       AWS_SECRET_ACCESS_KEY:
-#         from_secret: aws_secret_access_key
-#       AWS_DEFAULT_REGION: eu-west-1
-#       ACCOUNT_ID_PROD:
-#         from_secret: aws_account_id_prod
-#       AWS_NUKE_VERSION: "v3.51.1"
-#     commands:
-#       # Install required tools
-#       - yum update -y
-#       - yum install -y wget tar gzip jq
-#       # Install AWS Nuke
-#       - wget https://github.com/ekristen/aws-nuke/releases/download/$${AWS_NUKE_VERSION}/aws-nuke-$${AWS_NUKE_VERSION}-linux-amd64.tar.gz
-#       - tar -xvf aws-nuke-$${AWS_NUKE_VERSION}-linux-amd64.tar.gz
-#       - mv aws-nuke /usr/local/bin/aws-nuke
-#       - chmod +x /usr/local/bin/aws-nuke
-#       - export ACCOUNT_ID=$(aws sts get-caller-identity | jq -r ".Account")
-#       - sed "s/ACCOUNT_ID_PLACEHOLDER/$ACCOUNT_ID/" tests/e2e/ekscluster/awsnuke/config.yml > ./aws-nuke-config.yml
-#       - sed -i "s/ACCOUNT_ID_PROD_PLACEHOLDER/$ACCOUNT_ID_PROD/" ./aws-nuke-config.yml
-#       # Run AWS Nuke
-#       - aws-nuke nuke -c ./aws-nuke-config.yml --force --no-dry-run
-#       - aws s3 rm s3://e2e-drone-eks --recursive
+steps: # scheduled-aws-nuke
+  - name: run-aws-nuke
+    image: amazon/aws-cli:latest
+    environment:
+      AWS_ACCESS_KEY_ID:
+        from_secret: aws_access_key_id
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: aws_secret_access_key
+      AWS_DEFAULT_REGION: eu-west-1
+      ACCOUNT_ID_PROD:
+        from_secret: aws_account_id_prod
+      AWS_NUKE_VERSION: "v3.51.1"
+    commands:
+      # Install required tools
+      - yum update -y
+      - yum install -y wget tar gzip jq
+      # Install AWS Nuke
+      - wget https://github.com/ekristen/aws-nuke/releases/download/$${AWS_NUKE_VERSION}/aws-nuke-$${AWS_NUKE_VERSION}-linux-amd64.tar.gz
+      - tar -xvf aws-nuke-$${AWS_NUKE_VERSION}-linux-amd64.tar.gz
+      - mv aws-nuke /usr/local/bin/aws-nuke
+      - chmod +x /usr/local/bin/aws-nuke
+      - export ACCOUNT_ID=$(aws sts get-caller-identity | jq -r ".Account")
+      - sed "s/ACCOUNT_ID_PLACEHOLDER/$ACCOUNT_ID/" tests/e2e/ekscluster/awsnuke/config.yml > ./aws-nuke-config.yml
+      - sed -i "s/ACCOUNT_ID_PROD_PLACEHOLDER/$ACCOUNT_ID_PROD/" ./aws-nuke-config.yml
+      # Run AWS Nuke
+      - aws-nuke nuke -c ./aws-nuke-config.yml --force --no-dry-run
+      - aws s3 rm s3://e2e-drone-eks --recursive
 
 ---
 name: release
