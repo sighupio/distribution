@@ -3,6 +3,7 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
+
 # This is a sample configuration file to be used as a starting point. For the
 # complete reference of the configuration file schema, please refer to the
 # official documentation:
@@ -30,14 +31,13 @@ spec:
     ipxeServer:
       url: https://ipxe.example.com:8080
 
-    # Load balancers (HAProxy) with Keepalived for VIP HA
+    # Load balancers using HAProxy with Keepalived for VIP in HA
     loadBalancers:
       enabled: true
+      # Members defines the nodes that will be part of the load balancer pool.
       members:
         - hostname: haproxy1.example.com
-          ip: 192.168.1.200
         - hostname: haproxy2.example.com
-          ip: 192.168.1.202
       keepalived:
         enabled: true
         interface: eth0
@@ -221,30 +221,22 @@ spec:
 
   # Kubernetes cluster configuration
   kubernetes:
-    # Kubernetes version (matches immutable.yaml)
-    version: "1.33.4"
-
     # Control plane configuration (3 masters for HA)
     # The address points to the load balancer VIP for HA
     controlPlane:
-      address: 192.168.1.201:6443
+      address: api.example.com:6443
       members:
         - hostname: master1.example.com
-          ip: 192.168.1.10
         - hostname: master2.example.com
-          ip: 192.168.1.11
         - hostname: master3.example.com
-          ip: 192.168.1.12
 
     # etcd configuration (stacked on control plane)
+    # If etcd members are set, they will be used instead of the control plane members for etcd configuration. This allows for external etcd clusters or different topologies.
     etcd:
       members:
-        - hostname: master1.example.com
-          ip: 192.168.1.10
-        - hostname: master2.example.com
-          ip: 192.168.1.11
-        - hostname: master3.example.com
-          ip: 192.168.1.12
+        - hostname: etcd1.example.com
+        - hostname: etcd2.example.com
+        - hostname: etcd3.example.com
 
     # Worker nodes organized in node groups
     nodeGroups:
@@ -286,11 +278,11 @@ spec:
 
     modules:
       networking:
-        type: calico
+        type: cilium
 
       ingress:
         baseDomain: example.com
-        nginx:
+        haproxy:
           type: single
         certManager:
           clusterIssuer:

@@ -66,21 +66,12 @@ kubernetes:
   - path: .spec.kubernetes.controlPlane.members.*
     immutable: true
     description: "Control plane member configuration cannot be changed after cluster creation"
-
-  - path: .spec.kubernetes.version
-    immutable: false
-    description: "Kubernetes version can be upgraded following supported upgrade paths"
-    safe:
-      - from: "1.33.1"
-        to: "1.33.4"
-      - from: "1.33.4"
-        to: "1.34.0"
-    reducers:
-      - key: kubernetesVersionUpgrade
-        lifecycle: pre-apply
+  # kubeProxy can be disabled and reenabled in a live cluster, but requires manual intervention
+  # to reconfigure the kube-proxy DaemonSet. We could automate this in the future.
+  - path: .spec.kubernetes.advanced.kubeProxy.enabled
+    immutable: true
 
 distribution:
-  # Distribution module configuration - follows same patterns as other providers
   - path: .spec.distribution.common.networkPoliciesEnabled
     immutable: false
     description: "changes to the network policies have been detected. This will cause the reconfiguration or deletion of the current network policies."
@@ -89,7 +80,6 @@ distribution:
     reducers:
       - key: distributionCommonNetworkPoliciesEnabled
         lifecycle: pre-apply
-
   - path: .spec.distribution.modules.networking.type
     immutable: true
     description: "Networking module type cannot be changed after cluster creation"
@@ -110,7 +100,6 @@ distribution:
     reducers:
       - key: distributionModulesLoggingType
         lifecycle: pre-apply
-
   - path: .spec.distribution.modules.logging.loki.tsdbStartDate
     immutable: true
     description: "changes to Loki's TSDB start date have been detected. This parameter cannot be changed once set."
@@ -124,7 +113,10 @@ distribution:
             from: "opensearch"
           - path: ".spec.distribution.modules.logging.type"
             to: "opensearch"
-
+    unsupported:
+      - to: opensearch
+        from: loki
+        reason: "currently, switching Logging from loki to opensearch is not supported. You need to first remove the current stack with type: none."
   - path: .spec.distribution.modules.monitoring.alertmanager.installDefaultRules
     immutable: false
     description: "changes to the monitoring alertmanager configs have been detected. This will cause the reconfiguration, creation or deletion of the default alertmanager configs."
@@ -134,7 +126,6 @@ distribution:
     reducers:
       - key: distributionModulesMonitoringAlertmanagerInstalldefaultrules
         lifecycle: pre-apply
-
   - path: .spec.distribution.modules.policy.type
     immutable: false
     description: "changes to the policy module type have been detected. This will cause the reconfiguration or deletion of the current policy stack."
@@ -147,39 +138,122 @@ distribution:
       - to: kyverno
         from: gatekeeper
         reason: "currently, switching from gatekeeper to kyverno is not supported. You need to first remove the current stack with type: none."
-
+    reducers:
+      - key: distributionModulesPolicyType
+        lifecycle: pre-apply
+  - path: .spec.distribution.modules.policy.gatekeeper.installDefaultPolicies
+    immutable: false
+    description: "changes to Gatekeeper default policies option in the policy module have been detected. This will cause the installation or deletion of the default policies."
+    safe:
+      - from: false
+      - from: true
+    reducers:
+      - key: distributionModulesPolicyGatekeeperInstallDefaultPolicies
+        lifecycle: pre-apply
+  - path: .spec.distribution.modules.policy.kyverno.installDefaultPolicies
+    immutable: false
+    description: "changes to Kyverno default policies option in the policy module have been detected. This will cause the installation or deletion of the default policies."
+    safe:
+      - from: false
+      - from: true
+    reducers:
+      - key: distributionModulesPolicyKyvernoInstallDefaultPolicies
+        lifecycle: pre-apply
   - path: .spec.distribution.modules.tracing.type
     immutable: false
-    description: "changes to the tracing module type have been detected. This will cause the reconfiguration or deletion of the current tracing stack."
+    description: "changes to the tracing module type have been detected. This will cause the replacement of the current tracing stack (removal or creation)."
     safe:
       - from: none
     reducers:
       - key: distributionModulesTracingType
         lifecycle: pre-apply
-
+  - path: .spec.distribution.modules.tracing.tempo.backend
+    immutable: false
+    description: "changes to the tempo backend have been detected. This will cause the reconfiguration of tempo and the deletion of the current minio storage, if minio was disabled"
+    reducers:
+      - key: distributionModulesTracingTempoBackend
+        lifecycle: pre-apply
   - path: .spec.distribution.modules.dr.type
     immutable: false
-    description: "changes to the disaster recovery module type have been detected. This will cause the reconfiguration or deletion of the current DR stack."
+    description: "changes to the Disaster Recovery module type have been detected. This will cause the replacement of the current DR (velero) stack (removal or creation)."
     safe:
       - from: none
     reducers:
-      - key: distributionModulesDrType
+      - key: distributionModulesDRType
         lifecycle: pre-apply
-
-  - path: .spec.distribution.modules.ingress.nginx.type
+  - path: .spec.distribution.modules.dr.velero.backend
     immutable: false
-    description: "changes to the ingress nginx type have been detected. This will cause the reconfiguration or deletion of the current ingress stack."
+    description: "changes to the velero backend have been detected. This will cause the reconfiguration of velero and the deletion of the current minio storage, if minio was disabled"
+    reducers:
+      - key: distributionModulesDRVeleroBackend
+        lifecycle: pre-apply
+  - path: .spec.distribution.modules.monitoring.type
+    immutable: false
+    description: "changes to the Monitoring module type have been detected. This will cause the reconfiguration or deletion of the current monitoring stack."
     safe:
       - from: none
+      - from: prometheus
+        to: mimir
+      - from: prometheusAgent
+    reducers:
+      - key: distributionModulesMonitoringType
+        lifecycle: pre-apply
+    unsupported:
+      - from: mimir
+        to: prometheus
+        reason: "switching from Mimir to Prometheus is not currently supported. You need to first remove the current stack with type: none."
+      - from: mimir
+        to: prometheusAgent
+        reason: "switching from Mimir to Prometheus Agent is not currently supported. You need to first remove the current stack with type: none."
+  - path: .spec.distribution.modules.monitoring.mimir.backend
+    immutable: false
+    description: "changes to the mimir backend have been detected. This will cause the reconfiguration of mimir and the deletion of the current minio storage, if minio was disabled"
+    reducers:
+      - key: distributionModulesMonitoringMimirBackend
+        lifecycle: pre-apply
+  - path: .spec.distribution.modules.ingress.nginx.type
+    immutable: false
+    description: "changes to the nginx type in the Ingress module have been detected. This will cause the reconfiguration or deletion of the current ingress stack."
+    safe:
+      - from: none
+    unsupported:
+      - to: single
+        from: dual
+        reason: "currently, switching Ingress from dual to single nginx is not supported. You need to first remove the current stack with type: none."
+      - to: dual
+        from: single
+        reason: "currently, switching Ingress from single to dual nginx is not supported. You need to first remove the current stack with type: none."
     reducers:
       - key: distributionModulesIngressNginxType
         lifecycle: pre-apply
-
+  - path: .spec.distribution.modules.ingress.haproxy.type
+    immutable: false
+    description: "changes to the HAProxy type in the Ingress module have been detected. This will cause the reconfiguration or deletion of the current HAProxy ingress stack."
+    safe:
+      - from: none
+    unsupported:
+      - to: single
+        from: dual
+        reason: "currently, switching Ingress from dual to single HAProxy is not supported. You need to first remove the current stack with type: none."
+      - to: dual
+        from: single
+        reason: "currently, switching Ingress from single to dual HAProxy is not supported. You need to first remove the current stack with type: none."
+    reducers:
+      - key: distributionModulesIngressHAProxyType
+        lifecycle: pre-apply
   - path: .spec.distribution.modules.auth.provider.type
     immutable: false
-    description: "changes to the auth provider type have been detected. This will cause the reconfiguration or deletion of the current auth stack."
+    description: "changes to the auth provider type will trigger the reconfiguration of the security on the infrastructural ingresses"
     safe:
       - from: none
     reducers:
       - key: distributionModulesAuthProviderType
+        lifecycle: pre-apply
+  - path: .spec.distribution.modules.monitoring.grafana.basicAuthIngress
+    immutable: false
+    description: "Changes to the grafana basic auth ingress have been detected. This will cause the creation or deletion of the ingress."
+    safe:
+      - from: none
+    reducers:
+      - key: distributionModulesMonitoringGrafanaBasicAuthIngress
         lifecycle: pre-apply

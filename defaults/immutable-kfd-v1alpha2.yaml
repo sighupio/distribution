@@ -16,17 +16,6 @@ data:
     provider:
       type: immutable
     networkPoliciesEnabled: false
-
-  # Immutable-specific infrastructure defaults
-  infrastructure:
-    flatcarVersion: "4206.0.0"
-    installDisk: "/dev/sda"
-    ssh:
-      username: "core"
-      # keyPath is required and must come from user spec
-    # ipxeServer.url is required and must come from user spec
-    # nodes is required and must come from user spec
-
   # the module section will be used to fine tune each module behaviour and configuration
   modules:
     # ingress module configuration
@@ -59,7 +48,7 @@ data:
       # common configuration for nginx ingress controller
       nginx:
         # can be single or dual
-        type: single
+        type: none
         tls:
           # can be certManager, secret or none
           provider: certManager # it uses the configuration below as default when certManager is chosen
@@ -70,6 +59,26 @@ data:
               value
             ca: |
               value
+      # configuration for HAProxy ingress controller
+      haproxy:
+        # can be none, single or dual. Default is none.
+        type: single
+        tls:
+          # can be certManager, secret or none
+          provider: certManager
+          secret:
+            cert: |
+              value
+            key: |
+              value
+            ca: |
+              value
+      # configuration for Bring Your Own Ingress Controller mode
+      byoic:
+        # enable BYOIC mode. Default is false.
+        enabled: false
+        # the IngressClass to use for infrastructure ingresses when both nginx and haproxy are disabled
+        ingressClass: ""
       # the standard configuration for cert-manager on the ingress module
       certManager:
         # to create the clusterIssuer, this is an additional clusterIssuer than the two provided by cert-manager, for simplicity
@@ -250,7 +259,6 @@ data:
       overrides:
         nodeSelector: null
         tolerations: null
-      # etcdBackup configuration for bare-metal clusters
       etcdBackup:
         type: "none"
         pvc:
@@ -305,7 +313,7 @@ data:
           dex:
             host: ""
             ingressClass: ""
-          gangplank: # only needed as default
+          gangplank:
             host: ""
             ingressClass: ""
         tolerations: null
@@ -332,8 +340,8 @@ data:
         expiry:
           signingKeys: "6h"
           idTokens: "24h"
-      oidcTrustedCA: "" # only needed as default
-      oidcKubernetesAuth: # only needed as default
+      oidcTrustedCA: ""
+      oidcKubernetesAuth:
         enabled: false
       baseDomain: ""
 
