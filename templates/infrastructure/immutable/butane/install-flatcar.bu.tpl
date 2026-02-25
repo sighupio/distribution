@@ -62,7 +62,7 @@ systemd:
 
         [Service]
         Type=oneshot
-        ExecStart=/usr/bin/flatcar-install -d {{ .installDisk }} -i /opt/ignition/config.ign
+        ExecStart=/usr/bin/flatcar-install -d {{ .installDisk }} -i /opt/ignition/config.ign -b {{ .ipxeServerURL }}/assets/flatcar/{{ .arch }}
         ExecStartPost=/usr/bin/systemctl --no-block reboot
         RemainAfterExit=yes
 
