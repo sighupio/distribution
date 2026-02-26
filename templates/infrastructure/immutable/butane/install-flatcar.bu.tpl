@@ -28,11 +28,12 @@ storage:
       overwrite: true
       contents:
         inline: |
-           ╭───────────────────────────────────────────────────────────────────╮
-           │                                                                   │
-           │  FLATCAR WILL BE INSTALLED TO DISK AND THEN REBOOTED PLEASE WAIT  │
-           │                                                                   │
-           ╰───────────────────────────────────────────────────────────────────╯
+           ╭───────────────────────────────────────────────────────╮
+           │                                                       │
+           │                      PLEASE WAIT                      │
+           │  FLATCAR WILL BE INSTALLED TO DISK AND THEN REBOOTED  │
+           │                                                       │
+           ╰───────────────────────────────────────────────────────╯
 
 systemd:
   units:
