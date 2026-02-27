@@ -7,7 +7,7 @@
 # This is a sample configuration file to be used as a starting point. For the
 # complete reference of the configuration file schema, please refer to the
 # official documentation:
-# https://docs.kubernetesfury.com/docs/installation/sd-configuration/providers/OnPremises
+# https://docs.sighup.io/docs/installation/sd-configuration/providers/OnPremises
 
 ---
 apiVersion: kfd.sighup.io/v1alpha2
