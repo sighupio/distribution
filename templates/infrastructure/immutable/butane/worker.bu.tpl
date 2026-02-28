@@ -34,17 +34,12 @@ storage:
 
 systemd:
   units:
-    # Enable sysupdate timer to check for updates and trigger them if needed
-    - name: systemd-sysupdate.timer
-      enabled: true
-    # Disable Flatcar native reboot coordination as KureD will handle OS updates, too
+    # Disable all automatic updates - sysext and OS updates are manual-only in production
+{{ template "disable-sysext-updates" . }}
+{{ template "disable-os-updates" . }}
+    # Disable Flatcar native reboot coordination
     - name: locksmithd.service
       mask: true
-    # Sysupdate drop-ins for our custom sysexts, to trigger updates when new versions are available and reboot if needed
-    - name: systemd-sysupdate.service
-      dropins:
-{{ template "containerd-sysext-sysupdate-dropin" . }}
-{{ template "kubernetes-sysext-sysupdate-dropin" . }}
     # Other needed units
 {{ template "containerd-unit-generate-config" . }}
 {{ template "statusReporterBooted" . }}
