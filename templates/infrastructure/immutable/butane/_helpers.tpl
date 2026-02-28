@@ -111,16 +111,6 @@ passwd:
       hard: false
 {{- end }}
 
-{{- define "containerd-sysext-sysupdate-dropin" }}
-        - name: containerd.conf
-          contents: |
-            [Service]
-            ExecStartPre=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/containerd.raw > /tmp/containerd"
-            ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C containerd update
-            ExecStartPost=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/containerd.raw > /tmp/containerd-new"
-            ExecStartPost=/usr/bin/sh -c "if ! cmp --silent /tmp/containerd /tmp/containerd-new; then touch /run/reboot-required; fi"
-{{- end }}
-
 {{- define "containerd-unit-generate-config"}}
     - name: containerd.service
       dropins:
@@ -160,16 +150,6 @@ passwd:
     - path: /etc/extensions/keepalived.raw
       target: /opt/extensions/keepalived/keepalived-{{ .sysext.keepalived.version }}-{{ .node.arch }}.raw
       hard: false
-{{- end }}
-
-{{- define "keepalived-sysext-sysupdate-dropin" }}
-        - name: keepalived.conf
-          contents: |
-            [Service]
-            ExecStartPre=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/keepalived.raw > /tmp/keepalived"
-            ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C keepalived update
-            ExecStartPost=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/keepalived.raw > /tmp/keepalived-new"
-            ExecStartPost=/usr/bin/sh -c "if ! cmp --silent /tmp/keepalived /tmp/keepalived-new; then touch /run/reboot-required; fi"
 {{- end }}
 
 {{- define "keepalived-unit-fix-binary-path"}}
@@ -218,16 +198,6 @@ passwd:
       hard: false
 {{- end }}
 
-{{- define "kubernetes-sysext-sysupdate-dropin" }}
-        - name: kubernetes.conf
-          contents: |
-            [Service]
-            ExecStartPre=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/kubernetes.raw > /tmp/kubernetes"
-            ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C kubernetes update
-            ExecStartPost=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/kubernetes.raw > /tmp/kubernetes-new"
-            ExecStartPost=/usr/bin/sh -c "if ! cmp --silent /tmp/kubernetes /tmp/kubernetes-new; then touch /run/reboot-required; fi"
-{{- end }}
-
 {{- define "etcd-sysext-files" }}
     # etcd sysext download and sysupdate configuration
     - path: /opt/extensions/etcd/etcd-{{ .sysext.etcd.version }}-{{ .node.arch }}.raw
@@ -259,14 +229,21 @@ passwd:
       hard: false
 {{- end }}
 
-{{- define "etcd-sysext-sysupdate-dropin" }}
-        - name: etcd.conf
-          contents: |
-            [Service]
-            ExecStartPre=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/etcd.raw > /tmp/etcd"
-            ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C etcd update
-            ExecStartPost=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/etcd.raw > /tmp/etcd-new"
-            ExecStartPost=/usr/bin/sh -c "if ! cmp --silent /tmp/etcd /tmp/etcd-new; then touch /run/reboot-required; fi"
+{{- define "disable-sysext-updates" }}
+    # Disable sysext automatic updates - all sysext updates are manual-only in production
+    - name: systemd-sysupdate.timer
+      enabled: false
+      mask: true
+    - name: systemd-sysupdate.service
+      enabled: false
+      mask: true
+{{- end }}
+
+{{- define "disable-os-updates" }}
+    # Disable Flatcar OS automatic update checks and downloads - updates are manual-only
+    - name: update-engine.service
+      enabled: false
+      mask: true
 {{- end }}
 
 {{- define "disable-flatcar-containerd-docker" }}
