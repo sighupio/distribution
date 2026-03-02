@@ -251,7 +251,36 @@
         "required": [
           "members"
         ]
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "keepalived"
+            ],
+            "properties": {
+              "keepalived": {
+                "type": "object",
+                "required": [
+                  "enabled"
+                ],
+                "properties": {
+                  "enabled": {
+                    "const": true
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "members": {
+                "minItems": 2
+              }
+            }
+          }
+        }
+      ]
     },
     "Spec.Infrastructure.Node": {
       "type": "object",
@@ -1256,6 +1285,35 @@
       "required": [
         "address",
         "members"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "keepalived"
+            ],
+            "properties": {
+              "keepalived": {
+                "type": "object",
+                "required": [
+                  "enabled"
+                ],
+                "properties": {
+                  "enabled": {
+                    "const": true
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "members": {
+                "minItems": 2
+              }
+            }
+          }
+        }
       ]
     },
     "Spec.Kubernetes.Etcd": {
