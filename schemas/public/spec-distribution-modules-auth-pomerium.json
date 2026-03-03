@@ -31,7 +31,7 @@
   "$defs": {
     "Spec.Distribution.Modules.Auth.Pomerium.DefaultRoutesPolicy": {
       "type": "object",
-      "description": "override default routes for KFD components",
+      "description": "override default routes for SD components",
       "additionalProperties": false,
       "properties": {
         "monitoringPrometheus": {

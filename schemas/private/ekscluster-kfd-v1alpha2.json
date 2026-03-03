@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "description": "A KFD Cluster deployed on top of AWS's Elastic Kubernetes Service (EKS).",
+  "description": "A SD Cluster deployed on top of AWS's Elastic Kubernetes Service (EKS).",
   "type": "object",
   "properties": {
     "apiVersion": {
@@ -52,7 +52,7 @@
       "properties": {
         "distributionVersion": {
           "type": "string",
-          "description": "Defines which KFD version will be installed and, in consequence, the Kubernetes version used to create the cluster. It supports git tags and branches. Example: `v1.30.1`.",
+          "description": "Defines which SD version will be installed and, in consequence, the Kubernetes version used to create the cluster. It supports git tags and branches. Example: `v1.30.1`.",
           "minLength": 1
         },
         "region": {
@@ -1237,14 +1237,14 @@
       "properties": {
         "nodeSelector": {
           "$ref": "#/$defs/Types.KubeNodeSelector",
-          "description": "The node selector to use to place the pods for all the KFD modules. Follows Kubernetes selector format. Example: `node.kubernetes.io/role: infra`."
+          "description": "The node selector to use to place the pods for all the SD modules. Follows Kubernetes selector format. Example: `node.kubernetes.io/role: infra`."
         },
         "tolerations": {
           "type": "array",
           "items": {
             "$ref": "#/$defs/Types.KubeToleration"
           },
-          "description": "An array with the tolerations that will be added to the pods for all the KFD modules. Follows Kubernetes tolerations format. Example:\n\n```yaml\n- effect: NoSchedule\n  key: node.kubernetes.io/role\n  value: infra\n```"
+          "description": "An array with the tolerations that will be added to the pods for all the SD modules. Follows Kubernetes tolerations format. Example:\n\n```yaml\n- effect: NoSchedule\n  key: node.kubernetes.io/role\n  value: infra\n```"
         },
         "provider": {
           "$ref": "#/$defs/Spec.Distribution.Common.Provider"
@@ -1656,7 +1656,7 @@
         },
         "baseDomain": {
           "type": "string",
-          "description": "The base domain used for all the KFD infrastructural ingresses. If in the nginx `dual` configuration type, this value should be the same as the `.spec.distribution.modules.ingress.dns.private.name` zone."
+          "description": "The base domain used for all the SD infrastructural ingresses. If in the nginx `dual` configuration type, this value should be the same as the `.spec.distribution.modules.ingress.dns.private.name` zone."
         },
         "nginx": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.Nginx",
@@ -1988,7 +1988,7 @@
             "single",
             "dual"
           ],
-          "description": "The type of the Ingress nginx controller, options are:\n- `none`: no ingress controller will be installed and no infrastructural ingresses will be created.\n- `single`: a single ingress controller with ingress class `nginx` will be installed to manage all the ingress resources, infrastructural ingresses will be created.\n- `dual`: two independent ingress controllers will be installed, one for the `internal` ingress class intended for private ingresses and one for the `external` ingress class intended for public ingresses. KFD infrastructural ingresses wil use the `internal` ingress class when using the dual type.\n\nDefault is `single`."
+          "description": "The type of the Ingress nginx controller, options are:\n- `none`: no ingress controller will be installed and no infrastructural ingresses will be created.\n- `single`: a single ingress controller with ingress class `nginx` will be installed to manage all the ingress resources, infrastructural ingresses will be created.\n- `dual`: two independent ingress controllers will be installed, one for the `internal` ingress class intended for private ingresses and one for the `external` ingress class intended for public ingresses. SD infrastructural ingresses wil use the `internal` ingress class when using the dual type.\n\nDefault is `single`."
         },
         "tls": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.Nginx.TLS",

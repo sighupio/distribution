@@ -22,7 +22,7 @@ furyctl create config --kind EKSCluster --version v1.29.4 --name example-cluster
 
 ### Description
 
-A KFD Cluster deployed on top of AWS's Elastic Kubernetes Service (EKS).
+A SD Cluster deployed on top of AWS's Elastic Kubernetes Service (EKS).
 
 ## .apiVersion
 
@@ -117,7 +117,7 @@ Common configuration for all the distribution modules.
 
 ### Description
 
-The node selector to use to place the pods for all the KFD modules. Follows Kubernetes selector format. Example: `node.kubernetes.io/role: infra`.
+The node selector to use to place the pods for all the SD modules. Follows Kubernetes selector format. Example: `node.kubernetes.io/role: infra`.
 
 ## .spec.distribution.common.provider
 
@@ -160,7 +160,7 @@ The relative path to the vendor directory, does not need to be changed.
 
 ### Description
 
-An array with the tolerations that will be added to the pods for all the KFD modules. Follows Kubernetes tolerations format. Example:
+An array with the tolerations that will be added to the pods for all the SD modules. Follows Kubernetes tolerations format. Example:
 
 ```yaml
 - effect: NoSchedule
@@ -804,7 +804,7 @@ Configuration for Pomerium, an identity-aware reverse proxy used for SSO.
 
 ### Description
 
-override default routes for KFD components
+override default routes for SD components
 
 ## .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.gatekeeperPolicyManager
 
@@ -1794,7 +1794,7 @@ Whether to install or not the default `manifests` and `full` backups schedules. 
 
 ### Description
 
-The base domain used for all the KFD infrastructural ingresses. If in the nginx `dual` configuration type, this value should be the same as the `.spec.distribution.modules.ingress.dns.private.name` zone.
+The base domain used for all the SD infrastructural ingresses. If in the nginx `dual` configuration type, this value should be the same as the `.spec.distribution.modules.ingress.dns.private.name` zone.
 
 ## .spec.distribution.modules.ingress.byoic
 
@@ -2466,7 +2466,7 @@ The signing key file's content. You can use the `"{file://<path>}"` notation to 
 The type of the Ingress nginx controller, options are:
 - `none`: no ingress controller will be installed and no infrastructural ingresses will be created.
 - `single`: a single ingress controller with ingress class `nginx` will be installed to manage all the ingress resources, infrastructural ingresses will be created.
-- `dual`: two independent ingress controllers will be installed, one for the `internal` ingress class intended for private ingresses and one for the `external` ingress class intended for public ingresses. KFD infrastructural ingresses wil use the `internal` ingress class when using the dual type.
+- `dual`: two independent ingress controllers will be installed, one for the `internal` ingress class intended for private ingresses and one for the `external` ingress class intended for public ingresses. SD infrastructural ingresses wil use the `internal` ingress class when using the dual type.
 
 Default is `single`.
 
@@ -5104,7 +5104,7 @@ Default is `tempo`.
 
 ### Description
 
-Defines which KFD version will be installed and, in consequence, the Kubernetes version used to create the cluster. It supports git tags and branches. Example: `v1.30.1`.
+Defines which SD version will be installed and, in consequence, the Kubernetes version used to create the cluster. It supports git tags and branches. Example: `v1.30.1`.
 
 ### Constraints
 

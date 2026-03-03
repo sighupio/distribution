@@ -93,16 +93,16 @@ Some modules rely on persistent storage via PersistentVolumeClaims, by default (
 
 Core modules provide essential functionality to the distribution for production-grade clusters.
 
-| Module                          | Included Release               | Description                                                                                          |
-| ------------------------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------- |
-| [Networking][networking-module] | ![Version][networking-version] | Networking functionality via Calico or Cilium CNIs                                                   |
-| [Ingress][ingress-module]       | ![Version][ingress-version]    | Fast and reliable Ingress Controller and TLS certificate management                                  |
-| [Logging][logging-module]       | ![Version][logging-version]    | A centralized logging solution based on the LoggingOperator + OpenSearch or Loki stacks              |
-| [Monitoring][monitoring-module] | ![Version][monitoring-version] | Monitoring and alerting functionality based on Prometheus, AlertManager and Grafana                  |
-| [Tracing][tracing-module]       | ![Version][tracing-version]    | Tracing functionality based on Tempo                                                                 |
-| [Disaster Recovery][dr-module]  | ![Version][dr-version]         | Backup and disaster recovery solution using Velero                                                   |
-| [Policy][policy-module]         | ![Version][policy-version]     | Policy and Governance for your cluster using Gatekeeper and Gatekeeper Policy Manager or Kyverno     |
-| [Auth][auth-module]             | ![Version][auth-version]       | Improved auth for your Kubernetes Cluster and its applications                                       |
+| Module                          | Included Release               | Description                                                                                      |
+| ------------------------------- | ------------------------------ | ------------------------------------------------------------------------------------------------ |
+| [Networking][networking-module] | ![Version][networking-version] | Networking functionality via Calico or Cilium CNIs                                               |
+| [Ingress][ingress-module]       | ![Version][ingress-version]    | Fast and reliable Ingress Controller and TLS certificate management                              |
+| [Logging][logging-module]       | ![Version][logging-version]    | A centralized logging solution based on the LoggingOperator + OpenSearch or Loki stacks          |
+| [Monitoring][monitoring-module] | ![Version][monitoring-version] | Monitoring and alerting functionality based on Prometheus, AlertManager and Grafana              |
+| [Tracing][tracing-module]       | ![Version][tracing-version]    | Tracing functionality based on Tempo                                                             |
+| [Disaster Recovery][dr-module]  | ![Version][dr-version]         | Backup and disaster recovery solution using Velero                                               |
+| [Policy][policy-module]         | ![Version][policy-version]     | Policy and Governance for your cluster using Gatekeeper and Gatekeeper Policy Manager or Kyverno |
+| [Auth][auth-module]             | ![Version][auth-version]       | Improved auth for your Kubernetes Cluster and its applications                                   |
 
 ### Add-on Modules 📦
 
@@ -118,7 +118,7 @@ Add-on modules provide additional functionality to the distribution. Their relea
 
 ## Get started with SD 🚀
 
-To get started with SD, please head to the [quickstart guides on the documentation site](https://docs.kubernetesfury.com/docs/distribution/#%EF%B8%8F-how-do-i-get-started).
+To get started with SD, please head to the [quickstart guides on the documentation site](https://docs.sighup.io/docs/getting-started/).
 
 ## Issues 🐛
 
@@ -134,7 +134,7 @@ If you are looking to run SD in production and would like to learn more, SIGHUP 
 
 Current supported versions of SD are:
 
-|                                  SD Version                               | Kubernetes Version |
+|                                SD Version                                 | Kubernetes Version |
 | :-----------------------------------------------------------------------: | :----------------: |
 | [`1.34.0`](https://github.com/sighupio/distribution/releases/tag/v1.34.0) |      `1.34.x`      |
 | [`1.33.1`](https://github.com/sighupio/distribution/releases/tag/v1.33.1) |      `1.33.x`      |
