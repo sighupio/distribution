@@ -2,7 +2,7 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-- name: Verify that the cluster exists
+- name: Check if the Kubernetes cluster exists
   hosts: control_plane
   become: true
   tasks:
@@ -11,18 +11,22 @@
         path: /etc/kubernetes/admin.conf
       register: admin_conf_stat
 
-    - name: Getting admin.conf kubeconfig
-      become: yes
+    - name: Set fact if admin.conf exists on node
+      set_fact:
+        admin_conf_exists: "{{ admin_conf_stat.stat.exists }}"
+      when: admin_conf_stat.stat.exists
+
+    # furyctl needs the admin.conf to check for the cluster version.
+    - name: Fetch admin.conf kubeconfig
       fetch:
         src: /etc/kubernetes/admin.conf
         dest: "{{ kubernetes_kubeconfig_path }}/admin.conf"
         flat: yes
       when: admin_conf_stat.stat.exists
-
-    - name: Set fact if admin.conf exists
-      set_fact:
-        admin_conf_exists: "{{ admin_conf_stat.stat.exists }}"
-      when: admin_conf_stat.stat.exists
+      # We need just one copy of admin.conf, so we can stop after the first successful fetch:
+      run_once: true
+      # Also, without run_once (and not setting serial), fetching from several
+      # nodes to the same destination may cause checksum errors.
 
 - name: Aggregate results and fetch admin.conf
   hosts: control_plane
