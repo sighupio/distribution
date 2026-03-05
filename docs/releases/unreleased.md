@@ -11,6 +11,7 @@ N/A
 ## Bug Fixes 🐛
 
 - [[#497]](https://github.com/sighupio/distribution/pull/497) When the distribution network-policies are enabled, traffic between SD monitoring and logging namespaces, and from haproxy ingress controller to the monitoring namespace, is now allowed.
+- [[#498]](https://github.com/sighupio/distribution/pull/498) Fixes schema validation error caused by missing nginx field in the generated configuration file for all providers.
 
 ## Breaking changes 💔
 
