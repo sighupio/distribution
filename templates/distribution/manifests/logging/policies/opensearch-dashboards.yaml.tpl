@@ -52,6 +52,32 @@ spec:
       ports:
         - port: 5601
           protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: opensearch-dashboards-ingress-prometheus-metrics
+  namespace: logging
+  labels:
+    cluster.kfd.sighup.io/module: logging
+    cluster.kfd.sighup.io/logging-type: opensearch
+spec:
+  policyTypes:
+    - Ingress
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: opensearch-dashboards
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: prometheus
+          namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+      ports:
+        - port: 9601
+          protocol: TCP
 {{- $nginxType := .spec.distribution.modules.ingress.nginx.type }}
 {{- $haproxyType := .spec.distribution.modules.ingress.haproxy.type }}
 {{- $isSSO := eq .spec.distribution.modules.auth.provider.type "sso" }}
