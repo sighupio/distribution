@@ -4,58 +4,30 @@
 
 ---
 infrastructure:
-  # Immutable infrastructure settings - cannot be changed after cluster creation
-  - path: .spec.infrastructure.flatcarVersion
-    immutable: true
-    description: "Flatcar Container Linux version cannot be changed after cluster creation"
-
-  - path: .spec.infrastructure.installDisk
-    immutable: true
-    description: "Installation disk cannot be changed after cluster creation"
-
-  - path: .spec.infrastructure.ssh.keyPath
-    immutable: true
-    description: "SSH key path cannot be changed after cluster creation"
-
-  - path: .spec.infrastructure.ssh.username
-    immutable: true
-    description: "SSH username cannot be changed after cluster creation"
-
-  - path: .spec.infrastructure.ipxeServer.url
+  # TODO: Write the remaining rules for unsafe changes
+  - path: .spec.infrastructure.nodes.*.arch
     immutable: false
-    description: "iPXE server URL cannot be changed after cluster creation"
-
-  - path: .spec.infrastructure.nodes.*.macAddress
-    immutable: true
-    description: "Node MAC addresses are immutable and define the physical hardware"
-
-  - path: .spec.infrastructure.nodes.*.hostname
-    immutable: true
-    description: "Node hostnames cannot be changed after cluster creation"
-
-  - path: .spec.infrastructure.nodes.*.network.ethernets.*.addresses.*
-    immutable: true
-    description: "Node IP addresses cannot be changed after cluster creation"
-
-  - path: .spec.infrastructure.nodes.*.network.ethernets.*.gateway
-    immutable: true
-    description: "Node gateway cannot be changed after cluster creation"
+    description: "Changes to nodes configuration require manual intervention. Nodes will need to be recreated for the changes to take effect."
+    reducers:
+      - key: infrastructureNodesArch
+        lifecycle: pre-apply
+  - path: .spec.infrastructure.nodes.*.storage.installDisk
+    immutable: false
+    description: "Changes to nodes configuration require manual intervention. Nodes will need to be recreated for the changes to take effect."
+    reducers:
+      - key: infrastructureNodesArch
+        lifecycle: pre-apply
 
 kubernetes:
-  # Kubernetes cluster configuration - some immutable, some upgradeable
-  - path: .spec.kubernetes.dnsZone
-    immutable: true
-    description: "DNS zone cannot be changed after cluster creation"
-
   - path: .spec.kubernetes.controlPlane.address
     immutable: true
     description: "Control plane address cannot be changed after cluster creation"
 
-  - path: .spec.kubernetes.podCidr
+  - path: .spec.kubernetes.networking.podCidr
     immutable: true
     description: "Pod CIDR cannot be changed after cluster creation"
 
-  - path: .spec.kubernetes.svcCidr
+  - path: .spec.kubernetes.networking.svcCidr
     immutable: true
     description: "Service CIDR cannot be changed after cluster creation"
 
