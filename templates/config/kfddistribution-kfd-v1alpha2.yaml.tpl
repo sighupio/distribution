@@ -41,6 +41,10 @@ spec:
       ingress:
         # the base domain used for all the KFD ingresses, if in the HAProxy dual configuration, it should be the same as the .spec.distribution.modules.ingress.dns.private.name zone
         baseDomain: internal.example.dev
+        # configurations for the nginx ingress controller package
+        nginx:
+          # type defines if nginx should be configured as single or dual (internal + external) or none, with none no ingress controller will be deployed and also no ingress resource will be created
+          type: none
         # configurations for the haproxy ingress controller package
         haproxy:
           # type defines if haproxy should be configured as single or dual (internal + external) or none
