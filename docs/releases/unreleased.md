@@ -1,6 +1,6 @@
-# SIGHUP Distribution Release v1.34.2
+# SIGHUP Distribution Release TBD
 
-Welcome to SD release `v1.34.2`.
+Welcome to SD release `vTBD`.
 
 The distribution is maintained with ❤️ by the team [SIGHUP by ReeVo](https://sighup.io/).
 
