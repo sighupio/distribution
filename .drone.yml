@@ -76,6 +76,21 @@ steps: # qa
       - eval "$(mise activate bash --shims)"
       - bats -t tests/e2e/kfddistribution/schema.sh
 
+  - name: test-create-config
+    image: quay.io/sighup/mise:v2025.4.4
+    pull: always
+    depends_on:
+      - install-tools
+    volumes:
+      - name: mise-cache
+        path: /mise-data
+    commands:
+      - eval "$(mise activate bash --shims)"
+      - mkdir -p /tmp/test-kfddistribution /tmp/test-ekscluster /tmp/test-onpremises
+      - furyctl create config --kind KFDDistribution --version v1.34.0 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-kfddistribution
+      - furyctl create config --kind EKSCluster --version v1.34.0 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-ekscluster
+      - furyctl create config --kind OnPremises --version v1.34.0 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-onpremises
+
   - name: render
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
