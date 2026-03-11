@@ -13,6 +13,7 @@ storage:
 {{ template "network" . }}
 {{ template "python" . }}
 {{ template "sysupdate-noop" . }}
+{{ template "sshd-pq-configuration" . }}
 {{ template "containerd-sysext-files" . }}
 {{ template "keepalived-sysext-files" . }}
 {{ template "kubernetes-sysext-files" . }}
