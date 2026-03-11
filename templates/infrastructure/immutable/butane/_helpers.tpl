@@ -283,3 +283,15 @@ passwd:
         WantedBy=multi-user.target
 
 {{- end}}
+
+{{- define "sshd-pq-configuration" }}
+    # Enable post-quantum key exchange algorithms in SSH server configuration
+    # See: https://github.com/flatcar/Flatcar/issues/1921
+    - path: /etc/ssh/sshd_config.d/10-pq.conf
+      overwrite: true
+      mode: 0600
+      contents:
+        inline: |
+          KexAlgorithms +sntrup761x25519-sha512
+          KexAlgorithms +mlkem768x25519-sha256
+{{- end }}
