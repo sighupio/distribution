@@ -70,6 +70,22 @@ resources:
 
 patches:
   - path: patches/infra-nodes.yml
+{{- if .spec | digAny "kubernetes" "etcd" nil }}
+  - patch: |-
+      $patch: delete
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: etcd-metrics
+        namespace: kube-system
+  - patch: |-
+      $patch: delete
+      apiVersion: monitoring.coreos.com/v1
+      kind: ServiceMonitor
+      metadata:
+        name: etcd-metrics
+        namespace: kube-system
+{{- end }}
 {{- if eq .spec.distribution.common.provider.type "eks" }}{{/* in EKS there are no files to monitor on nodes */}}
   - patch: |-
       $patch: delete
