@@ -31,6 +31,9 @@ resources:
   - {{ print $vendorPrefix "/modules/monitoring/katalog/haproxy" }}
   - resources/haproxy-scrapeConfig.yaml
     {{- end }}
+    {{- if index .spec.kubernetes "etcd" }}
+  - resources/etcd-scrapeConfig.yaml
+    {{- end }}
   {{- end }}
 {{- end }}
 {{- if eq .spec.distribution.common.provider.type "eks" }}

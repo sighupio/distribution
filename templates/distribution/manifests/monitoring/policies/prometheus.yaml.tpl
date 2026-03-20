@@ -109,6 +109,24 @@ spec:
         - port: 8405
           protocol: TCP
 ---
+{{- if .spec | digAny "kubernetes" "etcd" nil }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: prometheus-egress-external-etcd
+  namespace: monitoring
+spec:
+  policyTypes:
+    - Egress
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: prometheus
+  egress:
+    - ports:
+        - port: 2378
+          protocol: TCP
+---
+{{- end }}
 {{- if eq .spec.distribution.modules.monitoring.mimir.backend "minio" }}
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
