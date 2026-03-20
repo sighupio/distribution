@@ -12,6 +12,7 @@ N/A
 
 - [[#497]](https://github.com/sighupio/distribution/pull/497) When the distribution network-policies are enabled, traffic between SD monitoring and logging namespaces, and from haproxy ingress controller to the monitoring namespace, is now allowed.
 - [[#498]](https://github.com/sighupio/distribution/pull/498) Fixes schema validation error caused by missing nginx field in the generated configuration file for all providers.
+- [[#501]](https://github.com/sighupio/distribution/pull/501) This resolves the issue where the etcd Grafana dashboard did not display data when etcd is running on dedicated nodes. Now, when `spec.kubernetes.etcd` is configured, a `ScrapeConfig` resource is generated to collect etcd metrics directly from the dedicated etcd nodes.
 
 ## Breaking changes 💔
 
