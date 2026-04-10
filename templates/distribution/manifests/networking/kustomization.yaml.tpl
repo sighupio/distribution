@@ -24,6 +24,9 @@ resources:
       {{- if not (.spec | digAny "kubernetes" "advanced" "kubeProxy" "enabled" true) }}
   - resources/tigera-kubernetes-service.yaml
       {{- end }}
+      {{- if $hasAnyIngress }}
+  - resources/whisker-ingress.yml
+      {{- end }}
     {{- end }}
     {{- if eq .spec.distribution.modules.networking.type "cilium" }}
   - {{ print $vendorPrefix "/modules/networking/katalog/cilium" }}

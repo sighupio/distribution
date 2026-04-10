@@ -93,6 +93,12 @@
           "items": {
             "type": "object"
           }
+        },
+        "whiskerUi": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
         }
       }
     },
