@@ -334,6 +334,10 @@ cert-manager.io/cluster-issuer: {{ .spec.distribution.modules.ingress.certManage
   {{- template "ingressHost" (dict "module" "networking" "package" "hubble" "prefix" "hubble." "spec" .) -}}
 {{ end }}
 
+{{ define "whiskerUrl" }}
+  {{- template "ingressHost" (dict "module" "networking" "package" "whisker" "prefix" "whisker." "spec" .) -}}
+{{ end }}
+
 {{- /* controlPlaneAddress {config: <config> args: ["host"| "port"]}
    Where:
     <config> is the root of the config file (usually `.`)
