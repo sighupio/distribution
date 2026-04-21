@@ -156,6 +156,12 @@ all:
         kubernetes_apiserver_certSANs:
 {{ .spec.kubernetes.advanced.apiServerCertSANs | toYaml | indent 10 }}
         {{- end }}
+        {{- /* We assume that kubeProxy is enabled by default */}}
+        {{- /* The `digAny` condition needs to be specified exactly as written below to properly check if the field has been populated */}}
+        {{- if not (.spec | digAny "kubernetes" "advanced" "kubeProxy" "enabled" true) }}
+        kubeadm_skip_phases:
+          - "addon/kube-proxy"
+        {{- end }}
     etcd:
       hosts:
         {{- if index $.spec.kubernetes "etcd" }}
@@ -336,6 +342,15 @@ all:
     {{- end }}
     {{- if index .spec.kubernetes.advanced.airGap "etcdDownloadUrl" }}
     etcd_download_url: "{{ .spec.kubernetes.advanced.airGap.etcdDownloadUrl }}"
+    {{- end }}
+    {{- if index .spec.kubernetes.advanced.airGap "kubeadmDownloadUrl" }}
+    kubeadm_download_url: "{{ .spec.kubernetes.advanced.airGap.kubeadmDownloadUrl }}"
+    {{- end }}
+    {{- if index .spec.kubernetes.advanced.airGap "kubeadmChecksum" }}
+    kubeadm_checksum: "{{ .spec.kubernetes.advanced.airGap.kubeadmChecksum }}"
+    {{- end }}
+    {{- if index .spec.kubernetes.advanced.airGap "kubeadmBinaryDir" }}
+    kubeadm_binary_dir: "{{ .spec.kubernetes.advanced.airGap.kubeadmBinaryDir }}"
     {{- end }}
     {{- end }}
 

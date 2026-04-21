@@ -140,6 +140,21 @@ distribution:
     reducers:
       - key: distributionModulesIngressNginxType
         lifecycle: pre-apply
+  - path: .spec.distribution.modules.ingress.haproxy.type
+    immutable: false
+    description: "changes to the HAProxy type in the Ingress module have been detected. This will cause the reconfiguration or deletion of the current HAProxy ingress stack."
+    safe:
+      - from: none
+    unsupported:
+      - to: single
+        from: dual
+        reason: "currently, switching Ingress from dual to single HAProxy is not supported. You need to first remove the current stack with type: none."
+      - to: dual
+        from: single
+        reason: "currently, switching Ingress from single to dual HAProxy is not supported. You need to first remove the current stack with type: none."
+    reducers:
+      - key: distributionModulesIngressHAProxyType
+        lifecycle: pre-apply
   - path: .spec.distribution.modules.auth.provider.type
     immutable: false
     description: "changes to the auth provider type will trigger the reconfiguration of the security on the infrastructural ingresses"

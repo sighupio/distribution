@@ -6,50 +6,60 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
+{{- $vendorPrefix := print "../" .spec.distribution.common.relativeVendorPath }}
 {{- $loggingType := .spec.distribution.modules.logging.type }}
 {{- $customOutputs := .spec.distribution.modules.logging.customOutputs }}
 {{- $loki := index .spec.distribution.modules.logging "loki" }}
 {{- $fluentdReplicas := index .spec.distribution.modules.logging.operator.fluentd "replicas" }}
 {{- $fluentdResources := index .spec.distribution.modules.logging.operator.fluentd "resources" }}
 {{- $fluentbitResources := index .spec.distribution.modules.logging.operator.fluentbit "resources" }}
+{{- $haproxyType := .spec.distribution.modules.ingress.haproxy.type }}
+{{- $isBYOIC := .spec.distribution.modules.ingress.byoic.enabled }}
+{{- $hasAnyIngress := or (ne .spec.distribution.modules.ingress.nginx.type "none") (ne $haproxyType "none") $isBYOIC }}
 
 resources:
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/logging-operator" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/logging-operated" }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/logging-operator" }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/logging-operated" }}
   - kapp-configs/logging-operator-crd.yaml
 {{- if eq $loggingType "loki" "opensearch" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/minio-ha" }}
-  {{- if ne .spec.distribution.modules.ingress.nginx.type "none" }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/minio-ha" }}
+  {{- if $hasAnyIngress }}
   - resources/ingress-infra.yml
   {{- end }}
 {{- end }}
 {{- if eq $loggingType "opensearch" "customOutputs" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/configs/audit" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/configs/events" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/configs/infra" }}
-  {{- if ne .spec.distribution.modules.ingress.nginx.type "none" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/configs/ingress-nginx" }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/configs/audit" }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/configs/events" }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/configs/infra" }}
+  {{- if ne $haproxyType "none" }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/configs/ingress-haproxy" }}
   {{- end }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/configs/kubernetes" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/configs/systemd" }}
+  {{- if ne .spec.distribution.modules.ingress.nginx.type "none" }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/configs/ingress-nginx" }}
+  {{- end }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/configs/kubernetes" }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/configs/systemd" }}
   {{- if eq $loggingType "opensearch" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/opensearch-dashboards" }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/opensearch-dashboards" }}
     {{- if eq .spec.distribution.modules.logging.opensearch.type "single" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/opensearch-single" }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/opensearch-single" }}
     {{- else if eq .spec.distribution.modules.logging.opensearch.type "triple" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/opensearch-triple" }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/opensearch-triple" }}
     {{- end }}
   {{- end }}
 {{- else if eq $loggingType "loki" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/loki-configs/audit" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/loki-configs/events" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/loki-configs/infra" }}
-  {{- if ne .spec.distribution.modules.ingress.nginx.type "none" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/loki-configs/ingress-nginx" }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/loki-configs/audit" }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/loki-configs/events" }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/loki-configs/infra" }}
+  {{- if ne $haproxyType "none" }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/loki-configs/ingress-haproxy" }}
   {{- end }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/loki-configs/kubernetes" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/loki-configs/systemd" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/logging/katalog/loki-distributed" }}
+  {{- if ne .spec.distribution.modules.ingress.nginx.type "none" }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/loki-configs/ingress-nginx" }}
+  {{- end }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/loki-configs/kubernetes" }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/loki-configs/systemd" }}
+  - {{ print $vendorPrefix "/modules/logging/katalog/loki-distributed" }}
   - kapp-configs/loki-hpa.yaml
 {{- end }}
 
@@ -112,6 +122,16 @@ patches:
         path: /spec
         value:
 {{ $customOutputs.ingressNginx | indent 10 }}
+  - target:
+      kind: Output
+      group: logging.banzaicloud.io
+      version: v1beta1
+      name: ingress-haproxy
+    patch: |-
+      - op: replace
+        path: /spec
+        value:
+{{ $customOutputs.ingressHaproxy | indent 10 }}
   - target:
       kind: ClusterOutput
       group: logging.banzaicloud.io

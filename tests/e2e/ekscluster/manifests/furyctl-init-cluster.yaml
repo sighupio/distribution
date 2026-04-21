@@ -17,7 +17,7 @@ metadata:
 spec:
   distributionVersion: v1.33.1
   toolsConfiguration:
-    terraform:
+    opentofu:
       state:
         s3:
           bucketName: e2e-drone-eks
@@ -98,6 +98,10 @@ spec:
       ingress:
         baseDomain: internal.e2e.ci.sighup.cc
         nginx:
+          type: dual
+          tls:
+            provider: certManager
+        haproxy:
           type: dual
           tls:
             provider: certManager

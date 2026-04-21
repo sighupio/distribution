@@ -6,12 +6,13 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
+{{- $vendorPrefix := print "../" .spec.distribution.common.relativeVendorPath }}
 {{- $version := semver .spec.distributionVersion }}
 
 resources:
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/aws/katalog/cluster-autoscaler/v" $version.Major "." $version.Minor ".x" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/aws/katalog/load-balancer-controller" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/aws/katalog/node-termination-handler" }}
+  - {{ print $vendorPrefix "/modules/aws/katalog/cluster-autoscaler/v" $version.Major "." $version.Minor ".x" }}
+  - {{ print $vendorPrefix "/modules/aws/katalog/load-balancer-controller" }}
+  - {{ print $vendorPrefix "/modules/aws/katalog/node-termination-handler" }}
   - resources/storageclasses.yml
   - resources/snapshotclasses.yml
 

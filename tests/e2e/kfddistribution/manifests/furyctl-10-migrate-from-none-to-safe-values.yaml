@@ -26,6 +26,10 @@ spec:
           type: single
           tls:
             provider: certManager
+        haproxy:
+          type: single
+          tls:
+            provider: certManager
         certManager:
           clusterIssuer:
             name: letsencrypt-fury

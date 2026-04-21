@@ -19,6 +19,7 @@ metadata:
     forecastle.stakater.com/icon: "https://min.io/resources/img/logo/MINIO_Bird.png"
     {{ if not .spec.distribution.modules.tracing.overrides.ingresses.minio.disableAuth }}{{ template "ingressAuth" . }}{{ end }}
     {{ template "certManagerClusterIssuer" . }}
+    {{ template "byoicAnnotations" . }}
   {{ if and (not .spec.distribution.modules.tracing.overrides.ingresses.minio.disableAuth) (eq .spec.distribution.modules.auth.provider.type "sso") }}
   name: minio-tracing
   namespace: pomerium
