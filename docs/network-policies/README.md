@@ -7,6 +7,7 @@ This documentation describes all Network Policies of the SD components for the O
 - [Ingress](modules/ingress/README.md) - Kubernetes Ingress Controller (single/dual) + Cert-manager
 - [Logging](modules/logging/README.md) - OpenSearch/Loki
 - [Monitoring](modules/monitoring/README.md) - Prometheus/Mimir
+- [Networking](modules/networking/README.md) - Whisker
 - [OPA](modules/opa/README.md) - Gatekeeper/Kyverno
 - [Tracing](modules/tracing/README.md) - Tempo
 

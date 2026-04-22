@@ -36,6 +36,10 @@ resources:
     {{- end }}
 {{- end }}
 
+{{ if eq .spec.distribution.common.networkPoliciesEnabled true }}
+  - policies
+{{- end }}
+
 patches:
 {{- if eq .spec.distribution.common.provider.type "eks" }}
   - path: patches/tigera/infra-nodes-and-mask.yaml
@@ -83,3 +87,4 @@ configMapGenerator:
     namespace: kube-system
   {{- end }}
 {{- end }}
+
