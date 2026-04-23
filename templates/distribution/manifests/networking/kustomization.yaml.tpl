@@ -36,7 +36,7 @@ resources:
     {{- end }}
 {{- end }}
 
-{{ if eq .spec.distribution.common.networkPoliciesEnabled true }}
+{{ if and (eq .spec.distribution.common.networkPoliciesEnabled true) (eq .spec.distribution.modules.networking.type "calico") $hasAnyIngress }}
   - policies
 {{- end }}
 
