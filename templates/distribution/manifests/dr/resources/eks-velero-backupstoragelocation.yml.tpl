@@ -14,6 +14,8 @@ spec:
   default: true
   objectStorage:
     bucket: {{ .spec.distribution.modules.dr.velero.eks.bucketName }}
+    prefix: {{ .spec.distribution.modules.dr.velero.eks.prefixName }}
+  accessMode: {{ .spec.distribution.modules.dr.velero.eks.accessMode }}
   config:
     region: {{ .spec.distribution.modules.dr.velero.eks.region }}
 {{- end }}

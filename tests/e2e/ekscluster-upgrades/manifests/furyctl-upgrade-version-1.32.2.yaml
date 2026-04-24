@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/sighupio/fury-distribution/v1.31.1/schemas/public/ekscluster-kfd-v1alpha2.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/sighupio/distribution/v1.32.2/schemas/public/ekscluster-kfd-v1alpha2.json
 # Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
@@ -15,9 +15,9 @@ kind: EKSCluster
 metadata:
   name: e2e-eks-upgrades
 spec:
-  distributionVersion: v1.31.2-rc.2
+  distributionVersion: v1.32.2
   toolsConfiguration:
-    terraform:
+    opentofu:
       state:
         s3:
           bucketName: e2e-drone-eks-upgrades
@@ -54,7 +54,7 @@ spec:
           - 0.0.0.0/0
   kubernetes:
     nodeAllowedSshPublicKey: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA1xMG9TEH97YhkmoehlMaAMwqi9NOIx2ItXKNv2KVnI
-    nodePoolGlobalAmiType: alinux2
+    nodePoolGlobalAmiType: alinux2023
     nodePoolsLaunchKind: launch_templates
     apiServer:
       privateAccess: true
@@ -64,7 +64,7 @@ spec:
       publicAccessCidrs:
         - 0.0.0.0/0
     nodePools:
-      - name: infra
+      - name: infra-alinux2023
         type: eks-managed
         size:
           min: 6
@@ -75,11 +75,13 @@ spec:
           volumeSize: 50
           volumeType: gp2
         labels:
-          nodepool: infra
+          nodepool: infra-alinux2023
           node.kubernetes.io/role: infra
+          os-type: alinux2023
         tags:
-          k8s.io/cluster-autoscaler/node-template/label/nodepool: worker
-          k8s.io/cluster-autoscaler/node-template/label/node.kubernetes.io/role: worker
+          k8s.io/cluster-autoscaler/node-template/label/nodepool: infra-alinux2023
+          k8s.io/cluster-autoscaler/node-template/label/node.kubernetes.io/role: infra
+          k8s.io/cluster-autoscaler/node-template/label/os-type: alinux2023
     awsAuth:
       additionalAccounts: []
       users: []
@@ -89,6 +91,10 @@ spec:
       ingress:
         baseDomain: internal.e2e.ci.sighup.cc
         nginx:
+          type: dual
+          tls:
+            provider: certManager
+        haproxy:
           type: dual
           tls:
             provider: certManager

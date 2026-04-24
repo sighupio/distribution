@@ -108,6 +108,12 @@ spec:
           podSelector:
             matchLabels:
               app.kubernetes.io/name: prometheus
+{{- $nginxType := .spec.distribution.modules.ingress.nginx.type }}
+{{- $haproxyType := .spec.distribution.modules.ingress.haproxy.type }}
+{{- $isSSO := eq .spec.distribution.modules.auth.provider.type "sso" }}
+{{- $isBYOIC := .spec.distribution.modules.ingress.byoic.enabled }}
+
+{{- if $isSSO }}
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -124,37 +130,100 @@ spec:
     matchLabels:
       app: minio
   ingress:
-# single nginx, no sso
-{{if and (eq .spec.distribution.modules.ingress.nginx.type "single") (ne .spec.distribution.modules.auth.provider.type "sso") }}
     - from:
-      - namespaceSelector:
-          matchLabels:
-            kubernetes.io/metadata.name: ingress-nginx
-        podSelector:
-          matchLabels:
-            app: ingress-nginx
-# dual nginx, no sso
-{{ else if and (eq .spec.distribution.modules.ingress.nginx.type "dual") (ne .spec.distribution.modules.auth.provider.type "sso") }}
-    - from:
-      - namespaceSelector:
-          matchLabels:
-            kubernetes.io/metadata.name: ingress-nginx
-        podSelector:
-          matchLabels:
-            app: ingress
-# sso
-{{ else if (eq .spec.distribution.modules.auth.provider.type "sso") }}
-    - from:
-      - namespaceSelector:
-          matchLabels:
-            kubernetes.io/metadata.name: pomerium
-        podSelector:
-          matchLabels:
-            app: pomerium
-{{ end }}
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: pomerium
+          podSelector:
+            matchLabels:
+              app: pomerium
       ports:
         - port: 9001
           protocol: TCP
+{{- else }}
+  {{- if ne $nginxType "none" }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: minio-ingress-nginx
+  namespace: tracing
+  labels:
+    cluster.kfd.sighup.io/module: tracing
+    cluster.kfd.sighup.io/tracing-backend: minio
+spec:
+  policyTypes:
+    - Ingress
+  podSelector:
+    matchLabels:
+      app: minio
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+          podSelector:
+            matchLabels:
+    {{- if eq $nginxType "dual" }}
+              app: ingress
+    {{- else }}
+              app: ingress-nginx
+    {{- end }}
+      ports:
+        - port: 9001
+          protocol: TCP
+  {{- end }}
+  {{- if ne $haproxyType "none" }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: minio-ingress-haproxy
+  namespace: tracing
+  labels:
+    cluster.kfd.sighup.io/module: tracing
+    cluster.kfd.sighup.io/tracing-backend: minio
+spec:
+  policyTypes:
+    - Ingress
+  podSelector:
+    matchLabels:
+      app: minio
+  ingress:
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: ingress-haproxy
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/name: kubernetes-ingress
+            app.kubernetes.io/instance: haproxy-ingress
+      ports:
+        - port: 9001
+          protocol: TCP
+  {{- end }}
+  {{- if $isBYOIC }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: minio-ingress-byoic
+  namespace: tracing
+  labels:
+    cluster.kfd.sighup.io/module: tracing
+    cluster.kfd.sighup.io/tracing-backend: minio
+spec:
+  policyTypes:
+    - Ingress
+  podSelector:
+    matchLabels:
+      app: minio
+  ingress:
+    - ports:
+        - port: 9001
+          protocol: TCP
+  {{- end }}
+{{- end }}
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy

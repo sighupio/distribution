@@ -3,6 +3,9 @@
 # license that can be found in the LICENSE file.
 
 {{- $monitoringType := .spec.distribution.modules.monitoring.type }}
+{{- $haproxyType := .spec.distribution.modules.ingress.haproxy.type }}
+{{- $isBYOIC := .spec.distribution.modules.ingress.byoic.enabled }}
+{{- $hasAnyIngress := or (ne .spec.distribution.modules.ingress.nginx.type "none") (ne $haproxyType "none") $isBYOIC }}
 ---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
@@ -28,6 +31,6 @@ resources:
 {{- end }}  
 {{- end }}
 
-{{- if and (ne .spec.distribution.modules.ingress.nginx.type "none") }}{{/* we don't need ingresses for Prometheus in Agent mode */}}
+{{- if $hasAnyIngress }}{{/* we don't need ingresses for Prometheus in Agent mode */}}
   - ingress.yaml
 {{- end }}
