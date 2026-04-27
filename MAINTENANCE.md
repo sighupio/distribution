@@ -61,7 +61,7 @@ With no further ado, the steps to release a new version are:
    2. `docs/COMPATIBILITY_MATRIX.md`
    3. `docs/VERSIONING.md`
    4. Write the release notes for the new version (`docs/releases/vx.y.z.md`)
-7. Use the `e2e-all-*` tag pattern to trigger all the e2e tests and fix eventual problems
+7. Use the `e2e-all-*` tag pattern to trigger all the e2e tests, fix eventual problems and finally tag a release candidate
 
 At this point, you'll need to switch to pushing some changes in furyctl
 
