@@ -147,7 +147,6 @@ trigger:
     include:
       - refs/tags/e2e-kfddistribution-**
       - refs/tags/e2e-all-**
-      - refs/tags/v*
     exclude:
       - refs/tags/**-docs*
 
@@ -255,7 +254,6 @@ trigger:
     include:
       - refs/tags/e2e-kfddistribution-**
       - refs/tags/e2e-all-**
-      - refs/tags/v*
     exclude:
       - refs/tags/**-docs*
 
@@ -363,7 +361,6 @@ trigger:
     include:
       - refs/tags/e2e-eks-**
       - refs/tags/e2e-all-**
-      - refs/tags/v*
 
 environment:
   MISE_DATA_DIR: /mise-data
@@ -519,8 +516,6 @@ trigger:
     include:
       - refs/tags/e2e-eks-**
       - refs/tags/e2e-all-**
-    exclude:
-      - refs/tags/v*
 
 environment:
   MISE_DATA_DIR: /mise-data
@@ -676,7 +671,6 @@ trigger:
     include:
       - refs/tags/e2e-eks-**
       - refs/tags/e2e-all-**
-      - refs/tags/v*
 
 environment:
   MISE_DATA_DIR: /mise-data
@@ -830,7 +824,6 @@ trigger:
     include:
       - refs/tags/e2e-onpremises-**
       - refs/tags/e2e-all-**
-      - refs/tags/v*
 
 environment:
   MISE_DATA_DIR: /mise-data
@@ -986,7 +979,6 @@ trigger:
     include:
       - refs/tags/e2e-onpremises-**
       - refs/tags/e2e-all-**
-      - refs/tags/v*
 
 environment:
   MISE_DATA_DIR: /mise-data
@@ -1183,12 +1175,7 @@ kind: pipeline
 type: docker
 
 depends_on:
-  - e2e-kfddistribution-1.33
-  - e2e-kfddistribution-1.33.1-to-1.33.2
-  - e2e-ekscluster-1.33.2
-  - e2e-ekscluster-upgrades-1.33.1-1.33.2
-  - e2e-onpremises
-  - e2e-onpremises-upgrades-1.33.1-1.33.2
+  - qa
 
 platform:
   os: linux
