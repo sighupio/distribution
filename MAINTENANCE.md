@@ -27,8 +27,8 @@ Different tag patterns trigger specific combinations of test pipelines to optimi
 | **`e2e-eks-*`**             | QA + ALL EKS e2e only (standard + selfmanaged + upgrades)                     |
 | **`e2e-kfddistribution-*`** | QA + kfddistro e2e only                                                       |
 | **`e2e-onpremises-*`**      | QA + onpremises e2e only                                                      |
-| **`v1.XX.X`**               | QA + ALL e2e EXCEPT selfmanaged → release (stable)                            |
-| **`v1.XX.X-rc.X`**          | QA + ALL e2e EXCEPT selfmanaged → release (prerelease)                        |
+| **`v1.XX.X`**               | QA → release (stable) - NO e2e                                                |
+| **`v1.XX.X-rc.X`**          | QA → release (prerelease) - NO e2e                                            |
 
 ## Process
 
