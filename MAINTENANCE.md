@@ -87,7 +87,7 @@ go mod tidy
 
 15. Update the CI's `.drone.yaml` file to use the release candidate for furyctl that you released in step `14`.
 16. Update the e2e tests with the new upgrade paths.
-17. Tag a new release candidate of the distribution to run the e2e tests using the new upgrade paths and furyctl's RC.
+17. Tag with the `e2e-all-*` pattern to run the e2e tests using the new upgrade paths and furyctl's RC, then tag a release candidate.
 18. After the CI passes and the PR has been approved, merge into `main`
 19. Tag the final release and let the CI run again and do the release.
 20. **Repeat all the process for the other 2 "minor" versions that need to be updated**, but targeting `release-vx.y` branches instead of `main`.
