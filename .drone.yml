@@ -656,7 +656,7 @@ steps: # e2e-ekscluster-selfmanaged-alinux2023-1.33.2
         - success
 
 ---
-name: e2e-ekscluster-upgrades-1.33.1-1.33.2
+name: e2e-ekscluster-upgrades-1.32.1-1.33.2
 kind: pipeline
 type: docker
 
@@ -712,7 +712,7 @@ steps: #e2e-eks-upgrades
         path: /furyctl-outdir
     commands:
       - eval "$(mise activate bash --shims)"
-      - ./tests/e2e/ekscluster-upgrades/e2e-ekscluster-upgrades-1.33.1-1.33.2.sh
+      - ./tests/e2e/ekscluster-upgrades/e2e-ekscluster-upgrades-1.32.1-1.33.2.sh
 
   - name: furyctl-delete
     image: quay.io/sighup/mise:v2025.4.4
@@ -827,7 +827,7 @@ trigger:
 
 environment:
   MISE_DATA_DIR: /mise-data
-  FURYCTL_VERSION: "v0.34.1-rc.0"
+  FURYCTL_VERSION: "v0.34.1-rc.2"
   TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
 
 volumes:
@@ -960,8 +960,8 @@ steps: # e2e-onpremises
         - failure
 
 ---
-# On-premises upgrade pipeline - v1.33.1 to v1.33.2
-name: e2e-onpremises-upgrades-1.33.1-1.33.2
+# On-premises upgrade pipeline - v1.32.1 to v1.33.2
+name: e2e-onpremises-upgrades-1.32.1-1.33.2
 kind: pipeline
 type: docker
 
@@ -982,7 +982,7 @@ trigger:
 
 environment:
   MISE_DATA_DIR: /mise-data
-  FURYCTL_VERSION: "v0.34.1-rc.0"
+  FURYCTL_VERSION: "v0.34.1-rc.2"
   TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
   KUBECONFIG: /cache/kubeconfig
 
@@ -993,7 +993,7 @@ volumes:
     host:
       path: /root/mise_data_dir
 
-steps: # e2e-onpremises-upgrades-1.33.1-1.33.2
+steps: # e2e-onpremises-upgrades-1.32.1-1.33.2
   - name: install-tools
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
@@ -1008,7 +1008,7 @@ steps: # e2e-onpremises-upgrades-1.33.1-1.33.2
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
     environment:
-      DISTRIBUTION_VERSION: "v1.33.1"
+      DISTRIBUTION_VERSION: "v1.32.1"
       AWS_ACCESS_KEY_ID:
         from_secret: aws_access_key_id
       AWS_SECRET_ACCESS_KEY:
@@ -1030,11 +1030,11 @@ steps: # e2e-onpremises-upgrades-1.33.1-1.33.2
       - export TF_VAR_private_key=$(cat /cache/ci-ssh-key)
       - ansible-playbook 0.local-tofu-run.yaml
 
-  - name: install-cluster-1.33.1-with-furyctl
+  - name: install-cluster-1.32.1-with-furyctl
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
     environment:
-      DISTRIBUTION_VERSION: "v1.33.1" # distribution version is hardcoded in the tofu outputs
+      DISTRIBUTION_VERSION: "v1.32.1" # distribution version is hardcoded in the tofu outputs
       AWS_ACCESS_KEY_ID:
         from_secret: aws_access_key_id
       AWS_SECRET_ACCESS_KEY:
