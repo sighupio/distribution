@@ -10,6 +10,7 @@ For a complete list of all SD releases and their compatibility with Kubernetes v
 
 | SD / Kubernetes Version                                                  | v1.34.X            | v1.33.X            | v1.32.X            |
 | ------------------------------------------------------------------------ | ------------------ | ------------------ | ------------------ |
+| [v1.34.1](https://github.com/sighupio/distribution/releases/tag/v1.34.1) | :white_check_mark: |                    |                    |
 | [v1.34.0](https://github.com/sighupio/distribution/releases/tag/v1.34.0) | :white_check_mark: |                    |                    |
 | [v1.33.2](https://github.com/sighupio/distribution/releases/tag/v1.33.2) |                    | :white_check_mark: |                    |
 | [v1.33.1](https://github.com/sighupio/distribution/releases/tag/v1.33.1) |                    | :white_check_mark: |                    |
