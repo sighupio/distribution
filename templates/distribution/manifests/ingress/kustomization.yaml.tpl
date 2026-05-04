@@ -77,6 +77,10 @@ patches:
   - path: patches/infra-nodes.yml
 {{- end }}
 
+{{- if ne .spec.distribution.modules.ingress.nginx.type "none" }}
+  - path: patches/nginx-kapp-group.yml
+{{- end }}
+
 {{- if eq .spec.distribution.common.provider.type "eks" }}
   {{- if eq .spec.distribution.modules.ingress.nginx.type "dual" }}
   - path: patches/eks-ingress-nginx-external.yml
