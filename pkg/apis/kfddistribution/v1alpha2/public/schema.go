@@ -5,8 +5,9 @@ package public
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/sighupio/go-jsonschema/pkg/types"
 	"reflect"
+
+	"github.com/sighupio/go-jsonschema/pkg/types"
 )
 
 // SD modules deployed on top of an existing Kubernetes cluster.

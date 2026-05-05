@@ -5,8 +5,9 @@ package private
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/sighupio/go-jsonschema/pkg/types"
 	"reflect"
+
+	"github.com/sighupio/go-jsonschema/pkg/types"
 )
 
 // A SD Cluster deployed on top of AWS's Elastic Kubernetes Service (EKS).
