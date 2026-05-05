@@ -3071,16 +3071,10 @@
           "description": "Set to override the tolerations that will be added to the pods of the Auth module."
         },
         "ingresses": {
-          "additionalProperties": false,
           "type": "object",
           "description": "Override the definition of the Auth module ingresses.",
-          "properties": {
-            "gangplank": {
-              "$ref": "#/$defs/Spec.Distribution.Modules.Auth.Overrides.Ingress"
-            },
-            "dex": {
-              "$ref": "#/$defs/Spec.Distribution.Modules.Auth.Overrides.Ingress"
-            }
+          "additionalProperties": {
+            "$ref": "#/$defs/Spec.Distribution.Modules.Auth.Overrides.Ingress"
           }
         }
       }

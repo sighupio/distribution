@@ -75,6 +75,7 @@ steps: # qa
     commands:
       - eval "$(mise activate bash --shims)"
       - bats -t tests/e2e/kfddistribution/schema.sh
+      - bats -t tests/e2e/onpremises/schema.sh
 
   - name: test-create-config
     image: quay.io/sighup/mise:v2025.4.4
