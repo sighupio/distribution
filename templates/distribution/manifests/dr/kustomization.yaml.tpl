@@ -2,38 +2,49 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
+{{- $vendorPrefix := print "../" .spec.distribution.common.relativeVendorPath }}
+
 ---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/dr/katalog/velero/velero-node-agent" }}
+  - {{ print $vendorPrefix "/modules/dr/katalog/velero/velero-node-agent" }}
 {{- if eq .spec.distribution.common.provider.type "eks" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/dr/katalog/velero/velero-aws" }}
+  - {{ print $vendorPrefix "/modules/dr/katalog/velero/velero-aws" }}
 {{- else if eq .spec.distribution.common.provider.type "none" }}
 
 {{- if eq .spec.distribution.modules.dr.velero.backend "minio" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/dr/katalog/velero/velero-on-prem" }}
+  - {{ print $vendorPrefix "/modules/dr/katalog/velero/velero-on-prem" }}
 {{- else }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/dr/katalog/velero/velero-aws" }}
-  - resources/storageLocation.yaml
-  - resources/volumeSnapshotLocation.yaml
+{{- if eq .spec.distribution.modules.dr.velero.backend "externalEndpoint" }}
+  - {{ print $vendorPrefix "/modules/dr/katalog/velero/velero-aws" }}
+  - resources/storageLocation.s3.yaml
+  - resources/volumeSnapshotLocation.s3.yaml
+{{- end }}
+
+{{- if eq .spec.distribution.modules.dr.velero.backend "gcs" }}
+  - {{ print $vendorPrefix "/modules/dr/katalog/velero/velero-gcp" }}
+  - resources/storageLocation.gcs.yaml
+  - resources/volumeSnapshotLocation.gcs.yaml
+{{- end }}
+
 {{- end }}
 {{- if .spec.distribution.modules.dr.velero.snapshotController.install }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/dr/katalog/velero/snapshot-controller" }}
+  - {{ print $vendorPrefix "/modules/dr/katalog/velero/snapshot-controller" }}
 {{- end }}
 {{- if eq .spec.distribution.modules.dr.etcdBackup.type "all" "s3" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/dr/katalog/etcd-backup-s3" }}
+  - {{ print $vendorPrefix "/modules/dr/katalog/etcd-backup-s3" }}
 {{- end}}
 {{- if eq .spec.distribution.modules.dr.etcdBackup.type "all" "pvc" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/dr/katalog/etcd-backup-pvc" }}
+  - {{ print $vendorPrefix "/modules/dr/katalog/etcd-backup-pvc" }}
 {{- if not (index .spec.distribution.modules.dr.etcdBackup.pvc "name") }}
   - resources/etcd-backup-pvc.yml
 {{- end }}
 {{- end }}
 {{- end }}
 {{- if .spec.distribution.modules.dr.velero.schedules.install }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/dr/katalog/velero/velero-schedules" }}
+  - {{ print $vendorPrefix "/modules/dr/katalog/velero/velero-schedules" }}
 {{- end }}
 {{- if eq .spec.distribution.common.provider.type "eks" }}
   - resources/eks-velero-backupstoragelocation.yml
@@ -49,6 +60,7 @@ patches:
 {{- if eq .spec.distribution.common.provider.type "eks" }}
   - path: patches/eks-velero.yml
 {{- end }}
+  - path: patches/node-agent-config.yml
 {{- if eq .spec.distribution.common.provider.type "none" }}
   {{- if ne .spec.distribution.modules.dr.etcdBackup.type "none" }}
   - path: patches/etcd-backup-schedule.yml
@@ -114,6 +126,12 @@ secretGenerator:
     namespace: kube-system
     files:
       - cloud=secrets/cloud-credentials.config
+{{- end }}
+{{- if eq .spec.distribution.modules.dr.velero.backend "gcs" }}
+  - name: cloud-credentials
+    namespace: kube-system
+    files:
+      - cloud=secrets/cloud-credentials-gcp.json
 {{- end }}
 {{- if eq .spec.distribution.modules.dr.etcdBackup.type "all" "s3" }}
   - name: etcd-backup-s3-rclone-conf

@@ -1,0 +1,124 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# Tests the following cases:
+
+# Given "spec.distribution.modules.ingress.haproxy.tls.provider" is "secret"
+# And "spec.distribution.modules.ingress.haproxy.tls.secret" is specified in full
+# When I validate the config against the schema
+# Then no errors are returned
+
+---
+apiVersion: kfd.sighup.io/v1alpha2
+kind: EKSCluster
+metadata:
+  name: furyctl-dev-aws-al
+spec:
+  infrastructure:
+    vpc:
+      network:
+        cidr: 10.0.0.0/16
+        subnetsCidrs:
+          private:
+            - 10.0.182.0/24
+            - 10.0.172.0/24
+            - 10.0.162.0/24
+          public:
+            - 10.0.20.0/24
+            - 10.0.30.0/24
+            - 10.0.40.0/24
+    vpn:
+      ssh:
+        allowedFromCidrs:
+          - 0.0.0.0/0
+        githubUsersName:
+          - jnardiello
+        publicKeys:
+          - ssh-ed25519 SomethingSomething engineering@sighup.io
+      vpnClientsSubnetCidr: 192.168.200.0/24
+  kubernetes:
+    apiServer:
+      privateAccess: true
+      privateAccessCidrs: ["0.0.0.0/0"]
+      publicAccessCidrs: []
+      publicAccess: false
+    nodeAllowedSshPublicKey: ssh-ed25519 SomethingSomething engineering@sighup.io
+    nodePoolsLaunchKind: both
+    nodePoolGlobalAmiType: "alinux2023"
+    nodePools:
+      - ami:
+          id: ami-01234567890123456
+          owner: "123456789012"
+        type: self-managed
+        instance:
+          type: t3.large
+        name: worker-eks
+        size:
+          max: 3
+          min: 2
+  distribution:
+    modules:
+      dr:
+        type: eks
+        velero:
+          eks:
+            bucketName: example-velero
+            iamRoleArn: arn:aws:iam::123456789012:role/example-velero
+            region: eu-west-1
+      ingress:
+        baseDomain: furyctl-demo.sighup.io
+        dns:
+          private:
+            create: true
+            name: internal.furyctl-demo.sighup.io
+            vpcId: ""
+          public:
+            create: true
+            name: furyctl-demo.sighup.io
+        nginx:
+          type: single
+          tls:
+            provider: certManager
+        haproxy:
+          type: single
+          tls:
+            provider: secret
+            secret:
+              ca: |
+                value
+              cert: |
+                value
+              key: |
+                value
+        certManager:
+          clusterIssuer:
+            name: letsencrypt-fury
+            email: email@test.it
+            type: http01
+            route53:
+              region: eu-west-1
+              hostedZoneId: Z1234567890
+              iamRoleArn: arn:aws:iam::123456789012:role/cert-manager
+        externalDns:
+          privateIamRoleArn: arn:aws:iam::123456789012:role/external-dns-private
+          publicIamRoleArn: arn:aws:iam::123456789012:role/external-dns-public
+      logging:
+        type: opensearch
+        opensearch:
+          type: single
+      policy:
+        type: gatekeeper
+        gatekeeper:
+          additionalExcludedNamespaces: []
+          installDefaultPolicies: true
+          enforcementAction: deny
+  distributionVersion: v1.24.1
+  region: eu-west-1
+  toolsConfiguration:
+    terraform:
+      state:
+        s3:
+          bucketName: furyctl-test-eks
+          keyPrefix: furyctl-test
+          region: eu-west-1

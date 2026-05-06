@@ -3,8 +3,10 @@
 # license that can be found in the LICENSE file.
 
 {{ if and (.spec.distribution.modules.ingress.certManager) (.spec.distribution.modules.ingress.certManager.clusterIssuer) }}
-
-{{ if and (eq .spec.distribution.modules.ingress.nginx.tls.provider "certManager") (eq .spec.distribution.modules.ingress.certManager.clusterIssuer.type "dns01") -}}
+{{- $nginxUsesCertManager := and (ne .spec.distribution.modules.ingress.nginx.type "none") (eq .spec.distribution.modules.ingress.nginx.tls.provider "certManager") -}}
+{{- $haproxyUsesCertManager := and (ne .spec.distribution.modules.ingress.haproxy.type "none") (eq .spec.distribution.modules.ingress.haproxy.tls.provider "certManager") -}}
+{{- $usesCertManager := or $nginxUsesCertManager $haproxyUsesCertManager -}}
+{{ if and $usesCertManager (eq .spec.distribution.modules.ingress.certManager.clusterIssuer.type "dns01") -}}
 ---
 apiVersion: v1
 kind: ServiceAccount

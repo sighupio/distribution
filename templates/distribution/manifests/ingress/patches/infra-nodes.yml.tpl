@@ -4,8 +4,13 @@
 
 {{- $certManagerArgs := dict "module" "ingress" "package" "certManager" "spec" .spec -}}
 {{- $nginxArgs := dict "module" "ingress" "package" "nginx" "spec" .spec -}}
+{{- $haproxyArgs := dict "module" "ingress" "package" "haproxy" "spec" .spec -}}
 {{- $dnsArgs := dict "module" "ingress" "package" "dns"  "spec" .spec -}}
 {{- $forecastleArgs := dict "module" "ingress" "package" "forecastle" "spec" .spec -}}
+
+{{- $haproxyType := .spec.distribution.modules.ingress.haproxy.type }}
+{{- $isBYOIC := .spec.distribution.modules.ingress.byoic.enabled }}
+{{- $hasAnyIngress := or (ne .spec.distribution.modules.ingress.nginx.type "none") (ne $haproxyType "none") $isBYOIC }}
 
 ---
 apiVersion: apps/v1
@@ -46,13 +51,13 @@ spec:
         {{ template "nodeSelector" $certManagerArgs }}
       tolerations:
         {{ template "tolerations" $certManagerArgs }}
-{{- if ne .spec.distribution.modules.ingress.nginx.type "none" }}
+{{- if $hasAnyIngress }}
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: forecastle
-  namespace: ingress-nginx
+  namespace: forecastle
 spec:
   template:
     spec:
@@ -103,15 +108,83 @@ spec:
       tolerations:
         {{ template "tolerations" $nginxArgs }}
 {{- end }}
+{{ if eq $haproxyType "dual" -}}
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: haproxy-ingress-external
+  namespace: ingress-haproxy
+spec:
+  template:
+    spec:
+      nodeSelector:
+        {{ template "nodeSelector" $haproxyArgs }}
+      tolerations:
+        {{ template "tolerations" $haproxyArgs }}
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: haproxy-ingress-internal
+  namespace: ingress-haproxy
+spec:
+  template:
+    spec:
+      nodeSelector:
+        {{ template "nodeSelector" $haproxyArgs }}
+      tolerations:
+        {{ template "tolerations" $haproxyArgs }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: haproxy-ingress-internal-crdjob-1
+  namespace: ingress-haproxy
+spec:
+  template:
+    spec:
+      nodeSelector:
+        {{ template "nodeSelector" $haproxyArgs }}
+      tolerations:
+        {{ template "tolerations" $haproxyArgs }}
+{{- else if eq $haproxyType "single" -}}
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: haproxy-ingress
+  namespace: ingress-haproxy
+spec:
+  template:
+    spec:
+      nodeSelector:
+        {{ template "nodeSelector" $haproxyArgs }}
+      tolerations:
+        {{ template "tolerations" $haproxyArgs }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: haproxy-ingress-crdjob-1
+  namespace: ingress-haproxy
+spec:
+  template:
+    spec:
+      nodeSelector:
+        {{ template "nodeSelector" $haproxyArgs }}
+      tolerations:
+        {{ template "tolerations" $haproxyArgs }}
+{{- end }}
 
 {{- if eq .spec.distribution.common.provider.type "eks" }}
-{{ if eq .spec.distribution.modules.ingress.nginx.type "dual" -}}
+{{ if or (eq .spec.distribution.modules.ingress.nginx.type "dual") (eq $haproxyType "dual") -}}
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: external-dns-public
-  namespace: ingress-nginx
+  namespace: external-dns
 spec:
   template:
     spec:
@@ -124,7 +197,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: external-dns-private
-  namespace: ingress-nginx
+  namespace: external-dns
 spec:
   template:
     spec:
@@ -132,13 +205,13 @@ spec:
         {{ template "nodeSelector" $dnsArgs }}
       tolerations:
         {{ template "tolerations" $dnsArgs }}
-{{- else if eq .spec.distribution.modules.ingress.nginx.type "single" -}}
+{{- else if or (eq .spec.distribution.modules.ingress.nginx.type "single") (eq $haproxyType "single") -}}
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: external-dns-public
-  namespace: ingress-nginx
+  namespace: external-dns
 spec:
   template:
     spec:

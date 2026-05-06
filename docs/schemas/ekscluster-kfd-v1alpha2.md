@@ -15,13 +15,14 @@ furyctl create config --kind EKSCluster --version v1.29.4 --name example-cluster
 | Property                  | Type     | Required |
 |:--------------------------|:---------|:---------|
 | [apiVersion](#apiversion) | `string` | Required |
+| [flags](#flags)           | `object` | Optional |
 | [kind](#kind)             | `string` | Required |
 | [metadata](#metadata)     | `object` | Required |
 | [spec](#spec)             | `object` | Required |
 
 ### Description
 
-A KFD Cluster deployed on top of AWS's Elastic Kubernetes Service (EKS).
+A SD Cluster deployed on top of AWS's Elastic Kubernetes Service (EKS).
 
 ## .apiVersion
 
@@ -34,6 +35,12 @@ A KFD Cluster deployed on top of AWS's Elastic Kubernetes Service (EKS).
 ```
 
 [try pattern](https://regexr.com/?expression=^kfd\.sighup\.io\/v\d%2B\(\(alpha|beta\)\d%2B\)?$)
+
+## .flags
+
+### Description
+
+Persistent furyctl command flags, see the documentation for more details: https://docs.sighup.io/furyctl/flags-configuration
 
 ## .kind
 
@@ -110,7 +117,7 @@ Common configuration for all the distribution modules.
 
 ### Description
 
-The node selector to use to place the pods for all the KFD modules. Follows Kubernetes selector format. Example: `node.kubernetes.io/role: infra`.
+The node selector to use to place the pods for all the SD modules. Follows Kubernetes selector format. Example: `node.kubernetes.io/role: infra`.
 
 ## .spec.distribution.common.provider
 
@@ -153,7 +160,7 @@ The relative path to the vendor directory, does not need to be changed.
 
 ### Description
 
-An array with the tolerations that will be added to the pods for all the KFD modules. Follows Kubernetes tolerations format. Example:
+An array with the tolerations that will be added to the pods for all the SD modules. Follows Kubernetes tolerations format. Example:
 
 ```yaml
 - effect: NoSchedule
@@ -786,7 +793,7 @@ Configuration for Pomerium, an identity-aware reverse proxy used for SSO.
 |:------------------------------------------------------------------------------------------------------------------|:--------|:---------|
 | [gatekeeperPolicyManager](#specdistributionmodulesauthpomeriumdefaultroutespolicygatekeeperpolicymanager)         | `array` | Optional |
 | [hubbleUi](#specdistributionmodulesauthpomeriumdefaultroutespolicyhubbleui)                                       | `array` | Optional |
-| [ingressNgnixForecastle](#specdistributionmodulesauthpomeriumdefaultroutespolicyingressngnixforecastle)           | `array` | Optional |
+| [ingressForecastle](#specdistributionmodulesauthpomeriumdefaultroutespolicyingressforecastle)                     | `array` | Optional |
 | [loggingMinioConsole](#specdistributionmodulesauthpomeriumdefaultroutespolicyloggingminioconsole)                 | `array` | Optional |
 | [loggingOpensearchDashboards](#specdistributionmodulesauthpomeriumdefaultroutespolicyloggingopensearchdashboards) | `array` | Optional |
 | [monitoringAlertmanager](#specdistributionmodulesauthpomeriumdefaultroutespolicymonitoringalertmanager)           | `array` | Optional |
@@ -797,13 +804,13 @@ Configuration for Pomerium, an identity-aware reverse proxy used for SSO.
 
 ### Description
 
-override default routes for KFD components
+override default routes for SD components
 
 ## .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.gatekeeperPolicyManager
 
 ## .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.hubbleUi
 
-## .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.ingressNgnixForecastle
+## .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.ingressForecastle
 
 ## .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.loggingMinioConsole
 
@@ -1511,6 +1518,7 @@ Default is `none`.
 | Property                                               | Type     | Required |
 |:-------------------------------------------------------|:---------|:---------|
 | [eks](#specdistributionmodulesdrveleroeks)             | `object` | Required |
+| [nodeAgent](#specdistributionmodulesdrveleronodeagent) | `object` | Optional |
 | [overrides](#specdistributionmodulesdrvelerooverrides) | `object` | Optional |
 | [schedules](#specdistributionmodulesdrveleroschedules) | `object` | Optional |
 
@@ -1520,14 +1528,37 @@ Default is `none`.
 
 | Property                                                    | Type     | Required |
 |:------------------------------------------------------------|:---------|:---------|
+| [accessMode](#specdistributionmodulesdrveleroeksaccessmode) | `string` | Optional |
 | [bucketName](#specdistributionmodulesdrveleroeksbucketname) | `string` | Required |
+| [prefixName](#specdistributionmodulesdrveleroeksprefixname) | `string` | Optional |
 | [region](#specdistributionmodulesdrveleroeksregion)         | `string` | Required |
+
+## .spec.distribution.modules.dr.velero.eks.accessMode
+
+### Description
+
+How Velero can access the backup storage location.
+
+### Constraints
+
+**enum**: the value of this property must be equal to one of the following string values:
+
+| Value       |
+|:------------|
+|`"ReadWrite"`|
+|`"ReadOnly"` |
 
 ## .spec.distribution.modules.dr.velero.eks.bucketName
 
 ### Description
 
 The name of the bucket for Velero.
+
+## .spec.distribution.modules.dr.velero.eks.prefixName
+
+### Description
+
+The prefix name to use inside the bucket.
 
 ## .spec.distribution.modules.dr.velero.eks.region
 
@@ -1570,6 +1601,24 @@ The region where the bucket for Velero will be located.
 |`"us-gov-west-1"` |
 |`"us-west-1"`     |
 |`"us-west-2"`     |
+
+## .spec.distribution.modules.dr.velero.nodeAgent
+
+### Properties
+
+| Property                                                                          | Type      | Required |
+|:----------------------------------------------------------------------------------|:----------|:---------|
+| [prepareQueueLength](#specdistributionmodulesdrveleronodeagentpreparequeuelength) | `integer` | Optional |
+
+### Description
+
+Configuration for Velero's node-agent DaemonSet.
+
+## .spec.distribution.modules.dr.velero.nodeAgent.prepareQueueLength
+
+### Description
+
+Defines the maximum number of DataUpload/DataDownload/PodVolumeBackup/PodVolumeRestore CRs under preparation statuses but not yet processed by any node. This constrains the number of intermediate objects (PVCs, VolumeSnapshots, etc.) to prevent unnecessary resource usage when cluster parallelism is limited.
 
 ## .spec.distribution.modules.dr.velero.overrides
 
@@ -1729,20 +1778,55 @@ Whether to install or not the default `manifests` and `full` backups schedules. 
 
 ### Properties
 
-| Property                                                  | Type     | Required |
-|:----------------------------------------------------------|:---------|:---------|
-| [baseDomain](#specdistributionmodulesingressbasedomain)   | `string` | Required |
-| [certManager](#specdistributionmodulesingresscertmanager) | `object` | Optional |
-| [dns](#specdistributionmodulesingressdns)                 | `object` | Optional |
-| [forecastle](#specdistributionmodulesingressforecastle)   | `object` | Optional |
-| [nginx](#specdistributionmodulesingressnginx)             | `object` | Required |
-| [overrides](#specdistributionmodulesingressoverrides)     | `object` | Optional |
+| Property                                                                                          | Type     | Required |
+|:--------------------------------------------------------------------------------------------------|:---------|:---------|
+| [baseDomain](#specdistributionmodulesingressbasedomain)                                           | `string` | Required |
+| [byoic](#specdistributionmodulesingressbyoic)                                                     | `object` | Optional |
+| [certManager](#specdistributionmodulesingresscertmanager)                                         | `object` | Optional |
+| [dns](#specdistributionmodulesingressdns)                                                         | `object` | Optional |
+| [forecastle](#specdistributionmodulesingressforecastle)                                           | `object` | Optional |
+| [haproxy](#specdistributionmodulesingresshaproxy)                                                 | `object` | Optional |
+| [infrastructureIngressController](#specdistributionmodulesingressinfrastructureingresscontroller) | `string` | Optional |
+| [nginx](#specdistributionmodulesingressnginx)                                                     | `object` | Required |
+| [overrides](#specdistributionmodulesingressoverrides)                                             | `object` | Optional |
 
 ## .spec.distribution.modules.ingress.baseDomain
 
 ### Description
 
-The base domain used for all the KFD infrastructural ingresses. If in the nginx `dual` configuration type, this value should be the same as the `.spec.distribution.modules.ingress.dns.private.name` zone.
+The base domain used for all the SD infrastructural ingresses. If in the nginx `dual` configuration type, this value should be the same as the `.spec.distribution.modules.ingress.dns.private.name` zone.
+
+## .spec.distribution.modules.ingress.byoic
+
+### Properties
+
+| Property                                                                   | Type      | Required |
+|:---------------------------------------------------------------------------|:----------|:---------|
+| [commonAnnotations](#specdistributionmodulesingressbyoiccommonannotations) | `object`  | Optional |
+| [enabled](#specdistributionmodulesingressbyoicenabled)                     | `boolean` | Required |
+| [ingressClass](#specdistributionmodulesingressbyoicingressclass)           | `string`  | Optional |
+
+### Description
+
+Configuration for Bring Your Own Ingress Controller mode. The ingressClass is used for infrastructure ingresses when both controllers are disabled.
+
+## .spec.distribution.modules.ingress.byoic.commonAnnotations
+
+### Description
+
+Annotations to apply to all infrastructure ingresses when using this BYOIC ingress class. Useful for controller-specific configuration (TLS, auth middlewares, etc.).
+
+## .spec.distribution.modules.ingress.byoic.enabled
+
+### Description
+
+Enable BYOIC mode.
+
+## .spec.distribution.modules.ingress.byoic.ingressClass
+
+### Description
+
+The IngressClass to use for infrastructure ingresses (Prometheus, Grafana, etc.) when both nginx and haproxy are disabled.
 
 ## .spec.distribution.modules.ingress.certManager
 
@@ -2068,6 +2152,173 @@ The key of the toleration
 
 The value of the toleration
 
+## .spec.distribution.modules.ingress.haproxy
+
+### Properties
+
+| Property                                                     | Type     | Required |
+|:-------------------------------------------------------------|:---------|:---------|
+| [overrides](#specdistributionmodulesingresshaproxyoverrides) | `object` | Optional |
+| [tls](#specdistributionmodulesingresshaproxytls)             | `object` | Optional |
+| [type](#specdistributionmodulesingresshaproxytype)           | `string` | Required |
+
+### Description
+
+Configuration for HAProxy ingress controller.
+
+## .spec.distribution.modules.ingress.haproxy.overrides
+
+### Properties
+
+| Property                                                                    | Type     | Required |
+|:----------------------------------------------------------------------------|:---------|:---------|
+| [nodeSelector](#specdistributionmodulesingresshaproxyoverridesnodeselector) | `object` | Optional |
+| [tolerations](#specdistributionmodulesingresshaproxyoverridestolerations)   | `array`  | Optional |
+
+## .spec.distribution.modules.ingress.haproxy.overrides.nodeSelector
+
+### Description
+
+Set to override the node selector used to place the pods of the package.
+
+## .spec.distribution.modules.ingress.haproxy.overrides.tolerations
+
+### Properties
+
+| Property                                                                       | Type     | Required |
+|:-------------------------------------------------------------------------------|:---------|:---------|
+| [effect](#specdistributionmodulesingresshaproxyoverridestolerationseffect)     | `string` | Required |
+| [key](#specdistributionmodulesingresshaproxyoverridestolerationskey)           | `string` | Required |
+| [operator](#specdistributionmodulesingresshaproxyoverridestolerationsoperator) | `string` | Optional |
+| [value](#specdistributionmodulesingresshaproxyoverridestolerationsvalue)       | `string` | Optional |
+
+### Description
+
+Set to override the tolerations that will be added to the pods of the package.
+
+## .spec.distribution.modules.ingress.haproxy.overrides.tolerations.effect
+
+### Constraints
+
+**enum**: the value of this property must be equal to one of the following string values:
+
+| Value              |
+|:-------------------|
+|`"NoSchedule"`      |
+|`"PreferNoSchedule"`|
+|`"NoExecute"`       |
+
+## .spec.distribution.modules.ingress.haproxy.overrides.tolerations.key
+
+### Description
+
+The key of the toleration
+
+## .spec.distribution.modules.ingress.haproxy.overrides.tolerations.operator
+
+### Constraints
+
+**enum**: the value of this property must be equal to one of the following string values:
+
+| Value    |
+|:---------|
+|`"Exists"`|
+|`"Equal"` |
+
+## .spec.distribution.modules.ingress.haproxy.overrides.tolerations.value
+
+### Description
+
+The value of the toleration
+
+## .spec.distribution.modules.ingress.haproxy.tls
+
+### Properties
+
+| Property                                                      | Type     | Required |
+|:--------------------------------------------------------------|:---------|:---------|
+| [provider](#specdistributionmodulesingresshaproxytlsprovider) | `string` | Required |
+| [secret](#specdistributionmodulesingresshaproxytlssecret)     | `object` | Optional |
+
+### Description
+
+TLS configuration for the HAProxy ingress controller.
+
+## .spec.distribution.modules.ingress.haproxy.tls.provider
+
+### Description
+
+The provider of the TLS certificates for the ingresses, one of: `none`, `certManager`, or `secret`.
+
+### Constraints
+
+**enum**: the value of this property must be equal to one of the following string values:
+
+| Value         |
+|:--------------|
+|`"certManager"`|
+|`"secret"`     |
+|`"none"`       |
+
+## .spec.distribution.modules.ingress.haproxy.tls.secret
+
+### Properties
+
+| Property                                                    | Type     | Required |
+|:------------------------------------------------------------|:---------|:---------|
+| [ca](#specdistributionmodulesingresshaproxytlssecretca)     | `string` | Required |
+| [cert](#specdistributionmodulesingresshaproxytlssecretcert) | `string` | Required |
+| [key](#specdistributionmodulesingresshaproxytlssecretkey)   | `string` | Required |
+
+### Description
+
+Kubernetes TLS secret for the HAProxy ingresses TLS certificate.
+
+## .spec.distribution.modules.ingress.haproxy.tls.secret.ca
+
+### Description
+
+The Certificate Authority certificate file's content. You can use the `"{file://<path>}"` notation to get the content from a file.
+
+## .spec.distribution.modules.ingress.haproxy.tls.secret.cert
+
+### Description
+
+The certificate file's content. You can use the `"{file://<path>}"` notation to get the content from a file.
+
+## .spec.distribution.modules.ingress.haproxy.tls.secret.key
+
+### Description
+
+The signing key file's content. You can use the `"{file://<path>}"` notation to get the content from a file.
+
+## .spec.distribution.modules.ingress.haproxy.type
+
+### Description
+
+The type of the HAProxy ingress controller, options are:
+- `none`: HAProxy ingress controller will not be installed.
+- `single`: a single HAProxy ingress controller with ingress class `haproxy` will be installed.
+- `dual`: two independent HAProxy ingress controllers will be installed, one for the `haproxy-internal` ingress class and one for the `haproxy-external` ingress class.
+
+Default is `none`.
+
+### Constraints
+
+**enum**: the value of this property must be equal to one of the following string values:
+
+| Value    |
+|:---------|
+|`"none"`  |
+|`"single"`|
+|`"dual"`  |
+
+## .spec.distribution.modules.ingress.infrastructureIngressController
+
+### Description
+
+Overrides the default ingress controller for SD infrastructure ingresses. Set to `nginx` or `haproxy` to select the controller family; the dual/single class mapping (e.g., `haproxy-internal`/`haproxy-external`) is applied automatically based on the controller's type setting. Useful during migrations to keep infrastructure ingresses on one controller while testing another. Do not use this field when both `nginx.type` and `haproxy.type` are `none`: in that case rely on `byoic.ingressClass` to define the ingress class for SD ingresses.
+
 ## .spec.distribution.modules.ingress.nginx
 
 ### Properties
@@ -2156,6 +2407,10 @@ The value of the toleration
 | [provider](#specdistributionmodulesingressnginxtlsprovider) | `string` | Required |
 | [secret](#specdistributionmodulesingressnginxtlssecret)     | `object` | Optional |
 
+### Description
+
+TLS configuration for the nginx ingress controller.
+
 ## .spec.distribution.modules.ingress.nginx.tls.provider
 
 ### Description
@@ -2211,7 +2466,7 @@ The signing key file's content. You can use the `"{file://<path>}"` notation to 
 The type of the Ingress nginx controller, options are:
 - `none`: no ingress controller will be installed and no infrastructural ingresses will be created.
 - `single`: a single ingress controller with ingress class `nginx` will be installed to manage all the ingress resources, infrastructural ingresses will be created.
-- `dual`: two independent ingress controllers will be installed, one for the `internal` ingress class intended for private ingresses and one for the `external` ingress class intended for public ingresses. KFD infrastructural ingresses wil use the `internal` ingress class when using the dual type.
+- `dual`: two independent ingress controllers will be installed, one for the `internal` ingress class intended for private ingresses and one for the `external` ingress class intended for public ingresses. SD infrastructural ingresses wil use the `internal` ingress class when using the dual type.
 
 Default is `single`.
 
@@ -2431,16 +2686,17 @@ The value of the toleration
 
 ### Properties
 
-| Property                                                                   | Type     | Required |
-|:---------------------------------------------------------------------------|:---------|:---------|
-| [audit](#specdistributionmodulesloggingcustomoutputsaudit)                 | `string` | Required |
-| [errors](#specdistributionmodulesloggingcustomoutputserrors)               | `string` | Required |
-| [events](#specdistributionmodulesloggingcustomoutputsevents)               | `string` | Required |
-| [infra](#specdistributionmodulesloggingcustomoutputsinfra)                 | `string` | Required |
-| [ingressNginx](#specdistributionmodulesloggingcustomoutputsingressnginx)   | `string` | Required |
-| [kubernetes](#specdistributionmodulesloggingcustomoutputskubernetes)       | `string` | Required |
-| [systemdCommon](#specdistributionmodulesloggingcustomoutputssystemdcommon) | `string` | Required |
-| [systemdEtcd](#specdistributionmodulesloggingcustomoutputssystemdetcd)     | `string` | Required |
+| Property                                                                     | Type     | Required |
+|:-----------------------------------------------------------------------------|:---------|:---------|
+| [audit](#specdistributionmodulesloggingcustomoutputsaudit)                   | `string` | Required |
+| [errors](#specdistributionmodulesloggingcustomoutputserrors)                 | `string` | Required |
+| [events](#specdistributionmodulesloggingcustomoutputsevents)                 | `string` | Required |
+| [infra](#specdistributionmodulesloggingcustomoutputsinfra)                   | `string` | Required |
+| [ingressHaproxy](#specdistributionmodulesloggingcustomoutputsingresshaproxy) | `string` | Required |
+| [ingressNginx](#specdistributionmodulesloggingcustomoutputsingressnginx)     | `string` | Required |
+| [kubernetes](#specdistributionmodulesloggingcustomoutputskubernetes)         | `string` | Required |
+| [systemdCommon](#specdistributionmodulesloggingcustomoutputssystemdcommon)   | `string` | Required |
+| [systemdEtcd](#specdistributionmodulesloggingcustomoutputssystemdetcd)       | `string` | Required |
 
 ### Description
 
@@ -2469,6 +2725,12 @@ This value defines where the output from the `events` Flow will be sent. This wi
 ### Description
 
 This value defines where the output from the `infra` Flow will be sent. This will be the `spec` section of the `Output` object. It must be a string (and not a YAML object) following the OutputSpec definition. Use the `nullout` output to discard the flow: `nullout: {}`
+
+## .spec.distribution.modules.logging.customOutputs.ingressHaproxy
+
+### Description
+
+This value defines where the output from the `ingressHaproxy` Flow will be sent. This will be the `spec` section of the `Output` object. It must be a string (and not a YAML object) following the OutputSpec definition. Use the `nullout` output to discard the flow: `nullout: {}`
 
 ## .spec.distribution.modules.logging.customOutputs.ingressNginx
 
@@ -4842,7 +5104,7 @@ Default is `tempo`.
 
 ### Description
 
-Defines which KFD version will be installed and, in consequence, the Kubernetes version used to create the cluster. It supports git tags and branches. Example: `v1.30.1`.
+Defines which SD version will be installed and, in consequence, the Kubernetes version used to create the cluster. It supports git tags and branches. Example: `v1.30.1`.
 
 ### Constraints
 
@@ -5335,7 +5597,7 @@ The SSH public key that can connect to the nodes via SSH using the `ec2-user` us
 
 ### Description
 
-Global default AMI type used for EKS worker nodes. This will apply to all node pools unless overridden by a specific node pool.
+Global default AMI type used for EKS worker nodes. This will apply to all node pools unless overridden by a specific node pool. Only Amazon Linux 2023 (alinux2023) images are supported. 
 
 ### Constraints
 
@@ -5343,7 +5605,6 @@ Global default AMI type used for EKS worker nodes. This will apply to all node p
 
 | Value        |
 |:-------------|
-|`"alinux2"`   |
 |`"alinux2023"`|
 
 ## .spec.kubernetes.nodePools
@@ -5676,7 +5937,7 @@ The owner of the AMI to use for the nodes, must be set toghether with the `id` f
 
 ### Description
 
-The AMI type defines the AMI to use for `eks-managed` and `self-managed` type of Node Pools. Only Amazon Linux based AMIs are supported. It can't be set at the same time than `ami.id` and `ami.owner`.
+The AMI type defines the AMI to use for `eks-managed` and `self-managed` type of Node Pools. Only Amazon Linux based AMIs are supported. For Kubernetes versions 1.33 and later, EKS will not provide pre-built optimized Amazon Linux 2 (alinux2). Only Amazon Linux 2023 (alinux2023) images are supported. It can't be set at the same time than `ami.id` and `ami.owner`.
 
 ### Constraints
 
@@ -5684,7 +5945,6 @@ The AMI type defines the AMI to use for `eks-managed` and `self-managed` type of
 
 | Value        |
 |:-------------|
-|`"alinux2"`   |
 |`"alinux2023"`|
 
 ## .spec.kubernetes.nodePools.attachedTargetGroups
@@ -6184,11 +6444,123 @@ This map defines which will be the common tags that will be added to all the res
 
 | Property                                      | Type     | Required |
 |:----------------------------------------------|:---------|:---------|
-| [terraform](#spectoolsconfigurationterraform) | `object` | Required |
+| [opentofu](#spectoolsconfigurationopentofu)   | `object` | Optional |
+| [terraform](#spectoolsconfigurationterraform) | `object` | Optional |
 
 ### Description
 
 Configuration for tools used by furyctl, like Terraform.
+
+## .spec.toolsConfiguration.opentofu
+
+### Properties
+
+| Property                                      | Type     | Required |
+|:----------------------------------------------|:---------|:---------|
+| [state](#spectoolsconfigurationopentofustate) | `object` | Required |
+
+### Description
+
+Configuration for storing the OpenTofu state of the cluster.
+
+## .spec.toolsConfiguration.opentofu.state
+
+### Properties
+
+| Property                                     | Type     | Required |
+|:---------------------------------------------|:---------|:---------|
+| [s3](#spectoolsconfigurationopentofustates3) | `object` | Required |
+
+### Description
+
+Configuration for storing the OpenTofu state of the cluster.
+
+## .spec.toolsConfiguration.opentofu.state.s3
+
+### Properties
+
+| Property                                                                           | Type      | Required |
+|:-----------------------------------------------------------------------------------|:----------|:---------|
+| [bucketName](#spectoolsconfigurationopentofustates3bucketname)                     | `string`  | Required |
+| [keyPrefix](#spectoolsconfigurationopentofustates3keyprefix)                       | `string`  | Required |
+| [region](#spectoolsconfigurationopentofustates3region)                             | `string`  | Required |
+| [skipRegionValidation](#spectoolsconfigurationopentofustates3skipregionvalidation) | `boolean` | Optional |
+
+### Description
+
+Configuration for the S3 bucket used to store the OpenTofu state.
+
+## .spec.toolsConfiguration.opentofu.state.s3.bucketName
+
+### Description
+
+This value defines which bucket will be used to store all the states.
+
+## .spec.toolsConfiguration.opentofu.state.s3.keyPrefix
+
+### Description
+
+This value defines which folder will be used to store all the states inside the bucket.
+
+### Constraints
+
+**maximum length**: the maximum number of characters for this string is: `960`
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[A-z0-9][A-z0-9!-_.*'()]+$
+```
+
+[try pattern](https://regexr.com/?expression=^[A-z0-9][A-z0-9!-_.*'\(\)]%2B$)
+
+## .spec.toolsConfiguration.opentofu.state.s3.region
+
+### Description
+
+This value defines in which region the bucket is located.
+
+### Constraints
+
+**enum**: the value of this property must be equal to one of the following string values:
+
+| Value            |
+|:-----------------|
+|`"af-south-1"`    |
+|`"ap-east-1"`     |
+|`"ap-northeast-1"`|
+|`"ap-northeast-2"`|
+|`"ap-northeast-3"`|
+|`"ap-south-1"`    |
+|`"ap-south-2"`    |
+|`"ap-southeast-1"`|
+|`"ap-southeast-2"`|
+|`"ap-southeast-3"`|
+|`"ap-southeast-4"`|
+|`"ca-central-1"`  |
+|`"eu-central-1"`  |
+|`"eu-central-2"`  |
+|`"eu-north-1"`    |
+|`"eu-south-1"`    |
+|`"eu-south-2"`    |
+|`"eu-west-1"`     |
+|`"eu-west-2"`     |
+|`"eu-west-3"`     |
+|`"me-central-1"`  |
+|`"me-south-1"`    |
+|`"sa-east-1"`     |
+|`"us-east-1"`     |
+|`"us-east-2"`     |
+|`"us-gov-east-1"` |
+|`"us-gov-west-1"` |
+|`"us-west-1"`     |
+|`"us-west-2"`     |
+
+## .spec.toolsConfiguration.opentofu.state.s3.skipRegionValidation
+
+### Description
+
+This value defines if the region of the bucket should be validated or not by OpenTofu, useful when using a bucket in a recently added region.
 
 ## .spec.toolsConfiguration.terraform
 
@@ -6197,6 +6569,10 @@ Configuration for tools used by furyctl, like Terraform.
 | Property                                       | Type     | Required |
 |:-----------------------------------------------|:---------|:---------|
 | [state](#spectoolsconfigurationterraformstate) | `object` | Required |
+
+### Description
+
+DEPRECATED: Configuration for storing the Terraform state of the cluster. Use 'opentofu' instead. This field will be removed in the next versions.
 
 ## .spec.toolsConfiguration.terraform.state
 

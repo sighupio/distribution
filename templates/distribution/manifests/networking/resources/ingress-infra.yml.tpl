@@ -19,6 +19,7 @@ metadata:
     {{ end }}
     {{ if not .spec.distribution.modules.networking.overrides.ingresses.hubble.disableAuth }}{{ template "ingressAuth" . }}{{ end }}
     {{ template "certManagerClusterIssuer" . }}
+    {{ template "byoicAnnotations" . }}
   name: hubble
   {{ if and (not .spec.distribution.modules.networking.overrides.ingresses.hubble.disableAuth) (eq .spec.distribution.modules.auth.provider.type "sso") }}
   namespace: pomerium
