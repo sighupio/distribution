@@ -34,7 +34,7 @@
       args:
         creates: /usr/local/bin/furyctl
       vars:
-        furyctl_version: "{{ lookup('env', 'FURYCTL_VERSION') | default('v0.34.1-rc.0') }}"
+        furyctl_version: "{{ lookup('env', 'FURYCTL_VERSION') | default('v0.34.1-rc.2') }}"
 
     - name: Create furyctl pki
       ansible.builtin.shell: furyctl create pki -p ./pki
@@ -99,7 +99,7 @@
       ignore_errors: yes
 
     - name: Create cluster with furyctl - Kubernetes phase
-      ansible.builtin.shell: furyctl apply cluster -o $PWD -D --phase kubernetes --force migrations --distro-location /tmp/fury-distribution
+      ansible.builtin.shell: furyctl apply -o $PWD -D --phase kubernetes --force migrations --distro-location /tmp/fury-distribution
       args:
         chdir: /root
       register: furyctl_kubernetes
@@ -122,7 +122,7 @@
         chdir: /root/.furyctl/reevo/kubernetes
 
     - name: Complete furyctl installation , all phases + post apply phase
-      ansible.builtin.shell: furyctl apply cluster -o $PWD -D --post-apply-phases distribution --force migrations --distro-location /tmp/fury-distribution
+      ansible.builtin.shell: furyctl apply -o $PWD -D --post-apply-phases distribution --force migrations --distro-location /tmp/fury-distribution
       args:
         chdir: /root
       register: furyctl_post_apply
@@ -135,7 +135,7 @@
         msg: "{{ furyctl_post_apply.stdout }}"
 
     - name: Apply distribution again, in the case storage class is not yet available
-      ansible.builtin.shell: sleep 60 && furyctl apply cluster -o $PWD -D --phase distribution --distro-location /tmp/fury-distribution
+      ansible.builtin.shell: sleep 60 && furyctl apply -o $PWD -D --phase distribution --distro-location /tmp/fury-distribution
       args:
         chdir: /root
       register: furyctl_distribution

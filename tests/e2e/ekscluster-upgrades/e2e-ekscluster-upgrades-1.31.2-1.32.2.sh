@@ -6,8 +6,8 @@
 set -e
 
 echo "----------------------------------------------------------------------------"
-echo "Executing furyctl for the initial setup 1.32.1 with alinux2"
-FURYCTL_YAML=tests/e2e/ekscluster-upgrades/manifests/furyctl-init-cluster-1.32.1.yaml
+echo "Executing furyctl for the initial setup 1.31.2 with alinux2"
+FURYCTL_YAML=tests/e2e/ekscluster-upgrades/manifests/furyctl-init-cluster-1.31.2.yaml
 tests/e2e/ekscluster/replace_variables.sh --cluster-name "$CLUSTER_NAME" --furyctl-yaml "$FURYCTL_YAML"
 if ! furyctl apply \
   --outdir /furyctl-outdir \
