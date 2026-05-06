@@ -32,39 +32,6 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: opensearch-ingress-opensearch-dashboards
-  namespace: logging
-  labels:
-    cluster.kfd.sighup.io/module: logging
-    cluster.kfd.sighup.io/logging-type: opensearch
-spec:
-  policyTypes:
-    - Ingress
-  # podSelector:
-  #   matchLabels:
-  #     app.kubernetes.io/name: opensearch
-  ingress:
-    - to:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: logging
-          podSelector:
-            matchLabels:
-              app.kubernetes.io/name: opensearch
-    - from:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: logging
-          podSelector:
-            matchLabels:
-              app.kubernetes.io/name: opensearch-dashboards
-      ports:
-        - port: 9200
-          protocol: TCP
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
   name: opensearch-dashboards-ingress-jobs
   namespace: logging
   labels:
@@ -89,6 +56,66 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
+  name: opensearch-dashboards-ingress-prometheus-metrics
+  namespace: logging
+  labels:
+    cluster.kfd.sighup.io/module: logging
+    cluster.kfd.sighup.io/logging-type: opensearch
+spec:
+  policyTypes:
+    - Ingress
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: opensearch-dashboards
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: prometheus
+          namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+      ports:
+        - port: 9601
+          protocol: TCP
+{{- $nginxType := .spec.distribution.modules.ingress.nginx.type }}
+{{- $haproxyType := .spec.distribution.modules.ingress.haproxy.type }}
+{{- $isSSO := eq .spec.distribution.modules.auth.provider.type "sso" }}
+{{- $isBYOIC := .spec.distribution.modules.ingress.byoic.enabled }}
+
+{{- if $isSSO }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: opensearch-dashboards-ingress-pomerium
+  namespace: logging
+  labels:
+    cluster.kfd.sighup.io/module: logging
+    cluster.kfd.sighup.io/logging-type: opensearch
+spec:
+  policyTypes:
+    - Ingress
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: opensearch-dashboards
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: pomerium
+          podSelector:
+            matchLabels:
+              app: pomerium
+      ports:
+        - port: 5601
+          protocol: TCP
+{{- else }}
+  {{- if ne $nginxType "none" }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
   name: opensearch-dashboards-ingress-nginx
   namespace: logging
   labels:
@@ -102,26 +129,71 @@ spec:
       app.kubernetes.io/name: opensearch-dashboards
   ingress:
     - from:
-      - namespaceSelector:
-{{- if (eq .spec.distribution.modules.auth.provider.type "sso") }}
-          matchLabels:
-            kubernetes.io/metadata.name: pomerium
-{{ else }}
-          matchLabels:
-            kubernetes.io/metadata.name: ingress-nginx
-{{- end }}
-        podSelector:
-          matchLabels:
-{{- if (eq .spec.distribution.modules.auth.provider.type "sso") }}
-            app: pomerium
-{{- else if eq .spec.distribution.modules.ingress.nginx.type "dual" }}
-            app: ingress
-{{- else if eq .spec.distribution.modules.ingress.nginx.type "single" }}
-            app: ingress-nginx
-{{- end }}
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+          podSelector:
+            matchLabels:
+    {{- if eq $nginxType "dual" }}
+              app: ingress
+    {{- else }}
+              app: ingress-nginx
+    {{- end }}
       ports:
         - port: 5601
           protocol: TCP
+  {{- end }}
+  {{- if ne $haproxyType "none" }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: opensearch-dashboards-ingress-haproxy
+  namespace: logging
+  labels:
+    cluster.kfd.sighup.io/module: logging
+    cluster.kfd.sighup.io/logging-type: opensearch
+spec:
+  policyTypes:
+    - Ingress
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: opensearch-dashboards
+  ingress:
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: ingress-haproxy
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/name: kubernetes-ingress
+            app.kubernetes.io/instance: haproxy-ingress
+      ports:
+        - port: 5601
+          protocol: TCP
+  {{- end }}
+  {{- if $isBYOIC }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: opensearch-dashboards-ingress-byoic
+  namespace: logging
+  labels:
+    cluster.kfd.sighup.io/module: logging
+    cluster.kfd.sighup.io/logging-type: opensearch
+spec:
+  policyTypes:
+    - Ingress
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: opensearch-dashboards
+  ingress:
+    - ports:
+        - port: 5601
+          protocol: TCP
+  {{- end }}
+{{- end }}
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy

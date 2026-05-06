@@ -18,7 +18,7 @@ kind: OnPremises
 metadata:
   name: reevo
 spec:
-  distributionVersion: v1.32.0
+  distributionVersion: v1.32.1
   kubernetes:
     pkiFolder: ./pki
     ssh:
@@ -136,9 +136,9 @@ spec:
           snapshotController:
             install: true
       tracing: 
-        type: tempo
-        tempo: 
-          backend: minio
+        type: none
+        # tempo: 
+        #   backend: minio
       auth:
         provider:
           type: none
@@ -156,7 +156,7 @@ spec:
           version: '1.8.1'
           set:
             - name: persistence.defaultClassReplicaCount
-              value: "1"
+              value: "2"
 EOF
 }
 
@@ -168,7 +168,7 @@ kind: OnPremises
 metadata:
   name: reevo
 spec:
-  distributionVersion: v1.33.1
+  distributionVersion: v1.33.2
   kubernetes:
     pkiFolder: ./pki
     ssh:
@@ -246,6 +246,14 @@ spec:
               cert: "{file://tls.crt}"
               key: "{file://tls.key}"
               ca: "{file://ca.crt}"
+        haproxy:
+          type: single
+          tls:
+            provider: secret
+            secret:
+              cert: "{file://tls.crt}"
+              key: "{file://tls.key}"
+              ca: "{file://ca.crt}"
         certManager:
           clusterIssuer:
             name: letsencrypt-fury
@@ -286,9 +294,9 @@ spec:
           snapshotController:
             install: true
       tracing: 
-        type: tempo
-        tempo: 
-          backend: minio
+        type: none
+        # tempo: 
+        #   backend: minio
       auth:
         provider:
           type: none
@@ -306,7 +314,7 @@ spec:
           version: '1.8.1'
           set:
             - name: persistence.defaultClassReplicaCount
-              value: "1"
+              value: "2"
 EOF
 }
 

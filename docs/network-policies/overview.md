@@ -3,7 +3,7 @@
 ```mermaid
 graph TD
     subgraph kfd[SD Core Modules]
-        ingress[Ingress<br/>Nginx + Cert-manager]
+        ingress[Kubernetes Ingress Controller + Cert-manager]
         auth[Auth<br/>Pomerium]
         mon[Monitoring<br/>Prometheus/Mimir]
         log[Logging<br/>Opensearch/Loki]

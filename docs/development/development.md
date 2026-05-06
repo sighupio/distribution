@@ -54,20 +54,20 @@ Once identified, `furyctl` downloads or references these dependencies from eithe
 
 ---
 
-## **What's inside the Makefile?**
+## **What's inside the mise.toml?**
 
 <details>
   <summary>Answer</summary>
 
-The important commands in the `Makefile` are:
+The important mise tasks are:
 
-- **`make tools-go`**: This command it's important and installs all the tools required for the subsequent commands.
+- **`mise install`**: This command installs all the tools required for the subsequent commands. Tool versions are managed in the `mise.toml` file.
 
-- **`make generate-go-models`**: This command generates Go code from the JSON schema files. The generated code defines the data models used in the codebase, providing a structured representation of the resources and configurations used by `furyctl`. It essentially converts the schema into Go structs, which are essential for interacting with the configuration data programmatically. The tool used to generate the code is https://github.com/sighupio/go-jsonschema.
+- **`mise run generate-go-models`**: This command generates Go code from the JSON schema files. The generated code defines the data models used in the codebase, providing a structured representation of the resources and configurations used by `furyctl`. It essentially converts the schema into Go structs, which are essential for interacting with the configuration data programmatically. The tool used to generate the code is https://github.com/sighupio/go-jsonschema.
 
-- **`make generate-docs`**: This command generates Markdown documentation from the schema files. It extracts the necessary information from the schemas and formats it into human-readable documentation, helping developers and users understand how to configure and use the distribution and resources. This documentation serves as the primary reference for anyone interacting with `furyctl`.
+- **`mise run generate-docs`**: This command generates Markdown documentation from the schema files. It extracts the necessary information from the schemas and formats it into human-readable documentation, helping developers and users understand how to configure and use the distribution and resources. This documentation serves as the primary reference for anyone interacting with `furyctl`.
 
-To have a working dev environment you need to launch `make tools-go` and you must have `asdf` installed and configured.
+To have a working dev environment you need to launch `mise install`. The required tool versions are managed in `mise.toml`.
 
 </details>
 
@@ -82,6 +82,6 @@ The `public` schema serves as the base schema, which is shared and visible to al
 
 The `private` schema is a modified version of the public schema, typically used internally within `furyctl`. It includes additional fields or configurations that should not be exposed in the public configuration files (like `furyctl.yaml`), but are still necessary for certain internal operations or customizations within the codebase.
 
-A notable case where the private schema is used is with the `EKSCluster` resource. Here, a patch (`schemas/private/ekscluster-kfd-v1alpha2.patch.json`) is applied to the public schema (`schemas/public/ekscluster-kfd-v1alpha2.json`) with `json-patch` and `jq` to add internal fields that are required for `furyctl` to function but are not intended for end-user modification. This separation ensures that sensitive or internal details remain private while maintaining flexibility for internal customization. Note that this process is automatic and managed by the `make generate-go-models` command. To configure a new private schema / patch create a new configuration on the Makefile (example on line 72) and a patch like `schemas/private/ekscluster-kfd-v1alpha2.patch.json` that is a standard json patch (https://jsonpatch.com).
+A notable case where the private schema is used is with the `EKSCluster` resource. Here, a patch (`schemas/private/ekscluster-kfd-v1alpha2.patch.json`) is applied to the public schema (`schemas/public/ekscluster-kfd-v1alpha2.json`) with `json-patch` and `jq` to add internal fields that are required for `furyctl` to function but are not intended for end-user modification. This separation ensures that sensitive or internal details remain private while maintaining flexibility for internal customization. Note that this process is automatic and managed by the `mise run generate-go-models` command. To configure a new private schema / patch create a new configuration in the `mise.toml` [tasks._generate-go-models] section and a patch like `schemas/private/ekscluster-kfd-v1alpha2.patch.json` that is a standard json patch (https://jsonpatch.com).
 
 </details>

@@ -16,6 +16,20 @@ Usually, a new release of SD is triggered by one of these events:
 
 The release is needed to render this updates available to SD's user base.
 
+## CI/CD Pipeline Triggers
+
+Different tag patterns trigger specific combinations of test pipelines to optimize CI resource usage and testing coverage:
+
+| Tag Pattern                 | Pipelines Triggered                                                           |
+| --------------------------- | ----------------------------------------------------------------------------- |
+| **Any push**                | QA only                                                                       |
+| **`e2e-all-*`**             | QA + ALL e2e tests (kfddistro, eks, eks-selfmanaged, onpremises) - NO release |
+| **`e2e-eks-*`**             | QA + ALL EKS e2e only (standard + selfmanaged + upgrades)                     |
+| **`e2e-kfddistribution-*`** | QA + kfddistro e2e only                                                       |
+| **`e2e-onpremises-*`**      | QA + onpremises e2e only                                                      |
+| **`v1.XX.X`**               | QA → release (stable) - NO e2e                                                |
+| **`v1.XX.X-rc.X`**          | QA → release (prerelease) - NO e2e                                            |
+
 ## Process
 
 The update process usually involves going back and forward between SD (this repo) and furyctl.
@@ -28,15 +42,15 @@ With no further ado, the steps to release a new version are:
 ### fury-distribution
 
 > [!WARNING]
-> If you are releasing a new `x.y.0` version create a `release-vX.<y-1>` branch for the previous release.
+> If you are releasing a new `x.y.0` version create a `release-vX.<y-1>` branch for the previous release (to be used later for backporting).
 
-1. Create a new branch `feat/vx.y.z` (`v1.29.4`, for example) where to work on.
+1. Create a new branch `feat/release-vx.y.z` (`feat/release-v1.29.4`, for example) where to work on.
 2. Create the PRs fixing the issues or adding new features to the templates or other files of fury-distribution, test them and merge them.
 3. Update the `kfd.yaml` and `Furyfile.yaml` files, bumping the distribution version, adjusting the modules and installers versions where needed.
 4. If the distribution schemas have been changed:
-   1. If you haven't already, install the needed tools with `make tools-go`.
-   2. Generate the new docs with `make generate-docs`.
-   3. Generate the go models with `make generate-go-models`
+   1. If you haven't already, install the needed tools with `mise install`.
+   2. Generate the new docs with `mise run generate-docs`.
+   3. Generate the go models with `mise run generate-go-models`
 5. Update the CI and e2e tests to point to the new version:
    1. `.drone.yaml`
    2. `tests/e2e-kfddistribution-*.yaml`
@@ -47,7 +61,7 @@ With no further ado, the steps to release a new version are:
    2. `docs/COMPATIBILITY_MATRIX.md`
    3. `docs/VERSIONING.md`
    4. Write the release notes for the new version (`docs/releases/vx.y.z.md`)
-7. Tag a release candidate to trigger all the e2e tests and fix eventual problems
+7. Use the `e2e-all-*` tag pattern to trigger all the e2e tests, fix eventual problems and finally tag a release candidate
 
 At this point, you'll need to switch to pushing some changes in furyctl
 
@@ -73,7 +87,7 @@ go mod tidy
 
 15. Update the CI's `.drone.yaml` file to use the release candidate for furyctl that you released in step `14`.
 16. Update the e2e tests with the new upgrade paths.
-17. Tag a new release candidate of the distribution to run the e2e tests using the new upgrade paths and furyctl's RC.
+17. Tag with the `e2e-all-*` pattern to run the e2e tests using the new upgrade paths and furyctl's RC, then tag a release candidate.
 18. After the CI passes and the PR has been approved, merge into `main`
 19. Tag the final release and let the CI run again and do the release.
 20. **Repeat all the process for the other 2 "minor" versions that need to be updated**, but targeting `release-vx.y` branches instead of `main`.

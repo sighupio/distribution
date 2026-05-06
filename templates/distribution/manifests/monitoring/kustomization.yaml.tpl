@@ -2,10 +2,13 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
+{{- $vendorPrefix := print "../" .spec.distribution.common.relativeVendorPath }}
 {{- $monitoringType := .spec.distribution.modules.monitoring.type }}
 {{- $installEnhancedHPAMetrics := .spec.distribution.modules.monitoring.prometheusAdapter.installEnhancedHPAMetrics }}
+{{- $haproxyType := .spec.distribution.modules.ingress.haproxy.type }}
+{{- $isBYOIC := .spec.distribution.modules.ingress.byoic.enabled }}
+{{- $hasAnyIngress := or (ne .spec.distribution.modules.ingress.nginx.type "none") (ne $haproxyType "none") $isBYOIC }}
 # rendering Kustomization file for monitoring type {{ $monitoringType }}
-
 ---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
@@ -13,39 +16,44 @@ kind: Kustomization
 resources:
 {{- /* common components for all the monitoring types */}}
   - kapp-configs/prometheus-operator-crd.yaml
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/monitoring/katalog/prometheus-operator" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/monitoring/katalog/kube-proxy-metrics" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/monitoring/katalog/kube-state-metrics" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/monitoring/katalog/node-exporter" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/monitoring/katalog/x509-exporter" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/monitoring/katalog/blackbox-exporter" }}
+  - {{ print $vendorPrefix "/modules/monitoring/katalog/prometheus-operator" }}
+{{- if .spec | digAny "kubernetes" "advanced" "kubeProxy" "enabled" true }}
+  - {{ print $vendorPrefix "/modules/monitoring/katalog/kube-proxy-metrics" }}
+{{- end }}
+  - {{ print $vendorPrefix "/modules/monitoring/katalog/kube-state-metrics" }}
+  - {{ print $vendorPrefix "/modules/monitoring/katalog/node-exporter" }}
+  - {{ print $vendorPrefix "/modules/monitoring/katalog/x509-exporter" }}
+  - {{ print $vendorPrefix "/modules/monitoring/katalog/blackbox-exporter" }}
 {{- if eq .spec.distribution.common.provider.type "none" }}{{/* none === on-premises and kfddistribution */}}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/monitoring/katalog/kubeadm-sm" }}
+  - {{ print $vendorPrefix "/modules/monitoring/katalog/kubeadm-sm" }}
   {{- if hasKeyAny .spec "kubernetes" }}
     {{- if .spec.kubernetes.loadBalancers.enabled }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/monitoring/katalog/haproxy" }}
+  - {{ print $vendorPrefix "/modules/monitoring/katalog/haproxy" }}
   - resources/haproxy-scrapeConfig.yaml
     {{- end }}
   {{- end }}
+  {{- if .spec | digAny "kubernetes" "etcd" nil }}
+  - resources/etcd-scrapeConfig.yaml
+  {{- end }}
 {{- end }}
 {{- if eq .spec.distribution.common.provider.type "eks" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/monitoring/katalog/eks-sm" }}
+  - {{ print $vendorPrefix "/modules/monitoring/katalog/eks-sm" }}
 {{- end }}
 {{- if or (eq $monitoringType "prometheus") (eq $monitoringType "mimir") }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/monitoring/katalog/alertmanager-operated" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/monitoring/katalog/prometheus-adapter" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/monitoring/katalog/grafana" }}
+  - {{ print $vendorPrefix "/modules/monitoring/katalog/alertmanager-operated" }}
+  - {{ print $vendorPrefix "/modules/monitoring/katalog/prometheus-adapter" }}
+  - {{ print $vendorPrefix "/modules/monitoring/katalog/grafana" }}
     {{- if .checks.storageClassAvailable }}
         {{- if eq $monitoringType "prometheus" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/monitoring/katalog/prometheus-operated" }}
+  - {{ print $vendorPrefix "/modules/monitoring/katalog/prometheus-operated" }}
         {{- else if eq $monitoringType "mimir" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/monitoring/katalog/mimir" }}
+  - {{ print $vendorPrefix "/modules/monitoring/katalog/mimir" }}
             {{- if eq .spec.distribution.modules.monitoring.mimir.backend "minio" }}
-  - {{ print "../" .spec.distribution.common.relativeVendorPath "/modules/monitoring/katalog/minio-ha" }}
+  - {{ print $vendorPrefix "/modules/monitoring/katalog/minio-ha" }}
             {{- end }}
         {{- end }}
     {{- end }}
-    {{- if and (ne .spec.distribution.modules.ingress.nginx.type "none") }}{{/* we don't need ingresses for Prometheus in Agent mode */}}
+    {{- if $hasAnyIngress }}{{/* we don't need ingresses for Prometheus in Agent mode */}}
   - resources/ingress-infra.yml
     {{- end }}
 {{- end }}
@@ -62,6 +70,22 @@ resources:
 
 patches:
   - path: patches/infra-nodes.yml
+{{- if .spec | digAny "kubernetes" "etcd" nil }}
+  - patch: |-
+      $patch: delete
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: etcd-metrics
+        namespace: kube-system
+  - patch: |-
+      $patch: delete
+      apiVersion: monitoring.coreos.com/v1
+      kind: ServiceMonitor
+      metadata:
+        name: etcd-metrics
+        namespace: kube-system
+{{- end }}
 {{- if eq .spec.distribution.common.provider.type "eks" }}{{/* in EKS there are no files to monitor on nodes */}}
   - patch: |-
       $patch: delete
