@@ -17,6 +17,11 @@ metadata:
     forecastle.stakater.com/group: "forecastle"
     {{ end }}
     forecastle.stakater.com/icon: "https://raw.githubusercontent.com/stakater/Forecastle/master/assets/web/forecastle-round-100px.png"
+    {{ if ne .spec.distribution.modules.ingress.nginx.type "none" }}
+    # Wait for the nginx controller rolling update to
+    # complete before creating this Ingress.
+    kapp.k14s.io/change-rule: "upsert after upserting nginx-controllers"
+    {{ end }}
     {{ if not .spec.distribution.modules.ingress.overrides.ingresses.forecastle.disableAuth }}{{ template "ingressAuth" . }}{{ end }}
     {{ template "certManagerClusterIssuer" . }}
     {{ template "byoicAnnotations" . }}
