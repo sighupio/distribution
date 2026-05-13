@@ -4,7 +4,6 @@
 
 ---
 infrastructure:
-  # TODO: Write the remaining rules for unsafe changes
   - path: .spec.infrastructure.nodes.*.arch
     immutable: false
     description: "Changes to nodes configuration require manual intervention. Nodes will need to be recreated for the changes to take effect."
@@ -17,17 +16,77 @@ infrastructure:
     reducers:
       - key: infrastructureNodesArch
         lifecycle: pre-apply
+  - path: .spec.infrastructure.nodes.*.hostname
+    immutable: false
+    description: "Changes to nodes configuration require manual intervention. Nodes will need to be recreated for the changes to take effect."
+    reducers:
+      - key: infrastructureNodesHostname
+        lifecycle: pre-apply
+  - path: .spec.infrastructure.nodes.*.macAddress
+    immutable: false
+    description: "Changes to nodes configuration require manual intervention. Nodes will need to be recreated for the changes to take effect."
+    reducers:
+      - key: infrastructureNodesMacAddress
+        lifecycle: pre-apply
+  - path: .spec.infrastructure.nodes.*.storage.additionalDisks
+    immutable: false
+    description: "Changes to nodes configuration require manual intervention. Nodes will need to be recreated for the changes to take effect."
+    reducers:
+      - key: infrastructureNodesStorageAdditionalDisks
+        lifecycle: pre-apply
+  - path: .spec.infrastructure.nodes.*.storage.files
+    immutable: false
+    description: "Changes to nodes configuration require manual intervention. Nodes will need to be recreated for the changes to take effect."
+    reducers:
+      - key: infrastructureNodesStorageFiles
+        lifecycle: pre-apply
+  - path: .spec.infrastructure.nodes.*.storage.links
+    immutable: false
+    description: "Changes to nodes configuration require manual intervention. Nodes will need to be recreated for the changes to take effect."
+    reducers:
+      - key: infrastructureNodesStorageLinks
+        lifecycle: pre-apply
+  - path: .spec.infrastructure.nodes.*.network.ethernets
+    immutable: false
+    description: "Changes to nodes configuration require manual intervention. Nodes will need to be recreated for the changes to take effect."
+    reducers:
+      - key: infrastructureNodesNetworkEthernets
+        lifecycle: pre-apply
+  - path: .spec.infrastructure.nodes.*.network.bonds
+    immutable: false
+    description: "Changes to nodes configuration require manual intervention. Nodes will need to be recreated for the changes to take effect."
+    reducers:
+      - key: infrastructureNodesNetworkBonds
+        lifecycle: pre-apply
+  - path: .spec.infrastructure.nodes.*.systemd.units
+    immutable: false
+    description: "Changes to nodes configuration require manual intervention. Nodes will need to be recreated for the changes to take effect."
+    reducers:
+      - key: infrastructureNodesSystemdUnits
+        lifecycle: pre-apply
+  - path: .spec.infrastructure.nodes.*.passwd.users
+    immutable: false
+    description: "Changes to nodes configuration require manual intervention. Nodes will need to be recreated for the changes to take effect."
+    reducers:
+      - key: infrastructureNodesPasswdUsers
+        lifecycle: pre-apply
+  - path: .spec.infrastructure.nodes.*.passwd.groups
+    immutable: false
+    description: "Changes to nodes configuration require manual intervention. Nodes will need to be recreated for the changes to take effect."
+    reducers:
+      - key: infrastructureNodesPasswdGroups
+        lifecycle: pre-apply
 
 kubernetes:
   - path: .spec.kubernetes.controlPlane.address
     immutable: true
     description: "Control plane address cannot be changed after cluster creation"
 
-  - path: .spec.kubernetes.networking.podCidr
+  - path: .spec.kubernetes.networking.podCIDR
     immutable: true
     description: "Pod CIDR cannot be changed after cluster creation"
 
-  - path: .spec.kubernetes.networking.svcCidr
+  - path: .spec.kubernetes.networking.serviceCIDR
     immutable: true
     description: "Service CIDR cannot be changed after cluster creation"
 
