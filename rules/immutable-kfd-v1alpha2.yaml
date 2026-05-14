@@ -10,7 +10,7 @@ infrastructure:
     reducers:
       - key: infrastructureNodesArch
         lifecycle: pre-apply
-  - path: .spec.infrastructure.nodes.*.storage.installDisk
+  - path: .spec.infrastructure.nodes.*.storage.**
     immutable: false
     description: "Changes to nodes configuration require manual intervention. Nodes will need to be recreated for the changes to take effect."
     reducers:
@@ -28,53 +28,23 @@ infrastructure:
     reducers:
       - key: infrastructureNodesMacAddress
         lifecycle: pre-apply
-  - path: .spec.infrastructure.nodes.*.storage.additionalDisks
-    immutable: false
-    description: "Changes to nodes configuration require manual intervention. Nodes will need to be recreated for the changes to take effect."
-    reducers:
-      - key: infrastructureNodesStorageAdditionalDisks
-        lifecycle: pre-apply
-  - path: .spec.infrastructure.nodes.*.storage.files
-    immutable: false
-    description: "Changes to nodes configuration require manual intervention. Nodes will need to be recreated for the changes to take effect."
-    reducers:
-      - key: infrastructureNodesStorageFiles
-        lifecycle: pre-apply
-  - path: .spec.infrastructure.nodes.*.storage.links
-    immutable: false
-    description: "Changes to nodes configuration require manual intervention. Nodes will need to be recreated for the changes to take effect."
-    reducers:
-      - key: infrastructureNodesStorageLinks
-        lifecycle: pre-apply
-  - path: .spec.infrastructure.nodes.*.network.ethernets
+  - path: .spec.infrastructure.nodes.*.network.ethernets.**
     immutable: false
     description: "Changes to nodes configuration require manual intervention. Nodes will need to be recreated for the changes to take effect."
     reducers:
       - key: infrastructureNodesNetworkEthernets
         lifecycle: pre-apply
-  - path: .spec.infrastructure.nodes.*.network.bonds
-    immutable: false
-    description: "Changes to nodes configuration require manual intervention. Nodes will need to be recreated for the changes to take effect."
-    reducers:
-      - key: infrastructureNodesNetworkBonds
-        lifecycle: pre-apply
-  - path: .spec.infrastructure.nodes.*.systemd.units
+  - path: .spec.infrastructure.nodes.*.systemd.units.**
     immutable: false
     description: "Changes to nodes configuration require manual intervention. Nodes will need to be recreated for the changes to take effect."
     reducers:
       - key: infrastructureNodesSystemdUnits
         lifecycle: pre-apply
-  - path: .spec.infrastructure.nodes.*.passwd.users
+  - path: .spec.infrastructure.nodes.*.passwd.**
     immutable: false
     description: "Changes to nodes configuration require manual intervention. Nodes will need to be recreated for the changes to take effect."
     reducers:
       - key: infrastructureNodesPasswdUsers
-        lifecycle: pre-apply
-  - path: .spec.infrastructure.nodes.*.passwd.groups
-    immutable: false
-    description: "Changes to nodes configuration require manual intervention. Nodes will need to be recreated for the changes to take effect."
-    reducers:
-      - key: infrastructureNodesPasswdGroups
         lifecycle: pre-apply
 
 kubernetes:
@@ -90,6 +60,9 @@ kubernetes:
     immutable: true
     description: "Service CIDR cannot be changed after cluster creation"
 
+  - path: .spec.kubernetes.etcd
+    immutable: true
+    description: "etcd configuration cannot be changed after cluster creation"
   - path: .spec.kubernetes.etcd.members.*
     immutable: true
     description: "etcd member configuration cannot be changed after cluster creation"
