@@ -51,6 +51,9 @@ patches:
   {{- /* The `digAny` condition needs to be specified exactly as written below to properly check if the field has been populated */}}
   {{- if not (.spec | digAny "kubernetes" "advanced" "kubeProxy" "enabled" true) }}
   - path: patches/tigera/ebpf-mode.yaml
+  {{- else if semverCompare ">=1.35.0" .spec.distributionVersion }}
+  {{- /* When kubeProxy is enabled and SD >= 1.35.0 (K8s >= 1.35), use nftables dataplane instead of default iptables */}}
+  - path: patches/tigera/nftables-mode.yaml
   {{- end }}
   {{- end }}
   {{- if eq .spec.distribution.modules.networking.type "cilium" }}
