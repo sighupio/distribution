@@ -923,6 +923,7 @@ Configuration for Pomerium, an identity-aware reverse proxy used for SSO.
 | [monitoringMinioConsole](#specdistributionmodulesauthpomeriumdefaultroutespolicymonitoringminioconsole)           | `array` | Optional |
 | [monitoringPrometheus](#specdistributionmodulesauthpomeriumdefaultroutespolicymonitoringprometheus)               | `array` | Optional |
 | [tracingMinioConsole](#specdistributionmodulesauthpomeriumdefaultroutespolicytracingminioconsole)                 | `array` | Optional |
+| [whiskerUi](#specdistributionmodulesauthpomeriumdefaultroutespolicywhiskerui)                                     | `array` | Optional |
 
 ### Description
 
@@ -947,6 +948,8 @@ override default routes for SD components
 ## .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.monitoringPrometheus
 
 ## .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.tracingMinioConsole
+
+## .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.whiskerUi
 
 ## .spec.distribution.modules.auth.pomerium.overrides
 

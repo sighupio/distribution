@@ -24,6 +24,9 @@ resources:
       {{- if not (.spec | digAny "kubernetes" "advanced" "kubeProxy" "enabled" true) }}
   - resources/tigera-kubernetes-service.yaml
       {{- end }}
+      {{- if $hasAnyIngress }}
+  - resources/whisker-ingress.yml
+      {{- end }}
     {{- end }}
     {{- if eq .spec.distribution.modules.networking.type "cilium" }}
   - {{ print $vendorPrefix "/modules/networking/katalog/cilium" }}
@@ -31,6 +34,10 @@ resources:
   - resources/ingress-infra.yml
       {{- end }}
     {{- end }}
+{{- end }}
+
+{{ if and (eq .spec.distribution.common.networkPoliciesEnabled true) (eq .spec.distribution.modules.networking.type "calico") $hasAnyIngress }}
+  - policies
 {{- end }}
 
 patches:
@@ -80,3 +87,4 @@ configMapGenerator:
     namespace: kube-system
   {{- end }}
 {{- end }}
+
