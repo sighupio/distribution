@@ -13,7 +13,7 @@ metadata:
     cluster.kfd.sighup.io/useful-link.name: "Calico Whisker UI"
     forecastle.stakater.com/expose: "true"
     forecastle.stakater.com/appName: "Calico Whisker UI"
-    forecastle.stakater.com/icon: "https://docs.tigera.io/img/calico-logo.png"
+    forecastle.stakater.com/icon: "https://docs.tigera.io/img/calico-logo-2026-black-text.svg"
     {{ if and (not .spec.distribution.modules.ingress.overrides.ingresses.forecastle.disableAuth) (eq .spec.distribution.modules.auth.provider.type "sso") }}
     forecastle.stakater.com/group: "networking"
     {{ end }}
