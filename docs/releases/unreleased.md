@@ -6,7 +6,7 @@ The distribution is maintained with ❤️ by the team [SIGHUP by ReeVo](https:/
 
 ## New features 🌟
 
-- [[#504]](https://github.com/sighupio/distribution/pull/504) Support Whisker Network Observability.
+- [[#504]](https://github.com/sighupio/distribution/pull/504) Add Whisker Network Observability UI tool for clusters using Tigera Calico as CNI.
 
 ## Bug Fixes 🐛
 
