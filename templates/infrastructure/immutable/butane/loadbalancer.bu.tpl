@@ -33,6 +33,12 @@ storage:
 {{ .node.storage.links | toYaml | indent 4 }}
 {{- end }}
 
+  # User-provided additional directories
+{{- if hasKeyAny .node.storage "directories" }}
+  directories:
+{{ .node.storage.directories | toYaml | indent 4 }}
+{{- end }}
+
 systemd:
   units:
     # Disable all automatic updates - sysext and OS updates are manual-only in production
