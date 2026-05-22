@@ -316,12 +316,6 @@
           },
           "description": "Node-specific kernel parameters that override global settings."
         },
-        "iscsi": {
-          "$ref": "#/$defs/Spec.Infrastructure.Node.Iscsi"
-        },
-        "multipath": {
-          "$ref": "#/$defs/Spec.Infrastructure.Node.Multipath"
-        },
         "network": {
           "$ref": "#/$defs/Spec.Infrastructure.Node.Network"
         },
@@ -594,10 +588,69 @@
               "target"
             ]
           }
+        },
+        "directories": {
+          "type": "array",
+          "description": "The list of directories to be created. Every directory must have a unique path. See https://coreos.github.io/butane/config-flatcar-v1_1/#objects-storage-directories",
+          "items": {
+            "$ref": "#/$defs/Spec.Infrastructure.Node.Storage.Directory"
+          }
         }
       },
       "required": [
         "installDisk"
+      ]
+    },
+    "Spec.Infrastructure.Node.Storage.Directory": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Represents a directory to be created on the filesystem. See Butane Flatcar v1.1.0 spec.",
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "The absolute path to the directory."
+        },
+        "overwrite": {
+          "type": "boolean",
+          "description": "Whether to delete preexisting nodes at the path. If overwrite is false and a directory already exists at the path, Ignition will only set its permissions. Defaults to false."
+        },
+        "mode": {
+          "type": "integer",
+          "description": "The directory's permission mode (decimal). Note that the mode must be properly specified as a decimal value (i.e. 0o755 -> 493). Example: 493 means 0755."
+        },
+        "user": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "The user of the directory.",
+          "properties": {
+            "id": {
+              "type": "integer",
+              "description": "The user ID of the owner."
+            },
+            "name": {
+              "type": "string",
+              "description": "The username of the owner."
+            }
+          }
+        },
+        "group": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "The group of the directory.",
+          "properties": {
+            "id": {
+              "type": "integer",
+              "description": "The group ID of the owner."
+            },
+            "name": {
+              "type": "string",
+              "description": "The group name of the owner."
+            }
+          }
+        }
+      },
+      "required": [
+        "path"
       ]
     },
     "Spec.Infrastructure.Node.Storage.Disk": {
@@ -705,68 +758,6 @@
         "label",
         "mountPoint"
       ]
-    },
-    "Spec.Infrastructure.Node.Iscsi": {
-      "type": "object",
-      "additionalProperties": false,
-      "description": "iSCSI initiator configuration. Ref: https://www.flatcar.org/docs/latest/setup/customization/other-settings/",
-      "properties": {
-        "enabled": {
-          "type": "boolean",
-          "description": "Enable iSCSI support on this node."
-        },
-        "config": {
-          "type": "string",
-          "minLength": 1,
-          "description": "iSCSI configuration content (required when enabled=true)."
-        }
-      },
-      "required": [
-        "enabled"
-      ],
-      "if": {
-        "properties": {
-          "enabled": {
-            "const": true
-          }
-        }
-      },
-      "then": {
-        "required": [
-          "config"
-        ]
-      }
-    },
-    "Spec.Infrastructure.Node.Multipath": {
-      "type": "object",
-      "additionalProperties": false,
-      "description": "DM-Multipath configuration for redundant storage paths.",
-      "properties": {
-        "enabled": {
-          "type": "boolean",
-          "description": "Enable multipath support on this node."
-        },
-        "config": {
-          "type": "string",
-          "minLength": 1,
-          "description": "Multipath configuration content (required when enabled=true)."
-        }
-      },
-      "required": [
-        "enabled"
-      ],
-      "if": {
-        "properties": {
-          "enabled": {
-            "const": true
-          }
-        }
-      },
-      "then": {
-        "required": [
-          "config"
-        ]
-      }
     },
     "Spec.Infrastructure.Node.Network": {
       "type": "object",
