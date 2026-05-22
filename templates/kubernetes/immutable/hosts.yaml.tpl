@@ -182,7 +182,7 @@ all:
               {{- end }}
             {{- end }}
             {{- if index $n "kernelParameters" }}
-            kernel_parameters:
+            sysctl_parameters:
               {{ $n.kernelParameters | toYaml | indent 14 | trim }}
             {{- end -}}
       {{- end }}
