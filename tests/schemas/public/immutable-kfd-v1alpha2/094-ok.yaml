@@ -88,7 +88,7 @@ spec:
 
     ssh:
       username: core
-      keyPath: ~/.ssh/id_rsa
+      privateKeyPath: ~/.ssh/id_rsa
 
   kubernetes:
     controlPlane:
@@ -123,6 +123,11 @@ spec:
         baseDomain: example.com
         nginx:
           type: dual
+        certManager:
+          clusterIssuer:
+            name: letsencrypt-prod
+            email: admin@example.com
+            type: http01
 
       logging:
         type: loki
@@ -135,9 +140,14 @@ spec:
 
       policy:
         type: kyverno
+        kyverno:
+          validationFailureAction: Audit
+          installDefaultPolicies: true
 
       dr:
         type: on-premises
+        velero:
+          backend: minio
 
       auth:
         provider:

@@ -16,6 +16,8 @@ spec:
         macAddress: 52:54:00:10:00:01
         storage:
           installDisk: /dev/sda
+          directories:
+            - mode: 493
         network:
           ethernets:
             eth0:

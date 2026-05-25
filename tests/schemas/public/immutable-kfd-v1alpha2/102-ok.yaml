@@ -16,6 +16,16 @@ spec:
         macAddress: 52:54:00:10:00:01
         storage:
           installDisk: /dev/sda
+          directories:
+            - path: /var/lib/required-only
+            - path: /var/lib/partial
+              mode: 493
+              overwrite: false
+            - path: /var/lib/named-only
+              user:
+                name: appuser
+              group:
+                name: appgroup
         network:
           ethernets:
             eth0:
