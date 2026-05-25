@@ -1,0 +1,26 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-fury
+spec:
+  acme:
+    email: example@sighup.io
+    privateKeySecretRef:
+      name: letsencrypt-fury
+    server: https://acme-v02.api.letsencrypt.org/directory
+    solvers:
+    - http01:
+        ingress:
+          class: haproxy-external
+          podTemplate:
+            metadata:
+              labels:
+                app: cert-manager
+            spec:
+              nodeSelector:
+                {}
+              tolerations:
+                []

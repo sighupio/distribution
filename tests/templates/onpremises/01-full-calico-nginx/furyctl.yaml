@@ -1,0 +1,110 @@
+# yaml-language-server: $schema=../../../../schemas/public/onpremises-kfd-v1alpha2.json
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# This is a test case furyctl.yaml to assert that the distribution templates are generating the right output
+---
+apiVersion: kfd.sighup.io/v1alpha2
+kind: OnPremises
+metadata:
+  name: full-calico-nginx
+spec:
+  distributionVersion: dummy # config based on v1.34.1, but we check against main
+  kubernetes:
+    pkiFolder: dummy
+    ssh:
+      username: dummy
+      keyPath: dummy
+    dnsZone: example.com
+    controlPlaneAddress: api.example.com
+    podCidr: 10.0.0.0/16
+    svcCidr: 10.1.0.0/16
+    loadBalancers:
+      enabled: false
+    masters:
+      hosts:
+        - name: master
+          ip: 10.0.0.1
+    nodes:
+      - name: nodes
+        hosts:
+          - name: node
+            ip: 10.0.0.2
+  distribution:
+    common:
+      nodeSelector:
+        node.kubernetes.io/role: infra
+      tolerations:
+        - effect: NoSchedule
+          key: node.kubernetes.io/role
+          value: infra
+    modules:
+      networking:
+        type: calico
+      ingress:
+        baseDomain: internal.example.com
+        nginx:
+          type: dual
+          tls:
+            provider: secret
+            secret:
+              cert: "cert.pem"
+              key: "key.pem"
+              ca: "ca.pem"
+        haproxy:
+          type: none
+        certManager:
+          clusterIssuer:
+            name: letsencrypt-fury
+            email: example@sighup.io
+            type: http01
+      logging:
+        type: loki
+        minio:
+          storageSize: "20Gi"
+      monitoring:
+        type: mimir
+        prometheus:
+          retentionTime: "15d"
+        mimir:
+          externalEndpoint:
+            bucketName: dummy
+            accessKeyId: secret
+            secretAccessKey: secret
+            endpoint: s3.example.com
+      tracing:
+        type: tempo
+        minio:
+          storageSize: "20Gi"
+      policy:
+        type: gatekeeper
+        gatekeeper:
+          additionalExcludedNamespaces: ["dummy"]
+          installDefaultPolicies: true
+          enforcementAction: deny
+      dr:
+        type: on-premises
+        velero: {}
+      auth:
+        provider:
+          type: sso
+        baseDomain: example.com
+        pomerium:
+          secrets:
+            COOKIE_SECRET: dummy_cookie
+            IDP_CLIENT_SECRET: dummy_idp
+            SHARED_SECRET: dummy_shared
+            SIGNING_KEY: dummy_signing
+        dex:
+          connectors:
+            - type: oidc
+              id: oidc
+              name: OIDC
+              config:
+                clientID: client-id
+                clientSecret: client-secret
+                issuer: https://dex.example.com
+    customPatches:
+      patches:
+        - path: dummy/folder

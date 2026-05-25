@@ -1,0 +1,20 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../../vendor/modules/aws/katalog/cluster-autoscaler/v1.34.x
+  - ../../../vendor/modules/aws/katalog/load-balancer-controller
+  - ../../../vendor/modules/aws/katalog/node-termination-handler
+  - resources/storageclasses.yml
+  - resources/snapshotclasses.yml
+
+patches:
+  - path: patches/cluster-autoscaler.yml
+  - path: patches/infra-nodes.yml
+  - path: patches/load-balancer-controller.yml
+  - path: patches/load-balancer-controller-kapp-wait.yml

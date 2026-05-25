@@ -1,0 +1,50 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+# rendering Kustomization file for monitoring type mimir
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - kapp-configs/prometheus-operator-crd.yaml
+  - ../../../vendor/modules/monitoring/katalog/prometheus-operator
+  - ../../../vendor/modules/monitoring/katalog/kube-proxy-metrics
+  - ../../../vendor/modules/monitoring/katalog/kube-state-metrics
+  - ../../../vendor/modules/monitoring/katalog/node-exporter
+  - ../../../vendor/modules/monitoring/katalog/x509-exporter
+  - ../../../vendor/modules/monitoring/katalog/blackbox-exporter
+  - ../../../vendor/modules/monitoring/katalog/kubeadm-sm
+  - ../../../vendor/modules/monitoring/katalog/alertmanager-operated
+  - ../../../vendor/modules/monitoring/katalog/prometheus-adapter
+  - ../../../vendor/modules/monitoring/katalog/grafana
+  - ../../../vendor/modules/monitoring/katalog/mimir
+  - ../../../vendor/modules/monitoring/katalog/minio-ha
+  - resources/ingress-infra.yml
+
+
+
+patches:
+  - path: patches/infra-nodes.yml
+  - path: patches/alertmanager-operated.yml
+  - path: patches/prometheus-operated.yml
+  - path: patches/minio.yml
+
+configMapGenerator:
+  - name: mimir-distributed-config
+    namespace: monitoring
+    behavior: replace
+    files:
+      - patches/mimir.yaml
+
+secretGenerator:
+  - name: minio-monitoring
+    namespace: monitoring
+    behavior: replace
+    envs:
+      - patches/minio.root.env
+  - name: grafana-config
+    behavior: merge
+    namespace: monitoring
+    files:
+      - grafana.ini=patches/grafana.ini

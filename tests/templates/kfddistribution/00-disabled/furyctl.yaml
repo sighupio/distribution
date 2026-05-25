@@ -1,0 +1,47 @@
+# yaml-language-server: $schema=../../../../schemas/public/kfddistribution-kfd-v1alpha2.json
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# This is a test case furyctl.yaml to assert that the distribution templates are generating the right output
+# This test verifies output when no modules are enabled
+---
+apiVersion: kfd.sighup.io/v1alpha2
+kind: KFDDistribution
+metadata:
+  name: no-modules-enabled
+spec:
+  distributionVersion: dummy # config based on v1.34.1, but we check against main
+  distribution:
+    kubeconfig: path/to/kubeconfig
+    modules:
+      networking:
+        type: none
+      ingress:
+        baseDomain: internal.example.com
+        nginx:
+          type: none
+        haproxy:
+          type: none
+          tls:
+            provider: certManager
+        certManager:
+          clusterIssuer:
+            name: letsencrypt-fury
+            email: example@sighup.io
+            type: http01
+      logging:
+        type: none
+        minio:
+          storageSize: "20Gi"
+      monitoring:
+        type: none
+      tracing:
+        type: none
+      policy:
+        type: none
+      dr:
+        type: none
+      auth:
+        provider:
+          type: none
