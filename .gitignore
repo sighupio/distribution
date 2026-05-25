@@ -9,5 +9,3 @@ go.work.sum
 .envrc
 .local
 .furyctl
-docs/presentation/presentation-immutable.md
-installers/immutable/fury-distribution.code-workspace
