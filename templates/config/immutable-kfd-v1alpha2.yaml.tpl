@@ -68,6 +68,16 @@ spec:
         # arch: x86-64  # Optional: Each node can have different arch for mixed clusters
         storage:
           installDisk: /dev/sda
+          # directories: # Optional: extra directories to create on the node's filesystem.
+          #   - path: /var/lib/myapp          # Required: absolute path to the directory.
+          #     mode: 493                     # Optional: permission mode as decimal (0o755 = 493).
+          #     overwrite: false              # Optional: delete preexisting node at the path. Defaults to false.
+          #     user:                         # Optional: directory owner.
+          #       id: 1000                    #   Optional: numeric user ID.
+          #       name: myuser                #   Optional: username.
+          #     group:                        # Optional: directory group.
+          #       id: 1000                    #   Optional: numeric group ID.
+          #       name: mygroup               #   Optional: group name.
         network:
           ethernets:
             eth0:

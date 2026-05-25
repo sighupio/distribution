@@ -25,10 +25,6 @@ spec:
     # Ref: https://www.flatcar.org/docs/latest/setup/customization/
     ipxeServer:
       url: https://ipxe.internal.example.com:8080
-      advanced:
-        logLevel: info
-        dataPath: /var/lib/matchbox
-        assetsPath: /var/lib/matchbox/assets
 
     nodes:
       # Control plane nodes (3)
@@ -458,7 +454,7 @@ spec:
     # SSH configuration for node access
     ssh:
       username: core
-      keyPath: ~/.ssh/id_ed25519_production
+      privateKeyPath: ~/.ssh/id_ed25519_production
 
   # Kubernetes cluster configuration
   # Ref: https://kubernetes.io/docs/setup/production-environment/
@@ -610,7 +606,7 @@ spec:
         username_claim: email
         groups_claim: groups
         username_prefix: "oidc:"
-        groups_prefix: "oidc:"
+        group_prefix: "oidc:"
 
       # User certificate generation
       users:
@@ -664,9 +660,7 @@ spec:
       logging:
         type: loki
         loki:
-          retentionPeriod: 720h
-          storage:
-            size: 50Gi
+          retentionTime: 720h
         minio:
           storageSize: 20Gi
 
@@ -686,8 +680,6 @@ spec:
           storageSize: 60Gi
         alertmanager:
           installDefaultRules: true
-          deadMansSwitch:
-            enabled: false
 
       # Tempo distributed tracing
       # Ref: https://grafana.com/docs/tempo/latest/
@@ -709,18 +701,19 @@ spec:
       dr:
         type: on-premises
         velero:
-          backend: s3
-          s3:
+          backend: externalEndpoint
+          externalEndpoint:
+            endpoint: s3.eu-west-1.amazonaws.com
             bucketName: production-cluster-backups
-            region: eu-west-1
-            endpoint: https://s3.eu-west-1.amazonaws.com
           schedules:
-            - name: daily-backup
-              schedule: 0 3 * * *
-              ttl: 720h
-            - name: weekly-backup
-              schedule: 0 3 * * 0
-              ttl: 2160h
+            install: true
+            definitions:
+              manifests:
+                schedule: "0 3 * * *"
+                ttl: 720h0m0s
+              full:
+                schedule: "0 3 * * 0"
+                ttl: 2160h0m0s
 
       # Authentication provider
       auth:

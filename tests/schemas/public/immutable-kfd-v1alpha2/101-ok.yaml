@@ -16,6 +16,16 @@ spec:
         macAddress: 52:54:00:10:00:01
         storage:
           installDisk: /dev/sda
+          directories:
+            - path: /var/lib/myapp
+              mode: 493
+              overwrite: true
+              user:
+                id: 1000
+                name: myuser
+              group:
+                id: 1000
+                name: mygroup
         network:
           ethernets:
             eth0:

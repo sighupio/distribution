@@ -76,6 +76,19 @@ steps: # qa
       - eval "$(mise activate bash --shims)"
       - bats -t tests/e2e/kfddistribution/schema.sh
 
+  - name: test-schema-immutable
+    image: quay.io/sighup/mise:v2025.4.4
+    pull: always
+    depends_on:
+      - license-check
+      - schema-check
+    volumes:
+      - name: mise-cache
+        path: /mise-data
+    commands:
+      - eval "$(mise activate bash --shims)"
+      - bats -t tests/e2e/immutable/schema.sh
+
   - name: render
     image: quay.io/sighup/mise:v2025.4.4
     pull: always

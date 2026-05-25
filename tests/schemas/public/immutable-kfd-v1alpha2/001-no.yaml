@@ -22,7 +22,7 @@ spec:
 
     ssh:
       username: core
-      keyPath: ~/.ssh/id_rsa
+      privateKeyPath: ~/.ssh/id_rsa
 
   kubernetes:
     controlPlane:
