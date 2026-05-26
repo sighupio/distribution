@@ -1,7 +1,7 @@
 {{- $providerType := .spec.distribution.common.provider.type }}
 
 {{- $podCIDR := "" }}
-{{- if and (eq $providerType "none") (index .spec.kubernetes) }}{{/* OnPremises */}}
+{{- if and (eq $providerType "none") (hasKeyAny .spec "kubernetes") }}{{/* OnPremises */}}
 {{- $podCIDR = .spec.kubernetes.podCidr }}
 {{- end }}
 {{- if eq $providerType "immutable" }}
