@@ -90,6 +90,11 @@ spec:
         provider:
           type: sso
         baseDomain: example.com
+        oidcKubernetesAuth:
+          enabled: true
+          clientID: dummy-oidc-client-id
+          clientSecret: dummy-oidc-client-secret
+          sessionSecurityKey: dummy-oidc-session-key
         pomerium:
           secrets:
             COOKIE_SECRET: dummy_cookie
