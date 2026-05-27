@@ -1,4 +1,4 @@
-# Immutable - Bare Metal Immutable Infrastructure Schema
+# SD Immutable Kind Schema
 
 This document explains the full schema for the `kind: Immutable` for the `furyctl.yaml` file used by `furyctl`. This configuration file will be used to provision and deploy bare metal nodes with iPXE boot, storage partitioning, network configuration, and the SIGHUP Distribution modules for immutable Kubernetes infrastructure.
 
@@ -929,7 +929,7 @@ Configuration for Pomerium, an identity-aware reverse proxy used for SSO.
 
 ### Description
 
-override default routes for KFD components
+override default routes for SD components
 
 ## .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.gatekeeperPolicyManager
 
@@ -5528,7 +5528,7 @@ The kernel parameter value. Example: "1"
 
 ### Description
 
-Load balancer configuration. Uses HAProxy for load balancing and keepalived for VIP failover between LB nodes.
+Load balancer configuration. Uses HAProxy for load balancing and keepalived for VIP failover between LB nodes. Having members defined will enable the load balancers.
 
 ## .spec.infrastructure.loadBalancers.containerd
 

@@ -1,4 +1,4 @@
-# Immutable - Bare Metal Immutable Infrastructure Schema
+# SD Immutable Kind Schema
 
 This document explains the full schema for the `kind: Immutable` for the `furyctl.yaml` file used by `furyctl`. This configuration file will be used to provision and deploy bare metal nodes with iPXE boot, storage partitioning, network configuration, and the SIGHUP Distribution modules for immutable Kubernetes infrastructure.
 
