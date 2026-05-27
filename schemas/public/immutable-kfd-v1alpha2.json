@@ -204,7 +204,7 @@
     "Spec.Infrastructure.LoadBalancers": {
       "type": "object",
       "additionalProperties": false,
-      "description": "Load balancer configuration. Uses HAProxy for load balancing and keepalived for VIP failover between LB nodes.",
+      "description": "Load balancer configuration. Uses HAProxy for load balancing and keepalived for VIP failover between LB nodes. Having members defined will enable the load balancers.",
       "properties": {
         "members": {
           "type": "array",
@@ -239,18 +239,6 @@
             }
           }
         }
-      },
-      "if": {
-        "properties": {
-          "enabled": {
-            "const": true
-          }
-        }
-      },
-      "then": {
-        "required": [
-          "members"
-        ]
       },
       "allOf": [
         {
