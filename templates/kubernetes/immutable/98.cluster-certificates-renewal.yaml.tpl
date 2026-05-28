@@ -28,17 +28,6 @@
   become: true
   serial: 1
   tasks:
-
-    - name: Get the current Kubernetes version
-      command: kubectl version --kubeconfig=/etc/kubernetes/admin.conf -o json
-      register: json_output
-      when: inventory_hostname in groups['control_plane']
-
-    - name: Set Kubernetes version
-      set_fact:
-        kubernetes_version: "{{ "{{ (json_output.stdout | from_json).serverVersion.major }}.{{ (json_output.stdout | from_json).serverVersion.minor }}" }}"
-      when: inventory_hostname in groups['control_plane']
-
     - name: Set backup timestamp
       set_fact:
         backup_timestamp: "{{ "{{ lookup('pipe', 'date +%Y-%m-%d_%H-%M-%S') }}" }}"
@@ -55,7 +44,7 @@
         path: "{{ "{{ ansible_facts['env']['HOME'] }}" }}/certs-backup/{{ print "{{ backup_timestamp }}" }}/etc-etcd-pki"
         state: directory
         mode: '0750'
-      when: inventory_hostname in groups['etcd']
+      when: inventory_hostname in groups['etcd'] or etcd_on_control_plane
 
     - name: Backup Kubernetes certificates
       copy:
@@ -73,7 +62,7 @@
         remote_src: yes
         mode: preserve
         directory_mode: '0750'
-      when: inventory_hostname in groups['etcd']
+      when: inventory_hostname in groups['etcd'] or etcd_on_control_plane
 
     - name: Renew Kubernetes control plane certs
       shell: |
@@ -92,7 +81,7 @@
         kubeadm certs renew --config=/etc/etcd/kubeadm-etcd.yml --cert-dir=/etc/etcd/pki etcd-healthcheck-client
         kubeadm certs renew --config=/etc/etcd/kubeadm-etcd.yml --cert-dir=/etc/etcd/pki etcd-peer
         kubeadm certs renew --config=/etc/etcd/kubeadm-etcd.yml --cert-dir=/etc/etcd/pki etcd-server
-      when: inventory_hostname in groups['etcd']
+      when: inventory_hostname in groups['etcd'] or etcd_on_control_plane
 
 - name: Distribute etcd certificates from etcd to control plane nodes
   hosts: control_plane
@@ -139,7 +128,7 @@
   tasks:
     - name: Restart etcd
       shell: systemctl restart etcd
-      when: inventory_hostname in groups['etcd']
+      when: inventory_hostname in groups['etcd'] or etcd_on_control_plane
 
     - name: Wait for etcd to be running
       shell: systemctl is-active etcd --quiet
@@ -147,7 +136,7 @@
       retries: 10
       delay: 5
       until: etcd_status.rc == 0
-      when: inventory_hostname in groups['etcd']
+      when: inventory_hostname in groups['etcd'] or etcd_on_control_plane
 
     - name: Restart control plane components
       shell: |
@@ -214,14 +203,6 @@
           state: absent
           regexp: '^$'
 
-    - name: Delete the Kubelet server cert before regenarating them
-      file:
-        path: "{{ "{{ item }}" }}"
-        state: absent
-      with_items:
-        - /var/lib/kubelet/pki/kubelet.crt
-        - /var/lib/kubelet/pki/kubelet.key
-
     - name: Restart Kubelet and regenerate the server certificate
       shell: |
         systemctl restart kubelet.service
@@ -256,10 +237,11 @@
     - debug: var=kconfig_info.stdout_lines
 
 - name: Print etcd certificates expiration dates
-  hosts: etcd
+  hosts: control_plane,etcd
   become: true
   tasks:
     - name: Print certificates expiration dates
+      when: inventory_hostname in groups['etcd'] or etcd_on_control_plane
       shell: |
         find /etc/etcd/pki -type f -name "*.crt" -print | sort |
         egrep -v 'ca\.crt$|\/pki\/expired\/|\/tmp\/|ca-bundle\.' |
