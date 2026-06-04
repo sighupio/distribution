@@ -269,11 +269,11 @@ spec:
           - hostname: worker2.example.com
           - hostname: worker3.example.com
     # Specify advanced configuration for Kubernetes features, such as encryption, additional users, kube-proxy, etc.
-    advanced:
-      encryption:
-        configuration: "{file://./secrets/etcd-encryption-config.yaml}"
-      kubeProxy:
-        enabled: true
+    # advanced:
+    #   encryption:
+    #     configuration: "{file://./secrets/etcd-encryption-config.yaml}"
+    #   kubeProxy:
+    #     enabled: true
 
   # SIGHUP Distribution modules
   distribution:
