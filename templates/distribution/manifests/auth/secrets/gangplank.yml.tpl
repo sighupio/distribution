@@ -4,7 +4,11 @@
 
 {{- if .spec.distribution.modules.auth.oidcKubernetesAuth.enabled }}
 clusterName: "{{ .metadata.name }}"
+{{- if eq .spec.distribution.common.provider.type "none" }}
 apiServerURL: "https://{{ .spec.kubernetes.controlPlaneAddress }}"
+{{- else if eq .spec.distribution.common.provider.type "immutable" }}
+apiServerURL: "https://{{ .spec.kubernetes.controlPlane.address }}"
+{{- end }}
 authorizeURL: "https://{{ template "dexUrl" .spec }}/auth"
 {{- if ne .spec.distribution.modules.auth.oidcTrustedCA "" }}
 trustedCAPath: "/tls/ca.crt"

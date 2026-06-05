@@ -20,10 +20,16 @@ kubernetes:
   onpremises:
     version: 1.34.4
     installer: v1.34.4
+  immutable:
+    version: 1.34.8
+    installer: v1.34.8-rc.0
 furyctlSchemas:
   eks:
     - apiVersion: kfd.sighup.io/v1alpha2
       kind: EKSCluster
+  immutable:
+    - apiVersion: kfd.sighup.io/v1alpha2
+      kind: Immutable
   kfddistribution:
     - apiVersion: kfd.sighup.io/v1alpha2
       kind: KFDDistribution

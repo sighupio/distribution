@@ -1,0 +1,4381 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "A SIGHUP Distribution Kubernetes Cluster deployed on bare metal infrastructure with iPXE boot provisioning and immutable OS configuration.",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "type": "string",
+      "pattern": "^kfd\\.sighup\\.io/v\\d+((alpha|beta)\\d+)?$"
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "Immutable"
+      ]
+    },
+    "metadata": {
+      "$ref": "#/$defs/Metadata"
+    },
+    "spec": {
+      "$ref": "#/$defs/Spec"
+    },
+    "flags": {
+      "description": "Persistent furyctl command flags, see the documentation for more details: https://docs.sighup.io/furyctl/flags-configuration"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "apiVersion",
+    "kind",
+    "metadata",
+    "spec"
+  ],
+  "$defs": {
+    "Metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the cluster. It will also be used as a prefix for all the other resources created.",
+          "minLength": 1,
+          "maxLength": 56
+        }
+      },
+      "required": [
+        "name"
+      ]
+    },
+    "Spec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "distributionVersion": {
+          "type": "string",
+          "description": "Defines which SD version will be installed and, in consequence, the Kubernetes version used to create the cluster. It supports git tags and branches. Example: `v1.32.1`.",
+          "minLength": 1
+        },
+        "infrastructure": {
+          "$ref": "#/$defs/Spec.Infrastructure"
+        },
+        "kubernetes": {
+          "$ref": "#/$defs/Spec.Kubernetes"
+        },
+        "distribution": {
+          "$ref": "#/$defs/Spec.Distribution"
+        },
+        "plugins": {
+          "$ref": "./spec-plugins.json"
+        },
+        "toolsConfiguration": {
+          "$ref": "#/$defs/Spec.ToolsConfiguration"
+        }
+      },
+      "required": [
+        "distributionVersion",
+        "infrastructure",
+        "kubernetes",
+        "distribution"
+      ]
+    },
+    "Spec.ToolsConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configuration for tools used by furyctl.",
+      "properties": {
+        "ansible": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Ansible configuration.",
+          "properties": {
+            "config": {
+              "type": "string",
+              "description": "Additional content to append to the generated ansible.cfg file."
+            },
+            "pythonInterpreter": {
+              "type": "string",
+              "description": "Path to the Python interpreter to be used by Ansible on the remote nodes. Example: /usr/bin/python3"
+            }
+          }
+        }
+      }
+    },
+    "Spec.Infrastructure": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Defines the bare metal infrastructure configuration, including nodes, network boot, storage, and networking.",
+      "properties": {
+        "proxy": {
+          "$ref": "#/$defs/Spec.Infrastructure.Proxy"
+        },
+        "kernelParameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Spec.Infrastructure.KernelParameter"
+          },
+          "description": "Global kernel parameters applied to all nodes at infrastructure level. Node-specific parameters override these global values. Ref: https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/"
+        },
+        "ipxeServer": {
+          "$ref": "#/$defs/Spec.Infrastructure.IpxeServer"
+        },
+        "nodes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Spec.Infrastructure.Node"
+          },
+          "description": "List of bare metal nodes to provision.",
+          "minItems": 1
+        },
+        "ssh": {
+          "$ref": "#/$defs/Spec.Infrastructure.SSH"
+        },
+        "loadBalancers": {
+          "$ref": "#/$defs/Spec.Infrastructure.LoadBalancers"
+        }
+      },
+      "required": [
+        "nodes",
+        "ssh"
+      ]
+    },
+    "Spec.Infrastructure.Proxy": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "HTTP/HTTPS proxy configuration for the infrastructure nodes.",
+      "properties": {
+        "http": {
+          "$ref": "#/$defs/Types.Uri",
+          "description": "The HTTP proxy URL. Example: http://proxy.example.com:3128"
+        },
+        "https": {
+          "$ref": "#/$defs/Types.Uri",
+          "description": "The HTTPS proxy URL. Example: https://proxy.example.com:3128"
+        },
+        "noProxy": {
+          "type": "string",
+          "description": "Comma-separated list of hosts that should not use the HTTP(S) proxy. Example: localhost,127.0.0.1,10.0.0.0/8,.example.com"
+        }
+      }
+    },
+    "Spec.Infrastructure.KernelParameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_-]*([.][a-z][a-z0-9_-]*)+$",
+          "description": "The kernel parameter name (sysctl format). Example: net.ipv4.ip_forward, net.bridge.bridge-nf-call-iptables",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "value": {
+          "type": "string",
+          "description": "The kernel parameter value. Example: \"1\"",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "name",
+        "value"
+      ]
+    },
+    "Spec.Infrastructure.IpxeServer": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "iPXE server configuration for network boot provisioning. Ref: https://www.flatcar.org/docs/latest/setup/customization/",
+      "properties": {
+        "url": {
+          "$ref": "#/$defs/Types.Uri",
+          "description": "The URL of the iPXE boot server. Example: https://ipxe.internal.example.com:8080"
+        },
+        "bindAddress": {
+          "type": "string",
+          "description": "The address where the iPXE server will listen for incoming requests. Default is the address from the URL"
+        },
+        "bindPort": {
+          "type": "integer",
+          "description": "The port where the iPXE server will listen for incoming requests. Default is the port from the URL or 80 if not specified."
+        }
+      },
+      "required": [
+        "url"
+      ]
+    },
+    "Spec.Infrastructure.LoadBalancers": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Load balancer configuration. Uses HAProxy for load balancing and keepalived for VIP failover between LB nodes. Having members defined will enable the load balancers.",
+      "properties": {
+        "members": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Spec.Kubernetes.Member"
+          },
+          "description": "Load balancer member nodes. These nodes will run HAProxy and keepalived. If no members are specified it will be assumed some other solution for load balancing is in place.",
+          "minItems": 1
+        },
+        "keepalived": {
+          "$ref": "#/$defs/Types.Keepalived"
+        },
+        "containerd": {
+          "$ref": "#/$defs/Spec.Kubernetes.Advanced.Containerd"
+        },
+        "haproxy": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "HAProxy container configuration for load balancing.",
+          "properties": {
+            "configuration": {
+              "type": "string",
+              "description": "Custom HAProxy configuration content. If not provided, a default configuration will be generated for load balancing Kubernetes control plane."
+            },
+            "image": {
+              "type": "string",
+              "description": "Container image for HAProxy. Example: docker.io/library/haproxy"
+            },
+            "tag": {
+              "type": "string",
+              "description": "Container tag for HAProxy. Example: 2.8-alpine"
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "keepalived"
+            ],
+            "properties": {
+              "keepalived": {
+                "type": "object",
+                "required": [
+                  "enabled"
+                ],
+                "properties": {
+                  "enabled": {
+                    "const": true
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "members": {
+                "minItems": 2
+              }
+            }
+          }
+        }
+      ]
+    },
+    "Spec.Infrastructure.Node": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Definition of a bare metal node with storage, network, and hardware configuration.",
+      "properties": {
+        "hostname": {
+          "type": "string",
+          "description": "Fully qualified domain name for the node. Example: node01.k8s.example.com",
+          "pattern": "^([a-zA-Z0-9]([a-zA-Z0-9\\-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z]{2,}$",
+          "minLength": 1
+        },
+        "arch": {
+          "type": "string",
+          "description": "CPU architecture for the node. Determines which Flatcar artifacts and sysext packages are downloaded. Supports mixed-architecture clusters where different nodes can run different architectures. Kubernetes automatically labels nodes with kubernetes.io/arch. Examples: x86-64 (Intel/AMD amd64), arm64 (ARM aarch64). See examples/immutable-mixed-arch-example.yaml for mixed-architecture cluster configuration.",
+          "enum": [
+            "x86-64",
+            "arm64"
+          ],
+          "default": "x86-64"
+        },
+        "macAddress": {
+          "$ref": "#/$defs/Types.MacAddress",
+          "description": "MAC address for PXE boot identification. Example: 52:54:00:10:00:01"
+        },
+        "storage": {
+          "$ref": "#/$defs/Spec.Infrastructure.Node.Storage"
+        },
+        "kernelParameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Spec.Infrastructure.KernelParameter"
+          },
+          "description": "Node-specific kernel parameters that override global settings."
+        },
+        "network": {
+          "$ref": "#/$defs/Spec.Infrastructure.Node.Network"
+        },
+        "systemd": {
+          "$ref": "#/$defs/Spec.Infrastructure.Node.Systemd"
+        },
+        "passwd": {
+          "$ref": "#/$defs/Spec.Infrastructure.Node.Passwd"
+        }
+      },
+      "required": [
+        "hostname",
+        "macAddress",
+        "storage",
+        "network"
+      ]
+    },
+    "Spec.Infrastructure.Node.Storage": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Storage configuration for the node, including install disk and additional disks with partitions.",
+      "properties": {
+        "installDisk": {
+          "$ref": "#/$defs/Types.DevicePath",
+          "description": "The disk device where the OS will be installed. Example: /dev/sda"
+        },
+        "additionalDisks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Spec.Infrastructure.Node.Storage.Disk"
+          },
+          "description": "Additional disks to partition and mount."
+        },
+        "files": {
+          "type": "array",
+          "description": "The list of files to be written. Every file, directory and link must have a unique path. See https://www.flatcar.org/docs/latest/provisioning/config-transpiler/configuration/",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "Represents a file to be created on the filesystem.",
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "The absolute path to the file."
+              },
+              "overwrite": {
+                "type": "boolean",
+                "description": "Whether to delete preexisting nodes at the path. Contents must be specified if overwrite is true. Defaults to false."
+              },
+              "contents": {
+                "type": "object",
+                "additionalProperties": false,
+                "description": "Options related to the contents of the file.",
+                "properties": {
+                  "compression": {
+                    "type": "string",
+                    "description": "The type of compression used on the contents (null or gzip). Compression cannot be used with S3.",
+                    "enum": [
+                      "gzip"
+                    ]
+                  },
+                  "source": {
+                    "type": "string",
+                    "description": "The URL of the file contents. Supported schemes are http, https, tftp, s3, gs, and data. When using http, it is advisable to use the verification option. Mutually exclusive with inline and local."
+                  },
+                  "inline": {
+                    "type": "string",
+                    "description": "The contents of the file. Mutually exclusive with source and local."
+                  },
+                  "local": {
+                    "type": "string",
+                    "description": "A local path to the contents of the file, relative to the directory specified by the --files-dir command-line argument. Mutually exclusive with source and inline."
+                  },
+                  "http_headers": {
+                    "type": "array",
+                    "description": "A list of HTTP headers to be added to the request. Available for http and https source schemes only.",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "description": "The header name."
+                        },
+                        "value": {
+                          "type": "string",
+                          "description": "The header contents."
+                        }
+                      },
+                      "required": [
+                        "name",
+                        "value"
+                      ]
+                    }
+                  },
+                  "verification": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "description": "Options related to the verification of the file contents.",
+                    "properties": {
+                      "hash": {
+                        "type": "string",
+                        "description": "The hash of the content, in the form <type>-<value> where type is either sha512 or sha256. Example: sha256-abcd1234..."
+                      }
+                    }
+                  }
+                }
+              },
+              "append": {
+                "type": "array",
+                "description": "List of contents to be appended to the file. Follows the same structure as contents.",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "compression": {
+                      "type": "string",
+                      "description": "The type of compression used on the contents (null or gzip).",
+                      "enum": [
+                        "gzip"
+                      ]
+                    },
+                    "source": {
+                      "type": "string",
+                      "description": "The URL of the contents to append. Supported schemes are http, https, tftp, s3, gs, and data. Mutually exclusive with inline and local."
+                    },
+                    "inline": {
+                      "type": "string",
+                      "description": "The contents to append. Mutually exclusive with source and local."
+                    },
+                    "local": {
+                      "type": "string",
+                      "description": "A local path to the contents to append, relative to the directory specified by the --files-dir command-line argument. Mutually exclusive with source and inline."
+                    },
+                    "http_headers": {
+                      "type": "array",
+                      "description": "A list of HTTP headers to be added to the request. Available for http and https source schemes only.",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "description": "The header name."
+                          },
+                          "value": {
+                            "type": "string",
+                            "description": "The header contents."
+                          }
+                        },
+                        "required": [
+                          "name",
+                          "value"
+                        ]
+                      }
+                    },
+                    "verification": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "description": "Options related to the verification of the appended contents.",
+                      "properties": {
+                        "hash": {
+                          "type": "string",
+                          "description": "The hash of the content, in the form <type>-<value> where type is either sha512 or sha256."
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "mode": {
+                "type": "integer",
+                "description": "The file's permission mode (in octal, e.g. 0644). Setuid/setgid/sticky bits are not supported. If not specified, the permission mode for files defaults to 0644 or the existing file's permissions if overwrite is false and a file already exists.",
+                "minimum": 0,
+                "maximum": 511
+              },
+              "user": {
+                "type": "object",
+                "additionalProperties": false,
+                "description": "Specifies the file's owner.",
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "description": "The user ID of the owner."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "The user name of the owner."
+                  }
+                }
+              },
+              "group": {
+                "type": "object",
+                "additionalProperties": false,
+                "description": "Specifies the file's group.",
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "description": "The group ID of the group."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "The group name of the group."
+                  }
+                }
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        },
+        "links": {
+          "type": "array",
+          "description": "The list of links to be created. Every link must have a unique path. See https://www.flatcar.org/docs/latest/provisioning/config-transpiler/configuration/",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "Represents a symbolic or hard link to be created.",
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "The absolute path to the link."
+              },
+              "overwrite": {
+                "type": "boolean",
+                "description": "Whether to delete preexisting nodes at the path. If overwrite is false and a matching link exists at the path, Ignition will only set the owner and group. Defaults to false."
+              },
+              "target": {
+                "type": "string",
+                "description": "The target path of the link."
+              },
+              "hard": {
+                "type": "boolean",
+                "description": "A symbolic link is created if this is false, a hard one if this is true."
+              },
+              "user": {
+                "type": "object",
+                "additionalProperties": false,
+                "description": "Specifies the owner for a symbolic link. Ignored for hard links.",
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "description": "The user ID of the owner."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "The user name of the owner."
+                  }
+                }
+              },
+              "group": {
+                "type": "object",
+                "additionalProperties": false,
+                "description": "Specifies the group for a symbolic link. Ignored for hard links.",
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "description": "The group ID of the group."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "The group name of the group."
+                  }
+                }
+              }
+            },
+            "required": [
+              "path",
+              "target"
+            ]
+          }
+        },
+        "directories": {
+          "type": "array",
+          "description": "The list of directories to be created. Every directory must have a unique path. See https://coreos.github.io/butane/config-flatcar-v1_1/#objects-storage-directories",
+          "items": {
+            "$ref": "#/$defs/Spec.Infrastructure.Node.Storage.Directory"
+          }
+        }
+      },
+      "required": [
+        "installDisk"
+      ]
+    },
+    "Spec.Infrastructure.Node.Storage.Directory": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Represents a directory to be created on the filesystem. See Butane Flatcar v1.1.0 spec.",
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "The absolute path to the directory."
+        },
+        "overwrite": {
+          "type": "boolean",
+          "description": "Whether to delete preexisting nodes at the path. If overwrite is false and a directory already exists at the path, Ignition will only set its permissions. Defaults to false."
+        },
+        "mode": {
+          "type": "integer",
+          "description": "The directory's permission mode (decimal). Note that the mode must be properly specified as a decimal value (i.e. 0o755 -> 493). Example: 493 means 0755."
+        },
+        "user": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "The user of the directory.",
+          "properties": {
+            "id": {
+              "type": "integer",
+              "description": "The user ID of the owner."
+            },
+            "name": {
+              "type": "string",
+              "description": "The username of the owner."
+            }
+          }
+        },
+        "group": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "The group of the directory.",
+          "properties": {
+            "id": {
+              "type": "integer",
+              "description": "The group ID of the owner."
+            },
+            "name": {
+              "type": "string",
+              "description": "The group name of the owner."
+            }
+          }
+        }
+      },
+      "required": [
+        "path"
+      ]
+    },
+    "Spec.Infrastructure.Node.Storage.Disk": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Additional disk configuration with partitions.",
+      "properties": {
+        "device": {
+          "$ref": "#/$defs/Types.DevicePath",
+          "description": "The disk device path. Example: /dev/sdb"
+        },
+        "partitions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Spec.Infrastructure.Node.Storage.Partition"
+          },
+          "description": "Partitions to create on this disk.",
+          "minItems": 1
+        }
+      },
+      "required": [
+        "device",
+        "partitions"
+      ]
+    },
+    "Spec.Infrastructure.Node.Storage.Partition": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Partition definition with filesystem and mount options.",
+      "properties": {
+        "label": {
+          "type": "string",
+          "description": "Partition label. Example: etcd-data",
+          "minLength": 1
+        },
+        "number": {
+          "type": "integer",
+          "description": "Partition number. Example: 1",
+          "minimum": 1,
+          "maximum": 128
+        },
+        "sizeMiB": {
+          "type": "integer",
+          "description": "Partition size in MiB. Use 0 to use all available space.",
+          "minimum": 0
+        },
+        "filesystem": {
+          "$ref": "#/$defs/Spec.Infrastructure.Node.Storage.Filesystem"
+        }
+      },
+      "required": [
+        "label",
+        "number",
+        "sizeMiB",
+        "filesystem"
+      ]
+    },
+    "Spec.Infrastructure.Node.Storage.Filesystem": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Filesystem configuration for a partition.",
+      "properties": {
+        "format": {
+          "$ref": "#/$defs/Types.FilesystemType",
+          "description": "Filesystem type. Example: ext4, xfs"
+        },
+        "label": {
+          "type": "string",
+          "description": "Filesystem label (max 12 chars for XFS compatibility). Example: ETCD",
+          "minLength": 1,
+          "maxLength": 12,
+          "pattern": "^[A-Z0-9_-]+$"
+        },
+        "mountPoint": {
+          "type": "string",
+          "description": "Mount point path. Example: /var/lib/etcd",
+          "pattern": "^/[a-zA-Z0-9/_-]*$"
+        },
+        "mountOptions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "noatime",
+              "nodiratime",
+              "relatime",
+              "strictatime",
+              "nodev",
+              "nosuid",
+              "noexec",
+              "ro",
+              "rw",
+              "sync",
+              "async",
+              "discard",
+              "nodiscard",
+              "defaults"
+            ]
+          },
+          "description": "Mount options (validated safe options only). Example: [\"noatime\", \"nodiratime\"]"
+        }
+      },
+      "required": [
+        "format",
+        "label",
+        "mountPoint"
+      ]
+    },
+    "Spec.Infrastructure.Node.Network": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Advanced network configuration with ethernets, bonds, and VLANs using networkd format.",
+      "properties": {
+        "ethernets": {
+          "type": "object",
+          "propertyNames": {
+            "pattern": "^(eth|ens|eno|enp|wlan|wlp|bond|br|vlan|lo|tun|tap)[a-zA-Z0-9._-]*$",
+            "maxLength": 15
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Spec.Infrastructure.Node.Network.Ethernet"
+          },
+          "description": "Ethernet interface configurations, keyed by interface name (e.g., eth0, ens3, eno49)."
+        },
+        "bonds": {
+          "type": "object",
+          "propertyNames": {
+            "pattern": "^bond[a-zA-Z0-9._-]*$",
+            "maxLength": 15
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Spec.Infrastructure.Node.Network.Bond"
+          },
+          "description": "Bond interface configurations, keyed by bond name (e.g., bond0, bond1)."
+        }
+      }
+    },
+    "Spec.Infrastructure.Node.Network.Ethernet": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Ethernet interface configuration.",
+      "properties": {
+        "addresses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Types.Cidr"
+          },
+          "description": "List of IP addresses in CIDR notation. Example: [\"192.168.1.10/24\"]"
+        },
+        "gateway": {
+          "$ref": "#/$defs/Types.IpAddress",
+          "description": "Default gateway IP address."
+        },
+        "nameservers": {
+          "$ref": "#/$defs/Spec.Infrastructure.Node.Network.Nameservers"
+        },
+        "dhcp4": {
+          "type": "boolean",
+          "description": "Enable DHCPv4. Default is false."
+        },
+        "routes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Spec.Infrastructure.Node.Network.Route"
+          },
+          "description": "Static routes for this interface."
+        }
+      },
+      "if": {
+        "anyOf": [
+          {
+            "not": {
+              "required": [
+                "dhcp4"
+              ]
+            }
+          },
+          {
+            "properties": {
+              "dhcp4": {
+                "const": false
+              }
+            }
+          }
+        ]
+      },
+      "then": {
+        "required": [
+          "addresses"
+        ],
+        "properties": {
+          "addresses": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    "Spec.Infrastructure.Node.Network.Bond": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Bond interface configuration for link aggregation.",
+      "properties": {
+        "addresses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Types.Cidr"
+          },
+          "description": "List of IP addresses in CIDR notation for the bond."
+        },
+        "gateway": {
+          "$ref": "#/$defs/Types.IpAddress",
+          "description": "Default gateway IP address for the bond."
+        },
+        "nameservers": {
+          "$ref": "#/$defs/Spec.Infrastructure.Node.Network.Nameservers"
+        },
+        "dhcp4": {
+          "type": "boolean",
+          "description": "Enable DHCPv4 on the bond. Default is false."
+        },
+        "interfaces": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^(eth|ens|eno|enp|wlan|wlp|bond|br|vlan|lo|tun|tap)[a-zA-Z0-9._-]*$",
+            "maxLength": 15,
+            "description": "Member interface name (e.g., ens1f0, ens1f1). Must be valid Linux interface name."
+          },
+          "description": "List of member interfaces for the bond.",
+          "minItems": 1
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "mode": {
+              "$ref": "#/$defs/Types.BondMode",
+              "description": "Bonding mode. Example: active-backup, 802.3ad"
+            },
+            "miiMonitorInterval": {
+              "type": "integer",
+              "description": "MII monitoring interval in milliseconds."
+            },
+            "minLinks": {
+              "type": "integer",
+              "description": "Minimum number of links that must be active before activating aggregate."
+            }
+          },
+          "required": [
+            "mode"
+          ]
+        },
+        "routes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Spec.Infrastructure.Node.Network.Route"
+          },
+          "description": "Static routes for this bond."
+        }
+      },
+      "required": [
+        "interfaces",
+        "parameters"
+      ],
+      "if": {
+        "anyOf": [
+          {
+            "not": {
+              "required": [
+                "dhcp4"
+              ]
+            }
+          },
+          {
+            "properties": {
+              "dhcp4": {
+                "const": false
+              }
+            }
+          }
+        ]
+      },
+      "then": {
+        "required": [
+          "addresses"
+        ],
+        "properties": {
+          "addresses": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    "Spec.Infrastructure.Node.Network.Nameservers": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "DNS nameserver configuration.",
+      "properties": {
+        "addresses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Types.IpAddress"
+          },
+          "description": "List of DNS server IP addresses."
+        },
+        "search": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\\.)*[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$",
+            "maxLength": 253,
+            "description": "DNS search domain in lowercase. Examples: example.com, internal, .internal"
+          },
+          "description": "List of DNS search domains (supports single-level domains).",
+          "maxItems": 6
+        }
+      }
+    },
+    "Spec.Infrastructure.Node.Network.Route": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Static route definition.",
+      "properties": {
+        "to": {
+          "type": "string",
+          "oneOf": [
+            {
+              "const": "default"
+            },
+            {
+              "$ref": "#/$defs/Types.Cidr"
+            }
+          ],
+          "description": "Destination network. Use 'default' for default route or specify CIDR. Examples: default, 10.0.0.0/8"
+        },
+        "via": {
+          "$ref": "#/$defs/Types.IpAddress",
+          "description": "Gateway IP address for this route."
+        }
+      },
+      "required": [
+        "to",
+        "via"
+      ]
+    },
+    "Spec.Infrastructure.Node.Systemd": {
+      "description": "Describes the desired state of the systemd units.",
+      "additionalProperties": false,
+      "properties": {
+        "units": {
+          "type": "array",
+          "description": "the list of systemd units. Every unit must have a unique name.",
+          "items": {
+            "name": {
+              "type": "string",
+              "description": "The name of the unit. This must be suffixed with a valid unit type (e.g. \"thing.service\")"
+            },
+            "enabled": {
+              "type": "boolean",
+              "description": "Whether or not the service shall be enabled. When true, the service is enabled. When false, the service is disabled. When omitted, the service is unmodified. In order for this to have any effect, the unit must have an install section."
+            },
+            "mask": {
+              "type": "boolean",
+              "description": "Whether or not the service shall be masked. When true, the service is masked by symlinking it to /dev/null."
+            },
+            "contents": {
+              "type": "string",
+              "description": "The content of the Unit file"
+            },
+            "dropins": {
+              "type": "array",
+              "description": "The list of drop-ins for the unit. Every drop-in must have a unique name.",
+              "items": {
+                "name": {
+                  "type": "string",
+                  "description": "The name of the the drop-in. This must be suffixed with \".conf\""
+                },
+                "contents": {
+                  "type": "string",
+                  "description": "The content of the drop-in"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Spec.Infrastructure.Node.Passwd": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Describes the desired additions to the passwd database. See https://www.flatcar.org/docs/latest/provisioning/config-transpiler/configuration/",
+      "properties": {
+        "users": {
+          "type": "array",
+          "description": "The list of accounts that shall exist. All users must have a unique name.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "Represents a user account to be created in the system.",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The username for the account."
+              },
+              "password_hash": {
+                "type": "string",
+                "description": "The hashed password for the account."
+              },
+              "ssh_authorized_keys": {
+                "type": "array",
+                "description": "A list of SSH keys to be added as an SSH key fragment at `.ssh/authorized_keys.d/ignition` in the user's home directory. All SSH keys must be unique.",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "uid": {
+                "type": "integer",
+                "description": "The user ID of the account."
+              },
+              "gecos": {
+                "type": "string",
+                "description": "The GECOS field of the account."
+              },
+              "home_dir": {
+                "type": "string",
+                "description": "The home directory of the account."
+              },
+              "no_create_home": {
+                "type": "boolean",
+                "description": "Whether or not to create the user's home directory. This only has an effect if the account doesn't exist yet."
+              },
+              "primary_group": {
+                "type": "string",
+                "description": "The name of the primary group of the account."
+              },
+              "groups": {
+                "type": "array",
+                "description": "The list of supplementary groups of the account.",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "no_user_group": {
+                "type": "boolean",
+                "description": "Whether or not to create a group with the same name as the user. This only has an effect if the account doesn't exist yet."
+              },
+              "no_log_init": {
+                "type": "boolean",
+                "description": "Whether or not to add the user to the lastlog and faillog databases. This only has an effect if the account doesn't exist yet."
+              },
+              "shell": {
+                "type": "string",
+                "description": "The login shell of the new account."
+              },
+              "should_exist": {
+                "type": "boolean",
+                "description": "Whether or not the user with the specified name should exist. If omitted, it defaults to true. If false, then Ignition will delete the specified user."
+              },
+              "system": {
+                "type": "boolean",
+                "description": "Whether or not this account should be a system account. This only has an effect if the account doesn't exist yet."
+              }
+            },
+            "required": [
+              "name"
+            ]
+          }
+        },
+        "groups": {
+          "type": "array",
+          "description": "The list of groups to be added. All groups must have a unique name.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "Represents a group to be created in the system.",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The name of the group."
+              },
+              "gid": {
+                "type": "integer",
+                "description": "The group ID of the new group."
+              },
+              "password_hash": {
+                "type": "string",
+                "description": "The hashed password of the new group."
+              },
+              "should_exist": {
+                "type": "boolean",
+                "description": "Whether or not the group with the specified name should exist. If omitted, it defaults to true. If false, then Ignition will delete the specified group."
+              },
+              "system": {
+                "type": "boolean",
+                "description": "Whether or not the group should be a system group. This only has an effect if the group doesn't exist yet."
+              }
+            },
+            "required": [
+              "name"
+            ]
+          }
+        }
+      }
+    },
+    "Spec.Infrastructure.SSH": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "SSH credentials for node access.",
+      "properties": {
+        "username": {
+          "type": "string",
+          "description": "SSH username. Example: core",
+          "minLength": 1
+        },
+        "privateKeyPath": {
+          "type": "string",
+          "description": "Path to the SSH private key. Example: ~/.ssh/id_ed25519_production"
+        },
+        "publicKeyPath": {
+          "type": "string",
+          "description": "Path to the SSH public key. If not specified, defaults to privateKeyPath + '.pub' (or keyPath + '.pub' if using deprecated keyPath). Example: ~/.ssh/id_ed25519_production.pub"
+        }
+      },
+      "required": [
+        "username"
+      ],
+      "oneOf": [
+        {
+          "required": [
+            "keyPath"
+          ]
+        },
+        {
+          "required": [
+            "privateKeyPath"
+          ]
+        }
+      ]
+    },
+    "Spec.Kubernetes": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Kubernetes cluster configuration including control plane, etcd, and worker nodes.",
+      "properties": {
+        "version": {
+          "type": "string",
+          "description": "Kubernetes version for sysext packages. Determines versions of containerd, kubernetes, and other components from installer defaults. Example: 1.33.4",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "pkiPath": {
+          "type": "string",
+          "description": "Path to the PKI directory where to find the certificates and keys for Kubernetes Control Plane and etcd. Must have the `master` and `etcd` folders inside."
+        },
+        "controlPlane": {
+          "$ref": "#/$defs/Spec.Kubernetes.ControlPlane"
+        },
+        "etcd": {
+          "$ref": "#/$defs/Spec.Kubernetes.Etcd"
+        },
+        "nodeGroups": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Spec.Kubernetes.NodeGroup"
+          },
+          "description": "Worker node groups with labels, taints, and annotations."
+        },
+        "networking": {
+          "$ref": "#/$defs/Spec.Kubernetes.Networking"
+        },
+        "advanced": {
+          "$ref": "#/$defs/Spec.Kubernetes.Advanced"
+        }
+      },
+      "required": [
+        "controlPlane",
+        "networking"
+      ]
+    },
+    "Spec.Kubernetes.ControlPlane": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Control plane configuration.",
+      "properties": {
+        "address": {
+          "type": "string",
+          "description": "The address for the Kubernetes control plane with port. Example: k8s-api.example.com:6443",
+          "pattern": "^[a-zA-Z0-9.-]+:[0-9]+$"
+        },
+        "kubeletConfiguration": {
+          "$ref": "#/$defs/Spec.Kubernetes.KubeletConfiguration"
+        },
+        "members": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Spec.Kubernetes.Member"
+          },
+          "description": "Control plane member nodes.",
+          "minItems": 1
+        },
+        "keepalived": {
+          "description": "This section allows to configure a floating Virtual IP between the Control Plane nodes via Keepalived. This can be used to provide high availability for the Kubernetes API server instead of a load balancer.",
+          "$ref": "#/$defs/Types.Keepalived"
+        },
+        "taints": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/$defs/Types.KubeTaints"
+          },
+          "description": "Kubernetes taints for the control-plane nodes, follows Kubernetes taints format. Default is `node-role.kubernetes.io/control-plane:NoSchedule`.\n\nExample:\n\n```yaml\n- effect: NoSchedule\n  key: node.kubernetes.io/role\n  value: control-plane\n```\n\nNOTE: Setting an empty list will remove the default control-plane taint.\n\nNOTE2: Takes effect only at cluster creation time."
+        },
+        "labels": {
+          "description": "Optional additional Kubernetes labels that will be added to the control-plane nodes. Follows Kubernetes labels format.\n\nNote: **Existing labels with the same key will be overwritten** and the label setting the `control-plane` role cannot be deleted.",
+          "$ref": "#/$defs/Types.KubeLabels"
+        },
+        "annotations": {
+          "description": "Optional additional Kubernetes annotations that will be added to the control-plane nodes. Follows Kubernetes annotations format. **Existing annotations with the same key will be overwritten**.",
+          "$ref": "#/$defs/Types.KubeAnnotations"
+        }
+      },
+      "required": [
+        "address",
+        "members"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "keepalived"
+            ],
+            "properties": {
+              "keepalived": {
+                "type": "object",
+                "required": [
+                  "enabled"
+                ],
+                "properties": {
+                  "enabled": {
+                    "const": true
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "members": {
+                "minItems": 2
+              }
+            }
+          }
+        }
+      ]
+    },
+    "Spec.Kubernetes.Etcd": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "etcd cluster configuration. Ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-upgrade-etcd/",
+      "properties": {
+        "members": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Spec.Kubernetes.Member"
+          },
+          "description": "etcd member nodes.",
+          "minItems": 1
+        }
+      },
+      "required": [
+        "members"
+      ]
+    },
+    "Spec.Kubernetes.Member": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "A member node reference with optional IP override.",
+      "properties": {
+        "hostname": {
+          "type": "string",
+          "description": "Hostname that must match an infrastructure node. Example: ctrl01.k8s.example.com",
+          "minLength": 1
+        },
+        "ip": {
+          "$ref": "#/$defs/Types.IpAddress",
+          "description": "Optional IP address. If not specified, it is inferred from the node's network configuration."
+        }
+      },
+      "required": [
+        "hostname"
+      ]
+    },
+    "Spec.Kubernetes.NodeGroup": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "A group of worker nodes with common labels, taints, and annotations. Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Node group name identifier. Example: infra_workers",
+          "minLength": 1
+        },
+        "nodes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Spec.Kubernetes.Member"
+          },
+          "description": "Nodes in this group.",
+          "minItems": 1
+        },
+        "labels": {
+          "$ref": "#/$defs/Types.KubeLabels",
+          "description": "Kubernetes labels to apply to nodes in this group."
+        },
+        "taints": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Types.KubeTaints"
+          },
+          "description": "Kubernetes taints to apply to nodes in this group."
+        },
+        "annotations": {
+          "$ref": "#/$defs/Types.KubeAnnotations",
+          "description": "Kubernetes annotations to apply to nodes in this group."
+        },
+        "kubeletConfiguration": {
+          "$ref": "#/$defs/Spec.Kubernetes.KubeletConfiguration"
+        }
+      },
+      "required": [
+        "name",
+        "nodes"
+      ]
+    },
+    "Spec.Kubernetes.KubeletConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Kubelet configuration parameters. Ref: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/",
+      "properties": {
+        "maxPods": {
+          "type": "integer",
+          "description": "Maximum number of pods per node. Example: 200",
+          "minimum": 1,
+          "maximum": 1000
+        },
+        "podPidsLimit": {
+          "type": "integer",
+          "description": "Maximum number of PIDs per pod. Example: 8192",
+          "minimum": 1
+        }
+      }
+    },
+    "Spec.Kubernetes.Networking": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Kubernetes network configuration. Ref: https://kubernetes.io/docs/concepts/cluster-administration/networking/",
+      "properties": {
+        "podCIDR": {
+          "$ref": "#/$defs/Types.Cidr",
+          "description": "Pod network CIDR. Example: 10.244.0.0/16"
+        },
+        "serviceCIDR": {
+          "$ref": "#/$defs/Types.Cidr",
+          "description": "Service network CIDR. Example: 10.96.0.0/12"
+        }
+      },
+      "required": [
+        "podCIDR",
+        "serviceCIDR"
+      ]
+    },
+    "Spec.Kubernetes.Advanced": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Advanced Kubernetes cluster configuration.",
+      "properties": {
+        "apiServer": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "API server configuration for certificate Subject Alternative Names.",
+          "properties": {
+            "certSANs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "$ref": "#/$defs/Types.IpAddress"
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,}$",
+                    "maxLength": 253
+                  }
+                ],
+                "description": "SAN entry (hostname or IP address). Examples: k8s-api.example.com, 192.168.100.100"
+              },
+              "description": "Additional Subject Alternative Names for the API server certificate."
+            }
+          }
+        },
+        "kubeProxy": {
+          "description": "Configuration for the kube-proxy component.",
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Setting this option to `false` will skip the installation of the kube-proxy component and install the CNI plugin with the following configuration: Cilium in kube-proxy-replacement mode and Calico in eBPF mode. Default is `true`.\n\nNOTE: Changing this option after the cluster has been created is not currently supported."
+            },
+            "additionalProperties": false
+          }
+        },
+        "kubeletConfiguration": {
+          "$ref": "#/$defs/Spec.Kubernetes.KubeletConfiguration"
+        },
+        "encryption": {
+          "$ref": "#/$defs/Spec.Kubernetes.Advanced.Encryption"
+        },
+        "containerd": {
+          "$ref": "#/$defs/Spec.Kubernetes.Advanced.Containerd"
+        },
+        "oidc": {
+          "$ref": "#/$defs/Spec.Kubernetes.Advanced.OIDC"
+        },
+        "users": {
+          "$ref": "#/$defs/Spec.Kubernetes.Advanced.Users"
+        },
+        "cloud": {
+          "description": "Cloud provider integration. Ref: https://kubernetes.io/docs/concepts/architecture/cloud-controller/",
+          "$ref": "#/$defs/Spec.Kubernetes.Advanced.Cloud"
+        },
+        "registry": {
+          "type": "string",
+          "description": "URL of the registry where to pull images from for the Kubernetes phase. (Default is registry.sighup.io/fury/on-premises)."
+        },
+        "controllerManager": {
+          "$ref": "#/$defs/Spec.Kubernetes.Advanced.ControllerManager"
+        },
+        "eventRateLimits": {
+          "type": "array",
+          "description": "Configures the limits of the API Server's EventRateLimit plugin. Each item represents a bucket (Server, Namespace, User, etc).",
+          "items": {
+            "type": "object",
+            "required": [
+              "type",
+              "qps",
+              "burst"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "Server",
+                  "Namespace",
+                  "User",
+                  "SourceAndObject"
+                ],
+                "description": "Type of limit to apply (Server, Namespace, User, SourceAndObject)."
+              },
+              "qps": {
+                "type": "integer",
+                "description": "Maximum allowed queries per second (QPS) for this bucket type."
+              },
+              "burst": {
+                "type": "integer",
+                "description": "Maximum allowed burst for this bucket type."
+              },
+              "cacheSize": {
+                "type": "integer",
+                "description": "Maximum number of cached objects for this bucket. Only for certain types like Namespace or User."
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    "Spec.Kubernetes.Advanced.Cloud": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "provider": {
+          "type": "string",
+          "description": "Sets the cloud provider for the Kubelet"
+        },
+        "config": {
+          "type": "string",
+          "description": "Sets cloud config for the Kubelet"
+        }
+      }
+    },
+    "Spec.Kubernetes.Advanced.Users": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "names": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of user names to create and get a kubeconfig file. Users will not have any permissions by default, RBAC setup for the new users is needed."
+        },
+        "org": {
+          "type": "string",
+          "description": "The organization the users belong to."
+        }
+      }
+    },
+    "Spec.Kubernetes.Advanced.OIDC": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "OIDC configuration for the Kubernetes API server.",
+      "properties": {
+        "issuer_url": {
+          "type": "string",
+          "description": "The issuer URL of the OIDC provider."
+        },
+        "client_id": {
+          "type": "string",
+          "description": "The client ID the API server will use to authenticate to the OIDC provider."
+        },
+        "ca_file": {
+          "type": "string",
+          "description": "The path to the certificate for the CA that signed the identity provider's web certificate. Defaults to the host's root CAs. This should be a path available to the API Server."
+        },
+        "username_claim": {
+          "type": "string",
+          "description": "JWT claim to use as the user name. The default value is `sub`, which is expected to be a unique identifier of the end user."
+        },
+        "username_prefix": {
+          "type": "string",
+          "description": "Prefix prepended to username claims to prevent clashes with existing names (such as system: users)."
+        },
+        "groups_claim": {
+          "type": "string",
+          "description": "JWT claim to use as the user's group."
+        },
+        "group_prefix": {
+          "type": "string",
+          "description": "Prefix prepended to group claims to prevent clashes with existing names (such as system: groups)."
+        }
+      }
+    },
+    "Spec.Kubernetes.Advanced.Containerd": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Advanced configuration for containerd",
+      "properties": {
+        "registryConfigs": {
+          "$ref": "#/$defs/Spec.Kubernetes.Advanced.Containerd.RegistryConfigs"
+        },
+        "selfmanagedRepositories": {
+          "type": "boolean",
+          "description": "Set to true if you manage the NVIDIA container toolkit's repositories externally and wish to skip their automatic configuration with furyctl. Default is false (furyctl manages repositories automatically).\nNotice that containerd itself is installed from binaries and does not use a repository. See `.spec.kubernetes.advanced.airGap` for other download options for containerd."
+        },
+        "storageDir": {
+          "type": "string",
+          "description": "The Containerd storage directory used in the config.toml file."
+        },
+        "stateDir": {
+          "type": "string",
+          "description": "The Containerd state directory used in the config.toml file."
+        },
+        "systemdDir": {
+          "type": "string",
+          "description": "The Containerd systemd service directory used in the config.toml file."
+        },
+        "oomScore": {
+          "type": "integer",
+          "description": "The Containerd OOM score adjustment used in the config.toml file."
+        },
+        "grpcMaxRecvMessageSize": {
+          "type": "integer",
+          "description": "The Containerd gRPC maximum receive message size in bytes used in the config.toml file."
+        },
+        "grpcMaxSendMessageSize": {
+          "type": "integer",
+          "description": "The Containerd gRPC maximum send message size in bytes used in the config.toml file."
+        },
+        "debugLevel": {
+          "type": "string",
+          "description": "The Containerd debug level used in the config.toml file."
+        },
+        "metricsAddress": {
+          "type": "string",
+          "description": "The Containerd metrics address used in the config.toml file."
+        },
+        "metricsGrpcHistogram": {
+          "type": "boolean",
+          "description": "Enable Containerd metrics gRPC histogram in the config.toml file."
+        },
+        "maxContainerLogLineSize": {
+          "type": "integer",
+          "description": "The maximum container log line size in bytes used in the config.toml file."
+        },
+        "deviceOwnershipFromSecurityContext": {
+          "type": "boolean",
+          "description": "Set to true to apply device ownership from the container runtime's security context instead of the host's defaults, used in the config.toml file."
+        }
+      }
+    },
+    "Spec.Kubernetes.Advanced.Containerd.RegistryConfigs": {
+      "description": "Allows specifying custom configuration for a registry at containerd level. You can set authentication details and mirrors for a registry.\nThis feature can be used for example to authenticate to a private registry at containerd (container runtime) level, i.e. globally instead of using `imagePullSecrets`. It also can be used to use a mirror for a registry or to enable insecure connections to trusted registries that have self-signed certificates.",
+      "type": "array",
+      "additionalProperties": false,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "registry": {
+            "type": "string",
+            "description": "Registry address on which you would like to configure authentication or mirror(s). Example: `myregistry.tld:5000`"
+          },
+          "username": {
+            "type": "string",
+            "description": "The username containerd will use to authenticate against the registry."
+          },
+          "password": {
+            "type": "string",
+            "description": "The password containerd will use to authenticate against the registry."
+          },
+          "insecureSkipVerify": {
+            "type": "boolean",
+            "description": "Set to `true` to skip TLS verification (e.g. when using self-signed certificates)."
+          },
+          "mirrorEndpoint": {
+            "type": "array",
+            "description": "Array of URLs with the mirrors to use for the registry. Example: `[\"http://mymirror.tld:8080\"]`",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "Spec.Kubernetes.Advanced.Encryption": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tlsCipherSuites": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The TLS cipher suites to use for etcd and kubeadm static pods. Example:\n```yaml\ntlsCipherSuites:\n  - \"TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256\"\n  - \"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256\"\n  - \"TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384\"\n  - \"TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384\"\n  - \"TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256\"\n  - \"TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256\"\n  - \"TLS_AES_128_GCM_SHA256\"\n  - \"TLS_AES_256_GCM_SHA384\"\n  - \"TLS_CHACHA20_POLY1305_SHA256\"\n```\n."
+        },
+        "tlsCipherSuitesKubelet": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The TLS cipher suites to use for the kubelet. Example:\n```yaml\ntlsCipherSuitesKubelet:\n  - \"TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256\"\n  - \"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256\"\n  - \"TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384\"\n - \"TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305\"\n  - \"TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305\"\n  - \"TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384\"\n```\n. NOTE: to customize the TLS cipher suites of the kubelet, set only this field - do not configure them under the `KubeletConfiguration`."
+        },
+        "configuration": {
+          "type": "string",
+          "description": "etcd's encryption at rest configuration. Must be a string with the EncryptionConfiguration object in YAML. Example:\n\n```yaml\n\napiVersion: apiserver.config.k8s.io/v1\nkind: EncryptionConfiguration\nresources:\n  - resources:\n    - secrets\n    providers:\n    - aescbc:\n        keys:\n        - name: mykey\n          secret: base64_encoded_secret\n```\n"
+        }
+      }
+    },
+    "Spec.Kubernetes.Advanced.ControllerManager": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Advanced configuration for the controller-manager.",
+      "properties": {
+        "gcThreshold": {
+          "type": "integer",
+          "description": "Maximum number of terminated Pods retained by the controller-manager before automatic deletion."
+        }
+      }
+    },
+    "Spec.Distribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "common": {
+          "$ref": "#/$defs/Spec.Distribution.Common"
+        },
+        "modules": {
+          "$ref": "#/$defs/Spec.Distribution.Modules"
+        },
+        "customPatches": {
+          "$ref": "../public/spec-distribution-custompatches.json"
+        }
+      },
+      "required": [
+        "modules"
+      ],
+      "if": {
+        "allOf": [
+          {
+            "required": [
+              "common"
+            ]
+          },
+          {
+            "properties": {
+              "common": {
+                "required": [
+                  "provider"
+                ]
+              }
+            }
+          },
+          {
+            "properties": {
+              "common": {
+                "properties": {
+                  "provider": {
+                    "required": [
+                      "type"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          {
+            "properties": {
+              "common": {
+                "properties": {
+                  "provider": {
+                    "properties": {
+                      "type": {
+                        "const": "eks"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "Spec.Distribution.Common": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Common configuration for all the distribution modules.",
+      "properties": {
+        "nodeSelector": {
+          "$ref": "#/$defs/Types.KubeNodeSelector",
+          "description": "The node selector to use to place the pods for all the SD modules. Follows Kubernetes selector format. Example: `node.kubernetes.io/role: infra`."
+        },
+        "tolerations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Types.KubeToleration"
+          },
+          "description": "An array with the tolerations that will be added to the pods for all the SD modules. Follows Kubernetes tolerations format. Example:\n\n```yaml\n- effect: NoSchedule\n  key: node.kubernetes.io/role\n  value: infra\n```"
+        },
+        "provider": {
+          "$ref": "#/$defs/Spec.Distribution.Common.Provider"
+        },
+        "relativeVendorPath": {
+          "type": "string",
+          "description": "The relative path to the vendor directory, does not need to be changed."
+        },
+        "registry": {
+          "type": "string",
+          "description": "URL of the registry where to pull images from for the Distribution phase. (Default is `registry.sighup.io/fury`).\n\nNOTE: If plugins are pulling from the default registry, the registry will be replaced for the plugin too."
+        },
+        "networkPoliciesEnabled": {
+          "type": "boolean",
+          "description": "EXPERIMENTAL FEATURE. This field defines whether Network Policies are provided for core modules."
+        }
+      }
+    },
+    "Spec.Distribution.Common.Provider": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "The provider type. Don't set. FOR INTERNAL USE ONLY."
+        }
+      },
+      "required": [
+        "type"
+      ]
+    },
+    "Spec.Distribution.Modules": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "auth": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Auth"
+        },
+        "dr": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Dr"
+        },
+        "ingress": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Ingress"
+        },
+        "logging": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Logging"
+        },
+        "monitoring": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Monitoring"
+        },
+        "tracing": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Tracing"
+        },
+        "networking": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Networking"
+        },
+        "policy": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Policy"
+        }
+      },
+      "required": [
+        "dr",
+        "ingress",
+        "logging",
+        "policy"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "allOf": [
+              {
+                "properties": {
+                  "auth": {
+                    "properties": {
+                      "provider": {
+                        "properties": {
+                          "type": {
+                            "const": "basicAuth"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "ingress": {
+                    "properties": {
+                      "nginx": {
+                        "properties": {
+                          "type": {
+                            "const": "none"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "anyOf": [
+                  {
+                    "properties": {
+                      "ingress": {
+                        "properties": {
+                          "haproxy": {
+                            "properties": {
+                              "type": {
+                                "const": "none"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "ingress": {
+                        "not": {
+                          "required": [
+                            "haproxy"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "properties": {
+                  "ingress": {
+                    "properties": {
+                      "byoic": {
+                        "properties": {
+                          "enabled": {
+                            "const": false
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "then": false
+        },
+        {
+          "if": {
+            "allOf": [
+              {
+                "properties": {
+                  "auth": {
+                    "properties": {
+                      "provider": {
+                        "properties": {
+                          "type": {
+                            "const": "basicAuth"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "ingress": {
+                    "properties": {
+                      "nginx": {
+                        "properties": {
+                          "type": {
+                            "const": "none"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "anyOf": [
+                  {
+                    "properties": {
+                      "ingress": {
+                        "properties": {
+                          "haproxy": {
+                            "properties": {
+                              "type": {
+                                "const": "none"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "ingress": {
+                        "not": {
+                          "required": [
+                            "haproxy"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "properties": {
+                  "ingress": {
+                    "properties": {
+                      "byoic": {
+                        "properties": {
+                          "enabled": {
+                            "const": true
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "then": false
+        },
+        {
+          "if": {
+            "allOf": [
+              {
+                "properties": {
+                  "auth": {
+                    "properties": {
+                      "provider": {
+                        "properties": {
+                          "type": {
+                            "const": "sso"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "ingress": {
+                    "properties": {
+                      "nginx": {
+                        "properties": {
+                          "type": {
+                            "const": "none"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "anyOf": [
+                  {
+                    "properties": {
+                      "ingress": {
+                        "properties": {
+                          "haproxy": {
+                            "properties": {
+                              "type": {
+                                "const": "none"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "ingress": {
+                        "not": {
+                          "required": [
+                            "haproxy"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "properties": {
+                  "ingress": {
+                    "properties": {
+                      "byoic": {
+                        "properties": {
+                          "enabled": {
+                            "const": false
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "then": false
+        },
+        {
+          "if": {
+            "allOf": [
+              {
+                "properties": {
+                  "auth": {
+                    "required": [
+                      "oidcKubernetesAuth"
+                    ],
+                    "properties": {
+                      "oidcKubernetesAuth": {
+                        "required": [
+                          "enabled"
+                        ],
+                        "properties": {
+                          "enabled": {
+                            "const": true
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "ingress": {
+                    "properties": {
+                      "nginx": {
+                        "properties": {
+                          "type": {
+                            "const": "none"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "anyOf": [
+                  {
+                    "properties": {
+                      "ingress": {
+                        "properties": {
+                          "haproxy": {
+                            "properties": {
+                              "type": {
+                                "const": "none"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "ingress": {
+                        "not": {
+                          "required": [
+                            "haproxy"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "properties": {
+                  "ingress": {
+                    "properties": {
+                      "byoic": {
+                        "properties": {
+                          "enabled": {
+                            "const": false
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "then": false
+        }
+      ]
+    },
+    "Spec.Distribution.Modules.Ingress": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "overrides": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.Overrides"
+        },
+        "baseDomain": {
+          "type": "string",
+          "description": "The base domain used for all the SD's infrastructural ingresses. If using the nginx `dual` type, this value should be the same as the domain associated with the `internal` ingress class."
+        },
+        "nginx": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.Nginx",
+          "description": "(DEPRECATED) Configurations for the Ingress NGINX Controller package."
+        },
+        "haproxy": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.HAProxy",
+          "description": "Configurations for the HAProxy Kubernetes Ingress Controller package."
+        },
+        "byoic": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.BYOIC",
+          "description": "Configuration for Bring Your Own Ingress Controller mode. Can coexist with nginx and haproxy. The ingressClass is used when both controllers are disabled."
+        },
+        "certManager": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.CertManager",
+          "description": "Configuration for the cert-manager package. Required even if `ingress.nginx.type` is `none`, cert-manager is used for managing other certificates in the cluster besides the TLS termination certificates for the ingresses."
+        },
+        "forecastle": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.Forecastle"
+        },
+        "infrastructureIngressController": {
+          "type": "string",
+          "description": "Overrides the default ingress controller for SD infrastructure ingresses. Set to `nginx` or `haproxy` to select the controller family; the dual/single class mapping (e.g., `haproxy-internal`/`haproxy-external`) is applied automatically based on the controller's type setting. Useful during migrations to keep infrastructure ingresses on one controller while testing another. Do not use this field when both `nginx.type` and `haproxy.type` are `none`: in that case rely on `byoic.ingressClass` to define the ingress class for SD ingresses."
+        }
+      },
+      "required": [
+        "baseDomain"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "nginx": {
+                "properties": {
+                  "tls": {
+                    "properties": {
+                      "provider": {
+                        "const": "certManager"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "certManager"
+            ]
+          }
+        },
+        {
+          "if": {
+            "allOf": [
+              {
+                "properties": {
+                  "byoic": {
+                    "properties": {
+                      "enabled": {
+                        "const": true
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "nginx": {
+                    "properties": {
+                      "type": {
+                        "const": "none"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "anyOf": [
+                  {
+                    "not": {
+                      "required": [
+                        "haproxy"
+                      ]
+                    }
+                  },
+                  {
+                    "properties": {
+                      "haproxy": {
+                        "properties": {
+                          "type": {
+                            "const": "none"
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "then": {
+            "properties": {
+              "byoic": {
+                "required": [
+                  "ingressClass"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "Spec.Distribution.Modules.Ingress.Overrides": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Override the common configuration with a particular configuration for the Ingress module.",
+      "properties": {
+        "ingresses": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.Overrides.Ingresses"
+        },
+        "nodeSelector": {
+          "$ref": "#/$defs/Types.KubeNodeSelector",
+          "description": "Set to override the node selector used to place the pods of the Ingress module."
+        },
+        "tolerations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Types.KubeToleration"
+          },
+          "description": "Set to override the tolerations that will be added to the pods of the Ingress module."
+        }
+      }
+    },
+    "Spec.Distribution.Modules.Ingress.Overrides.Ingresses": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "forecastle": {
+          "$ref": "#/$defs/Types.FuryModuleOverridesIngress"
+        }
+      }
+    },
+    "Spec.Distribution.Modules.Ingress.Forecastle": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "overrides": {
+          "$ref": "#/$defs/Types.FuryModuleComponentOverrides"
+        }
+      }
+    },
+    "Spec.Distribution.Modules.Ingress.HAProxy": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configuration for HAProxy Kubernetes Ingress Controller.",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "none",
+            "single",
+            "dual"
+          ],
+          "description": "The type of the HAProxy Kubernetes Ingress Controller, options are:\n- `none`: HAProxy ingress controller will not be installed.\n- `single`: a single HAProxy ingress controller with ingress class `haproxy` will be installed.\n- `dual`: two independent HAProxy ingress controllers will be installed, one for the `haproxy-internal` ingress class and one for the `haproxy-external` ingress class.\n\nDefault is `none`."
+        },
+        "tls": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.HAProxy.TLS",
+          "description": "TLS configuration for the HAProxy Kubernetes Ingress Controller."
+        },
+        "overrides": {
+          "$ref": "#/$defs/Types.FuryModuleComponentOverrides"
+        }
+      },
+      "required": [
+        "type"
+      ]
+    },
+    "Spec.Distribution.Modules.Ingress.HAProxy.TLS": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "TLS configuration for the HAProxy Kubernetes Ingress Controller.",
+      "properties": {
+        "provider": {
+          "type": "string",
+          "enum": [
+            "certManager",
+            "secret",
+            "none"
+          ],
+          "description": "The provider of the TLS certificates for the ingresses, one of: `none`, `certManager`, or `secret`."
+        },
+        "secret": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.HAProxy.TLS.Secret"
+        }
+      },
+      "required": [
+        "provider"
+      ],
+      "if": {
+        "properties": {
+          "provider": {
+            "const": "secret"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "secret"
+        ]
+      }
+    },
+    "Spec.Distribution.Modules.Ingress.HAProxy.TLS.Secret": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Kubernetes TLS secret for the HAProxy ingresses TLS certificate.",
+      "properties": {
+        "cert": {
+          "type": "string",
+          "description": "The certificate file's content. You can use the `\"{file://<path>}\"` notation to get the content from a file."
+        },
+        "key": {
+          "type": "string",
+          "description": "The signing key file's content. You can use the `\"{file://<path>}\"` notation to get the content from a file."
+        },
+        "ca": {
+          "type": "string",
+          "description": "The Certificate Authority certificate file's content. You can use the `\"{file://<path>}\"` notation to get the content from a file."
+        }
+      },
+      "required": [
+        "ca",
+        "cert",
+        "key"
+      ]
+    },
+    "Spec.Distribution.Modules.Ingress.BYOIC": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configuration for Bring Your Own Ingress Controller mode. The ingressClass is used for infrastructure ingresses when both controllers are disabled.",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable BYOIC mode."
+        },
+        "ingressClass": {
+          "type": "string",
+          "description": "The IngressClass to use for infrastructure ingresses (Prometheus, Grafana, etc.) when both nginx and haproxy are disabled."
+        },
+        "commonAnnotations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Annotations to apply to all infrastructure ingresses when using this BYOIC ingress class. Useful for controller-specific configuration (TLS, auth middlewares, etc.)."
+        }
+      },
+      "required": [
+        "enabled"
+      ]
+    },
+    "Spec.Distribution.Modules.Ingress.Nginx": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "none",
+            "single",
+            "dual"
+          ],
+          "description": "The type of the Ingress nginx controller, options are:\n- `none`: no ingress controller will be installed and no infrastructural ingresses will be created.\n- `single`: a single ingress controller with ingress class `nginx` will be installed to manage all the ingress resources, infrastructural ingresses will be created.\n- `dual`: two independent ingress controllers will be installed, one for the `internal` ingress class intended for private ingresses and one for the `external` ingress class intended for public ingresses. SD's infrastructural ingresses wil use the `internal` ingress class when using the dual type.\n\nDefault is `single`."
+        },
+        "tls": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.Nginx.TLS",
+          "description": "TLS configuration for the Ingress NGINX Controller."
+        },
+        "overrides": {
+          "$ref": "#/$defs/Types.FuryModuleComponentOverrides"
+        }
+      },
+      "required": [
+        "type"
+      ]
+    },
+    "Spec.Distribution.Modules.Ingress.Nginx.TLS": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "TLS configuration for the Ingress NGINX Controller.",
+      "properties": {
+        "provider": {
+          "type": "string",
+          "enum": [
+            "certManager",
+            "secret",
+            "none"
+          ],
+          "description": "The provider of the TLS certificates for the ingresses, one of: `none`, `certManager`, or `secret`."
+        },
+        "secret": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.Nginx.TLS.Secret"
+        }
+      },
+      "required": [
+        "provider"
+      ],
+      "if": {
+        "properties": {
+          "provider": {
+            "const": "secret"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "secret"
+        ]
+      }
+    },
+    "Spec.Distribution.Modules.Ingress.Nginx.TLS.Secret": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Kubernetes TLS secret for the ingresses TLS certificate.",
+      "properties": {
+        "cert": {
+          "type": "string",
+          "description": "The certificate file's content. You can use the `\"{file://<path>}\"` notation to get the content from a file."
+        },
+        "key": {
+          "type": "string",
+          "description": "The signing key file's content. You can use the `\"{file://<path>}\"` notation to get the content from a file."
+        },
+        "ca": {
+          "type": "string",
+          "description": "The Certificate Authority certificate file's content. You can use the `\"{file://<path>}\"` notation to get the content from a file."
+        }
+      },
+      "required": [
+        "ca",
+        "cert",
+        "key"
+      ]
+    },
+    "Spec.Distribution.Modules.Ingress.CertManager": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configuration for the cert-manager package. Required even if `ingress.nginx.type` is `none`, cert-manager is used for managing other certificates in the cluster besides the TLS termination certificates for the ingresses.",
+      "properties": {
+        "clusterIssuer": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.CertManager.ClusterIssuer"
+        },
+        "overrides": {
+          "$ref": "#/$defs/Types.FuryModuleComponentOverrides"
+        }
+      },
+      "required": [
+        "clusterIssuer"
+      ]
+    },
+    "Spec.Distribution.Modules.Ingress.CertManager.ClusterIssuer": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configuration for the cert-manager's ACME clusterIssuer used to request certificates from Let's Encrypt.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the clusterIssuer."
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "The email address to use during the certificate issuing process."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "http01"
+          ],
+          "description": "The type of the clusterIssuer. Only `http01` challenge is supported for on-premises clusters. See solvers for arbitrary configurations."
+        },
+        "solvers": {
+          "type": "array",
+          "description": "The list of challenge solvers to use instead of the default one for the `http01` challenge. Check [cert manager's documentation](https://cert-manager.io/docs/configuration/acme/#adding-multiple-solver-types) for examples for this field."
+        }
+      },
+      "required": [
+        "name",
+        "email"
+      ],
+      "oneOf": [
+        {
+          "required": [
+            "type"
+          ]
+        },
+        {
+          "required": [
+            "solvers"
+          ]
+        }
+      ]
+    },
+    "Spec.Distribution.Modules.Logging": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configuration for the Logging module.",
+      "properties": {
+        "overrides": {
+          "$ref": "#/$defs/Types.FuryModuleOverrides"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "none",
+            "opensearch",
+            "loki",
+            "customOutputs"
+          ],
+          "description": "Selects the logging stack. Options are:\n- `none`: will disable the centralized logging.\n- `opensearch`: will deploy and configure the Logging Operator and an OpenSearch cluster (can be single or triple for HA) where the logs will be stored.\n- `loki`: will use a distributed Grafana Loki instead of OpenSearch for storage.\n- `customOuputs`: the Logging Operator will be deployed and installed but without in-cluster storage, you will have to create the needed Outputs and ClusterOutputs to ship the logs to your desired storage.\n\nDefault is `opensearch`."
+        },
+        "opensearch": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Logging.Opensearch"
+        },
+        "loki": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Logging.Loki"
+        },
+        "minio": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Logging.Minio"
+        },
+        "operator": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Logging.Operator"
+        },
+        "customOutputs": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Logging.CustomOutputs"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "opensearch"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "opensearch"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "customOutputs"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "customOutputs"
+            ]
+          }
+        }
+      ]
+    },
+    "Spec.Distribution.Modules.Logging.Opensearch": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "single",
+            "triple"
+          ],
+          "description": "The type of OpenSearch deployment. One of: `single` for a single replica or `triple` for an HA 3-replicas deployment."
+        },
+        "resources": {
+          "$ref": "#/$defs/Types.KubeResources"
+        },
+        "storageSize": {
+          "type": "string",
+          "description": "The storage size for the OpenSearch volumes. Follows Kubernetes resources storage requests. Default is `150Gi`."
+        },
+        "overrides": {
+          "$ref": "#/$defs/Types.FuryModuleComponentOverrides"
+        }
+      },
+      "required": [
+        "type"
+      ]
+    },
+    "Spec.Distribution.Modules.Logging.Minio": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configuration for Logging's MinIO deployment.",
+      "properties": {
+        "storageSize": {
+          "type": "string",
+          "description": "The PVC size for each MinIO disk, 6 disks total."
+        },
+        "rootUser": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "username": {
+              "type": "string",
+              "description": "The username for the default MinIO root user."
+            },
+            "password": {
+              "type": "string",
+              "description": "The password for the default MinIO root user."
+            }
+          }
+        },
+        "overrides": {
+          "$ref": "#/$defs/Types.FuryModuleComponentOverrides"
+        }
+      }
+    },
+    "Spec.Distribution.Modules.Logging.Loki": {
+      "type": "object",
+      "description": "Configuration for the Loki package.",
+      "additionalProperties": false,
+      "properties": {
+        "backend": {
+          "type": "string",
+          "description": "The storage backend type for Loki. `minio` will use an in-cluster MinIO deployment for object storage, `externalEndpoint` can be used to point to an external object storage instead of deploying an in-cluster MinIO.",
+          "enum": [
+            "minio",
+            "externalEndpoint"
+          ]
+        },
+        "externalEndpoint": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Configuration for Loki's external storage backend.",
+          "properties": {
+            "endpoint": {
+              "type": "string",
+              "description": "External S3-compatible endpoint for Loki's storage."
+            },
+            "insecure": {
+              "type": "boolean",
+              "description": "If true, will use HTTP as protocol instead of HTTPS."
+            },
+            "secretAccessKey": {
+              "type": "string",
+              "description": "The secret access key (password) for the external S3-compatible bucket."
+            },
+            "accessKeyId": {
+              "type": "string",
+              "description": "The access key ID (username) for the external S3-compatible bucket."
+            },
+            "bucketName": {
+              "type": "string",
+              "description": "The bucket name of the external S3-compatible object storage."
+            }
+          }
+        },
+        "tsdbStartDate": {
+          "type": "string",
+          "format": "date",
+          "description": "Starting from versions 1.28.4, 1.29.5 and 1.30.0 of SIGHUP Distribution, Loki changed the time series database from BoltDB to TSDB and the schema that it uses to store the logs from v11 to v13.\n\nThe value of this field will determine the date when Loki will start writing using the new TSDB and the schema v13, always at midnight UTC. The old BoltDB and schema will be kept until all the logs expire for reading purposes.\n\nFrom versions 1.29.7, 1.30.2 and 1.31.1 of the Distribution, this field will be immutable once set and its value should be a date before upgrading to one of these versions or creating the cluster, Loki does not support writing BoltDB and schema v11 anymore.\n\nValue must be a string in `ISO 8601` date format (`yyyy-mm-dd`). Example: `2024-11-18`."
+        },
+        "retentionTime": {
+          "type": "string",
+          "description": "Optional retention period for logs stored in Loki (default `720h`, 30 days). Setting it to `0s` disables retention. Format must match: `[0-9]+(s|m|h|d|w|y)`."
+        },
+        "resources": {
+          "$ref": "#/$defs/Types.KubeResources"
+        }
+      }
+    },
+    "Spec.Distribution.Modules.Logging.Operator": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configuration for the Logging Operator.",
+      "properties": {
+        "fluentd": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Configuration for Fluentd that collects the logs and forwards them to the outputs.",
+          "properties": {
+            "replicas": {
+              "type": "integer",
+              "description": "The number of Fluentd replicas to run. Default is `2`."
+            },
+            "resources": {
+              "$ref": "#/$defs/Types.KubeResources"
+            }
+          }
+        },
+        "fluentbit": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Configuration for Fluent Bit that reads the logs from the workload and forwards them to Fluentd.",
+          "properties": {
+            "resources": {
+              "$ref": "#/$defs/Types.KubeResources"
+            }
+          }
+        },
+        "overrides": {
+          "$ref": "#/$defs/Types.FuryModuleComponentOverrides"
+        }
+      }
+    },
+    "Spec.Distribution.Modules.Logging.CustomOutputs": {
+      "description": "When using the `customOutputs` logging type, you need to manually specify the spec of the several `Output` and `ClusterOutputs` that the Logging Operator expects to forward the logs collected by the pre-defined flows.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "audit": {
+          "type": "string",
+          "description": "This value defines where the output from the `audit` Flow will be sent. This will be the `spec` section of the `Output` object. It must be a string (and not a YAML object) following the OutputSpec definition. Use the `nullout` output to discard the flow: `nullout: {}`"
+        },
+        "events": {
+          "type": "string",
+          "description": "This value defines where the output from the `events` Flow will be sent. This will be the `spec` section of the `Output` object. It must be a string (and not a YAML object) following the OutputSpec definition. Use the `nullout` output to discard the flow: `nullout: {}`"
+        },
+        "infra": {
+          "type": "string",
+          "description": "This value defines where the output from the `infra` Flow will be sent. This will be the `spec` section of the `Output` object. It must be a string (and not a YAML object) following the OutputSpec definition. Use the `nullout` output to discard the flow: `nullout: {}`"
+        },
+        "ingressNginx": {
+          "type": "string",
+          "description": "This value defines where the output from the `ingressNginx` Flow will be sent. This will be the `spec` section of the `Output` object. It must be a string (and not a YAML object) following the OutputSpec definition. Use the `nullout` output to discard the flow: `nullout: {}`"
+        },
+        "ingressHaproxy": {
+          "type": "string",
+          "description": "This value defines where the output from the `ingressHaproxy` Flow will be sent. This will be the `spec` section of the `Output` object. It must be a string (and not a YAML object) following the OutputSpec definition. Use the `nullout` output to discard the flow: `nullout: {}`"
+        },
+        "kubernetes": {
+          "type": "string",
+          "description": "This value defines where the output from the `kubernetes` Flow will be sent. This will be the `spec` section of the `Output` object. It must be a string (and not a YAML object) following the OutputSpec definition. Use the `nullout` output to discard the flow: `nullout: {}`"
+        },
+        "systemdCommon": {
+          "type": "string",
+          "description": "This value defines where the output from the `systemdCommon` Flow will be sent. This will be the `spec` section of the `Output` object. It must be a string (and not a YAML object) following the OutputSpec definition. Use the `nullout` output to discard the flow: `nullout: {}`"
+        },
+        "systemdEtcd": {
+          "type": "string",
+          "description": "This value defines where the output from the `systemdEtcd` Flow will be sent. This will be the `spec` section of the `Output` object. It must be a string (and not a YAML object) following the OutputSpec definition. Use the `nullout` output to discard the flow: `nullout: {}`"
+        },
+        "errors": {
+          "type": "string",
+          "description": "This value defines where the output from the `errors` Flow will be sent. This will be the `spec` section of the `Output` object. It must be a string (and not a YAML object) following the OutputSpec definition. Use the `nullout` output to discard the flow: `nullout: {}`"
+        }
+      },
+      "required": [
+        "audit",
+        "events",
+        "infra",
+        "ingressHaproxy",
+        "ingressNginx",
+        "kubernetes",
+        "systemdCommon",
+        "systemdEtcd",
+        "errors"
+      ]
+    },
+    "Spec.Distribution.Modules.Monitoring": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configuration for the Monitoring module.",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "none",
+            "prometheus",
+            "prometheusAgent",
+            "mimir"
+          ],
+          "description": "The type of the monitoring, must be `none`, `prometheus`, `prometheusAgent` or `mimir`.\n\n- `none`: will disable the whole monitoring stack.\n- `prometheus`: will install Prometheus Operator and a preconfigured Prometheus instance, Alertmanager, a set of alert rules, exporters needed to monitor all the components of the cluster, Grafana and a series of dashboards to view the collected metrics, and more.\n- `prometheusAgent`: will install Prometheus operator, an instance of Prometheus in Agent mode (no alerting, no queries, no storage), and all the exporters needed to get metrics for the status of the cluster and the workloads. Useful when having a centralized (remote) Prometheus where to ship the metrics and not storing them locally in the cluster.\n- `mimir`: will install the same as the `prometheus` option, plus Grafana Mimir that allows for longer retention of metrics and the usage of Object Storage.\n\nDefault is `prometheus`."
+        },
+        "overrides": {
+          "$ref": "#/$defs/Types.FuryModuleOverrides"
+        },
+        "prometheus": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Monitoring.Prometheus"
+        },
+        "prometheusAgent": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Monitoring.PrometheusAgent"
+        },
+        "prometheusAdapter": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Monitoring.PrometheusAdapter"
+        },
+        "alertmanager": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Monitoring.AlertManager"
+        },
+        "grafana": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Monitoring.Grafana"
+        },
+        "blackboxExporter": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Monitoring.BlackboxExporter"
+        },
+        "kubeStateMetrics": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Monitoring.KubeStateMetrics"
+        },
+        "x509Exporter": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Monitoring.X509Exporter"
+        },
+        "mimir": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Monitoring.Mimir"
+        },
+        "minio": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Monitoring.Minio"
+        }
+      },
+      "required": [
+        "type"
+      ]
+    },
+    "Spec.Distribution.Modules.Monitoring.Prometheus": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "resources": {
+          "$ref": "#/$defs/Types.KubeResources"
+        },
+        "retentionTime": {
+          "type": "string",
+          "description": "The retention time for the `k8s` Prometheus instance."
+        },
+        "retentionSize": {
+          "type": "string",
+          "description": "The retention size for the `k8s` Prometheus instance."
+        },
+        "storageSize": {
+          "type": "string",
+          "description": "The storage size for the `k8s` Prometheus instance."
+        },
+        "remoteWrite": {
+          "description": "Set this option to ship the collected metrics to a remote Prometheus receiver.\n\n`remoteWrite` is an array of objects that allows configuring the [remoteWrite](https://prometheus.io/docs/specs/remote_write_spec/) options for Prometheus. The objects in the array follow [the same schema as in the prometheus operator](https://prometheus-operator.dev/docs/operator/api/#monitoring.coreos.com/v1.RemoteWriteSpec).",
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "Spec.Distribution.Modules.Monitoring.PrometheusAdapter": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "resources": {
+          "$ref": "#/$defs/Types.KubeResources"
+        },
+        "installEnhancedHPAMetrics": {
+          "type": "boolean",
+          "description": "Configures whether to enable advanced HPA metric collection in the Prometheus Adapter. When set to `true`, the Prometheus Adapter component will query Prometheus instances directly to retrieve additional metrics related to the Horizontal Pod Autoscaler (HPA). These metrics provide deeper visibility into HPA behaviour and performance. **Caution:** Enabling this feature results in a significant increase in RAM consumption of the Prometheus Adapter, as it requires managing an additional dataset. Default value: true."
+        }
+      }
+    },
+    "Spec.Distribution.Modules.Monitoring.PrometheusAgent": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "resources": {
+          "$ref": "#/$defs/Types.KubeResources"
+        },
+        "remoteWrite": {
+          "description": "Set this option to ship the collected metrics to a remote Prometheus receiver.\n\n`remoteWrite` is an array of objects that allows configuring the [remoteWrite](https://prometheus.io/docs/specs/remote_write_spec/) options for Prometheus. The objects in the array follow [the same schema as in the prometheus operator](https://prometheus-operator.dev/docs/operator/api/#monitoring.coreos.com/v1.RemoteWriteSpec).",
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "Spec.Distribution.Modules.Monitoring.AlertManager": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "deadManSwitchWebhookUrl": {
+          "type": "string",
+          "description": "The webhook URL to send dead man's switch monitoring, for example to use with healthchecks.io."
+        },
+        "installDefaultRules": {
+          "type": "boolean",
+          "description": "Set to false to avoid installing the Prometheus rules (alerts) included with the distribution."
+        },
+        "slackWebhookUrl": {
+          "type": "string",
+          "description": "The Slack webhook URL where to send the infrastructural and workload alerts to."
+        }
+      }
+    },
+    "Spec.Distribution.Modules.Monitoring.Grafana": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "usersRoleAttributePath": {
+          "type": "string",
+          "description": "[JMESPath](http://jmespath.org/examples.html) expression to retrieve the user's role. Example:\n\n```yaml\nusersRoleAttributePath: \"contains(groups[*], 'beta') && 'Admin' || contains(groups[*], 'gamma') && 'Editor' || contains(groups[*], 'delta') && 'Viewer'\n```\n\nMore details in [Grafana's documentation](https://grafana.com/docs/grafana/latest/setup-grafana/configure-security/configure-authentication/generic-oauth/#configure-role-mapping)."
+        },
+        "basicAuthIngress": {
+          "type": "boolean",
+          "description": "Setting this to true will deploy an additional `grafana-basic-auth` ingress protected with Grafana's basic auth instead of SSO. It's intended use is as a temporary ingress for when there are problems with the SSO login flow.\n\nNotice that by default anonymous access is enabled."
+        },
+        "overrides": {
+          "$ref": "#/$defs/Types.FuryModuleComponentOverrides"
+        }
+      }
+    },
+    "Spec.Distribution.Modules.Monitoring.BlackboxExporter": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "overrides": {
+          "$ref": "#/$defs/Types.FuryModuleComponentOverrides"
+        }
+      }
+    },
+    "Spec.Distribution.Modules.Monitoring.KubeStateMetrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "overrides": {
+          "$ref": "#/$defs/Types.FuryModuleComponentOverrides"
+        }
+      }
+    },
+    "Spec.Distribution.Modules.Monitoring.X509Exporter": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "overrides": {
+          "$ref": "#/$defs/Types.FuryModuleComponentOverrides"
+        }
+      }
+    },
+    "Spec.Distribution.Modules.Monitoring.Mimir": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configuration for the Mimir package.",
+      "properties": {
+        "retentionTime": {
+          "type": "string",
+          "description": "The retention time for the logs stored in Mimir. Default is `30d`. Value must match the regular expression `[0-9]+(ns|us|µs|ms|s|m|h|d|w|y)` where y = 365 days."
+        },
+        "backend": {
+          "type": "string",
+          "enum": [
+            "minio",
+            "externalEndpoint"
+          ],
+          "description": "The storage backend type for Mimir. `minio` will use an in-cluster MinIO deployment for object storage, `externalEndpoint` can be used to point to an external S3-compatible object storage instead of deploying an in-cluster MinIO."
+        },
+        "externalEndpoint": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Configuration for Mimir's external storage backend.",
+          "properties": {
+            "endpoint": {
+              "type": "string",
+              "description": "The external S3-compatible endpoint for Mimir's storage."
+            },
+            "insecure": {
+              "type": "boolean",
+              "description": "If true, will use HTTP as protocol instead of HTTPS."
+            },
+            "secretAccessKey": {
+              "type": "string",
+              "description": "The secret access key (password) for the external S3-compatible bucket."
+            },
+            "accessKeyId": {
+              "type": "string",
+              "description": "The access key ID (username) for the external S3-compatible bucket."
+            },
+            "bucketName": {
+              "type": "string",
+              "description": "The bucket name of the external S3-compatible object storage."
+            }
+          }
+        },
+        "overrides": {
+          "$ref": "#/$defs/Types.FuryModuleComponentOverrides"
+        }
+      }
+    },
+    "Spec.Distribution.Modules.Monitoring.Minio": {
+      "type": "object",
+      "description": "Configuration for Monitoring's MinIO deployment.",
+      "additionalProperties": false,
+      "properties": {
+        "storageSize": {
+          "type": "string",
+          "description": "The PVC size for each MinIO disk, 6 disks total."
+        },
+        "rootUser": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "username": {
+              "type": "string",
+              "description": "The username for the default MinIO root user."
+            },
+            "password": {
+              "type": "string",
+              "description": "The password for the default MinIO root user."
+            }
+          }
+        },
+        "overrides": {
+          "$ref": "#/$defs/Types.FuryModuleComponentOverrides"
+        }
+      }
+    },
+    "Spec.Distribution.Modules.Tracing": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configuration for the Tracing module.",
+      "properties": {
+        "overrides": {
+          "$ref": "#/$defs/Types.FuryModuleOverrides"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "none",
+            "tempo"
+          ],
+          "description": "The type of tracing to use, either `none` or `tempo`. `none` will disable the Tracing module and `tempo` will install a Grafana Tempo deployment.\n\nDefault is `tempo`."
+        },
+        "tempo": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Tracing.Tempo"
+        },
+        "minio": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Tracing.Minio"
+        }
+      },
+      "required": [
+        "type"
+      ]
+    },
+    "Spec.Distribution.Modules.Tracing.Tempo": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configuration for the Tempo package.",
+      "properties": {
+        "retentionTime": {
+          "type": "string",
+          "description": "The retention time for the traces stored in Tempo."
+        },
+        "backend": {
+          "type": "string",
+          "enum": [
+            "minio",
+            "externalEndpoint"
+          ],
+          "description": "The storage backend type for Tempo. `minio` will use an in-cluster MinIO deployment for object storage, `externalEndpoint` can be used to point to an external S3-compatible object storage instead of deploying an in-cluster MinIO."
+        },
+        "externalEndpoint": {
+          "description": "Configuration for Tempo's external storage backend.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "endpoint": {
+              "type": "string",
+              "description": "The external S3-compatible endpoint for Tempo's storage."
+            },
+            "insecure": {
+              "type": "boolean",
+              "description": "If true, will use HTTP as protocol instead of HTTPS."
+            },
+            "secretAccessKey": {
+              "type": "string",
+              "description": "The secret access key (password) for the external S3-compatible bucket."
+            },
+            "accessKeyId": {
+              "type": "string",
+              "description": "The access key ID (username) for the external S3-compatible bucket."
+            },
+            "bucketName": {
+              "type": "string",
+              "description": "The bucket name of the external S3-compatible object storage."
+            }
+          }
+        },
+        "overrides": {
+          "$ref": "#/$defs/Types.FuryModuleComponentOverrides"
+        }
+      }
+    },
+    "Spec.Distribution.Modules.Tracing.Minio": {
+      "type": "object",
+      "description": "Configuration for Tracing's MinIO deployment.",
+      "additionalProperties": false,
+      "properties": {
+        "storageSize": {
+          "type": "string",
+          "description": "The PVC size for each MinIO disk, 6 disks total."
+        },
+        "rootUser": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "username": {
+              "type": "string",
+              "description": "The username for the default MinIO root user."
+            },
+            "password": {
+              "type": "string",
+              "description": "The password for the default MinIO root user."
+            }
+          }
+        },
+        "overrides": {
+          "$ref": "#/$defs/Types.FuryModuleComponentOverrides"
+        }
+      }
+    },
+    "Spec.Distribution.Modules.Networking": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configuration for the Networking module.",
+      "properties": {
+        "overrides": {
+          "$ref": "#/$defs/Types.FuryModuleOverrides"
+        },
+        "tigeraOperator": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Networking.TigeraOperator"
+        },
+        "cilium": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Networking.Cilium"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "calico",
+            "cilium"
+          ],
+          "description": "The type of CNI plugin to use, either `calico` (Tigera Operator) or `cilium`. Default is `calico`."
+        }
+      },
+      "required": [
+        "type"
+      ]
+    },
+    "Spec.Distribution.Modules.Networking.TigeraOperator": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "podCidr": {
+          "$ref": "#/$defs/Types.Cidr",
+          "description": "Allows specifing a CIDR for the Pods network different from `.spec.kubernetes.podCidr`. If not set the default is to use `.spec.kubernetes.podCidr`. WARNING: The value for this field cannot be changed once set."
+        },
+        "blockSize": {
+          "type": "integer",
+          "description": "BlockSize specifies the CIDR prefix length to use when allocating per-node IP blocks from the main IP pool CIDR. WARNING: The value for this field cannot be changed once set. Default is 26.",
+          "minimum": 1,
+          "maximum": 32
+        },
+        "overrides": {
+          "$ref": "#/$defs/Types.FuryModuleComponentOverrides"
+        }
+      }
+    },
+    "Spec.Distribution.Modules.Networking.Cilium": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "podCidr": {
+          "$ref": "#/$defs/Types.Cidr",
+          "description": "Allows specifing a CIDR for the Pods network different from `.spec.kubernetes.podCidr`. If not set the default is to use `.spec.kubernetes.podCidr`."
+        },
+        "maskSize": {
+          "type": "string",
+          "description": "The mask size to use for the Pods network on each node."
+        },
+        "overrides": {
+          "$ref": "#/$defs/Types.FuryModuleComponentOverrides"
+        }
+      }
+    },
+    "Spec.Distribution.Modules.Policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configuration for the Policy module.",
+      "properties": {
+        "overrides": {
+          "$ref": "#/$defs/Types.FuryModuleOverrides"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "none",
+            "gatekeeper",
+            "kyverno"
+          ],
+          "description": "The type of policy enforcement to use, either `none`, `gatekeeper` or `kyverno`.\n\nDefault is `none`."
+        },
+        "gatekeeper": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Policy.Gatekeeper"
+        },
+        "kyverno": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Policy.Kyverno"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "gatekeeper"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "gatekeeper"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "kyverno"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "kyverno"
+            ]
+          }
+        }
+      ]
+    },
+    "Spec.Distribution.Modules.Policy.Gatekeeper": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configuration for the Gatekeeper package.",
+      "properties": {
+        "additionalExcludedNamespaces": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "This parameter adds namespaces to Gatekeeper's exemption list, so it will not enforce the constraints on them."
+        },
+        "enforcementAction": {
+          "type": "string",
+          "enum": [
+            "deny",
+            "dryrun",
+            "warn"
+          ],
+          "description": "The default enforcement action to use for the included constraints. `deny` will block the admission when violations to the policies are found, `warn` will show a message to the user but will admit the violating requests and `dryrun` won't give any feedback to the user but it will log the violations."
+        },
+        "installDefaultPolicies": {
+          "type": "boolean",
+          "description": "Set to `false` to avoid installing the default Gatekeeper policies (constraints templates and constraints) included with the distribution."
+        },
+        "overrides": {
+          "$ref": "#/$defs/Types.FuryModuleComponentOverrides"
+        }
+      },
+      "required": [
+        "enforcementAction",
+        "installDefaultPolicies"
+      ]
+    },
+    "Spec.Distribution.Modules.Policy.Kyverno": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configuration for the Kyverno package.",
+      "properties": {
+        "additionalExcludedNamespaces": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "This parameter adds namespaces to Kyverno's exemption list, so it will not enforce the policies on them."
+        },
+        "validationFailureAction": {
+          "type": "string",
+          "enum": [
+            "Audit",
+            "Enforce"
+          ],
+          "description": "The validation failure action to use for the included policies, `Enforce` will block when a request does not comply with the policies and `Audit` will not block but log when a request does not comply with the policies."
+        },
+        "installDefaultPolicies": {
+          "type": "boolean",
+          "description": "Set to `false` to avoid installing the default Kyverno policies included with distribution."
+        },
+        "overrides": {
+          "$ref": "#/$defs/Types.FuryModuleComponentOverrides"
+        }
+      },
+      "required": [
+        "validationFailureAction",
+        "installDefaultPolicies"
+      ]
+    },
+    "Spec.Distribution.Modules.Dr": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configuration for the Disaster Recovery module.",
+      "properties": {
+        "overrides": {
+          "$ref": "#/$defs/Types.FuryModuleOverrides"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "none",
+            "on-premises"
+          ],
+          "description": "The type of the Disaster Recovery, must be `none` or `on-premises`. `none` disables the module and `on-premises` will install Velero, an optional MinIO deployment and optionally etcd-backup.\n\nDefault is `none`."
+        },
+        "velero": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Dr.Velero"
+        },
+        "etcdBackup": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Dr.EtcdBackup"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "if": {
+        "properties": {
+          "type": {
+            "const": "on-premises"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "type",
+          "velero"
+        ]
+      }
+    },
+    "Spec.Distribution.Modules.Dr.EtcdBackup": {
+      "type": "object",
+      "description": "Configuration for the ETCD backup package.",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "s3",
+            "pvc",
+            "none",
+            "all"
+          ],
+          "description": "The type of the etcd backup to enable, options are:\n- `none`: no etcd backup CronJob will be installed and no etcd backup will be performed.\n- `s3`: the etcd-backup-s3 package will be enabled. It will deploy a CronJob which continuously snapshots a healthy etcd node and will save the backups in a configured S3 bucket.\n- `pvc`: the etcd-backup-pvc package will be enabled. It will deploy a CronJob which continuously snapshots a healthy etcd node and will save the backups in a configured PersistentVolumeClaim.\n- `all`: both kinds of backups will be enabled.\n\nDefault is `none`."
+        },
+        "backupPrefix": {
+          "type": "string",
+          "additionalProperties": false,
+          "description": "A prefix to be prepended to the backup filenames. If unset, the prefix defaults to the cluster's name."
+        },
+        "pvc": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Configuration parameters for the `pvc` type of `etcdBackup`.",
+          "properties": {
+            "schedule": {
+              "type": "string",
+              "description": "The cron expression for the `etcd-backup-pvc` backup schedule. Default is `0 1 * * *` (everyday at 01:00)."
+            },
+            "name": {
+              "type": "string",
+              "description": "The PersistentVolumeClaim name where the backups will be saved. If set, `size` and `storageClass` will be ignored and `etcd-backup` will use the PersistentVolumeClaim that matches the name set. Please note that the PersistentVolumeClaim must be created inside the `kube-system` namespace.\n\nIf you leave `name` unset `furyctl` will create a PersistentVolumeClaim for you with an arbitrary name."
+            },
+            "size": {
+              "type": "string",
+              "description": "The size that the `furyctl`-managed PersistentVolumeClaim will use. This has no effect and is ignored if `name` is set. Default is `10G`."
+            },
+            "accessModes": {
+              "type": "array",
+              "description": "The accessModes that the `furyctl`-managed PersistentVolumeClaim will use. This has no effect and is ignored if `name` is set. Default is `[\"ReadOnlyOnce\"]`"
+            },
+            "storageClass": {
+              "type": "string",
+              "description": "The storage class that the `furyctl`-managed PersistentVolumeClaim will use. This has no effect and is ignored if `name` is set. Default is `default`."
+            },
+            "retentionTime": {
+              "type": "string",
+              "description": "The retention time of the backups inside the PersistentVolumeClaim. Follows rclone's `min-age` format. Example: '30d' for 30 days. Default is `10d` (ten days)."
+            }
+          }
+        },
+        "s3": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Configuration parameters for the `s3` type of `etcdBackup`.",
+          "properties": {
+            "schedule": {
+              "type": "string",
+              "description": "The cron expression for the `etcd-backup-s3` backup schedule. Default is `0 1 * * *` (everyday at 01:00)."
+            },
+            "endpoint": {
+              "type": "string",
+              "description": "External S3-compatible endpoint for etcd-backup-s3's storage."
+            },
+            "insecure": {
+              "type": "boolean",
+              "description": "If true, will use HTTP as protocol instead of HTTPS."
+            },
+            "secretAccessKey": {
+              "type": "string",
+              "description": "The secret access key (password) for the external S3-compatible bucket."
+            },
+            "accessKeyId": {
+              "type": "string",
+              "description": "The access key ID (username) for the external S3-compatible bucket."
+            },
+            "bucketName": {
+              "type": "string",
+              "description": "The bucket name of the external S3-compatible object storage."
+            },
+            "retentionTime": {
+              "type": "string",
+              "description": "The retention time of the external S3-compatible object storage. Follows rclone's `min-age` format. Example: '30d' for 30 days. Default is `10d` (ten days)."
+            }
+          },
+          "required": [
+            "endpoint",
+            "accessKeyId",
+            "secretAccessKey",
+            "bucketName"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "required": [
+            "type"
+          ]
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": [
+                  "s3",
+                  "all"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "s3"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": [
+                  "pvc",
+                  "all"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "pvc"
+            ]
+          }
+        }
+      ]
+    },
+    "Spec.Distribution.Modules.Dr.Velero": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configuration for the Velero package.",
+      "properties": {
+        "backend": {
+          "type": "string",
+          "enum": [
+            "minio",
+            "externalEndpoint",
+            "gcs"
+          ],
+          "description": "The storage backend type for Velero. `minio` will use an in-cluster MinIO deployment for object storage, `externalEndpoint` can be used to point to an external S3-compatible object storage instead of deploying an in-cluster MinIO, `gcs` can be used to point to an external GCS object storage instead of deploying an in-cluster MinIO."
+        },
+        "externalEndpoint": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Configuration for Velero's external storage backend.",
+          "properties": {
+            "endpoint": {
+              "type": "string",
+              "description": "External S3-compatible endpoint for Velero's storage."
+            },
+            "insecure": {
+              "type": "boolean",
+              "description": "If true, will use HTTP as protocol instead of HTTPS."
+            },
+            "secretAccessKey": {
+              "type": "string",
+              "description": "The secret access key (password) for the external S3-compatible bucket."
+            },
+            "accessKeyId": {
+              "type": "string",
+              "description": "The access key ID (username) for the external S3-compatible bucket."
+            },
+            "bucketName": {
+              "type": "string",
+              "description": "The bucket name of the external object storage."
+            },
+            "prefixName": {
+              "type": "string",
+              "description": "The prefix name to use inside the bucket."
+            },
+            "accessMode": {
+              "type": "string",
+              "enum": [
+                "ReadWrite",
+                "ReadOnly"
+              ],
+              "description": "How Velero can access the backup storage location."
+            }
+          }
+        },
+        "gcs": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Configuration for Velero's gcs storage backend.",
+          "properties": {
+            "bucketName": {
+              "type": "string",
+              "description": "The bucket name of the gcs object storage."
+            },
+            "prefixName": {
+              "type": "string",
+              "description": "The prefix name to use inside the gcs bucket."
+            },
+            "accessMode": {
+              "type": "string",
+              "enum": [
+                "ReadWrite",
+                "ReadOnly"
+              ],
+              "description": "How Velero can access the backup storage location."
+            },
+            "clientEmail": {
+              "type": "string",
+              "description": "Full gcs client email."
+            },
+            "serviceAccountString": {
+              "type": "string",
+              "description": "Service gcs account JSON string."
+            }
+          }
+        },
+        "schedules": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Configuration for Velero's backup schedules.",
+          "properties": {
+            "install": {
+              "type": "boolean",
+              "description": "Whether to install or not the default `manifests` and `full` backups schedules. Default is `true`."
+            },
+            "definitions": {
+              "type": "object",
+              "additionalProperties": false,
+              "description": "Configuration for Velero schedules.",
+              "properties": {
+                "manifests": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "description": "Configuration for Velero's manifests backup schedule.",
+                  "properties": {
+                    "schedule": {
+                      "type": "string",
+                      "description": "The cron expression for the `manifests` backup schedule (default `*/15 * * * *`)."
+                    },
+                    "ttl": {
+                      "type": "string",
+                      "description": "The Time To Live (TTL) of the backups created by the backup schedules (default `720h0m0s`, 30 days). Notice that changing this value will affect only newly created backups, prior backups will keep the old TTL."
+                    }
+                  }
+                },
+                "full": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "description": "Configuration for Velero's manifests backup schedule.",
+                  "properties": {
+                    "schedule": {
+                      "type": "string",
+                      "description": "The cron expression for the `full` backup schedule (default `0 1 * * *`)."
+                    },
+                    "ttl": {
+                      "type": "string",
+                      "description": "The Time To Live (TTL) of the backups created by the backup schedules (default `720h0m0s`, 30 days). Notice that changing this value will affect only newly created backups, prior backups will keep the old TTL."
+                    },
+                    "snapshotMoveData": {
+                      "type": "boolean",
+                      "description": "EXPERIMENTAL (if you do more than one backups, the following backups after the first are not automatically restorable, see https://github.com/vmware-tanzu/velero/issues/7057#issuecomment-2466815898 for the manual restore solution): SnapshotMoveData specifies whether snapshot data should be moved. Velero will create a new volume from the snapshot and upload the content to the storageLocation."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "snapshotController": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Configuration for the additional snapshotController component installation.",
+          "properties": {
+            "install": {
+              "type": "boolean",
+              "description": "Whether to install or not the snapshotController component in the cluster. Before enabling this field, check if your CSI driver does not have snapshotController built-in."
+            }
+          }
+        },
+        "nodeAgent": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Configuration for Velero's node-agent DaemonSet.",
+          "properties": {
+            "prepareQueueLength": {
+              "type": "integer",
+              "description": "Defines the maximum number of DataUpload/DataDownload/PodVolumeBackup/PodVolumeRestore CRs under preparation statuses but not yet processed by any node. This constrains the number of intermediate objects (PVCs, VolumeSnapshots, etc.) to prevent unnecessary resource usage when cluster parallelism is limited."
+            }
+          }
+        },
+        "overrides": {
+          "$ref": "#/$defs/Types.FuryModuleComponentOverrides"
+        }
+      }
+    },
+    "Spec.Distribution.Modules.Auth": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configuration for the Auth module.",
+      "properties": {
+        "overrides": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Auth.Overrides"
+        },
+        "provider": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Auth.Provider"
+        },
+        "baseDomain": {
+          "type": "string",
+          "description": "The base domain for the ingresses created by the Auth module (Gangplank, Pomerium, Dex). Notice that when the ingress module type is `dual`, these will use the `external` ingress class."
+        },
+        "pomerium": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Auth.Pomerium"
+        },
+        "dex": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Auth.Dex"
+        },
+        "oidcKubernetesAuth": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Auth.OIDCKubernetesAuth"
+        },
+        "oidcTrustedCA": {
+          "type": "string",
+          "description": "The Certificate Authority certificate file's content to trust for self-signed certificates at the OAuth2 URL. You can use the `\"{file://<path>}\"` notation to get the content from a file."
+        }
+      },
+      "required": [
+        "provider"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "provider": {
+                "properties": {
+                  "type": {
+                    "const": "sso"
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "dex",
+              "pomerium",
+              "baseDomain"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "provider": {
+                "properties": {
+                  "type": {
+                    "const": "basicAuth"
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "provider": {
+                "required": [
+                  "basicAuth"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "oidcKubernetesAuth": {
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "oidcKubernetesAuth": {
+                    "properties": {
+                      "enabled": {
+                        "const": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "then": {
+            "required": [
+              "baseDomain",
+              "dex"
+            ]
+          }
+        }
+      ]
+    },
+    "Spec.Distribution.Modules.Auth.Overrides": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Override the common configuration with a particular configuration for the Auth module.",
+      "properties": {
+        "nodeSelector": {
+          "$ref": "#/$defs/Types.KubeNodeSelector",
+          "description": "Set to override the node selector used to place the pods of the Auth module."
+        },
+        "tolerations": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/$defs/Types.KubeToleration"
+          },
+          "description": "Set to override the tolerations that will be added to the pods of the Auth module."
+        },
+        "ingresses": {
+          "additionalProperties": false,
+          "type": "object",
+          "description": "Override the definition of the Auth module ingresses.",
+          "properties": {
+            "gangplank": {
+              "$ref": "#/$defs/Spec.Distribution.Modules.Auth.Overrides.Ingress"
+            },
+            "dex": {
+              "$ref": "#/$defs/Spec.Distribution.Modules.Auth.Overrides.Ingress"
+            }
+          }
+        }
+      }
+    },
+    "Spec.Distribution.Modules.Auth.Overrides.Ingress": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "host": {
+          "type": "string",
+          "description": "Use this host for the ingress instead of the default one."
+        },
+        "ingressClass": {
+          "type": "string",
+          "description": "Use this ingress class for the ingress instead of the default one."
+        }
+      },
+      "required": [
+        "host",
+        "ingressClass"
+      ]
+    },
+    "Spec.Distribution.Modules.Auth.Provider": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "none",
+            "basicAuth",
+            "sso"
+          ],
+          "description": "The type of the Auth provider, options are:\n- `none`: will disable authentication in the infrastructural ingresses.\n- `sso`: will protect the infrastructural ingresses with Pomerium and Dex (SSO) and require authentication before accessing them.\n- `basicAuth`: will protect the infrastructural ingresses with HTTP basic auth (username and password) authentication.\n\nDefault is `none`."
+        },
+        "basicAuth": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Auth.Provider.BasicAuth"
+        }
+      },
+      "required": [
+        "type"
+      ]
+    },
+    "Spec.Distribution.Modules.Auth.Provider.BasicAuth": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configuration for the HTTP Basic Auth provider.",
+      "properties": {
+        "username": {
+          "type": "string",
+          "description": "The username for logging in with the HTTP basic authentication."
+        },
+        "password": {
+          "type": "string",
+          "description": "The password for logging in with the HTTP basic authentication."
+        }
+      },
+      "required": [
+        "username",
+        "password"
+      ]
+    },
+    "Spec.Distribution.Modules.Auth.Pomerium": {
+      "$ref": "./spec-distribution-modules-auth-pomerium.json"
+    },
+    "Spec.Distribution.Modules.Auth.Dex": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configuration for the Dex package.",
+      "properties": {
+        "connectors": {
+          "type": "array",
+          "description": "A list with each item defining a Dex connector. Follows Dex connectors configuration format: https://dexidp.io/docs/connectors/"
+        },
+        "additionalStaticClients": {
+          "type": "array",
+          "description": "Additional static clients defitions that will be added to the default clients included with the distribution in Dex's configuration. Example:\n\n```yaml\nadditionalStaticClients:\n  - id: my-custom-client\n    name: \"A custom additional static client\"\n    redirectURIs:\n      - \"https://myapp.tld/redirect\"\n      - \"https://alias.tld/oidc-callback\"\n    secret: supersecretpassword\n```\nReference: https://dexidp.io/docs/connectors/local/"
+        },
+        "expiry": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "signingKeys": {
+              "type": "string",
+              "description": "Dex signing key expiration time duration (default 6h)."
+            },
+            "idTokens": {
+              "type": "string",
+              "description": "Dex ID tokens expiration time duration (default 24h)."
+            }
+          }
+        },
+        "overrides": {
+          "$ref": "#/$defs/Types.FuryModuleComponentOverrides"
+        }
+      },
+      "required": [
+        "connectors"
+      ]
+    },
+    "Spec.Distribution.Modules.Auth.OIDCKubernetesAuth": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "If true, components needed for interacting with the Kubernetes API with OIDC authentication (Gangplank, Dex) be deployed and configued."
+        },
+        "clientID": {
+          "type": "string",
+          "description": "The client ID that the Kubernetes API will use to authenticate against the OIDC provider (Dex)."
+        },
+        "clientSecret": {
+          "type": "string",
+          "description": "The client secret that the Kubernetes API will use to authenticate against the OIDC provider (Dex)."
+        },
+        "scopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Used to specify the scope of the requested Oauth authorization by Gangplank. Defaults to: `[\"openid\", \"profile\", \"email\", \"offline_access\", \"groups\"]`"
+        },
+        "usernameClaim": {
+          "type": "string",
+          "description": "The JWT claim to use as the username. This is used in Gangplank's UI. This is combined with the clusterName for the user portion of the kubeconfig. Defaults to `nickname`."
+        },
+        "emailClaim": {
+          "type": "string",
+          "description": "DEPRECATED. Defaults to `email`."
+        },
+        "sessionSecurityKey": {
+          "type": "string",
+          "description": "The Key to use for the sessions in Gangplank. Must be different between different instances of Gangplank."
+        },
+        "removeCAFromKubeconfig": {
+          "type": "boolean",
+          "description": "Set to true to remove the CA from the kubeconfig file generated by Gangplank."
+        },
+        "namespace": {
+          "type": "string",
+          "description": "The namespace to set in the context of the kubeconfig file generated by Gangplank. Defaults to `default`."
+        }
+      },
+      "required": [
+        "enabled"
+      ],
+      "if": {
+        "properties": {
+          "enabled": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "clientID",
+          "clientSecret",
+          "sessionSecurityKey"
+        ]
+      }
+    },
+    "Types.MacAddress": {
+      "type": "string",
+      "pattern": "^([0-9A-Fa-f]{2}:){5}([0-9A-Fa-f]{2})$",
+      "description": "MAC address in format XX:XX:XX:XX:XX:XX"
+    },
+    "Types.DevicePath": {
+      "type": "string",
+      "pattern": "^/dev/[a-zA-Z0-9/]+$",
+      "description": "Unix device path. Example: /dev/sda, /dev/nvme0n1"
+    },
+    "Types.FilesystemType": {
+      "type": "string",
+      "enum": [
+        "ext4",
+        "xfs",
+        "btrfs",
+        "ext3",
+        "vfat"
+      ],
+      "description": "Filesystem type"
+    },
+    "Types.BondMode": {
+      "type": "string",
+      "enum": [
+        "balance-rr",
+        "active-backup",
+        "balance-xor",
+        "broadcast",
+        "802.3ad",
+        "balance-tlb",
+        "balance-alb"
+      ],
+      "description": "Linux bonding mode"
+    },
+    "Types.SemVer": {
+      "type": "string",
+      "pattern": "^v?(?P<major>0|[1-9]\\d*)\\.(?P<minor>0|[1-9]\\d*)\\.(?P<patch>0|[1-9]\\d*)(?:-(?P<prerelease>(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"
+    },
+    "Types.IpAddress": {
+      "type": "string",
+      "pattern": "^((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)\\.){3}(25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)$"
+    },
+    "Types.Cidr": {
+      "type": "string",
+      "pattern": "^((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)\\.){3}(25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)\\/(3[0-2]|[1-2][0-9]|[0-9])$"
+    },
+    "Types.FileRef": {
+      "type": "string",
+      "pattern": "^\\{file\\:\\/\\/.+\\}$"
+    },
+    "Types.EnvRef": {
+      "type": "string",
+      "pattern": "\\{^env\\:\\/\\/.*\\}$"
+    },
+    "Types.TcpPort": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 65535
+    },
+    "Types.SshPubKey": {
+      "type": "string",
+      "pattern": "^ssh\\-(dsa|ecdsa|ecdsa-sk|ed25519|ed25519-sk|rsa)\\s+"
+    },
+    "Types.Uri": {
+      "type": "string",
+      "pattern": "^(http|https)\\:\\/\\/.+$"
+    },
+    "Types.KubeLabels": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "propertyNames": {
+        "pattern": "^([a-zA-Z0-9][a-zA-Z0-9-.]*[a-zA-Z0-9]/)?([a-zA-Z0-9][-a-zA-Z0-9_.]*)?[a-zA-Z0-9]$",
+        "maxLength": 253
+      },
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^(([a-zA-Z0-9][-a-zA-Z0-9_.]*)?[a-zA-Z0-9])?$",
+        "maxLength": 63
+      }
+    },
+    "Types.KubeAnnotations": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "propertyNames": {
+        "pattern": "^([a-zA-Z0-9][a-zA-Z0-9-.]*[a-zA-Z0-9]/)?([a-zA-Z0-9][-a-zA-Z0-9_.]*)?[a-zA-Z0-9]$",
+        "maxLength": 253
+      },
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "Types.KubeTaints": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "effect": {
+          "type": "string",
+          "enum": [
+            "NoSchedule",
+            "PreferNoSchedule",
+            "NoExecute"
+          ]
+        },
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "effect",
+        "key",
+        "value"
+      ]
+    },
+    "Types.KubeNodeSelector": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "Types.KubeToleration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "effect": {
+          "type": "string",
+          "enum": [
+            "NoSchedule",
+            "PreferNoSchedule",
+            "NoExecute"
+          ]
+        },
+        "operator": {
+          "type": "string",
+          "enum": [
+            "Exists",
+            "Equal"
+          ]
+        },
+        "key": {
+          "type": "string",
+          "description": "The key of the toleration"
+        },
+        "value": {
+          "type": "string",
+          "description": "The value of the toleration"
+        }
+      },
+      "required": [
+        "effect",
+        "key"
+      ],
+      "anyOf": [
+        {
+          "required": [
+            "operator"
+          ]
+        },
+        {
+          "required": [
+            "value"
+          ]
+        }
+      ]
+    },
+    "Types.KubeResources": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "requests": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "cpu": {
+              "type": "string",
+              "pattern": "^[0-9]+(\\.[0-9]+)?(m|)$",
+              "description": "The CPU request for the Pod, in cores or millicores. Examples: 500m, 1, 0.5"
+            },
+            "memory": {
+              "$ref": "#/$defs/Types.KubernetesQuantity",
+              "description": "The memory request for the Pod. Example: 500Mi, 1Gi"
+            }
+          }
+        },
+        "limits": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "cpu": {
+              "type": "string",
+              "pattern": "^[0-9]+(\\.[0-9]+)?(m|)$",
+              "description": "The CPU limit for the Pod, in cores or millicores. Examples: 1000m, 2, 1.5"
+            },
+            "memory": {
+              "$ref": "#/$defs/Types.KubernetesQuantity",
+              "description": "The memory limit for the Pod. Example: 1Gi, 2Gi"
+            }
+          }
+        }
+      }
+    },
+    "Types.KubernetesQuantity": {
+      "type": "string",
+      "pattern": "^[0-9]+(\\.[0-9]+)?(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk])$",
+      "description": "Kubernetes resource quantity format. Examples: 50Gi, 100Mi, 1Ti"
+    },
+    "Types.Duration": {
+      "type": "string",
+      "pattern": "^[0-9]+(\\.[0-9]+)?(ns|us|µs|ms|s|m|h|d)$",
+      "description": "Duration format with unit suffix. Examples: 720h, 15d, 30m, 5s"
+    },
+    "Types.FuryModuleOverrides": {
+      "type": "object",
+      "description": "Override the common configuration with a particular configuration for the module.",
+      "additionalProperties": false,
+      "properties": {
+        "nodeSelector": {
+          "$ref": "#/$defs/Types.KubeNodeSelector",
+          "description": "Set to override the node selector used to place the pods of the module."
+        },
+        "tolerations": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/$defs/Types.KubeToleration"
+          },
+          "description": "Set to override the tolerations that will be added to the pods of the module."
+        },
+        "ingresses": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/Types.FuryModuleOverridesIngress"
+          }
+        }
+      }
+    },
+    "Types.FuryModuleComponentOverrides": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "nodeSelector": {
+          "$ref": "#/$defs/Types.KubeNodeSelector",
+          "description": "Set to override the node selector used to place the pods of the package."
+        },
+        "tolerations": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/$defs/Types.KubeToleration"
+          },
+          "description": "Set to override the tolerations that will be added to the pods of the package."
+        }
+      }
+    },
+    "Types.FuryModuleOverridesIngress": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "disableAuth": {
+          "type": "boolean",
+          "description": "If true, the ingress will not have authentication even if `.spec.modules.auth.provider.type` is SSO or Basic Auth."
+        },
+        "host": {
+          "type": "string",
+          "description": "Use this host for the ingress instead of the default one."
+        },
+        "ingressClass": {
+          "type": "string",
+          "description": "Use this ingress class for the ingress instead of the default one."
+        }
+      }
+    },
+    "Types.Keepalived": {
+      "description": "This section allows to configure a floating Virtual IP between the nodes via Keepalived. This can be used to provide high availability between 2 or more nodes.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Set to install keepalived with a floating virtual IP shared between the load balancer hosts for a deployment in High Availability."
+        },
+        "interface": {
+          "type": "string",
+          "description": "Name of the network interface where to bind the Keepalived virtual IP."
+        },
+        "ip": {
+          "type": "string",
+          "description": "The Virtual floating IP for Keepalived"
+        },
+        "virtualRouterId": {
+          "type": "string",
+          "description": "The virtual router ID of Keepalived, an arbitrary unique number from 1 to 255 used to differentiate multiple instances of vrrpd running on the same network interface and address family and multicast/unicast (and hence same socket)."
+        },
+        "passphrase": {
+          "type": "string",
+          "description": "Password for accessing vrrpd. Make it unique between Keepalived clusters.",
+          "maxLength": 8
+        }
+      },
+      "required": [
+        "enabled"
+      ],
+      "if": {
+        "properties": {
+          "enabled": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "ip"
+        ]
+      }
+    }
+  }
+}
