@@ -46,6 +46,7 @@ addlicense -c "SIGHUP s.r.l" -y 2017-present -v -l bsd \
   -ignore 'templates/distribution/**' \
   -ignore 'target/**' \
   -ignore 'vendor/**' \
+  -ignore 'tests/templates/**' \
   --check .
 """
 
@@ -147,3 +148,59 @@ run = [
   "docker run --rm -v $(PWD)/docs/network-policies/modules/opa:/workdir minlag/mermaid-cli:latest -i \"/workdir/kyverno.md\" -o \"/workdir/kyverno.png\" -w 2048 -H 1536 -b white",
   "docker run --rm -v $(PWD)/docs/network-policies/modules/tracing:/workdir minlag/mermaid-cli:latest -i \"/workdir/tempo.md\" -o \"/workdir/tempo.png\" -w 2048 -H 1536 -b white"
 ]
+
+[tasks."test:templates:update-baseline"]
+description = "Update templates test suite baseline"
+usage = """
+flag "-f --force" help="Force overwrite of previous failed tests output folder"
+"""
+run = """
+#!/usr/bin/env bash
+set -euo pipefail
+pushd tests/templates
+for dir in */; do
+  pushd "$dir"
+  echo "Updating baseline for kind $dir..."
+  for subdir in */; do
+    pushd "$subdir"
+    echo "Updating baseline for $subdir..."
+    rm -rf baseline
+    furyctl dump template --distro-location {{config_root}} ${usage_force:+--no-overwrite=false}
+    mv distribution baseline
+    echo
+    echo
+    popd
+  done
+  popd
+done
+popd
+"""
+
+[tasks."test:templates:regressions"]
+description = "Run templates regressions tests"
+usage = """
+flag "-f --force" help="Force overwrite of previous failed tests output folder"
+"""
+run = """
+#!/usr/bin/env bash
+set -euo pipefail
+pushd tests/templates
+for dir in */; do
+  pushd "$dir"
+  echo "Running templates regressions tests for kind $dir..."
+  for subdir in */; do
+    pushd "$subdir"
+    echo "Dumping templates for case $subdir..."
+    furyctl dump template --distro-location {{config_root}} ${usage_force:+--no-overwrite=false}
+    echo "Comparing templates for case $subdir with baseline for kind $dir..."
+    diff --recursive baseline distribution
+    echo "Cleaning up distribution output for $subdir..."
+    rm -rf distribution
+    echo
+    echo
+    popd
+  done
+  popd
+done
+popd
+"""

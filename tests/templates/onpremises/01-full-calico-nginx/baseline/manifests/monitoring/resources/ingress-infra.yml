@@ -1,0 +1,168 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    cluster.kfd.sighup.io/useful-link.enable: "true"
+  annotations:
+    cluster.kfd.sighup.io/useful-link.url: https://alertmanager.internal.example.com
+    cluster.kfd.sighup.io/useful-link.name: "Alertmanager"
+    forecastle.stakater.com/expose: "true"
+    forecastle.stakater.com/appName: "Alertmanager"
+    
+    forecastle.stakater.com/group: "monitoring"
+    
+    forecastle.stakater.com/icon: "https://github.com/stakater/ForecastleIcons/raw/master/alert-manager.png"
+    
+    
+    
+
+  name: alertmanager
+  
+  namespace: pomerium
+  
+spec:
+  ingressClassName: internal
+  rules:
+    - host: alertmanager.internal.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+            
+              service:
+                name: pomerium
+                port:
+                  number: 80
+            
+  tls:
+    - hosts:
+      - alertmanager.internal.example.com
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    cluster.kfd.sighup.io/useful-link.enable: "true"
+  annotations:
+    cluster.kfd.sighup.io/useful-link.url: https://grafana.internal.example.com
+    cluster.kfd.sighup.io/useful-link.name: "Grafana"
+    forecastle.stakater.com/expose: "true"
+    forecastle.stakater.com/appName: "Grafana"
+    
+    forecastle.stakater.com/group: "monitoring"
+    
+    forecastle.stakater.com/icon: "https://github.com/stakater/ForecastleIcons/raw/master/grafana.png"
+    
+    
+    
+
+  name: grafana
+  
+  namespace: pomerium
+  
+spec:
+  ingressClassName: internal
+  rules:
+    - host: grafana.internal.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+            
+              service:
+                name: pomerium
+                port:
+                  number: 80
+            
+  tls:
+    - hosts:
+      - grafana.internal.example.com
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    cluster.kfd.sighup.io/useful-link.enable: "true"
+  annotations:
+    cluster.kfd.sighup.io/useful-link.url: https://prometheus.internal.example.com
+    cluster.kfd.sighup.io/useful-link.name: "Prometheus"
+    forecastle.stakater.com/expose: "true"
+    forecastle.stakater.com/appName: "Prometheus"
+    
+    forecastle.stakater.com/group: "monitoring"
+    
+    forecastle.stakater.com/icon: "https://github.com/stakater/ForecastleIcons/raw/master/prometheus.png"
+    
+    
+    
+
+  name: prometheus
+  
+  namespace: pomerium
+  
+spec:
+  ingressClassName: internal
+  rules:
+    - host: prometheus.internal.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+            
+              service:
+                name: pomerium
+                port:
+                  number: 80
+            
+  tls:
+    - hosts:
+      - prometheus.internal.example.com
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    cluster.kfd.sighup.io/useful-link.enable: "true"
+  annotations:
+    cluster.kfd.sighup.io/useful-link.url: https://minio-monitoring.internal.example.com
+    cluster.kfd.sighup.io/useful-link.name: "MinIO Monitoring"
+    forecastle.stakater.com/expose: "true"
+    forecastle.stakater.com/appName: "MinIO Monitoring"
+    
+    forecastle.stakater.com/group: "monitoring"
+    
+    forecastle.stakater.com/icon: "https://min.io/resources/img/logo/MINIO_Bird.png"
+    
+    
+    
+
+  
+  name: minio-monitoring
+  namespace: pomerium
+  
+spec:
+  ingressClassName: internal
+  rules:
+    - host: minio-monitoring.internal.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+            
+              service:
+                name: pomerium
+                port:
+                  number: 80
+            
+  tls:
+    - hosts:
+      - minio-monitoring.internal.example.com

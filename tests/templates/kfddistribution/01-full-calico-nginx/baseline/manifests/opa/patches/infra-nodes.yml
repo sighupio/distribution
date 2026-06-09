@@ -1,0 +1,41 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gatekeeper-audit
+  namespace: gatekeeper-system
+spec:
+  template:
+    spec:
+      nodeSelector:
+        null
+      tolerations:
+        null
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gatekeeper-controller-manager
+  namespace: gatekeeper-system
+spec:
+  template:
+    spec:
+      nodeSelector:
+        null
+      tolerations:
+        null
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gatekeeper-policy-manager
+spec:
+  template:
+    spec:
+      nodeSelector:
+        null
+      tolerations:
+        null

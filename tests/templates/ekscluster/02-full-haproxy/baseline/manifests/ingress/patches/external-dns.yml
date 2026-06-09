@@ -1,0 +1,60 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/external-dns-public
+  name: external-dns-public
+  namespace: external-dns
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: external-dns-public
+  namespace: external-dns
+spec:
+  template:
+    spec:
+      containers:
+      - name: external-dns
+        env:
+        - name: PROVIDER
+          value: aws
+        args:
+          - --source=service
+          - --source=ingress
+          - --provider=$(PROVIDER)
+          - --aws-zone-type=public
+          - --txt-owner-id=full-cilium-haproxy-public
+          - --exclude-domains=internal.example.com
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/external-dns-private
+  name: external-dns-private
+  namespace: external-dns
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: external-dns-private
+  namespace: external-dns
+spec:
+  template:
+    spec:
+      containers:
+      - name: external-dns
+        env:
+        - name: PROVIDER
+          value: aws
+        args:
+          - --source=service
+          - --source=ingress
+          - --provider=$(PROVIDER)
+          - --aws-zone-type=private
+          - --txt-owner-id=full-cilium-haproxy-private

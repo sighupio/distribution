@@ -1,0 +1,50 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    cluster.kfd.sighup.io/useful-link.enable: "true"
+  annotations:
+    cluster.kfd.sighup.io/useful-link.url: https://directory.internal.example.com
+    cluster.kfd.sighup.io/useful-link.name: "Forecastle"
+    forecastle.stakater.com/expose: "true"
+    forecastle.stakater.com/appName: "Forecastle"
+    
+    forecastle.stakater.com/group: "forecastle"
+    
+    forecastle.stakater.com/icon: "https://raw.githubusercontent.com/stakater/Forecastle/master/assets/web/forecastle-round-100px.png"
+    
+    # Wait for the nginx controller rolling update to
+    # complete before creating this Ingress.
+    kapp.k14s.io/change-rule: "upsert after upserting nginx-controllers"
+    
+    
+    
+    
+
+  name: forecastle
+  
+  namespace: pomerium
+  
+spec:
+  ingressClassName: internal
+  rules:
+    - host: directory.internal.example.com
+      http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+          
+            service:
+              name: pomerium
+              port:
+                number: 80
+          
+  tls:
+    - hosts:
+      - directory.internal.example.com
