@@ -788,6 +788,7 @@ Override the common configuration with a particular configuration for the Auth m
 |:---------------------------------------------------------------------|:---------|:---------|
 | [dex](#specdistributionmodulesauthoverridesingressesdex)             | `object` | Optional |
 | [gangplank](#specdistributionmodulesauthoverridesingressesgangplank) | `object` | Optional |
+| [pomerium](#specdistributionmodulesauthoverridesingressespomerium)   | `object` | Optional |
 
 ### Description
 
@@ -830,6 +831,27 @@ Use this ingress class for the ingress instead of the default one.
 Use this host for the ingress instead of the default one.
 
 ## .spec.distribution.modules.auth.overrides.ingresses.gangplank.ingressClass
+
+### Description
+
+Use this ingress class for the ingress instead of the default one.
+
+## .spec.distribution.modules.auth.overrides.ingresses.pomerium
+
+### Properties
+
+| Property                                                                           | Type     | Required |
+|:-----------------------------------------------------------------------------------|:---------|:---------|
+| [host](#specdistributionmodulesauthoverridesingressespomeriumhost)                 | `string` | Required |
+| [ingressClass](#specdistributionmodulesauthoverridesingressespomeriumingressclass) | `string` | Required |
+
+## .spec.distribution.modules.auth.overrides.ingresses.pomerium.host
+
+### Description
+
+Use this host for the ingress instead of the default one.
+
+## .spec.distribution.modules.auth.overrides.ingresses.pomerium.ingressClass
 
 ### Description
 
