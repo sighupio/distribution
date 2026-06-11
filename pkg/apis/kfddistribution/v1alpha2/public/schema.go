@@ -5,8 +5,9 @@ package public
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/sighupio/go-jsonschema/pkg/types"
 	"reflect"
+
+	"github.com/sighupio/go-jsonschema/pkg/types"
 )
 
 // SD modules deployed on top of an existing Kubernetes cluster.
@@ -364,7 +365,7 @@ type SpecDistributionModulesAuthDexExpiry struct {
 // module.
 type SpecDistributionModulesAuthOverrides struct {
 	// Override the definition of the Auth module ingresses.
-	Ingresses SpecDistributionModulesAuthOverridesIngresses `json:"ingresses,omitempty" yaml:"ingresses,omitempty" mapstructure:"ingresses,omitempty"`
+	Ingresses *SpecDistributionModulesAuthOverridesIngresses `json:"ingresses,omitempty" yaml:"ingresses,omitempty" mapstructure:"ingresses,omitempty"`
 
 	// Set to override the node selector used to place the pods of the Auth module.
 	NodeSelector TypesKubeNodeSelector `json:"nodeSelector,omitempty" yaml:"nodeSelector,omitempty" mapstructure:"nodeSelector,omitempty"`
@@ -383,7 +384,16 @@ type SpecDistributionModulesAuthOverridesIngress struct {
 }
 
 // Override the definition of the Auth module ingresses.
-type SpecDistributionModulesAuthOverridesIngresses map[string]SpecDistributionModulesAuthOverridesIngress
+type SpecDistributionModulesAuthOverridesIngresses struct {
+	// Dex corresponds to the JSON schema field "dex".
+	Dex *SpecDistributionModulesAuthOverridesIngress `json:"dex,omitempty" yaml:"dex,omitempty" mapstructure:"dex,omitempty"`
+
+	// Gangplank corresponds to the JSON schema field "gangplank".
+	Gangplank *SpecDistributionModulesAuthOverridesIngress `json:"gangplank,omitempty" yaml:"gangplank,omitempty" mapstructure:"gangplank,omitempty"`
+
+	// Pomerium corresponds to the JSON schema field "pomerium".
+	Pomerium *SpecDistributionModulesAuthOverridesIngress `json:"pomerium,omitempty" yaml:"pomerium,omitempty" mapstructure:"pomerium,omitempty"`
+}
 
 type SpecDistributionModulesAuthPomerium interface{}
 

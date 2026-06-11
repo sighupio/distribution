@@ -709,9 +709,80 @@ Override the common configuration with a particular configuration for the Auth m
 
 ## .spec.distribution.modules.auth.overrides.ingresses
 
+### Properties
+
+| Property                                                             | Type     | Required |
+|:---------------------------------------------------------------------|:---------|:---------|
+| [dex](#specdistributionmodulesauthoverridesingressesdex)             | `object` | Optional |
+| [gangplank](#specdistributionmodulesauthoverridesingressesgangplank) | `object` | Optional |
+| [pomerium](#specdistributionmodulesauthoverridesingressespomerium)   | `object` | Optional |
+
 ### Description
 
 Override the definition of the Auth module ingresses.
+
+## .spec.distribution.modules.auth.overrides.ingresses.dex
+
+### Properties
+
+| Property                                                                      | Type     | Required |
+|:------------------------------------------------------------------------------|:---------|:---------|
+| [host](#specdistributionmodulesauthoverridesingressesdexhost)                 | `string` | Required |
+| [ingressClass](#specdistributionmodulesauthoverridesingressesdexingressclass) | `string` | Required |
+
+## .spec.distribution.modules.auth.overrides.ingresses.dex.host
+
+### Description
+
+Use this host for the ingress instead of the default one.
+
+## .spec.distribution.modules.auth.overrides.ingresses.dex.ingressClass
+
+### Description
+
+Use this ingress class for the ingress instead of the default one.
+
+## .spec.distribution.modules.auth.overrides.ingresses.gangplank
+
+### Properties
+
+| Property                                                                            | Type     | Required |
+|:------------------------------------------------------------------------------------|:---------|:---------|
+| [host](#specdistributionmodulesauthoverridesingressesgangplankhost)                 | `string` | Required |
+| [ingressClass](#specdistributionmodulesauthoverridesingressesgangplankingressclass) | `string` | Required |
+
+## .spec.distribution.modules.auth.overrides.ingresses.gangplank.host
+
+### Description
+
+Use this host for the ingress instead of the default one.
+
+## .spec.distribution.modules.auth.overrides.ingresses.gangplank.ingressClass
+
+### Description
+
+Use this ingress class for the ingress instead of the default one.
+
+## .spec.distribution.modules.auth.overrides.ingresses.pomerium
+
+### Properties
+
+| Property                                                                           | Type     | Required |
+|:-----------------------------------------------------------------------------------|:---------|:---------|
+| [host](#specdistributionmodulesauthoverridesingressespomeriumhost)                 | `string` | Required |
+| [ingressClass](#specdistributionmodulesauthoverridesingressespomeriumingressclass) | `string` | Required |
+
+## .spec.distribution.modules.auth.overrides.ingresses.pomerium.host
+
+### Description
+
+Use this host for the ingress instead of the default one.
+
+## .spec.distribution.modules.auth.overrides.ingresses.pomerium.ingressClass
+
+### Description
+
+Use this ingress class for the ingress instead of the default one.
 
 ## .spec.distribution.modules.auth.overrides.nodeSelector
 

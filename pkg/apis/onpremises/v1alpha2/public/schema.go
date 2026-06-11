@@ -2,10 +2,13 @@
 
 package public
 
-import "encoding/json"
-import "fmt"
-import "github.com/sighupio/go-jsonschema/pkg/types"
-import "reflect"
+import (
+	"encoding/json"
+	"fmt"
+	"reflect"
+
+	"github.com/sighupio/go-jsonschema/pkg/types"
+)
 
 type Metadata struct {
 	// The name of the cluster. It will also be used as a prefix for all the other
@@ -423,6 +426,9 @@ type SpecDistributionModulesAuthOverridesIngresses struct {
 
 	// Gangplank corresponds to the JSON schema field "gangplank".
 	Gangplank *SpecDistributionModulesAuthOverridesIngress `json:"gangplank,omitempty" yaml:"gangplank,omitempty" mapstructure:"gangplank,omitempty"`
+
+	// Pomerium corresponds to the JSON schema field "pomerium".
+	Pomerium *SpecDistributionModulesAuthOverridesIngress `json:"pomerium,omitempty" yaml:"pomerium,omitempty" mapstructure:"pomerium,omitempty"`
 }
 
 type SpecDistributionModulesAuthPomerium interface{}
