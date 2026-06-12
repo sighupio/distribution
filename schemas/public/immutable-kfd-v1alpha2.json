@@ -195,6 +195,20 @@
         "bindPort": {
           "type": "integer",
           "description": "The port where the iPXE server will listen for incoming requests. Default is the port from the URL or 80 if not specified."
+        },
+        "preInstallCommands": {
+          "type": "array",
+          "description": "List of commands to execute before installing Flatcar to disk",
+          "items": {
+            "type": "string"
+          }
+        },
+        "postInstallCommands": {
+          "type": "array",
+          "description": "List of commands to execute after installing Flatcar to disk and before rebooting the node",
+          "items": {
+            "type": "string"
+          }
         }
       },
       "required": [

@@ -37,16 +37,19 @@ storage:
 
 systemd:
   units:
-    - name: furyctl-status-reporter.service
+    - name: flatcar-install-blocked.service
       enabled: true
       contents: |
         [Unit]
-        Description=Report node status to furyctl
+        Description=Install Flatcar to disk blocked
         Requires=network-online.target
         After=network-online.target
+        ConditionPathExists=/opt/ignition/config.ign
+        ConditionPathExists=/dev/disk/by-label/ROOT
+
         [Service]
         Type=oneshot
-        ExecStart=/usr/bin/curl -X POST '{{ .ipxeServerURL }}/status?node={{ .hostname }}&status=installing'
+        ExecStart=/usr/bin/curl -X POST '{{ .ipxeServerURL }}/status?node={{ .hostname }}&status=installation-blocked'
         RemainAfterExit=yes
 
         [Install]
@@ -63,7 +66,21 @@ systemd:
 
         [Service]
         Type=oneshot
+        {{- if .ipxeServerPreInstallCommands }}
+        ExecStartPre=/usr/bin/curl -X POST '{{ .ipxeServerURL }}/status?node={{ .hostname }}&status=running%%20pre-install%%20commands'
+        {{- range .ipxeServerPreInstallCommands }}
+        ExecStartPre={{ . }}
+        {{- end }}
+        {{- end }}
+        ExecStartPre=/usr/bin/curl -X POST '{{ .ipxeServerURL }}/status?node={{ .hostname }}&status=installing'
         ExecStart=/usr/bin/flatcar-install -d {{ .installDisk }} -i /opt/ignition/config.ign -b {{ .ipxeServerURL }}/assets/flatcar/{{ .arch }}
+        {{- if .ipxeServerPostInstallCommands }}
+        ExecStartPost=/usr/bin/curl -X POST '{{ .ipxeServerURL }}/status?node={{ .hostname }}&status=running%%20post-install%%20commands'
+        {{- range .ipxeServerPostInstallCommands }}
+        ExecStartPost={{ . }}
+        {{- end }}
+        {{- end }}
+        ExecStartPost=/usr/bin/curl -X POST '{{ .ipxeServerURL }}/status?node={{ .hostname }}&status=rebooting'
         ExecStartPost=/usr/bin/systemctl --no-block reboot
         RemainAfterExit=yes
 
