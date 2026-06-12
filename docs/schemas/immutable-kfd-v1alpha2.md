@@ -5434,11 +5434,13 @@ Defines the bare metal infrastructure configuration, including nodes, network bo
 
 ### Properties
 
-| Property                                                | Type      | Required |
-|:--------------------------------------------------------|:----------|:---------|
-| [bindAddress](#specinfrastructureipxeserverbindaddress) | `string`  | Optional |
-| [bindPort](#specinfrastructureipxeserverbindport)       | `integer` | Optional |
-| [url](#specinfrastructureipxeserverurl)                 | `string`  | Required |
+| Property                                                                | Type      | Required |
+|:------------------------------------------------------------------------|:----------|:---------|
+| [bindAddress](#specinfrastructureipxeserverbindaddress)                 | `string`  | Optional |
+| [bindPort](#specinfrastructureipxeserverbindport)                       | `integer` | Optional |
+| [postInstallCommands](#specinfrastructureipxeserverpostinstallcommands) | `array`   | Optional |
+| [preInstallCommands](#specinfrastructureipxeserverpreinstallcommands)   | `array`   | Optional |
+| [url](#specinfrastructureipxeserverurl)                                 | `string`  | Required |
 
 ### Description
 
@@ -5455,6 +5457,18 @@ The address where the iPXE server will listen for incoming requests. Default is 
 ### Description
 
 The port where the iPXE server will listen for incoming requests. Default is the port from the URL or 80 if not specified.
+
+## .spec.infrastructure.ipxeServer.postInstallCommands
+
+### Description
+
+List of commands to execute after installing Flatcar to disk and before rebooting the node
+
+## .spec.infrastructure.ipxeServer.preInstallCommands
+
+### Description
+
+List of commands to execute before installing Flatcar to disk
 
 ## .spec.infrastructure.ipxeServer.url
 
