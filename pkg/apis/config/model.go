@@ -74,6 +74,7 @@ type KFDToolsCommon struct {
 	Kapp      KFDTool `yaml:"kapp"`
 	Helm      KFDTool `yaml:"helm"`
 	Helmfile  KFDTool `yaml:"helmfile"`
+	Ansible   KFDTool `yaml:"ansible"`
 }
 
 type KFDToolsEks struct {
