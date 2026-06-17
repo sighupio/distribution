@@ -56,6 +56,11 @@ tools:
       version: 0.65.0
     ansible:
       version: v0.2.1
+      checksums:
+        linux-amd64: "7fcb1e397872579b7c05bc87a47d531025d362b421d3bcae337a748256733d89"
+        linux-arm64: "f8022d2a8cbfa2a66c2a9b1883d35d848438cfff27e81b0c22df92657bdfa796"
+        darwin-amd64: "1cfd1fb4facc3e485d7df93535dea5853320b67326c171361f6d329b7e83d0e0"
+        darwin-arm64: "2f7a5cf81125f1f127eb709128fd92a179ed473fc60fd29633ef95536b6bc5e7"
   eks:
     awscli:
       version: ">= 2.8.12"
