@@ -65,19 +65,25 @@ type KFDTools struct {
 }
 
 type KFDToolsCommon struct {
-	Furyagent KFDTool `yaml:"furyagent" validate:"required"`
 	Kubectl   KFDTool `yaml:"kubectl"   validate:"required"`
 	Kustomize KFDTool `yaml:"kustomize" validate:"required"`
-	Terraform KFDTool `yaml:"terraform"`
-	OpenTofu  KFDTool `yaml:"opentofu"  validate:"required"`
 	Yq        KFDTool `yaml:"yq"        validate:"required"`
 	Kapp      KFDTool `yaml:"kapp"`
 	Helm      KFDTool `yaml:"helm"`
 	Helmfile  KFDTool `yaml:"helmfile"`
+	// Terraform, OpenTofu and Furyagent are kept here for backward compatibility with
+	// distributions < 1.34.2 that pinned them under tools.common. Newer distributions pin
+	// opentofu/furyagent under the provider section (tools.eks); consumers resolve the
+	// provider value first and fall back to these. Hence they are optional.
+	Terraform KFDTool `yaml:"terraform"`
+	OpenTofu  KFDTool `yaml:"opentofu"`
+	Furyagent KFDTool `yaml:"furyagent"`
 }
 
 type KFDToolsEks struct {
-	Awscli KFDTool `yaml:"awscli" validate:"required"`
+	Awscli    KFDTool `yaml:"awscli" validate:"required"`
+	OpenTofu  KFDTool `yaml:"opentofu"`
+	Furyagent KFDTool `yaml:"furyagent"`
 }
 
 type KFDTool struct {
