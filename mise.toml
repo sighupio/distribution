@@ -19,18 +19,12 @@ ansible = "latest"
 awscli = "2.24.17"
 furyctl = "0.34.1-rc.2"
 
-# Go packages (using go: backend)
-"go:github.com/evanphx/json-patch/v5/cmd/json-patch" = "v5.9.0"
+# Go-based CLI tools to work with the JSON schemas and docs (this repo has no Go code).
 "go:github.com/santhosh-tekuri/jsonschema/cmd/jv" = "v0.7.0"
-"go:github.com/sighupio/go-jsonschema" = "latest"
 "go:github.com/sighupio/md-gen" = "latest"
-"go:golang.org/x/tools/cmd/goimports" = "v0.26.0"
-"go:github.com/daixiang0/gci" = "v0.10.1"
-"go:github.com/momaek/formattag" = "v0.0.9"
 
 # GitHub releases (using ubi: backend)
 "ubi:google/addlicense" = "v1.1.1"
-"ubi:mvdan/gofumpt" = "v0.7.0"
 
 [env]
 CGO_ENABLED = 0
@@ -59,70 +53,6 @@ addlicense -c "SIGHUP s.r.l" -y 2017-present -v -l bsd \
   -ignore 'vendor/**' \
   .
 """
-
-[tasks.fmt]
-description = "format Go code with gofmt"
-run = """
-find . -name "*.go" -type f -not -path '*/vendor/*' \
-  -exec sh -c 'echo "formatting $1.." && gofmt -w -s "$1"' sh {} \\;
-"""
-
-[tasks.fumpt]
-description = "format Go code with gofumpt"
-run = """
-find . -name "*.go" -type f -not -path '*/vendor/*' \
-  -exec sh -c 'echo "formatting $1.." && gofumpt -w -extra "$1"' sh {} \\;
-"""
-
-[tasks.imports]
-description = "organize Go imports with goimports"
-run = "goimports -v -w -e -local github.com/sighupio pkg/"
-
-[tasks.gci]
-description = "format imports with gci"
-run = """
-find . -name "*.go" -type f -not -path '*/vendor/*' \
-  -exec sh -c 'echo "formatting imports for $1.." && \
-    gci write --skip-generated -s standard -s default -s "Prefix(github.com/sighupio)" "$1"' sh {} \\;
-"""
-
-[tasks.formattag]
-description = "format struct tags with formattag"
-run = """
-find . -name "*.go" -type f -not -path '*/vendor/*' \
-  -exec sh -c 'formattag -file "$1"' sh {} \\;
-"""
-
-[tasks.format-go]
-description = "run complete Go formatting pipeline"
-depends = ["fmt", "fumpt", "imports", "gci", "formattag"]
-
-[tasks.lint-go]
-description = "run linting with golangci-lint"
-run = "golangci-lint -v run --color=always --config=.rules/.golangci.yml ./..."
-
-[tasks.dump-private-schema]
-description = "generate private schema from public schema"
-run = """
-cat schemas/public/ekscluster-kfd-v1alpha2.json | \
-  json-patch -p schemas/private/ekscluster-kfd-v1alpha2.patch.json | \
-  jq -r > schemas/private/ekscluster-kfd-v1alpha2.json
-"""
-
-[tasks._generate-go-models]
-description = "generate Go models from JSON schemas"
-depends = ["dump-private-schema"]
-run = [
-  "go-jsonschema --package public --resolve-extension json --output pkg/apis/ekscluster/v1alpha2/public/schema.go schemas/public/ekscluster-kfd-v1alpha2.json",
-  "go-jsonschema --package private --resolve-extension json --output pkg/apis/ekscluster/v1alpha2/private/schema.go schemas/private/ekscluster-kfd-v1alpha2.json",
-  "go-jsonschema --package public --resolve-extension json --output pkg/apis/immutable/v1alpha2/public/schema.go schemas/public/immutable-kfd-v1alpha2.json",
-  "go-jsonschema --package public --resolve-extension json --output pkg/apis/kfddistribution/v1alpha2/public/schema.go schemas/public/kfddistribution-kfd-v1alpha2.json",
-  "go-jsonschema --package public --resolve-extension json --output pkg/apis/onpremises/v1alpha2/public/schema.go schemas/public/onpremises-kfd-v1alpha2.json"
-]
-
-[tasks.generate-go-models]
-description = "generate Go models and format them"
-depends = ["_generate-go-models", "format-go"]
 
 [tasks.generate-docs]
 description = "generate documentation from schemas"

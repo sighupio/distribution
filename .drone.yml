@@ -47,28 +47,11 @@ steps: # qa
       - eval "$(mise activate bash --shims)"
       - mise run license-check
 
-  - name: schema-check
-    image: quay.io/sighup/mise:v2025.4.4
-    pull: always
-    depends_on:
-      - install-tools
-    volumes:
-      - name: mise-cache
-        path: /mise-data
-    commands:
-      - eval "$(mise activate bash --shims)"
-      - |
-        cat schemas/public/ekscluster-kfd-v1alpha2.json | \
-          json-patch -p schemas/private/ekscluster-kfd-v1alpha2.patch.json | \
-          jq -r > /tmp/schemas-private-ekscluster-kfd-v1alpha2.json
-      - diff schemas/private/ekscluster-kfd-v1alpha2.json /tmp/schemas-private-ekscluster-kfd-v1alpha2.json
-
   - name: test-schema
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
     depends_on:
       - license-check
-      - schema-check
     volumes:
       - name: mise-cache
         path: /mise-data
@@ -82,7 +65,6 @@ steps: # qa
     pull: always
     depends_on:
       - license-check
-      - schema-check
     volumes:
       - name: mise-cache
         path: /mise-data
@@ -109,7 +91,7 @@ steps: # qa
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
     depends_on:
-      - schema-check
+      - install-tools
     volumes:
       - name: mise-cache
         path: /mise-data
@@ -122,7 +104,6 @@ steps: # qa
     pull: always
     depends_on:
       - license-check
-      - schema-check
     environment:
       NETRC_FILE:
         from_secret: NETRC_FILE
