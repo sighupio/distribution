@@ -72,6 +72,20 @@
 
   {
     "op": "add",
+    "path": "/$defs/Spec.Distribution.Modules.Logging.Loki/properties/s3/properties/iamRoleArn",
+    "value": {
+      "$ref": "#/$defs/Types.AwsArn",
+      "description": "The IAM role ARN for Loki's S3 access via IRSA. Injected by furyctl from the Terraform output."
+    }
+  },
+  {
+    "op": "add",
+    "path": "/$defs/Spec.Distribution.Modules.Logging.Loki/properties/s3/required/-",
+    "value": "iamRoleArn"
+  },
+
+  {
+    "op": "add",
     "path": "/$defs/Spec.Distribution.Modules.Ingress.CertManager.ClusterIssuer/properties/route53",
     "value": {
       "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.ClusterIssuer.Route53"

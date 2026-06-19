@@ -43,6 +43,17 @@ provider "aws" {
      }
    }
 }
+provider "aws" {
+  alias = "loki"
+  region = "{{ .spec.distribution.modules.logging.loki.s3.region }}"
+  default_tags {
+     tags = {
+       {{- range $k, $v := .spec.tags }}
+       {{ $k }} = "{{ $v }}"
+       {{- end}}
+     }
+   }
+}
 
 data "aws_eks_cluster" "this" {
   name = "{{ .metadata.name }}"

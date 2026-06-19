@@ -40,6 +40,11 @@ common:
       secret_access_key: ${MINIO_SECRET_KEY}
       s3forcepathstyle: true
 {{- end }}
+{{- if eq .spec.distribution.modules.logging.loki.backend "s3" }}
+      bucketnames: {{ .spec.distribution.modules.logging.loki.s3.bucketName }}
+      region: {{ .spec.distribution.modules.logging.loki.s3.region }}
+      s3forcepathstyle: false
+{{- end }}
 frontend:
   compress_responses: true
   log_queries_longer_than: 5s 

@@ -16,13 +16,18 @@ kind: Kustomization
 {{- $haproxyType := .spec.distribution.modules.ingress.haproxy.type }}
 {{- $isBYOIC := .spec.distribution.modules.ingress.byoic.enabled }}
 {{- $hasAnyIngress := or (ne .spec.distribution.modules.ingress.nginx.type "none") (ne $haproxyType "none") $isBYOIC }}
+{{- $lokiBackend := "minio" }}
+{{- if and $loki (index $loki "backend") }}{{ $lokiBackend = $loki.backend }}{{ end }}
+{{- /* MinIO is deployed for OpenSearch (which always uses it) and for Loki only when its backend is minio. */}}
+{{- $deployMinio := or (eq $loggingType "opensearch") (and (eq $loggingType "loki") (eq $lokiBackend "minio")) }}
 
 resources:
   - {{ print $vendorPrefix "/modules/logging/katalog/logging-operator" }}
   - {{ print $vendorPrefix "/modules/logging/katalog/logging-operated" }}
   - kapp-configs/logging-operator-crd.yaml
-{{- if eq $loggingType "loki" "opensearch" }}
+{{- if $deployMinio }}
   - {{ print $vendorPrefix "/modules/logging/katalog/minio-ha" }}
+  {{- /* ingress-infra.yml only contains the OpenSearch Dashboards and MinIO ingresses, so it is needed only when MinIO is deployed. */}}
   {{- if $hasAnyIngress }}
   - resources/ingress-infra.yml
   {{- end }}
@@ -72,14 +77,19 @@ patches:
 {{- if or $fluentdReplicas $fluentdResources $fluentbitResources }}
   - path: patches/logging-operated-resources.yaml
 {{- end }}
-{{- if eq $loggingType "opensearch" "loki" }}
+{{- if $deployMinio }}
   - path: patches/minio.yml
+{{- end }}
+{{- if eq $loggingType "opensearch" "loki" }}
   {{- if eq $loggingType "opensearch" }}
   - path: patches/opensearch.yml
   {{- /* The patch file below can be empty when loki resources is not defined but kustomize 5.6.0 (our current version) fails when a patch file is empty, so we need to apply it conditionally. */ -}}
   {{- else if hasKeyAny $loki "resources" }}
   - path: patches/loki-resources.yml
   {{- end }}
+{{- end }}
+{{- if eq $lokiBackend "s3" }}
+  - path: patches/eks-loki-s3.yml
 {{- end }}
 {{- if eq $loggingType "customOutputs" }}
   - target:
@@ -201,9 +211,11 @@ secretGenerator:
     envs:
       - patches/minio.credentials.loki.env
   {{- end }}
+  {{- if $deployMinio }}
   - name: minio-logging
     namespace: logging
     behavior: replace
     envs:
       - patches/minio.root.env
+  {{- end }}
 {{- end }}

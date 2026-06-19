@@ -131,6 +131,25 @@ $kubectlbin delete --ignore-not-found --wait --timeout=180s -f delete-dr-minio.y
 {{- end }}
 {{- end }}
 
+{{- if eq .spec.distribution.modules.logging.type "loki" }}
+{{- if ne .spec.distribution.modules.logging.loki.backend "minio" }}
+
+echo "Cleaning up Minio HA on logging namespace..."
+
+$kustomizebin build $vendorPath/modules/logging/katalog/minio-ha > delete-logging-minio-ha.yaml
+
+{{- if eq .spec.distribution.modules.monitoring.type "none" }}
+if ! $kubectlbin get apiservice v1.monitoring.coreos.com; then
+  cat delete-logging-minio-ha.yaml | $yqbin 'select(.apiVersion != "monitoring.coreos.com/v1")' > delete-logging-minio-ha-filtered.yaml
+  cp delete-logging-minio-ha-filtered.yaml delete-logging-minio-ha.yaml
+fi
+{{- end }}
+$kubectlbin delete --ignore-not-found --wait --timeout=180s -f delete-logging-minio-ha.yaml
+$kubectlbin delete --ignore-not-found --wait --timeout=180s networkpolicies -A -l cluster.kfd.sighup.io/logging-backend=minio
+
+{{- end }}
+{{- end }}
+
 
 {{- if eq .spec.distribution.modules.policy.type "kyverno" }}
 {{- if not .spec.distribution.modules.policy.kyverno.installDefaultPolicies }}

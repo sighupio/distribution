@@ -130,6 +130,7 @@ data:
           password: minio123
       loki:
         tsdbStartDate: "2025-05-15" # we needed this field when migrating from BoltDB to TSDB. Now TSDB is the default.
+        # backend can be minio, externalEndpoint or s3 (s3 is EKS-only, uses IRSA, no static credentials)
         backend: minio
         externalEndpoint:
           endpoint: s3.eu-west-1.amazonaws.com
@@ -137,6 +138,13 @@ data:
           secretAccessKey: example
           accessKeyId: example
           bucketName: lokibucket
+        # this configuration will be used if backend is s3 (EKS-only, uses IRSA, no static credentials).
+        # The bucket and IAM role are created by the distribution Terraform; iamRoleArn is injected by furyctl.
+        s3:
+          bucketName: example-loki
+          region: eu-west-1
+          authMethod: irsa
+          iamRoleArn: arn:aws:iam::123456789012:role/example-loki
         # retentionTime can be set to 0s to disable retention
         retentionTime: 720h # 30 days
       customOutputs: {}

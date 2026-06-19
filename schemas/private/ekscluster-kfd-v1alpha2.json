@@ -2324,10 +2324,43 @@
       "properties": {
         "backend": {
           "type": "string",
-          "description": "The storage backend type for Loki. `minio` will use an in-cluster MinIO deployment for object storage, `externalEndpoint` can be used to point to an external object storage instead of deploying an in-cluster MinIO.",
+          "description": "The storage backend type for Loki. `minio` will use an in-cluster MinIO deployment for object storage, `externalEndpoint` can be used to point to an external object storage instead of deploying an in-cluster MinIO, `s3` will use a dedicated AWS S3 bucket accessed without static credentials (IRSA). The `s3` backend is available only on EKS clusters.",
           "enum": [
             "minio",
-            "externalEndpoint"
+            "externalEndpoint",
+            "s3"
+          ]
+        },
+        "s3": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Configuration for Loki's dedicated AWS S3 storage bucket. Available only on EKS clusters; authentication uses IRSA (no static credentials).",
+          "properties": {
+            "bucketName": {
+              "type": "string",
+              "description": "The name of the dedicated AWS S3 bucket for Loki's storage."
+            },
+            "region": {
+              "$ref": "#/$defs/Types.AwsRegion",
+              "description": "The AWS region where the S3 bucket is located."
+            },
+            "authMethod": {
+              "type": "string",
+              "description": "The authentication method Loki uses to access the S3 bucket. `irsa` uses IAM Roles for Service Accounts. Support for `podIdentity` is planned.",
+              "default": "irsa",
+              "enum": [
+                "irsa"
+              ]
+            },
+            "iamRoleArn": {
+              "$ref": "#/$defs/Types.AwsArn",
+              "description": "The IAM role ARN for Loki's S3 access via IRSA. Injected by furyctl from the Terraform output."
+            }
+          },
+          "required": [
+            "bucketName",
+            "region",
+            "iamRoleArn"
           ]
         },
         "externalEndpoint": {

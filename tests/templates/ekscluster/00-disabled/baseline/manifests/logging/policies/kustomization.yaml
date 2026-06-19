@@ -14,4 +14,3 @@ resources:
   - fluentbit.yaml
   - fluentd.yaml
   - logging-operator.yaml
-  - minio.yaml
