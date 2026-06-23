@@ -18,10 +18,14 @@ kubernetes:
     immutable: true
   - path: .spec.kubernetes.masters.hosts.*
     immutable: true
-  # kubeProxy can be disabled and reenabled in a live cluster, but requires manual intervention
-  # to reconfigure the kube-proxy DaemonSet. We could automate this in the future.
-  - path: .spec.kubernetes.advanced.kubeProxy.enabled
-    immutable: true
+  - path: .spec.kubernetes.advanced.kubeProxy.type
+    immutable: false
+    description: "changes to kubeProxy.type have been detected."
+    unsupported:
+      - to: none
+        reason: "disabling kube-proxy on an existing cluster is not supported and requires manual intervention to remove the kube-proxy DaemonSet."
+      - from: none
+        reason: "enabling kube-proxy on a cluster where it was never installed is not supported and requires manual intervention."
 distribution:
   - path: .spec.distribution.common.networkPoliciesEnabled
     immutable: false

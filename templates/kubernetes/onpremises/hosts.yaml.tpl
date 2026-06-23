@@ -156,11 +156,13 @@ all:
         kubernetes_apiserver_certSANs:
 {{ .spec.kubernetes.advanced.apiServerCertSANs | toYaml | indent 10 }}
         {{- end }}
-        {{- /* We assume that kubeProxy is enabled by default */}}
         {{- /* The `digAny` condition needs to be specified exactly as written below to properly check if the field has been populated */}}
-        {{- if not (.spec | digAny "kubernetes" "advanced" "kubeProxy" "enabled" true) }}
+        {{- $kubeProxyType := .spec | digAny "kubernetes" "advanced" "kubeProxy" "type" "ipvs" }}
+        {{- if eq $kubeProxyType "none" }}
         kubeadm_skip_phases:
           - "addon/kube-proxy"
+        {{- else }}
+        kubernetes_kube_proxy_mode: {{ $kubeProxyType }}
         {{- end }}
     etcd:
       hosts:

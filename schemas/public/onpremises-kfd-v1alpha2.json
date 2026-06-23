@@ -516,9 +516,10 @@
           "description": "Configuration for the kube-proxy component.",
           "type": "object",
           "properties": {
-            "enabled": {
-              "type": "boolean",
-              "description": "Setting this option to `false` will skip the installation of the kube-proxy component and install the CNI plugin with the following configuration: Cilium in kube-proxy-replacement mode and Calico in eBPF mode. Default is `true`.\n\nNOTE: Changing this option after the cluster has been created is not currently supported."
+            "type": {
+              "type": "string",
+              "enum": ["none", "ipvs", "nftables"],
+              "description": "The operating mode for kube-proxy. `none` skips kube-proxy installation and configures the CNI accordingly (Cilium in kube-proxy-replacement mode, Calico in eBPF mode). `ipvs` installs kube-proxy in IPVS mode (default). `nftables` installs kube-proxy in nftables mode.\n\nNOTE: Changing to `type: none` after the cluster has been created is not currently supported."
             },
             "additionalProperties": false
           }
