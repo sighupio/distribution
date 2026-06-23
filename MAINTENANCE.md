@@ -42,7 +42,7 @@ With no further ado, the steps to release a new version are:
 ### fury-distribution
 
 > [!WARNING]
-> If you are releasing a new `x.y.0` version create a `release-vX.<y-1>` branch for the previous release (to be used later for backporting).
+> If you are releasing a new `x.y.0` version, create a `release-vX.<y-1>` branch for the previous release (to be used later for backporting) starting from the **latest stable tag** of that minor (e.g. `release-v1.34` from tag `v1.34.1`), **not** from `main`.
 
 1. Create a new branch `feat/release-vx.y.z` (`feat/release-v1.29.4`, for example) where to work on.
 2. Create the PRs fixing the issues or adding new features to the templates or other files of fury-distribution, test them and merge them.
