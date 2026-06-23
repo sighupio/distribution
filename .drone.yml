@@ -7,7 +7,7 @@ kind: pipeline
 type: docker
 
 node:
-   performance: low
+  performance: low
 
 platform:
   os: linux
@@ -75,6 +75,20 @@ steps: # qa
     commands:
       - eval "$(mise activate bash --shims)"
       - bats -t tests/e2e/kfddistribution/schema.sh
+      - bats -t tests/e2e/onpremises/schema.sh
+
+  - name: test-schema-immutable
+    image: quay.io/sighup/mise:v2025.4.4
+    pull: always
+    depends_on:
+      - license-check
+      - schema-check
+    volumes:
+      - name: mise-cache
+        path: /mise-data
+    commands:
+      - eval "$(mise activate bash --shims)"
+      - bats -t tests/e2e/immutable/schema.sh
 
   - name: test-create-config
     image: quay.io/sighup/mise:v2025.4.4
@@ -90,6 +104,18 @@ steps: # qa
       - furyctl create config --kind KFDDistribution --version v1.34.1 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-kfddistribution
       - furyctl create config --kind EKSCluster --version v1.34.1 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-ekscluster
       - furyctl create config --kind OnPremises --version v1.34.1 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-onpremises
+
+  - name: test-templates-regressions
+    image: quay.io/sighup/mise:v2025.4.4
+    pull: always
+    depends_on:
+      - schema-check
+    volumes:
+      - name: mise-cache
+        path: /mise-data
+    commands:
+      - eval "$(mise activate bash --shims)"
+      - mise run "test:templates:regressions"
 
   - name: render
     image: quay.io/sighup/mise:v2025.4.4
@@ -632,7 +658,7 @@ steps: # e2e-ekscluster-selfmanaged-alinux2023-1.34.1
     when:
       status:
         - success
-  
+
   - name: delete-aws-bucket
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
@@ -784,7 +810,7 @@ steps: #e2e-eks-upgrades
     when:
       status:
         - success
-  
+
   - name: delete-aws-bucket
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
@@ -812,7 +838,7 @@ name: e2e-onpremises
 kind: pipeline
 type: docker
 node:
-   performance: low
+  performance: low
 
 depends_on:
   - qa
@@ -966,7 +992,7 @@ kind: pipeline
 type: docker
 
 node:
-   performance: low
+  performance: low
 
 depends_on:
   - qa

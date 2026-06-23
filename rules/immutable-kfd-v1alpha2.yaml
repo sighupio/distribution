@@ -1,0 +1,263 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+infrastructure:
+  - path: .spec.infrastructure.nodes.*.arch
+    immutable: false
+    description: "Changes to nodes configuration require manual intervention. Nodes will need to be recreated for the changes to take effect."
+    reducers:
+      - key: infrastructureNodesArch
+        lifecycle: pre-apply
+  - path: .spec.infrastructure.nodes.*.storage.**
+    immutable: false
+    description: "Changes to nodes configuration require manual intervention. Nodes will need to be recreated for the changes to take effect."
+    reducers:
+      - key: infrastructureNodesArch
+        lifecycle: pre-apply
+  - path: .spec.infrastructure.nodes.*.hostname
+    immutable: false
+    description: "Changes to nodes configuration require manual intervention. Nodes will need to be recreated for the changes to take effect."
+    reducers:
+      - key: infrastructureNodesHostname
+        lifecycle: pre-apply
+  - path: .spec.infrastructure.nodes.*.macAddress
+    immutable: false
+    description: "Changes to nodes configuration require manual intervention. Nodes will need to be recreated for the changes to take effect."
+    reducers:
+      - key: infrastructureNodesMacAddress
+        lifecycle: pre-apply
+  - path: .spec.infrastructure.nodes.*.network.ethernets.**
+    immutable: false
+    description: "Changes to nodes configuration require manual intervention. Nodes will need to be recreated for the changes to take effect."
+    reducers:
+      - key: infrastructureNodesNetworkEthernets
+        lifecycle: pre-apply
+  - path: .spec.infrastructure.nodes.*.systemd.units.**
+    immutable: false
+    description: "Changes to nodes configuration require manual intervention. Nodes will need to be recreated for the changes to take effect."
+    reducers:
+      - key: infrastructureNodesSystemdUnits
+        lifecycle: pre-apply
+  - path: .spec.infrastructure.nodes.*.passwd.**
+    immutable: false
+    description: "Changes to nodes configuration require manual intervention. Nodes will need to be recreated for the changes to take effect."
+    reducers:
+      - key: infrastructureNodesPasswdUsers
+        lifecycle: pre-apply
+
+kubernetes:
+  - path: .spec.kubernetes.controlPlane.address
+    immutable: true
+    description: "Control plane address cannot be changed after cluster creation"
+
+  - path: .spec.kubernetes.networking.podCIDR
+    immutable: true
+    description: "Pod CIDR cannot be changed after cluster creation"
+
+  - path: .spec.kubernetes.networking.serviceCIDR
+    immutable: true
+    description: "Service CIDR cannot be changed after cluster creation"
+
+  - path: .spec.kubernetes.etcd
+    immutable: true
+    description: "etcd configuration cannot be changed after cluster creation"
+  - path: .spec.kubernetes.etcd.members.*
+    immutable: true
+    description: "etcd member configuration cannot be changed after cluster creation"
+
+  - path: .spec.kubernetes.controlPlane.members.*
+    immutable: true
+    description: "Control plane member configuration cannot be changed after cluster creation"
+  # kubeProxy can be disabled and reenabled in a live cluster, but requires manual intervention
+  # to reconfigure the kube-proxy DaemonSet. We could automate this in the future.
+  - path: .spec.kubernetes.advanced.kubeProxy.enabled
+    immutable: true
+
+distribution:
+  - path: .spec.distribution.common.networkPoliciesEnabled
+    immutable: false
+    description: "changes to the network policies have been detected. This will cause the reconfiguration or deletion of the current network policies."
+    safe:
+      - to: none
+    reducers:
+      - key: distributionCommonNetworkPoliciesEnabled
+        lifecycle: pre-apply
+  - path: .spec.distribution.modules.networking.type
+    immutable: true
+    description: "Networking module type cannot be changed after cluster creation"
+
+  - path: .spec.distribution.modules.networking.tigeraOperator.blockSize
+    immutable: true
+    description: "Tigera Operator block size cannot be changed after cluster creation"
+
+  - path: .spec.distribution.modules.networking.tigeraOperator.podCidr
+    immutable: true
+    description: "Tigera Operator pod CIDR cannot be changed after cluster creation"
+
+  - path: .spec.distribution.modules.logging.type
+    immutable: false
+    description: "changes to the logging module type have been detected. This will cause the reconfiguration or deletion of the current logging stack."
+    safe:
+      - from: none
+    reducers:
+      - key: distributionModulesLoggingType
+        lifecycle: pre-apply
+  - path: .spec.distribution.modules.logging.loki.tsdbStartDate
+    immutable: true
+    description: "changes to Loki's TSDB start date have been detected. This parameter cannot be changed once set."
+    safe:
+      - fromNodes:
+          - path: ".spec.distribution.modules.logging.type"
+            from: "none"
+          - path: ".spec.distribution.modules.logging.type"
+            to: "none"
+          - path: ".spec.distribution.modules.logging.type"
+            from: "opensearch"
+          - path: ".spec.distribution.modules.logging.type"
+            to: "opensearch"
+    unsupported:
+      - to: opensearch
+        from: loki
+        reason: "currently, switching Logging from loki to opensearch is not supported. You need to first remove the current stack with type: none."
+  - path: .spec.distribution.modules.monitoring.alertmanager.installDefaultRules
+    immutable: false
+    description: "changes to the monitoring alertmanager configs have been detected. This will cause the reconfiguration, creation or deletion of the default alertmanager configs."
+    safe:
+      - from: false
+      - from: true
+    reducers:
+      - key: distributionModulesMonitoringAlertmanagerInstalldefaultrules
+        lifecycle: pre-apply
+  - path: .spec.distribution.modules.policy.type
+    immutable: false
+    description: "changes to the policy module type have been detected. This will cause the reconfiguration or deletion of the current policy stack."
+    safe:
+      - from: none
+    unsupported:
+      - to: gatekeeper
+        from: kyverno
+        reason: "currently, switching from kyverno to gatekeeper is not supported. You need to first remove the current stack with type: none."
+      - to: kyverno
+        from: gatekeeper
+        reason: "currently, switching from gatekeeper to kyverno is not supported. You need to first remove the current stack with type: none."
+    reducers:
+      - key: distributionModulesPolicyType
+        lifecycle: pre-apply
+  - path: .spec.distribution.modules.policy.gatekeeper.installDefaultPolicies
+    immutable: false
+    description: "changes to Gatekeeper default policies option in the policy module have been detected. This will cause the installation or deletion of the default policies."
+    safe:
+      - from: false
+      - from: true
+    reducers:
+      - key: distributionModulesPolicyGatekeeperInstallDefaultPolicies
+        lifecycle: pre-apply
+  - path: .spec.distribution.modules.policy.kyverno.installDefaultPolicies
+    immutable: false
+    description: "changes to Kyverno default policies option in the policy module have been detected. This will cause the installation or deletion of the default policies."
+    safe:
+      - from: false
+      - from: true
+    reducers:
+      - key: distributionModulesPolicyKyvernoInstallDefaultPolicies
+        lifecycle: pre-apply
+  - path: .spec.distribution.modules.tracing.type
+    immutable: false
+    description: "changes to the tracing module type have been detected. This will cause the replacement of the current tracing stack (removal or creation)."
+    safe:
+      - from: none
+    reducers:
+      - key: distributionModulesTracingType
+        lifecycle: pre-apply
+  - path: .spec.distribution.modules.tracing.tempo.backend
+    immutable: false
+    description: "changes to the tempo backend have been detected. This will cause the reconfiguration of tempo and the deletion of the current minio storage, if minio was disabled"
+    reducers:
+      - key: distributionModulesTracingTempoBackend
+        lifecycle: pre-apply
+  - path: .spec.distribution.modules.dr.type
+    immutable: false
+    description: "changes to the Disaster Recovery module type have been detected. This will cause the replacement of the current DR (velero) stack (removal or creation)."
+    safe:
+      - from: none
+    reducers:
+      - key: distributionModulesDRType
+        lifecycle: pre-apply
+  - path: .spec.distribution.modules.dr.velero.backend
+    immutable: false
+    description: "changes to the velero backend have been detected. This will cause the reconfiguration of velero and the deletion of the current minio storage, if minio was disabled"
+    reducers:
+      - key: distributionModulesDRVeleroBackend
+        lifecycle: pre-apply
+  - path: .spec.distribution.modules.monitoring.type
+    immutable: false
+    description: "changes to the Monitoring module type have been detected. This will cause the reconfiguration or deletion of the current monitoring stack."
+    safe:
+      - from: none
+      - from: prometheus
+        to: mimir
+      - from: prometheusAgent
+    reducers:
+      - key: distributionModulesMonitoringType
+        lifecycle: pre-apply
+    unsupported:
+      - from: mimir
+        to: prometheus
+        reason: "switching from Mimir to Prometheus is not currently supported. You need to first remove the current stack with type: none."
+      - from: mimir
+        to: prometheusAgent
+        reason: "switching from Mimir to Prometheus Agent is not currently supported. You need to first remove the current stack with type: none."
+  - path: .spec.distribution.modules.monitoring.mimir.backend
+    immutable: false
+    description: "changes to the mimir backend have been detected. This will cause the reconfiguration of mimir and the deletion of the current minio storage, if minio was disabled"
+    reducers:
+      - key: distributionModulesMonitoringMimirBackend
+        lifecycle: pre-apply
+  - path: .spec.distribution.modules.ingress.nginx.type
+    immutable: false
+    description: "changes to the nginx type in the Ingress module have been detected. This will cause the reconfiguration or deletion of the current ingress stack."
+    safe:
+      - from: none
+    unsupported:
+      - to: single
+        from: dual
+        reason: "currently, switching Ingress from dual to single nginx is not supported. You need to first remove the current stack with type: none."
+      - to: dual
+        from: single
+        reason: "currently, switching Ingress from single to dual nginx is not supported. You need to first remove the current stack with type: none."
+    reducers:
+      - key: distributionModulesIngressNginxType
+        lifecycle: pre-apply
+  - path: .spec.distribution.modules.ingress.haproxy.type
+    immutable: false
+    description: "changes to the HAProxy type in the Ingress module have been detected. This will cause the reconfiguration or deletion of the current HAProxy ingress stack."
+    safe:
+      - from: none
+    unsupported:
+      - to: single
+        from: dual
+        reason: "currently, switching Ingress from dual to single HAProxy is not supported. You need to first remove the current stack with type: none."
+      - to: dual
+        from: single
+        reason: "currently, switching Ingress from single to dual HAProxy is not supported. You need to first remove the current stack with type: none."
+    reducers:
+      - key: distributionModulesIngressHAProxyType
+        lifecycle: pre-apply
+  - path: .spec.distribution.modules.auth.provider.type
+    immutable: false
+    description: "changes to the auth provider type will trigger the reconfiguration of the security on the infrastructural ingresses"
+    safe:
+      - from: none
+    reducers:
+      - key: distributionModulesAuthProviderType
+        lifecycle: pre-apply
+  - path: .spec.distribution.modules.monitoring.grafana.basicAuthIngress
+    immutable: false
+    description: "Changes to the grafana basic auth ingress have been detected. This will cause the creation or deletion of the ingress."
+    safe:
+      - from: none
+    reducers:
+      - key: distributionModulesMonitoringGrafanaBasicAuthIngress
+        lifecycle: pre-apply

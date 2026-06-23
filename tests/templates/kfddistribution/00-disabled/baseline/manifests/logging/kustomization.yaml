@@ -1,0 +1,25 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../../vendor/modules/logging/katalog/logging-operator
+  - ../../../vendor/modules/logging/katalog/logging-operated
+  - kapp-configs/logging-operator-crd.yaml
+
+patches:
+  - path: patches/infra-nodes.yml
+  - patch: |-
+      apiVersion: logging.banzaicloud.io/v1beta1
+      kind: Logging
+      metadata:
+        name: infra
+      spec:
+        fluentd:
+          metrics:
+            serviceMonitor: false
+            prometheusRules: false

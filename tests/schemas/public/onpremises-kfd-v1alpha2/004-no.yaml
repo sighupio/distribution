@@ -1,0 +1,52 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# Tests the following cases:
+
+# Given an OnPremises config
+# And "spec.distribution.modules.auth.overrides.ingresses" contains an unknown key
+# When I validate the config against the schema
+# Then a validation error is returned for the unknown property
+
+---
+apiVersion: kfd.sighup.io/v1alpha2
+kind: OnPremises
+metadata:
+  name: onpremises-test-unknown-ingress-override
+spec:
+  distributionVersion: v1.34.0
+  distribution:
+    modules:
+      auth:
+        provider:
+          type: sso
+        baseDomain: example.test
+        dex:
+          connectors: []
+        pomerium:
+          secrets:
+            COOKIE_SECRET: "test"
+            IDP_CLIENT_SECRET: "test"
+            SHARED_SECRET: "test"
+            SIGNING_KEY: "test"
+        overrides:
+          ingresses:
+            pomeriun:
+              host: pomerium.example.test
+              ingressClass: external
+      dr:
+        type: none
+      ingress:
+        baseDomain: example.test
+        nginx:
+          type: single
+        certManager:
+          clusterIssuer:
+            name: letsencrypt-example
+            email: example@example.test
+            type: http01
+      logging:
+        type: none
+      policy:
+        type: none

@@ -3080,6 +3080,9 @@
             },
             "dex": {
               "$ref": "#/$defs/Spec.Distribution.Modules.Auth.Overrides.Ingress"
+            },
+            "pomerium": {
+              "$ref": "#/$defs/Spec.Distribution.Modules.Auth.Overrides.Ingress"
             }
           }
         }
