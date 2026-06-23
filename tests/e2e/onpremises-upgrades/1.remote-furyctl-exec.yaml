@@ -55,36 +55,14 @@
     # Ubuntu runs unattended-upgrades automatically on fresh nodes,
     # which holds the dpkg lock and can restart sshd. Wait for all nodes
     # to be reachable, then disable the service before furyctl runs.
-    # Runs ON the haproxy bridge (the only host with a route to the private
-    # 10.10.1.0/24 net). Some Hetzner nodes intermittently take a while to bring
-    # up their private NIC, and wait_for_connection blocks on the long OS TCP
-    # timeout per dead host (few real retries). Probe port 22 with a short 5s
-    # timeout, every 10s, for up to 10 minutes, so slow nodes are retried often.
-    - name: Wait for all cluster nodes to be reachable via SSH (from the haproxy bridge)
-      ansible.builtin.shell: |
-        set -u
-        nodes="10.10.1.2 10.10.1.3 10.10.1.4 10.10.1.5 10.10.1.6 10.10.1.7 10.10.1.8 10.10.1.9 10.10.1.10"
-        deadline=$(( $(date +%s) + 600 ))
-        while :; do
-          pending=""
-          for ip in $nodes; do
-            if ! timeout 5 bash -c ">/dev/tcp/${ip}/22" 2>/dev/null; then
-              pending="${pending} ${ip}"
-            fi
-          done
-          if [ -z "${pending}" ]; then
-            echo "All cluster nodes reachable on port 22."
-            break
-          fi
-          if [ "$(date +%s)" -ge "${deadline}" ]; then
-            echo "Timed out after 10m waiting for SSH on:${pending}" >&2
-            exit 1
-          fi
-          echo "Still waiting for SSH on:${pending}"
-          sleep 10
-        done
-      args:
-        executable: /bin/bash
+    - name: Wait for all cluster nodes to be reachable via SSH
+      ansible.builtin.shell: >
+        ANSIBLE_HOST_KEY_CHECKING=False
+        ansible all
+        -i "10.10.1.2,10.10.1.3,10.10.1.4,10.10.1.5,10.10.1.6,10.10.1.7,10.10.1.8,10.10.1.9,10.10.1.10,"
+        -m wait_for_connection
+        -a "timeout=600 sleep=10"
+        -u root
 
     - name: Disable unattended-upgrades on all cluster nodes before kubernetes installation
       ansible.builtin.shell: >
