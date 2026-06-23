@@ -34,7 +34,7 @@
       args:
         creates: /usr/local/bin/furyctl
       vars:
-        furyctl_version: "{{ lookup('env', 'FURYCTL_VERSION') | default('v0.35.0-rc.4') }}"
+        furyctl_version: "{{ lookup('env', 'FURYCTL_VERSION') | default('v0.35.0-rc.5') }}"
 
     - name: Create furyctl pki
       ansible.builtin.shell: furyctl create pki -p ./pki
