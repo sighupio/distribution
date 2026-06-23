@@ -270,7 +270,7 @@ steps: # e2e-kfddistribution-1.34
         - failure
 
 ---
-# We test 1.33.1 -> 1.34.1 upgrade pipeline
+# We test 1.34.1 -> 1.35.0 upgrade pipeline
 name: e2e-kfddistribution-1.34.1-to-1.35.0
 kind: pipeline
 type: docker
@@ -297,7 +297,7 @@ environment:
   MISE_DATA_DIR: /mise-data
   CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-upgrades
   KUBECONFIG: /drone/src/kubeconfig-upgrades
-  KUBECTL_VERSION: "1.33.0"
+  KUBECTL_VERSION: "1.34.0"
   CLUSTER_VERSION: v1.34.0
 
 volumes:
@@ -308,7 +308,7 @@ volumes:
     host:
       path: /root/mise_data_dir
 
-steps: # e2e-kfddistribution-1.33.1-to-1.34.1
+steps: # e2e-kfddistribution-1.34.1-to-1.35.0
   - name: install-tools
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
@@ -1090,7 +1090,7 @@ steps: # e2e-onpremises
         - failure
 
 ---
-# On-premises upgrade pipeline - v1.33.1 to v1.34.1
+# On-premises upgrade pipeline - v1.34.1 to v1.35.0
 name: e2e-onpremises-upgrades-1.34.1-1.35.0
 kind: pipeline
 type: docker
@@ -1123,7 +1123,7 @@ volumes:
     host:
       path: /root/mise_data_dir
 
-steps: # e2e-onpremises-upgrades-1.33.1-1.34.1
+steps: # e2e-onpremises-upgrades-1.34.1-1.35.0
   - name: install-tools
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
@@ -1169,7 +1169,7 @@ steps: # e2e-onpremises-upgrades-1.33.1-1.34.1
       - export TF_VAR_private_key=$(cat /cache/ci-ssh-key)
       - ansible-playbook 0.local-tofu-run.yaml
 
-  - name: install-cluster-1.33.1-with-furyctl
+  - name: install-cluster-1.34.1-with-furyctl
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
     environment:
@@ -1208,7 +1208,7 @@ steps: # e2e-onpremises-upgrades-1.33.1-1.34.1
       - eval "$(mise activate bash --shims)"
       - ./tests/e2e/onpremises-upgrades/e2e-onpremises.sh
 
-  - name: upgrade-cluster-to-1.34.1-with-furyctl
+  - name: upgrade-cluster-to-1.35.0-with-furyctl
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
     environment:
