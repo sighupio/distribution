@@ -18,6 +18,13 @@ clone:
 
 environment:
   MISE_DATA_DIR: /mise-data
+  # Authenticate GitHub API calls for mise (tool downloads, including furyctl's
+  # bundled mise) and furyctl's latest-release check, to avoid the 60 req/h
+  # unauthenticated rate limit. Pipeline-level env propagates to all steps.
+  MISE_GITHUB_TOKEN:
+    from_secret: github_token
+  GITHUB_TOKEN:
+    from_secret: github_token
 
 volumes:
   - name: mise-cache
@@ -159,6 +166,13 @@ trigger:
 
 environment:
   MISE_DATA_DIR: /mise-data
+  # Authenticate GitHub API calls for mise (tool downloads, including furyctl's
+  # bundled mise) and furyctl's latest-release check, to avoid the 60 req/h
+  # unauthenticated rate limit. Pipeline-level env propagates to all steps.
+  MISE_GITHUB_TOKEN:
+    from_secret: github_token
+  GITHUB_TOKEN:
+    from_secret: github_token
   CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}
   KUBECONFIG: /drone/src/kubeconfig
   CLUSTER_VERSION: v1.35.0
@@ -266,6 +280,13 @@ trigger:
 
 environment:
   MISE_DATA_DIR: /mise-data
+  # Authenticate GitHub API calls for mise (tool downloads, including furyctl's
+  # bundled mise) and furyctl's latest-release check, to avoid the 60 req/h
+  # unauthenticated rate limit. Pipeline-level env propagates to all steps.
+  MISE_GITHUB_TOKEN:
+    from_secret: github_token
+  GITHUB_TOKEN:
+    from_secret: github_token
   CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-upgrades
   KUBECONFIG: /drone/src/kubeconfig-upgrades
   KUBECTL_VERSION: "1.33.0"
@@ -371,6 +392,13 @@ trigger:
 
 environment:
   MISE_DATA_DIR: /mise-data
+  # Authenticate GitHub API calls for mise (tool downloads, including furyctl's
+  # bundled mise) and furyctl's latest-release check, to avoid the 60 req/h
+  # unauthenticated rate limit. Pipeline-level env propagates to all steps.
+  MISE_GITHUB_TOKEN:
+    from_secret: github_token
+  GITHUB_TOKEN:
+    from_secret: github_token
   DISTRIBUTION_VERSION: "v1.35.0"
   CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}
 
@@ -526,6 +554,13 @@ trigger:
 
 environment:
   MISE_DATA_DIR: /mise-data
+  # Authenticate GitHub API calls for mise (tool downloads, including furyctl's
+  # bundled mise) and furyctl's latest-release check, to avoid the 60 req/h
+  # unauthenticated rate limit. Pipeline-level env propagates to all steps.
+  MISE_GITHUB_TOKEN:
+    from_secret: github_token
+  GITHUB_TOKEN:
+    from_secret: github_token
   DISTRIBUTION_VERSION: "v1.35.0"
   CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-selfmanaged
 
@@ -681,6 +716,13 @@ trigger:
 
 environment:
   MISE_DATA_DIR: /mise-data
+  # Authenticate GitHub API calls for mise (tool downloads, including furyctl's
+  # bundled mise) and furyctl's latest-release check, to avoid the 60 req/h
+  # unauthenticated rate limit. Pipeline-level env propagates to all steps.
+  MISE_GITHUB_TOKEN:
+    from_secret: github_token
+  GITHUB_TOKEN:
+    from_secret: github_token
   DISTRIBUTION_VERSION: "v1.35.0"
   CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-upgrades
 
@@ -834,7 +876,14 @@ trigger:
 
 environment:
   MISE_DATA_DIR: /mise-data
-  FURYCTL_VERSION: "v0.35.0-rc.1"
+  # Authenticate GitHub API calls for mise (tool downloads, including furyctl's
+  # bundled mise) and furyctl's latest-release check, to avoid the 60 req/h
+  # unauthenticated rate limit. Pipeline-level env propagates to all steps.
+  MISE_GITHUB_TOKEN:
+    from_secret: github_token
+  GITHUB_TOKEN:
+    from_secret: github_token
+  FURYCTL_VERSION: "v0.35.0-rc.4"
   TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
 
 volumes:
@@ -989,7 +1038,14 @@ trigger:
 
 environment:
   MISE_DATA_DIR: /mise-data
-  FURYCTL_VERSION: "v0.35.0-rc.1"
+  # Authenticate GitHub API calls for mise (tool downloads, including furyctl's
+  # bundled mise) and furyctl's latest-release check, to avoid the 60 req/h
+  # unauthenticated rate limit. Pipeline-level env propagates to all steps.
+  MISE_GITHUB_TOKEN:
+    from_secret: github_token
+  GITHUB_TOKEN:
+    from_secret: github_token
+  FURYCTL_VERSION: "v0.35.0-rc.4"
   TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
   KUBECONFIG: /cache/kubeconfig
 
