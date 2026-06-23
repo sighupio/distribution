@@ -83,9 +83,9 @@ steps: # qa
     commands:
       - eval "$(mise activate bash --shims)"
       - mkdir -p /tmp/test-kfddistribution /tmp/test-ekscluster /tmp/test-onpremises
-      - furyctl create config --kind KFDDistribution --version v1.34.1 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-kfddistribution
-      - furyctl create config --kind EKSCluster --version v1.34.1 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-ekscluster
-      - furyctl create config --kind OnPremises --version v1.34.1 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-onpremises
+      - furyctl create config --kind KFDDistribution --version v1.35.0 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-kfddistribution
+      - furyctl create config --kind EKSCluster --version v1.35.0 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-ekscluster
+      - furyctl create config --kind OnPremises --version v1.35.0 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-onpremises
 
   - name: test-templates-regressions
     image: quay.io/sighup/mise:v2025.4.4
