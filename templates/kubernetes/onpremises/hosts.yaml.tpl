@@ -130,10 +130,6 @@ all:
         {{- end }}
 
         {{- if index .spec.kubernetes "advanced" }}
-        {{- if and (index .spec.kubernetes.advanced "registry") (ne .spec.kubernetes.advanced.registry "") }}
-        kubernetes_image_registry: "{{ .spec.kubernetes.advanced.registry }}"
-        {{- end }}
-
         {{- if index .spec.kubernetes.advanced "eventRateLimits" }}
         eventratelimits:
           {{- range .spec.kubernetes.advanced.eventRateLimits }}
@@ -255,6 +251,9 @@ all:
     no_proxy: "{{ .spec.kubernetes.proxy.noProxy }}"
     {{- end }}
     {{- if (index .spec.kubernetes "advanced") }}
+    {{- if and (index .spec.kubernetes.advanced "registry") (ne .spec.kubernetes.advanced.registry "") }}
+    kubernetes_image_registry: "{{ .spec.kubernetes.advanced.registry }}"
+    {{- end }}
     {{- if (index .spec.kubernetes.advanced "containerd") }}
     {{- if (index .spec.kubernetes.advanced.containerd "registryConfigs") }}
     containerd_registry_configs:
