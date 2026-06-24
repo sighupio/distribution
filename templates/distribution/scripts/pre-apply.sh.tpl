@@ -250,8 +250,12 @@ deleteGatekeeperDefaultPolicies
 {{- if index .reducers "distributionModulesPolicyKyvernoInstallDefaultPolicies" }}
 
 deleteKyvernoDefaultPolicies() {
-  $kustomizebin build $vendorPath/modules/opa/katalog/kyverno/policies | $kubectlbin delete --ignore-not-found --wait --timeout=600s -f -
-  echo "Kyverno default policies resources deleted"
+  if $kubectlbin get crd clusterpolicies.kyverno.io > /dev/null 2>&1; then
+    $kustomizebin build $vendorPath/modules/opa/katalog/kyverno/policies | $kubectlbin delete --ignore-not-found --wait --timeout=600s -f -
+    echo "Kyverno default policies resources deleted"
+  else
+    echo "Kyverno CRDs not found, skipping deleteKyvernoDefaultPolicies"
+  fi
 }
 
 # from enabled
