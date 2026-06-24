@@ -2,6 +2,7 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 resource "hcloud_server" "haproxy" {
+  depends_on  = [hcloud_network_subnet.network_subnet]
   name        = "haproxy-0-upgrades-${var.ci_number}"
   image       = "ubuntu-24.04"
   server_type = "cx33"
@@ -17,8 +18,8 @@ resource "hcloud_server" "haproxy" {
 
 resource "null_resource" "init_haproxy" {
   triggers = {
-    instance_id   = hcloud_server.haproxy.id
-    private_key   = var.private_key
+    instance_id = hcloud_server.haproxy.id
+    private_key = var.private_key
   }
 
   connection {
@@ -29,16 +30,17 @@ resource "null_resource" "init_haproxy" {
   }
 
   provisioner "remote-exec" {
-    inline = [ 
+    inline = [
       "echo \"IdentityFile ~/.ssh/id_ed25519\" > /root/.ssh/config ",
       "echo \"${var.private_key}\" > /root/.ssh/id_ed25519",
       "chmod 600 /root/.ssh/id_ed25519"
-     ]
+    ]
   }
 
 }
 
 resource "hcloud_server" "controlplane" {
+  depends_on  = [hcloud_network_subnet.network_subnet]
   count       = 3
   name        = "controlplane-upgrades-${count.index}-${var.ci_number}"
   image       = "ubuntu-24.04"
@@ -56,6 +58,7 @@ resource "hcloud_server" "controlplane" {
 }
 
 resource "hcloud_server" "infra" {
+  depends_on  = [hcloud_network_subnet.network_subnet]
   count       = 3
   name        = "infra-upgrades-${count.index}-${var.ci_number}"
   image       = "ubuntu-24.04"
@@ -66,13 +69,14 @@ resource "hcloud_server" "infra" {
     network_id = hcloud_network.network.id
     ip         = "10.10.1.${count.index + 6}"
   }
-    public_net {
+  public_net {
     ipv4_enabled = true
     ipv6_enabled = false
   }
 }
 
 resource "hcloud_server" "worker" {
+  depends_on  = [hcloud_network_subnet.network_subnet]
   count       = 2
   name        = "worker-upgrades-${count.index}-${var.ci_number}"
   image       = "ubuntu-24.04"
