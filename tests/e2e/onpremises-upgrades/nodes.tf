@@ -62,7 +62,7 @@ resource "hcloud_server" "infra" {
   count       = 3
   name        = "infra-upgrades-${count.index}-${var.ci_number}"
   image       = "ubuntu-24.04"
-  server_type = "cx33"
+  server_type = "cx43"
   location    = "nbg1"
   ssh_keys    = [hcloud_ssh_key.ssh_key.id]
   network {
@@ -80,7 +80,7 @@ resource "hcloud_server" "worker" {
   count       = 2
   name        = "worker-upgrades-${count.index}-${var.ci_number}"
   image       = "ubuntu-24.04"
-  server_type = "cx33"
+  server_type = "cx43"
   location    = "nbg1"
   ssh_keys    = [hcloud_ssh_key.ssh_key.id]
   network {
