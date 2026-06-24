@@ -166,7 +166,7 @@ spec:
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: haproxy-ingress-crdjob-1
+  name: haproxy-ingress-crdjob
   namespace: ingress-haproxy
 spec:
   template:
