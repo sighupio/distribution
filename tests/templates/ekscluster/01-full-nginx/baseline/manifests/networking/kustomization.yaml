@@ -8,5 +8,8 @@ kind: Kustomization
 resources:
   - ../../../vendor/modules/networking/katalog/tigera/eks-policy-only
 
+
+
 patches:
   - path: patches/tigera/infra-nodes-and-mask.yaml
+
