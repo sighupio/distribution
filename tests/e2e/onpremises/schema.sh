@@ -160,3 +160,9 @@ test_schema() {
 
     test_schema "public" "onpremises-kfd-v1alpha2" "004-no" expect
 }
+
+@test "005 - ok (per-host dnsZone on masters, etcd, workers, and loadBalancers)" {
+    info
+
+    test_schema "public" "onpremises-kfd-v1alpha2" "005-ok" expect_ok
+}

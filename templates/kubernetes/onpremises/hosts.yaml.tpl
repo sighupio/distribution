@@ -7,9 +7,10 @@ all:
     haproxy:
       hosts:
         {{- range $h := .spec.kubernetes.loadBalancers.hosts }}
+        {{- $hostDnsZone := default $dnsZone (index $h "dnsZone") }}
         {{ $h.name }}:
           ansible_host: "{{ $h.ip }}"
-          kubernetes_hostname: "{{ $h.name }}.{{ $dnsZone }}"
+          kubernetes_hostname: "{{ $h.name }}.{{ $hostDnsZone }}"
         {{- end }}
       vars:
         keepalived_cluster: {{ .spec.kubernetes.loadBalancers.keepalived.enabled }}
@@ -25,14 +26,15 @@ all:
       hosts:
         {{- $etcdInitialCluster := list }}
         {{- range $h := .spec.kubernetes.masters.hosts }}
+        {{- $hostDnsZone := default $dnsZone (index $h "dnsZone") }}
         {{- if not (index $.spec.kubernetes "etcd") }}
-        {{- $etcdUri := print $h.name "=https://" $h.name "." $dnsZone ":2380" }}
+        {{- $etcdUri := print $h.name "=https://" $h.name "." $hostDnsZone ":2380" }}
         {{- $etcdInitialCluster = append $etcdInitialCluster $etcdUri }}
         {{- end }}
         {{ $h.name }}:
           ansible_host: "{{ $h.ip }}"
           kubernetes_apiserver_advertise_address: "{{ $h.ip }}"
-          kubernetes_hostname: "{{ $h.name }}.{{ $dnsZone }}"
+          kubernetes_hostname: "{{ $h.name }}.{{ $hostDnsZone }}"
           {{- if index $.spec.kubernetes.masters "labels" }}
           kubernetes_node_labels:
             {{ $.spec.kubernetes.masters.labels | toYaml | indent 12 | trim }}
@@ -54,7 +56,7 @@ all:
         etcd:
           endpoints:
             {{- range $h := .spec.kubernetes.etcd.hosts }}
-            - "https://{{ $h.name }}.{{ $dnsZone }}:2379"
+            - "https://{{ $h.name }}.{{ default $dnsZone (index $h "dnsZone") }}:2379"
             {{- end }}
           caFile: "/etc/etcd/pki/etcd/ca.crt"
           keyFile: "/etc/etcd/pki/apiserver-etcd-client.key"
@@ -162,11 +164,12 @@ all:
       hosts:
         {{- if index $.spec.kubernetes "etcd" }}
         {{- range $h := .spec.kubernetes.etcd.hosts }}
-        {{- $etcdUri := print $h.name "=https://" $h.name "." $dnsZone ":2380" }}
+        {{- $hostDnsZone := default $dnsZone (index $h "dnsZone") }}
+        {{- $etcdUri := print $h.name "=https://" $h.name "." $hostDnsZone ":2380" }}
         {{- $etcdInitialCluster = append $etcdInitialCluster $etcdUri }}
         {{ $h.name }}:
           ansible_host: "{{ $h.ip }}"
-          kubernetes_hostname: "{{ $h.name }}.{{ $dnsZone }}"
+          kubernetes_hostname: "{{ $h.name }}.{{ $hostDnsZone }}"
           etcd_client_address: "{{ $h.ip }}"
         {{- end }}
       vars:
@@ -174,9 +177,10 @@ all:
         etcd_initial_cluster: "{{ $etcdInitialCluster | join "," }}"
         {{- else }}
         {{- range $h := .spec.kubernetes.masters.hosts }}
+        {{- $hostDnsZone := default $dnsZone (index $h "dnsZone") }}
         {{ $h.name }}:
           ansible_host: "{{ $h.ip }}"
-          kubernetes_hostname: "{{ $h.name }}.{{ $dnsZone }}"
+          kubernetes_hostname: "{{ $h.name }}.{{ $hostDnsZone }}"
         {{- end }}
       vars:
         dns_zone: "{{ $dnsZone }}"
@@ -187,9 +191,10 @@ all:
         {{ $n.name }}:
           hosts:
           {{- range $h := $n.hosts }}
+          {{- $hostDnsZone := default $dnsZone (index $h "dnsZone") }}
             {{ $h.name }}:
               ansible_host: "{{ $h.ip }}"
-              kubernetes_hostname: "{{ $h.name }}.{{ $dnsZone }}"
+              kubernetes_hostname: "{{ $h.name }}.{{ $hostDnsZone }}"
           {{- end }}
           vars:
             kubernetes_role: "{{ $n.name }}"

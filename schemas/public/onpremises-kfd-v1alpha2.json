@@ -223,11 +223,15 @@
       "properties": {
         "name": {
           "type": "string",
-          "description": "A name to identify the host. This value will be concatenated to `.spec.kubernetes.dnsZone` to calculate the FQDN for the host as `<name>.<dnsZone>`."
+          "description": "A name to identify the host. This value will be concatenated to `.spec.kubernetes.dnsZone` (or the host-level `dnsZone` if set) to calculate the FQDN for the host as `<name>.<dnsZone>`."
         },
         "ip": {
           "type": "string",
           "description": "The IP address of the host."
+        },
+        "dnsZone": {
+          "type": "string",
+          "description": "Optional per-host DNS zone override. When set, takes precedence over `.spec.kubernetes.dnsZone` when computing the FQDN for this host."
         }
       },
       "required": [
@@ -346,11 +350,15 @@
       "properties": {
         "name": {
           "type": "string",
-          "description": "A name to identify the host. This value will be concatenated to `.spec.kubernetes.dnsZone` to calculate the FQDN for the host as `<name>.<dnsZone>`."
+          "description": "A name to identify the host. This value will be concatenated to `.spec.kubernetes.dnsZone` (or the host-level `dnsZone` if set) to calculate the FQDN for the host as `<name>.<dnsZone>`."
         },
         "ip": {
           "type": "string",
           "description": "The IP address of the host"
+        },
+        "dnsZone": {
+          "type": "string",
+          "description": "Optional per-host DNS zone override. When set, takes precedence over `.spec.kubernetes.dnsZone` when computing the FQDN for this host."
         }
       },
       "required": [
@@ -382,11 +390,15 @@
       "properties": {
         "name": {
           "type": "string",
-          "description": "A name to identify the etcd node. This value will be concatenated to `.spec.kubernetes.dnsZone` to calculate the FQDN for the host as `<name>.<dnsZone>`."
+          "description": "A name to identify the etcd node. This value will be concatenated to `.spec.kubernetes.dnsZone` (or the host-level `dnsZone` if set) to calculate the FQDN for the host as `<name>.<dnsZone>`."
         },
         "ip": {
           "type": "string",
           "description": "The IP address of the etcd node."
+        },
+        "dnsZone": {
+          "type": "string",
+          "description": "Optional per-host DNS zone override. When set, takes precedence over `.spec.kubernetes.dnsZone` when computing the FQDN for this etcd node."
         }
       },
       "required": [
@@ -452,11 +464,15 @@
       "additionalProperties": false,
       "properties": {
         "name": {
-          "description": "A name to identify the host. This value will be concatenated to `.spec.kubernetes.dnsZone` to calculate the FQDN for the host as `<name>.<dnsZone>`.",
+          "description": "A name to identify the host. This value will be concatenated to `.spec.kubernetes.dnsZone` (or the host-level `dnsZone` if set) to calculate the FQDN for the host as `<name>.<dnsZone>`.",
           "type": "string"
         },
         "ip": {
           "description": "The IP address of the host",
+          "type": "string"
+        },
+        "dnsZone": {
+          "description": "Optional per-host DNS zone override. When set, takes precedence over `.spec.kubernetes.dnsZone` when computing the FQDN for this host.",
           "type": "string"
         }
       },
