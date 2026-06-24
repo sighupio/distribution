@@ -176,6 +176,9 @@ all:
       vars:
         dns_zone: "{{ $dnsZone }}"
         etcd_initial_cluster: "{{ $etcdInitialCluster | join "," }}"
+        {{- if and (index .spec.kubernetes "advanced") (index .spec.kubernetes.advanced "registry") (ne .spec.kubernetes.advanced.registry "") }}
+        kubernetes_image_registry: "{{ .spec.kubernetes.advanced.registry }}"
+        {{- end }}
         {{- else }}
         {{- range $h := .spec.kubernetes.masters.hosts }}
         {{ $h.name }}:
@@ -232,6 +235,10 @@ all:
               {{ $n.kernelParameters | toYaml | indent 14 | trim }}
             {{- end -}}
 
+      {{- end }}
+      {{- if and (index .spec.kubernetes "advanced") (index .spec.kubernetes.advanced "registry") (ne .spec.kubernetes.advanced.registry "") }}
+      vars:
+        kubernetes_image_registry: "{{ .spec.kubernetes.advanced.registry }}"
       {{- end }}
     ungrouped: {}
   vars:
