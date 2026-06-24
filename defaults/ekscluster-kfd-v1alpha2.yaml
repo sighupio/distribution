@@ -234,6 +234,10 @@ data:
             disableAuth: false
             host: ""
             ingressClass: ""
+          whisker:
+            disableAuth: false
+            host: ""
+            ingressClass: ""
       tigeraOperator:
         podCidr: null # not used
         blockSize: 26 # not used

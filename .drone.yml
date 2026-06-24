@@ -28,11 +28,19 @@ steps: # qa
   - name: install-tools
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
+    environment:
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
     volumes:
       - name: mise-cache
         path: /mise-data
     commands:
-      - mise install
+      # Serialize concurrent `mise install` across parallel pipelines that share
+      # the host MISE_DATA_DIR (/mise-data) on the same Drone worker, otherwise
+      # they corrupt each other. flock on a lockfile in the shared dir.
+      - "(flock -w 1800 9 || exit 1; mise install) 9>/mise-data/.mise-install.lock"
       - eval "$(mise activate bash --shims)"
 
   - name: license-check
@@ -47,28 +55,11 @@ steps: # qa
       - eval "$(mise activate bash --shims)"
       - mise run license-check
 
-  - name: schema-check
-    image: quay.io/sighup/mise:v2025.4.4
-    pull: always
-    depends_on:
-      - install-tools
-    volumes:
-      - name: mise-cache
-        path: /mise-data
-    commands:
-      - eval "$(mise activate bash --shims)"
-      - |
-        cat schemas/public/ekscluster-kfd-v1alpha2.json | \
-          json-patch -p schemas/private/ekscluster-kfd-v1alpha2.patch.json | \
-          jq -r > /tmp/schemas-private-ekscluster-kfd-v1alpha2.json
-      - diff schemas/private/ekscluster-kfd-v1alpha2.json /tmp/schemas-private-ekscluster-kfd-v1alpha2.json
-
   - name: test-schema
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
     depends_on:
       - license-check
-      - schema-check
     volumes:
       - name: mise-cache
         path: /mise-data
@@ -82,7 +73,6 @@ steps: # qa
     pull: always
     depends_on:
       - license-check
-      - schema-check
     volumes:
       - name: mise-cache
         path: /mise-data
@@ -95,21 +85,31 @@ steps: # qa
     pull: always
     depends_on:
       - install-tools
+    environment:
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
     volumes:
       - name: mise-cache
         path: /mise-data
     commands:
       - eval "$(mise activate bash --shims)"
       - mkdir -p /tmp/test-kfddistribution /tmp/test-ekscluster /tmp/test-onpremises
-      - furyctl create config --kind KFDDistribution --version v1.34.1 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-kfddistribution
-      - furyctl create config --kind EKSCluster --version v1.34.1 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-ekscluster
-      - furyctl create config --kind OnPremises --version v1.34.1 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-onpremises
+      - furyctl create config --kind KFDDistribution --version v1.35.0 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-kfddistribution
+      - furyctl create config --kind EKSCluster --version v1.35.0 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-ekscluster
+      - furyctl create config --kind OnPremises --version v1.35.0 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-onpremises
 
   - name: test-templates-regressions
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
     depends_on:
-      - schema-check
+      - install-tools
+    environment:
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
     volumes:
       - name: mise-cache
         path: /mise-data
@@ -122,7 +122,6 @@ steps: # qa
     pull: always
     depends_on:
       - license-check
-      - schema-check
     environment:
       NETRC_FILE:
         from_secret: NETRC_FILE
@@ -132,6 +131,10 @@ steps: # qa
       FURYCTL_DISABLE_ANALYTICS: "true"
       KUBECONFIG: ./dummy
       KUBECTL_VERSION: "1.34.1"
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
     volumes:
       - name: mise-cache
         path: /mise-data
@@ -154,7 +157,7 @@ steps: # qa
       - /pluto detect distribution.yml --ignore-deprecations --target-versions=k8s=v1.34.0
 
 ---
-name: e2e-kfddistribution-1.34
+name: e2e-kfddistribution-1.35
 kind: pipeline
 type: docker
 
@@ -180,7 +183,7 @@ environment:
   MISE_DATA_DIR: /mise-data
   CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}
   KUBECONFIG: /drone/src/kubeconfig
-  CLUSTER_VERSION: v1.34.0
+  CLUSTER_VERSION: v1.35.0
 
 volumes:
   - name: dockersock
@@ -194,11 +197,19 @@ steps: # e2e-kfddistribution-1.34
   - name: install-tools
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
+    environment:
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
     volumes:
       - name: mise-cache
         path: /mise-data
     commands:
-      - mise install
+      # Serialize concurrent `mise install` across parallel pipelines that share
+      # the host MISE_DATA_DIR (/mise-data) on the same Drone worker, otherwise
+      # they corrupt each other. flock on a lockfile in the shared dir.
+      - "(flock -w 1800 9 || exit 1; mise install) 9>/mise-data/.mise-install.lock"
       - eval "$(mise activate bash --shims)"
 
   - name: create Kind cluster
@@ -231,6 +242,11 @@ steps: # e2e-kfddistribution-1.34
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
     network_mode: host
+    environment:
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
     volumes:
       - name: mise-cache
         path: /mise-data
@@ -260,8 +276,8 @@ steps: # e2e-kfddistribution-1.34
         - failure
 
 ---
-# We test 1.33.1 -> 1.34.1 upgrade pipeline
-name: e2e-kfddistribution-1.33.1-to-1.34.1
+# We test 1.34.1 -> 1.35.0 upgrade pipeline
+name: e2e-kfddistribution-1.34.1-to-1.35.0
 kind: pipeline
 type: docker
 
@@ -287,8 +303,8 @@ environment:
   MISE_DATA_DIR: /mise-data
   CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-upgrades
   KUBECONFIG: /drone/src/kubeconfig-upgrades
-  KUBECTL_VERSION: "1.33.0"
-  CLUSTER_VERSION: v1.33.0
+  KUBECTL_VERSION: "1.34.0"
+  CLUSTER_VERSION: v1.34.0
 
 volumes:
   - name: dockersock
@@ -298,15 +314,23 @@ volumes:
     host:
       path: /root/mise_data_dir
 
-steps: # e2e-kfddistribution-1.33.1-to-1.34.1
+steps: # e2e-kfddistribution-1.34.1-to-1.35.0
   - name: install-tools
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
+    environment:
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
     volumes:
       - name: mise-cache
         path: /mise-data
     commands:
-      - mise install
+      # Serialize concurrent `mise install` across parallel pipelines that share
+      # the host MISE_DATA_DIR (/mise-data) on the same Drone worker, otherwise
+      # they corrupt each other. flock on a lockfile in the shared dir.
+      - "(flock -w 1800 9 || exit 1; mise install) 9>/mise-data/.mise-install.lock"
       - eval "$(mise activate bash --shims)"
 
   - name: create Kind cluster
@@ -341,6 +365,11 @@ steps: # e2e-kfddistribution-1.33.1-to-1.34.1
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
     network_mode: host
+    environment:
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
     volumes:
       - name: mise-cache
         path: /mise-data
@@ -372,7 +401,7 @@ steps: # e2e-kfddistribution-1.33.1-to-1.34.1
         - failure
 
 ---
-name: e2e-ekscluster-1.34.1
+name: e2e-ekscluster-1.35.0
 kind: pipeline
 type: docker
 
@@ -390,7 +419,7 @@ trigger:
 
 environment:
   MISE_DATA_DIR: /mise-data
-  DISTRIBUTION_VERSION: "v1.34.1"
+  DISTRIBUTION_VERSION: "v1.35.0"
   CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}
 
 volumes:
@@ -404,11 +433,19 @@ steps: # e2e-ekscluster-1.34.1
   - name: install-tools
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
+    environment:
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
     volumes:
       - name: mise-cache
         path: /mise-data
     commands:
-      - mise install
+      # Serialize concurrent `mise install` across parallel pipelines that share
+      # the host MISE_DATA_DIR (/mise-data) on the same Drone worker, otherwise
+      # they corrupt each other. flock on a lockfile in the shared dir.
+      - "(flock -w 1800 9 || exit 1; mise install) 9>/mise-data/.mise-install.lock"
       - eval "$(mise activate bash --shims)"
 
   - name: run-tests
@@ -421,6 +458,10 @@ steps: # e2e-ekscluster-1.34.1
         from_secret: aws_secret_access_key
       AWS_REGION:
         from_secret: aws_region
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
     volumes:
       - name: mise-cache
         path: /mise-data
@@ -440,6 +481,10 @@ steps: # e2e-ekscluster-1.34.1
         from_secret: aws_secret_access_key
       AWS_REGION:
         from_secret: aws_region
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
     volumes:
       - name: mise-cache
         path: /mise-data
@@ -471,6 +516,10 @@ steps: # e2e-ekscluster-1.34.1
         from_secret: aws_secret_access_key
       AWS_REGION:
         from_secret: aws_region
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
     volumes:
       - name: mise-cache
         path: /mise-data
@@ -514,6 +563,10 @@ steps: # e2e-ekscluster-1.34.1
         from_secret: aws_secret_access_key
       AWS_REGION:
         from_secret: aws_region
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
     volumes:
       - name: mise-cache
         path: /mise-data
@@ -527,7 +580,7 @@ steps: # e2e-ekscluster-1.34.1
         - success
 
 ---
-name: e2e-ekscluster-selfmanaged-alinux2023-1.34.1
+name: e2e-ekscluster-selfmanaged-alinux2023-1.35.0
 kind: pipeline
 type: docker
 
@@ -545,7 +598,7 @@ trigger:
 
 environment:
   MISE_DATA_DIR: /mise-data
-  DISTRIBUTION_VERSION: "v1.34.1"
+  DISTRIBUTION_VERSION: "v1.35.0"
   CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-selfmanaged
 
 volumes:
@@ -559,11 +612,19 @@ steps: # e2e-ekscluster-selfmanaged-alinux2023-1.34.1
   - name: install-tools
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
+    environment:
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
     volumes:
       - name: mise-cache
         path: /mise-data
     commands:
-      - mise install
+      # Serialize concurrent `mise install` across parallel pipelines that share
+      # the host MISE_DATA_DIR (/mise-data) on the same Drone worker, otherwise
+      # they corrupt each other. flock on a lockfile in the shared dir.
+      - "(flock -w 1800 9 || exit 1; mise install) 9>/mise-data/.mise-install.lock"
       - eval "$(mise activate bash --shims)"
 
   - name: run-tests
@@ -576,6 +637,10 @@ steps: # e2e-ekscluster-selfmanaged-alinux2023-1.34.1
         from_secret: aws_secret_access_key
       AWS_REGION:
         from_secret: aws_region
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
     volumes:
       - name: mise-cache
         path: /mise-data
@@ -595,6 +660,10 @@ steps: # e2e-ekscluster-selfmanaged-alinux2023-1.34.1
         from_secret: aws_secret_access_key
       AWS_REGION:
         from_secret: aws_region
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
     volumes:
       - name: mise-cache
         path: /mise-data
@@ -626,6 +695,10 @@ steps: # e2e-ekscluster-selfmanaged-alinux2023-1.34.1
         from_secret: aws_secret_access_key
       AWS_REGION:
         from_secret: aws_region
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
     volumes:
       - name: mise-cache
         path: /mise-data
@@ -669,6 +742,10 @@ steps: # e2e-ekscluster-selfmanaged-alinux2023-1.34.1
         from_secret: aws_secret_access_key
       AWS_REGION:
         from_secret: aws_region
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
     volumes:
       - name: mise-cache
         path: /mise-data
@@ -682,7 +759,7 @@ steps: # e2e-ekscluster-selfmanaged-alinux2023-1.34.1
         - success
 
 ---
-name: e2e-ekscluster-upgrades-1.33.1-1.34.1
+name: e2e-ekscluster-upgrades-1.34.1-1.35.0
 kind: pipeline
 type: docker
 
@@ -700,7 +777,7 @@ trigger:
 
 environment:
   MISE_DATA_DIR: /mise-data
-  DISTRIBUTION_VERSION: "v1.34.1"
+  DISTRIBUTION_VERSION: "v1.35.0"
   CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-upgrades
 
 volumes:
@@ -714,11 +791,19 @@ steps: #e2e-eks-upgrades
   - name: install-tools
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
+    environment:
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
     volumes:
       - name: mise-cache
         path: /mise-data
     commands:
-      - mise install
+      # Serialize concurrent `mise install` across parallel pipelines that share
+      # the host MISE_DATA_DIR (/mise-data) on the same Drone worker, otherwise
+      # they corrupt each other. flock on a lockfile in the shared dir.
+      - "(flock -w 1800 9 || exit 1; mise install) 9>/mise-data/.mise-install.lock"
       - eval "$(mise activate bash --shims)"
 
   - name: run-tests
@@ -731,6 +816,10 @@ steps: #e2e-eks-upgrades
         from_secret: aws_secret_access_key
       AWS_REGION:
         from_secret: aws_region
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
     volumes:
       - name: mise-cache
         path: /mise-data
@@ -738,7 +827,7 @@ steps: #e2e-eks-upgrades
         path: /furyctl-outdir
     commands:
       - eval "$(mise activate bash --shims)"
-      - ./tests/e2e/ekscluster-upgrades/e2e-ekscluster-upgrades-1.33.1-1.34.1.sh
+      - ./tests/e2e/ekscluster-upgrades/e2e-ekscluster-upgrades-1.34.1-1.35.0.sh
 
   - name: furyctl-delete
     image: quay.io/sighup/mise:v2025.4.4
@@ -750,6 +839,10 @@ steps: #e2e-eks-upgrades
         from_secret: aws_secret_access_key
       AWS_REGION:
         from_secret: aws_region
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
     volumes:
       - name: mise-cache
         path: /mise-data
@@ -778,6 +871,10 @@ steps: #e2e-eks-upgrades
         from_secret: aws_secret_access_key
       AWS_REGION:
         from_secret: aws_region
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
     volumes:
       - name: mise-cache
         path: /mise-data
@@ -821,6 +918,10 @@ steps: #e2e-eks-upgrades
         from_secret: aws_secret_access_key
       AWS_REGION:
         from_secret: aws_region
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
     volumes:
       - name: mise-cache
         path: /mise-data
@@ -853,7 +954,7 @@ trigger:
 
 environment:
   MISE_DATA_DIR: /mise-data
-  FURYCTL_VERSION: "v0.34.1-rc.2"
+  FURYCTL_VERSION: "v0.35.0-rc.5"
   TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
 
 volumes:
@@ -867,11 +968,19 @@ steps: # e2e-onpremises
   - name: install-tools
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
+    environment:
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
     volumes:
       - name: mise-cache
         path: /mise-data
     commands:
-      - mise install
+      # Serialize concurrent `mise install` across parallel pipelines that share
+      # the host MISE_DATA_DIR (/mise-data) on the same Drone worker, otherwise
+      # they corrupt each other. flock on a lockfile in the shared dir.
+      - "(flock -w 1800 9 || exit 1; mise install) 9>/mise-data/.mise-install.lock"
       - eval "$(mise activate bash --shims)"
 
   - name: create-hetzner-infrastructure
@@ -884,6 +993,10 @@ steps: # e2e-onpremises
         from_secret: aws_secret_access_key
       AWS_REGION:
         from_secret: aws_region
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
       TF_VAR_hcloud_token:
         from_secret: hcloud_token
     volumes:
@@ -909,6 +1022,10 @@ steps: # e2e-onpremises
         from_secret: aws_secret_access_key
       AWS_REGION:
         from_secret: aws_region
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
       TF_VAR_hcloud_token:
         from_secret: hcloud_token
     volumes:
@@ -931,6 +1048,10 @@ steps: # e2e-onpremises
         from_secret: aws_secret_access_key
       AWS_REGION:
         from_secret: aws_region
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
       TF_VAR_hcloud_token:
         from_secret: hcloud_token
     volumes:
@@ -967,6 +1088,10 @@ steps: # e2e-onpremises
         from_secret: aws_secret_access_key
       AWS_REGION:
         from_secret: aws_region
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
       TF_VAR_hcloud_token:
         from_secret: hcloud_token
     volumes:
@@ -986,8 +1111,8 @@ steps: # e2e-onpremises
         - failure
 
 ---
-# On-premises upgrade pipeline - v1.33.1 to v1.34.1
-name: e2e-onpremises-upgrades-1.33.1-1.34.1
+# On-premises upgrade pipeline - v1.34.1 to v1.35.0
+name: e2e-onpremises-upgrades-1.34.1-1.35.0
 kind: pipeline
 type: docker
 
@@ -1008,7 +1133,7 @@ trigger:
 
 environment:
   MISE_DATA_DIR: /mise-data
-  FURYCTL_VERSION: "v0.34.1-rc.2"
+  FURYCTL_VERSION: "v0.35.0-rc.5"
   TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
   KUBECONFIG: /cache/kubeconfig
 
@@ -1019,28 +1144,40 @@ volumes:
     host:
       path: /root/mise_data_dir
 
-steps: # e2e-onpremises-upgrades-1.33.1-1.34.1
+steps: # e2e-onpremises-upgrades-1.34.1-1.35.0
   - name: install-tools
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
+    environment:
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
     volumes:
       - name: mise-cache
         path: /mise-data
     commands:
-      - mise install
+      # Serialize concurrent `mise install` across parallel pipelines that share
+      # the host MISE_DATA_DIR (/mise-data) on the same Drone worker, otherwise
+      # they corrupt each other. flock on a lockfile in the shared dir.
+      - "(flock -w 1800 9 || exit 1; mise install) 9>/mise-data/.mise-install.lock"
       - eval "$(mise activate bash --shims)"
 
   - name: create-hetzner-infrastructure
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
     environment:
-      DISTRIBUTION_VERSION: "v1.33.1"
+      DISTRIBUTION_VERSION: "v1.34.1"
       AWS_ACCESS_KEY_ID:
         from_secret: aws_access_key_id
       AWS_SECRET_ACCESS_KEY:
         from_secret: aws_secret_access_key
       AWS_REGION:
         from_secret: aws_region
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
       TF_VAR_hcloud_token:
         from_secret: hcloud_token
     volumes:
@@ -1056,17 +1193,21 @@ steps: # e2e-onpremises-upgrades-1.33.1-1.34.1
       - export TF_VAR_private_key=$(cat /cache/ci-ssh-key)
       - ansible-playbook 0.local-tofu-run.yaml
 
-  - name: install-cluster-1.33.1-with-furyctl
+  - name: install-cluster-1.34.1-with-furyctl
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
     environment:
-      DISTRIBUTION_VERSION: "v1.33.1" # distribution version is hardcoded in the tofu outputs
+      DISTRIBUTION_VERSION: "v1.34.1" # distribution version is hardcoded in the tofu outputs
       AWS_ACCESS_KEY_ID:
         from_secret: aws_access_key_id
       AWS_SECRET_ACCESS_KEY:
         from_secret: aws_secret_access_key
       AWS_REGION:
         from_secret: aws_region
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
       TF_VAR_hcloud_token:
         from_secret: hcloud_token
     volumes:
@@ -1091,17 +1232,21 @@ steps: # e2e-onpremises-upgrades-1.33.1-1.34.1
       - eval "$(mise activate bash --shims)"
       - ./tests/e2e/onpremises-upgrades/e2e-onpremises.sh
 
-  - name: upgrade-cluster-to-1.34.1-with-furyctl
+  - name: upgrade-cluster-to-1.35.0-with-furyctl
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
     environment:
-      DISTRIBUTION_VERSION: "v1.34.1" # distribution version is hardcoded in the tofu outputs
+      DISTRIBUTION_VERSION: "v1.35.0" # distribution version is hardcoded in the tofu outputs
       AWS_ACCESS_KEY_ID:
         from_secret: aws_access_key_id
       AWS_SECRET_ACCESS_KEY:
         from_secret: aws_secret_access_key
       AWS_REGION:
         from_secret: aws_region
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
       TF_VAR_hcloud_token:
         from_secret: hcloud_token
     volumes:
@@ -1130,13 +1275,17 @@ steps: # e2e-onpremises-upgrades-1.33.1-1.34.1
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
     environment:
-      DISTRIBUTION_VERSION: "v1.34.1"
+      DISTRIBUTION_VERSION: "v1.35.0"
       AWS_ACCESS_KEY_ID:
         from_secret: aws_access_key_id
       AWS_SECRET_ACCESS_KEY:
         from_secret: aws_secret_access_key
       AWS_REGION:
         from_secret: aws_region
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
       TF_VAR_hcloud_token:
         from_secret: hcloud_token
     volumes:

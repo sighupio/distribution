@@ -70,4 +70,10 @@ routes:
       - allow:
           and:
             - authenticated_user: true
+  - from: https://whisker.internal.example.com
+    to: http://whisker.calico-system.svc.cluster.local:8081
+    policy:
+      - allow:
+          and:
+            - authenticated_user: true
 

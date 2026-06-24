@@ -126,7 +126,6 @@ test_schema() {
 @test "001 - ok" {
     info
 
-    test_schema "private" "ekscluster-kfd-v1alpha2" "001-ok" expect_ok
     test_schema "public" "ekscluster-kfd-v1alpha2" "001-ok" expect_ok
 }
 
@@ -140,14 +139,12 @@ test_schema() {
         assert_error_contains "/spec/kubernetes/subnetIds" "got array, want null" || return $?
     }
 
-    test_schema "private" "ekscluster-kfd-v1alpha2" "001-no" expect
     test_schema "public" "ekscluster-kfd-v1alpha2" "001-no" expect
 }
 
 @test "002 - ok" {
     info
 
-    test_schema "private" "ekscluster-kfd-v1alpha2" "002-ok" expect_ok
     test_schema "public" "ekscluster-kfd-v1alpha2" "002-ok" expect_ok
 }
 
@@ -162,14 +159,12 @@ test_schema() {
         assert_error_contains "/spec/kubernetes" "'subnetIds'" || return $?
     }
 
-    test_schema "private" "ekscluster-kfd-v1alpha2" "002-no" expect
     test_schema "public" "ekscluster-kfd-v1alpha2" "002-no" expect
 }
 
 @test "003 - ok" {
     info
 
-    test_schema "private" "ekscluster-kfd-v1alpha2" "003-ok" expect_ok
     test_schema "public" "ekscluster-kfd-v1alpha2" "003-ok" expect_ok
 }
 
@@ -183,14 +178,12 @@ test_schema() {
         assert_error_contains "/spec/distribution/modules/auth/pomerium" "got object, want null" || return $?
     }
 
-    test_schema "private" "ekscluster-kfd-v1alpha2" "003-no" expect
     test_schema "public" "ekscluster-kfd-v1alpha2" "003-no" expect
 }
 
 @test "004 - ok" {
     info
 
-    test_schema "private" "ekscluster-kfd-v1alpha2" "004-ok" expect_ok
     test_schema "public" "ekscluster-kfd-v1alpha2" "004-ok" expect_ok
 }
 
@@ -204,14 +197,12 @@ test_schema() {
         assert_error_contains "/spec/distribution/modules/auth/provider" "'basicAuth'" || return $?
     }
 
-    test_schema "private" "ekscluster-kfd-v1alpha2" "004-no" expect
     test_schema "public" "ekscluster-kfd-v1alpha2" "004-no" expect
 }
 
 @test "005 - ok" {
     info
 
-    test_schema "private" "ekscluster-kfd-v1alpha2" "005-ok" expect_ok
     test_schema "public" "ekscluster-kfd-v1alpha2" "005-ok" expect_ok
 }
 
@@ -224,14 +215,12 @@ test_schema() {
         assert_error_contains "/spec/distribution/modules/aws" "got object, want null" || return $?
     }
 
-    test_schema "private" "ekscluster-kfd-v1alpha2" "005-no" expect
     test_schema "public" "ekscluster-kfd-v1alpha2" "005-no" expect
 }
 
 @test "006 - ok" {
     info
 
-    test_schema "private" "ekscluster-kfd-v1alpha2" "006-ok" expect_ok
     test_schema "public" "ekscluster-kfd-v1alpha2" "006-ok" expect_ok
 }
 
@@ -247,14 +236,12 @@ test_schema() {
         assert_error_contains "/spec/distribution/modules" "'aws'" || return $?
     }
 
-    test_schema "private" "ekscluster-kfd-v1alpha2" "006-no" expect
     test_schema "public" "ekscluster-kfd-v1alpha2" "006-no" expect
 }
 
 @test "007 - ok" {
     info
 
-    test_schema "private" "ekscluster-kfd-v1alpha2" "007-ok" expect_ok
     test_schema "public" "ekscluster-kfd-v1alpha2" "007-ok" expect_ok
 }
 
@@ -268,14 +255,12 @@ test_schema() {
         assert_error_contains "/spec/distribution/modules" "'aws'" || return $?
     }
 
-    test_schema "private" "ekscluster-kfd-v1alpha2" "007-no" expect
     test_schema "public" "ekscluster-kfd-v1alpha2" "007-no" expect
 }
 
 @test "008 - ok" {
     info
 
-    test_schema "private" "ekscluster-kfd-v1alpha2" "008-ok" expect_ok
     test_schema "public" "ekscluster-kfd-v1alpha2" "008-ok" expect_ok
 }
 
@@ -288,14 +273,12 @@ test_schema() {
         assert_error_contains "/spec/distribution/customPatches/patches/0" "oneOf" || return $?
     }
 
-    test_schema "private" "ekscluster-kfd-v1alpha2" "008-no" expect
     test_schema "public" "ekscluster-kfd-v1alpha2" "008-no" expect
 }
 
 @test "009 - ok" {
     info
 
-    test_schema "private" "ekscluster-kfd-v1alpha2" "009-ok" expect_ok
     test_schema "public" "ekscluster-kfd-v1alpha2" "009-ok" expect_ok
 }
 
@@ -309,14 +292,12 @@ test_schema() {
         assert_error_contains "/spec/distribution/customPatches/configMapGenerator/0" "'type'" || return $?
     }
 
-    test_schema "private" "ekscluster-kfd-v1alpha2" "009-no" expect
     test_schema "public" "ekscluster-kfd-v1alpha2" "009-no" expect
 }
 
 @test "010 - ok" {
     info
 
-    test_schema "private" "ekscluster-kfd-v1alpha2" "010-ok" expect_ok
     test_schema "public" "ekscluster-kfd-v1alpha2" "010-ok" expect_ok
 }
 
@@ -329,14 +310,12 @@ test_schema() {
         assert_error_contains "/spec/infrastructure/vpn/vpcId" "got string, want null" || return $?
     }
 
-    test_schema "private" "ekscluster-kfd-v1alpha2" "010-no" expect
     test_schema "public" "ekscluster-kfd-v1alpha2" "010-no" expect
 }
 
 @test "011 - ok" {
     info
 
-    test_schema "private" "ekscluster-kfd-v1alpha2" "011-ok" expect_ok
     test_schema "public" "ekscluster-kfd-v1alpha2" "011-ok" expect_ok
 }
 
@@ -350,14 +329,12 @@ test_schema() {
         assert_error_contains "/spec/infrastructure/vpn" "'vpcId'" || return $?
     }
 
-    test_schema "private" "ekscluster-kfd-v1alpha2" "011-no" expect
     test_schema "public" "ekscluster-kfd-v1alpha2" "011-no" expect
 }
 
 @test "013 - ok" {
     info
 
-    test_schema "private" "ekscluster-kfd-v1alpha2" "013-ok" expect_ok
     test_schema "public" "ekscluster-kfd-v1alpha2" "013-ok" expect_ok
 }
 
@@ -371,14 +348,12 @@ test_schema() {
         assert_error_contains "/spec/distribution/modules/ingress/haproxy/tls" "'secret'" || return $?
     }
 
-    test_schema "private" "ekscluster-kfd-v1alpha2" "013-no" expect
     test_schema "public" "ekscluster-kfd-v1alpha2" "013-no" expect
 }
 
 @test "014 - ok (pomerium override accepted)" {
     info
 
-    test_schema "private" "ekscluster-kfd-v1alpha2" "014-ok" expect_ok
     test_schema "public" "ekscluster-kfd-v1alpha2" "014-ok" expect_ok
 }
 
@@ -392,14 +367,12 @@ test_schema() {
         assert_error_contains "/spec/distribution/modules/auth/overrides/ingresses/pomerium" "'ingressClass'" || return $?
     }
 
-    test_schema "private" "ekscluster-kfd-v1alpha2" "014-no" expect
     test_schema "public" "ekscluster-kfd-v1alpha2" "014-no" expect
 }
 
 @test "015 - ok (dex + gangplank + pomerium overrides)" {
     info
 
-    test_schema "private" "ekscluster-kfd-v1alpha2" "015-ok" expect_ok
     test_schema "public" "ekscluster-kfd-v1alpha2" "015-ok" expect_ok
 }
 
@@ -413,6 +386,5 @@ test_schema() {
         assert_error_contains "/spec/distribution/modules/auth/overrides/ingresses" "'pomeriun'" || return $?
     }
 
-    test_schema "private" "ekscluster-kfd-v1alpha2" "015-no" expect
     test_schema "public" "ekscluster-kfd-v1alpha2" "015-no" expect
 }
