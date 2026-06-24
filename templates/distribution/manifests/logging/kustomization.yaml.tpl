@@ -190,7 +190,7 @@ patches:
 {{- if eq $loggingType "opensearch" "loki" }}
 secretGenerator:
   {{- if eq $loggingType "loki" }}
-  - name: loki
+  - name: loki-distributed
     namespace: logging
     behavior: merge
     files:
