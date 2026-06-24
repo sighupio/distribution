@@ -231,6 +231,10 @@ data:
             disableAuth: false
             host: ""
             ingressClass: ""
+          whisker:
+            disableAuth: false
+            host: ""
+            ingressClass: ""
     # policy module configuration
     policy:
       overrides:
