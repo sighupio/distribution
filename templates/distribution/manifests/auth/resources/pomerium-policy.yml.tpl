@@ -150,8 +150,8 @@ routes:
   - from: https://{{ template "whiskerUrl" .spec }}
     to: http://whisker.calico-system.svc.cluster.local:8081
     policy:
-      {{- if and (index .spec.distribution.modules.auth.pomerium "defaultRoutesPolicy") (index .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy "whiskerUi") }}
-      {{- .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.whiskerUi | toYaml | nindent 6 }}
+      {{- if and (index .spec.distribution.modules.auth.pomerium "defaultRoutesPolicy") (index .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy "whisker") }}
+      {{- .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.whisker | toYaml | nindent 6 }}
       {{- else }}
       - allow:
           and:

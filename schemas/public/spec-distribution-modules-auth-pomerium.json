@@ -94,7 +94,7 @@
             "type": "object"
           }
         },
-        "whiskerUi": {
+        "whisker": {
           "type": "array",
           "items": {
             "type": "object"
