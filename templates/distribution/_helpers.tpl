@@ -310,10 +310,6 @@ cert-manager.io/cluster-issuer: {{ .spec.distribution.modules.ingress.certManage
   {{- template "ingressHost" (dict "module" "ingress" "package" "forecastle" "prefix" "directory." "spec" .) -}}
 {{ end }}
 
-{{ define "cerebroUrl" }}
-  {{- template "ingressHost" (dict "module" "logging" "package" "cerebro" "prefix" "cerebro." "spec" .) -}}
-{{ end }}
-
 {{ define "gpmUrl" }}
   {{- template "ingressHost" (dict "module" "policy" "package" "gpm" "prefix" "gpm." "spec" .) -}}
 {{ end }}

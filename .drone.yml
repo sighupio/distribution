@@ -95,10 +95,11 @@ steps: # qa
         path: /mise-data
     commands:
       - eval "$(mise activate bash --shims)"
-      - mkdir -p /tmp/test-kfddistribution /tmp/test-ekscluster /tmp/test-onpremises
+      - mkdir -p /tmp/test-kfddistribution /tmp/test-ekscluster /tmp/test-onpremises /tmp/test-immutable
       - furyctl create config --kind KFDDistribution --version v1.35.0 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-kfddistribution
       - furyctl create config --kind EKSCluster --version v1.35.0 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-ekscluster
       - furyctl create config --kind OnPremises --version v1.35.0 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-onpremises
+      - furyctl create config --kind Immutable --version v1.35.0 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-immutable
 
   - name: test-templates-regressions
     image: quay.io/sighup/mise:v2025.4.4
@@ -154,7 +155,7 @@ steps: # qa
       - render
     commands:
       # we use --ignore-deprecations because we don't want the CI to fail when the API has not been removed yet.
-      - /pluto detect distribution.yml --ignore-deprecations --target-versions=k8s=v1.34.0
+      - /pluto detect distribution.yml --ignore-deprecations --target-versions=k8s=v1.35.0
 
 ---
 name: e2e-kfddistribution-1.35
