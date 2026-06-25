@@ -70,3 +70,17 @@ Example:
 If there's any future work that could improve or extend on the work you've done in this PR you can mention it so
 this PR can be used as context for that.
 -->
+
+### Self-assestment checklist 🏁
+
+> [!IMPORTANT]
+> Make sure that you completed this checklist before asking for review.
+>
+> PRs that do not have this checklist ready won't be reviewed.
+
+- [ ] My PR is has a clear scope and does not mix together several unrelated changes
+- [ ] I've updated the `docs/releases/unreleased.md` file (or equivalent)
+- [ ] I've tested the proposed changes and wrote the tests performed in the section above
+- [ ] My branch is up-to-date with the target branch and there are no conflicts
+- [ ] I've considered all the different kinds (KFDDistribution, OnPremises, EKSCluster, Immutable) that may be affected by this change
+- [ ] CI is green
