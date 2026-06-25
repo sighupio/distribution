@@ -46,13 +46,22 @@ Once you install fury for the first time, if you change mind about a configurati
 
 The rules for immutable fields and migrations are evaluated within the core logic of the `furyctl` tool. These rules are defined in the configuration files and enforced by the tool to ensure consistency and prevent misconfigurations.
 
-These rules serve as safety mechanisms during module changes (e.g., switching from the Loki logging system to OpenSearch). Some changes are allowed, while others are not. For example, fields marked as `immutable` will return an error if an attempt is made to change them.
+These rules serve as safety mechanisms during module changes (e.g., switching from the Loki logging system to OpenSearch). Some changes are allowed, while others are not.
 
-The rules are configured in the `rules` folder, and the commands/scripts executed for each rule are found in `templates/distribution/scripts/pre-apply.sh.tpl`.
+The rules live in the `rules/<kind>-kfd-v1alpha2.yaml` files, one per phase section (`infrastructure`, `kubernetes`, `distribution`). Each rule targets a config `path` and can carry three independent kinds of behaviour:
 
-Additionally, **Reducers** are special fields rendered inside the template engine that indicate whether a particular feature or module of the distribution has changed. The `.to` and `.from` strings indicate these changes precisely.
+- **`immutable: true`** — the field cannot change after the first apply; any change returns an error at preflight.
+- **`unsupported`** — a list of forbidden transitions, each with `from`/`to`/`reason`. furyctl blocks the change at preflight when a diff matches a condition (`from` only, `to` only, or both). A rule can declare `unsupported` **without** any reducer: the block does not depend on reducers being present. `from: none`/`to: none` here match the string value `"none"`, not an absent (nil) field.
+- **`reducers`** — a list of `{key, lifecycle}` entries. When the targeted path changes, furyctl fills the reducer's `.from`/`.to` from the diff and runs the artifact named after its `lifecycle`. Reducers are how "when this changes, run that" is expressed, fully data-driven from the rules (no Go changes needed to add one).
 
-For example from logging `loki` to `opensearch` the `.form` key contains the previous value `loki` and the key `.to` contains `opensearch` so you can run the `deleteLoki` script by checking the `.from` key. The new module `opensearch` will then be installed by the standard apply flow. (`templates/distribution/scripts/pre-apply.sh.tpl:106`)
+A single rule can combine all three (e.g. `kubeProxy.type` is `immutable: false` with several `unsupported` directions **and** a `reducers` entry for the allowed direction).
+
+**How reducers run, per phase:**
+
+- **distribution phase** — the reducers are injected into the template engine as `reducers.<key>.{from,to}`, the templates are re-rendered, and the script `templates/distribution/scripts/<lifecycle>.sh` is executed. Example: switching logging from `loki` to `opensearch`, the reducer's `.from` is `loki` and `.to` is `opensearch`, so `pre-apply.sh` can run the `deleteLoki` step by checking `.from`; the new module is then installed by the standard apply flow (`templates/distribution/scripts/pre-apply.sh.tpl`).
+- **kubernetes phase (onpremises)** — the analogue uses Ansible: furyctl writes the reducers to an extra-vars file and runs the playbook `templates/kubernetes/onpremises/migrations/<lifecycle>.yaml`, passing `reducers.<key>.{from,to}`. Example: `kubeProxy.type` carries a reducer with `lifecycle: post-kubernetes`, so `migrations/post-kubernetes.yaml` performs the `ipvs`/`nil` → `nftables` migration on the cluster. Adding a new kubernetes-phase migration only requires a new rule with a `reducers` block plus a new `migrations/<lifecycle>.yaml` playbook — no furyctl code changes.
+
+> Note on new fields: when a field is added to a config that never had it (e.g. the new `kubeProxy.type`), the stored config has no value for it, so the diff is `nil -> <value>`. furyctl expands the parent-object change down to the leaf so leaf-targeted reducers/unsupported rules still match this case.
 
 </details>
 
