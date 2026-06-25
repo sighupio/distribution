@@ -57,3 +57,23 @@ tools:
       version: 1.10.0
     furyagent:
       version: 0.4.0
+  onpremises:
+    ansible:
+      version: 2.21.0
+      python: "3.12"
+      uv: "0.9"
+      collections:
+        - name: ansible.posix
+          version: 2.2.0
+        - name: community.general
+          version: 13.0.1
+  immutable:
+    ansible:
+      version: 2.21.0
+      python: "3.12"
+      uv: "0.9"
+      collections:
+        - name: ansible.posix
+          version: 2.2.0
+        - name: community.general
+          version: 13.0.1
