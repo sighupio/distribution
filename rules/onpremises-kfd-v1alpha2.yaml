@@ -26,6 +26,14 @@ kubernetes:
         reason: "disabling kube-proxy on an existing cluster is not supported and requires manual intervention to remove the kube-proxy DaemonSet."
       - from: none
         reason: "enabling kube-proxy on a cluster where it was never installed is not supported and requires manual intervention."
+      - to: ipvs
+        reason: "kube-proxy IPVS mode is deprecated; only migration to nftables is supported on an existing cluster."
+    reducers:
+      # Only ipvs->nftables and nil->nftables reach this point (the unsupported
+      # rules above block every other direction). The migration playbook lives at
+      # templates/kubernetes/onpremises/migrations/post-kubernetes.yaml.
+      - key: kubeProxyType
+        lifecycle: post-kubernetes
 distribution:
   - path: .spec.distribution.common.networkPoliciesEnabled
     immutable: false
