@@ -71,7 +71,7 @@ If there's any future work that could improve or extend on the work you've done 
 this PR can be used as context for that.
 -->
 
-### Self-assestment checklist 🏁
+### Self-assessment checklist 🏁
 
 > [!IMPORTANT]
 > Make sure that you completed this checklist before asking for review.
@@ -84,3 +84,4 @@ this PR can be used as context for that.
 - [ ] My branch is up-to-date with the target branch and there are no conflicts
 - [ ] I've considered all the different kinds (KFDDistribution, OnPremises, EKSCluster, Immutable) that may be affected by this change
 - [ ] CI is green
+
