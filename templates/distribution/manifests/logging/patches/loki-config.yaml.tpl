@@ -1,7 +1,6 @@
 # Copyright (c) 2025-present SIGHUP s.r.l. All rights reserved.
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
-#
 
 analytics:
   reporting_enabled: false
@@ -19,7 +18,7 @@ bloom_gateway:
     addresses: dnssrvnoa+_grpc._tcp.loki-distributed-bloom-gateway-headless.logging.svc.cluster.local
   enabled: false
 common:
-  compactor_address: 'http://loki-distributed-compactor:3100'
+  compactor_grpc_address: 'loki-distributed-compactor.logging.svc.cluster.local:9095'
   path_prefix: /var/loki
   replication_factor: 1
   storage:
@@ -42,11 +41,11 @@ common:
 {{- end }}
 frontend:
   compress_responses: true
-  log_queries_longer_than: 5s 
-  scheduler_address: loki-distributed-query-scheduler.logging.svc.cluster.local:9095
+  log_queries_longer_than: 5s
+  scheduler_address: loki-distributed-query-scheduler-headless.logging.svc.cluster.local:9095
   tail_proxy_url: http://loki-distributed-querier.logging.svc.cluster.local:3100
 frontend_worker:
-  scheduler_address: loki-distributed-query-scheduler.logging.svc.cluster.local:9095
+  scheduler_address: loki-distributed-query-scheduler-headless.logging.svc.cluster.local:9095
 index_gateway:
   mode: simple
 ingester:
@@ -60,7 +59,6 @@ ingester:
         store: memberlist
       replication_factor: 1
   wal:
-    dir: /var/loki/wal
     flush_on_shutdown: true
 limits_config:
   allow_structured_metadata: true
@@ -73,8 +71,15 @@ limits_config:
   max_label_names_per_series: 30
   retention_period: {{ .spec.distribution.modules.logging.loki.retentionTime }}
 memberlist:
+  abort_if_cluster_join_fails: true
+  advertise_port: 7946
+  bind_port: 7946
   join_members:
-  - loki-distributed-memberlist
+  - loki-distributed-memberlist.logging.svc.cluster.local
+  max_join_backoff: 1m
+  max_join_retries: 10
+  min_join_backoff: 1s
+  rejoin_interval: 90s
 pattern_ingester:
   enabled: true
 querier:
@@ -99,7 +104,7 @@ schema_config:
     schema: v11
     store: boltdb-shipper
 {{- if and (index .spec.distribution.modules.logging "loki") (index .spec.distribution.modules.logging.loki "tsdbStartDate") }}
-  - from: "{{ .spec.distribution.modules.logging.loki.tsdbStartDate }}" 
+  - from: "{{ .spec.distribution.modules.logging.loki.tsdbStartDate }}"
     index:
       period: 24h
       prefix: index_
@@ -108,10 +113,18 @@ schema_config:
     store: tsdb
 {{- end }}
 server:
+  graceful_shutdown_timeout: 5s
   grpc_listen_port: 9095
+  grpc_server_max_concurrent_streams: 1000
+  grpc_server_max_recv_msg_size: 104857600
+  grpc_server_max_send_msg_size: 104857600
+  grpc_server_min_time_between_pings: 10s
+  grpc_server_ping_without_stream_allowed: true
   http_listen_port: 3100
-  http_server_read_timeout: 600s
-  http_server_write_timeout: 600s
+  http_server_idle_timeout: 30s
+  http_server_read_timeout: 10m0s
+  http_server_write_timeout: 10m0s
+  log_level: info
 storage_config:
   bloom_shipper:
     working_directory: /var/loki/data/bloomshipper
@@ -133,6 +146,7 @@ storage_config:
     resync_interval: 5s
     index_gateway_client:
       server_address: dns+loki-distributed-index-gateway-headless.logging.svc.cluster.local:9095
+  use_thanos_objstore: false
 compactor:
   working_directory: /var/loki/compactor
   retention_enabled: {{ ne .spec.distribution.modules.logging.loki.retentionTime "0s" }}

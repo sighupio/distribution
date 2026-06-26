@@ -91,7 +91,7 @@ query_frontend:
 server:
     grpc_server_max_recv_msg_size: 4194304
     grpc_server_max_send_msg_size: 4194304
-    http_listen_port: 3100
+    http_listen_port: 3200
     http_server_read_timeout: 30s
     http_server_write_timeout: 30s
     log_format: logfmt
