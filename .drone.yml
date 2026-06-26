@@ -955,7 +955,7 @@ trigger:
 
 environment:
   MISE_DATA_DIR: /mise-data
-  FURYCTL_VERSION: "v0.35.0-rc.5"
+  FURYCTL_VERSION: "v0.35.0-rc.7"
   TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
 
 volumes:
@@ -1134,7 +1134,7 @@ trigger:
 
 environment:
   MISE_DATA_DIR: /mise-data
-  FURYCTL_VERSION: "v0.35.0-rc.5"
+  FURYCTL_VERSION: "v0.35.0-rc.7"
   TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
   KUBECONFIG: /cache/kubeconfig
 
