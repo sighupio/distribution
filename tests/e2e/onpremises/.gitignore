@@ -1,0 +1,14 @@
+# generated, ephemeral test artifacts — never commit
+kubeconfig
+pki/
+.vabbe/
+tls.crt
+tls.key
+ca.crt
+ca-key.pem
+csr.pem
+*.srl
+*.log
+.terraform/
+.terraform.lock.hcl
+terraform.plan
