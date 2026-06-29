@@ -1,0 +1,65 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# Runs the whole e2e INSIDE the single VM: the Kubernetes API and ingress live on
+# container IPs reachable only from the VM, so install AND tests run here (not on
+# the CI host). bootstrap.sh does: mise tools -> vabbe keygen -> host-prep ->
+# vabbe up -> furyctl install. Then kube-bench (CIS) and the bats suite run.
+---
+- name: Remote Setup - Run the on-premises e2e on the Docker-host VM
+  hosts: vm
+  gather_facts: false
+
+  tasks:
+    - name: Wait for the VM to be reachable via SSH
+      ansible.builtin.wait_for_connection:
+        timeout: 300
+        sleep: 15
+
+    - name: Wait for cloud-init (Docker install) to finish
+      ansible.builtin.command: cloud-init status --wait
+      changed_when: false
+
+    - name: Install mise (provides vabbe + furyctl/kubectl/ansible/bats/jq)
+      ansible.builtin.shell: |
+        set -e
+        curl -fsSL https://mise.run | sh
+        echo 'eval "$(/root/.local/bin/mise activate bash --shims)"' >> /root/.bashrc
+      args:
+        creates: /root/.local/bin/mise
+
+    - name: Clone the distribution at the tested commit
+      ansible.builtin.git:
+        repo: https://github.com/sighupio/distribution.git
+        dest: /root/distribution
+        version: "{{ lookup('env', 'DRONE_COMMIT_SHA') | default('main', true) }}"
+
+    - name: Run the vabbe bootstrap (host-prep + vabbe up + furyctl install)
+      ansible.builtin.shell: |
+        set -eo pipefail
+        export PATH="/root/.local/bin:$PATH"
+        export GITHUB_TOKEN="{{ lookup('env', 'GITHUB_TOKEN') }}"
+        ./scripts/bootstrap.sh
+      args:
+        chdir: /root/distribution/tests/e2e/onpremises
+        executable: /bin/bash
+
+    - name: Run CIS kube-bench on the node containers
+      ansible.builtin.shell: |
+        set -eo pipefail
+        ./scripts/run-kube-bench.sh
+      args:
+        chdir: /root/distribution/tests/e2e/onpremises
+        executable: /bin/bash
+
+    - name: Run the bats e2e suite against the cluster
+      ansible.builtin.shell: |
+        set -eo pipefail
+        export PATH="/root/.local/bin:$PATH"
+        eval "$(mise activate bash --shims)"
+        export KUBECONFIG=/root/distribution/tests/e2e/onpremises/config/kubeconfig
+        ./e2e-onpremises.sh
+      args:
+        chdir: /root/distribution/tests/e2e/onpremises/tests
+        executable: /bin/bash

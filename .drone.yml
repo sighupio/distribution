@@ -66,7 +66,7 @@ steps: # qa
     commands:
       - eval "$(mise activate bash --shims)"
       - bats -t tests/e2e/kfddistribution/schema.sh
-      - bats -t tests/e2e/onpremises/schema.sh
+      - bats -t tests/e2e/onpremises/tests/schema.sh
 
   - name: test-schema-immutable
     image: quay.io/sighup/mise:v2025.4.4
@@ -1025,7 +1025,7 @@ steps: # e2e-onpremises
       - export TF_VAR_private_key=$(cat /cache/ci-ssh-key)
       - ansible-playbook 0.local-tofu-run.yaml
 
-  - name: install-cluster-with-furyctl
+  - name: install-and-test-cluster
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
     environment:
@@ -1049,47 +1049,7 @@ steps: # e2e-onpremises
     commands:
       - eval "$(mise activate bash --shims)"
       - cd tests/e2e/onpremises/
-      - ansible-playbook 1.remote-furyctl-exec.yaml
-
-  - name: kube-bench-security-test
-    image: quay.io/sighup/mise:v2025.4.4
-    pull: always
-    environment:
-      AWS_ACCESS_KEY_ID:
-        from_secret: aws_access_key_id
-      AWS_SECRET_ACCESS_KEY:
-        from_secret: aws_secret_access_key
-      AWS_REGION:
-        from_secret: aws_region
-      MISE_GITHUB_TOKEN:
-        from_secret: github_token
-      GITHUB_TOKEN:
-        from_secret: github_token
-      TF_VAR_hcloud_token:
-        from_secret: hcloud_token
-    volumes:
-      - name: cache
-        path: /cache
-      - name: mise-cache
-        path: /mise-data
-    commands:
-      - eval "$(mise activate bash --shims)"
-      - cd tests/e2e/onpremises/
-      - ansible-playbook 2.remote-kube-bench-test.yaml
-
-  - name: bats-tests
-    image: quay.io/sighup/mise:v2025.4.4
-    pull: always
-    environment:
-      KUBECONFIG: /cache/kubeconfig
-    volumes:
-      - name: cache
-        path: /cache
-      - name: mise-cache
-        path: /mise-data
-    commands:
-      - eval "$(mise activate bash --shims)"
-      - ./tests/e2e/onpremises/e2e-onpremises.sh
+      - ansible-playbook 1.remote-e2e.yaml
 
   - name: delete
     image: quay.io/sighup/mise:v2025.4.4
@@ -1117,7 +1077,7 @@ steps: # e2e-onpremises
       - cd tests/e2e/onpremises/
       - export TF_VAR_public_key=$(cat /cache/ci-ssh-key.pub)
       - export TF_VAR_private_key=$(cat /cache/ci-ssh-key)
-      - ansible-playbook 3.local-tofu-destroy.yaml
+      - ansible-playbook 2.local-tofu-destroy.yaml
     when:
       status:
         - success

@@ -1,0 +1,24 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# Tools for the vabbe-based local/CI on-premises install e2e.
+# On the host (Mac or the Hetzner VM): `mise install` gets the vabbe CLI.
+# Inside the in-network runner (which mounts this folder at /work): `mise install`
+# gets furyctl/ansible/kubectl to drive the install.
+[tools]
+"github:nutellinoit/vabbe" = "0.2.0"
+
+# runner toolchain (used inside the runner to run furyctl)
+furyctl = "0.35.0-rc.8"
+kubectl = "1.35.5"
+ansible = "latest"
+python  = "3.12"
+pipx    = "latest"
+
+[env]
+# point kubectl at this folder's kubeconfig (furyctl writes ./kubeconfig here)
+KUBECONFIG = "{{config_root}}/kubeconfig"
+
+[settings]
+experimental = true
