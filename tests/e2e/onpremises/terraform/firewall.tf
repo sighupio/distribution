@@ -2,7 +2,7 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-resource "hcloud_firewall" "haproxy" {
+resource "hcloud_firewall" "vm" {
   name = "e2e-firewall-${var.ci_number}"
 
   rule {
