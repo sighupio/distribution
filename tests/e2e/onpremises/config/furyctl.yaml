@@ -1,0 +1,194 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+apiVersion: kfd.sighup.io/v1alpha2
+kind: OnPremises
+metadata:
+  name: onprem135
+spec:
+  distributionVersion: v1.35.0
+  kubernetes:
+    pkiFolder: ./pki
+    ssh:
+      username: root
+      keyPath: /root/.ssh/id_ed25519
+    dnsZone: nip.io
+    # single haproxy, no VIP: the control-plane endpoint points straight at it
+    controlPlaneAddress: 10-10-1-2.nip.io:6443
+    podCidr: 10.128.0.0/14
+    svcCidr: 172.30.0.0/16
+    loadBalancers:
+      enabled: true
+      selfmanagedRepositories: false
+      hosts:
+        - name: haproxy-10-10-1-2
+          ip: 10.10.1.2
+      # keepalived disabled = no VIP. The onprem template still renders
+      # keepalived.* unconditionally, so the fields must stay present (unused).
+      keepalived:
+        enabled: false
+        interface: eth0
+        ip: 10.250.250.179/32
+        virtualRouterId: "201"
+        passphrase: "b16cf069"
+      stats:
+        username: admin
+        password: "password"
+      additionalConfig: "{file://./haproxy-additional.cfg}"
+    masters:
+      hosts:
+        - name: controlplane0-10-10-1-3
+          ip: 10.10.1.3
+        - name: controlplane1-10-10-1-4
+          ip: 10.10.1.4
+        - name: controlplane2-10-10-1-5
+          ip: 10.10.1.5
+    nodes:
+      - name: worker
+        hosts:
+          - name: worker0-10-10-1-9
+            ip: 10.10.1.9
+          - name: worker1-10-10-1-10
+            ip: 10.10.1.10
+          - name: worker2-10-10-1-11
+            ip: 10.10.1.11
+        taints: []
+    advanced:
+      selfmanagedRepositories: false
+      # No kube-proxy: it can't write the init-netns sysctl nf_conntrack_max inside
+      # a container node. type=none → Cilium runs in kube-proxy-replacement (eBPF).
+      kubeProxy:
+        type: none
+      containerd:
+        selfmanagedRepositories: false
+      encryption:
+        configuration: "{file://./encrypted-secret-config.yaml}"
+  distribution:
+    common:
+      # this lab has no dedicated infra nodes (3 master + 3 worker), so the
+      # distribution runs on the workers. Reference envs use role: infra.
+      nodeSelector:
+        node.kubernetes.io/role: worker
+      networkPoliciesEnabled: true
+    modules:
+      networking:
+        type: cilium
+      ingress:
+        baseDomain: ingress.10-10-1-2.nip.io
+        nginx:
+          type: single
+          tls:
+            provider: secret
+            secret:
+              cert: "{file://tls.crt}"
+              key: "{file://tls.key}"
+              ca: "{file://ca.crt}"
+        haproxy:
+          type: single
+          tls:
+            provider: secret
+            secret:
+              cert: "{file://tls.crt}"
+              key: "{file://tls.key}"
+              ca: "{file://ca.crt}"
+        certManager:
+          clusterIssuer:
+            name: letsencrypt-fury
+            email: samuele.chiocca@reevo.it
+            type: http01
+      logging:
+        type: loki
+        opensearch:
+          type: triple
+        loki:
+          backend: minio
+          tsdbStartDate: "2024-11-18"
+      monitoring:
+        type: mimir
+        mimir:
+          retentionTime: 3d
+          backend: minio
+        prometheus:
+          retentionTime: 1d
+          retentionSize: 5GiB
+          storageSize: 20Gi
+        alertmanager:
+          installDefaultRules: false
+      policy:
+        type: kyverno
+        kyverno:
+          additionalExcludedNamespaces: ["local-path-storage"]
+          installDefaultPolicies: true
+          validationFailureAction: Audit
+      dr:
+        type: on-premises
+        velero:
+          backend: minio
+          schedules:
+            install: true
+            definitions:
+              full:
+                snapshotMoveData: true
+          snapshotController:
+            install: true
+      tracing:
+        type: tempo
+        tempo:
+          backend: minio
+      auth:
+        provider:
+          type: none
+    # ----------------------------------------------------------------------------
+    # customPatches: kustomize-style overrides applied on top of the distribution.
+    # Safe examples (generators create NEW resources) are active; the resource-
+    # targeting examples are commented so `furyctl apply` won't fail if the target
+    # isn't present — uncomment and adapt as needed.
+    customPatches:
+      configMapGenerator:
+        - name: example-extra-config
+          namespace: monitoring
+          behavior: create
+          literals:
+            - EXAMPLE_FLAG=true
+      secretGenerator:
+        - name: example-extra-secret
+          namespace: monitoring
+          type: Opaque
+          behavior: create
+          literals:
+            - token=changeme
+      # images:
+      #   - name: registry.sighup.io/fury/some/image
+      #     newTag: v1.2.3
+      # patches:
+      #   - target:
+      #       group: apps
+      #       version: v1
+      #       kind: Deployment
+      #       name: forecastle
+      #       namespace: ingress-nginx
+      #     patch: |-
+      #       - op: add
+      #         path: /spec/template/metadata/annotations/example
+      #         value: "patched-by-custompatches"
+      # patchesStrategicMerge:
+      #   - |-
+      #     apiVersion: apps/v1
+      #     kind: Deployment
+      #     metadata:
+      #       name: cert-manager
+      #       namespace: cert-manager
+      #     spec:
+      #       template:
+      #         metadata:
+      #           annotations:
+      #             example: strategic-merge
+  plugins:
+    # local-path-provisioner as the default StorageClass. longhorn (the usual
+    # on-prem storage) needs open-iscsi/iscsid on the nodes, which is hostile in
+    # container-nodes; local-path uses node-local dirs and works in containers.
+    kustomize:
+      - name: local-path-provisioner
+        folder: ./plugins/local-path-provisioner
