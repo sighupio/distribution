@@ -1,0 +1,37 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# on-premises install e2e lab: containers acting as VMs (systemd+ssh), via vabbe.
+# 1 haproxy + 3 control plane + 3 worker on a flat 10.10.1.0/24, plus an in-network
+# `runner` that drives furyctl over SSH (the host can't reach these IPs on macOS
+# Docker Desktop, so the driver lives inside the network; works on Linux too).
+#
+# The vabbe node image bakes the container-as-VM fixes (`/` rshared, pod-reachable
+# resolv.conf, containerd volume, swap/modules handled via `vabbe host-prep`), so
+# Cilium (kube-proxy-replacement) and CoreDNS come up with no manual tweaks.
+name: onprem135
+network:
+  subnet: 10.10.1.0/24
+defaults:
+  image: ghcr.io/nutellinoit/vabbe-node:v0.2.0
+nodes:
+  - { name: haproxy-10-10-1-2,       ip: 10.10.1.2, caps: [NET_ADMIN, NET_RAW] }
+  - { name: controlplane0-10-10-1-3, ip: 10.10.1.3 }
+  - { name: controlplane1-10-10-1-4, ip: 10.10.1.4 }
+  - { name: controlplane2-10-10-1-5, ip: 10.10.1.5 }
+  - { name: worker0-10-10-1-9,       ip: 10.10.1.9 }
+  - { name: worker1-10-10-1-10,      ip: 10.10.1.10 }
+  - { name: worker2-10-10-1-11,      ip: 10.10.1.11 }
+  - name: runner
+    ip: 10.10.1.250
+    image: jdxcode/mise:latest
+    entrypoint: ["/bin/sleep", "infinity"]
+    runner: true
+    mounts:
+      - .:/work                    # this config/ dir → /work (furyctl.yaml, certs, kubeconfig)
+      - ../../../..:/distribution  # repo root → /distribution (config/ is 4 levels deep) for --distro-location
+    env:
+      GITHUB_TOKEN: "${GITHUB_TOKEN}"   # export before `vabbe up`; furyctl/mise need it (else 403)
+    # NOTE: vabbe auto-mounts the lab key at /root/.ssh/id_ed25519 on every node
+    # (incl. the runner) — don't bind it yourself. furyctl.yaml ssh.keyPath points there.
