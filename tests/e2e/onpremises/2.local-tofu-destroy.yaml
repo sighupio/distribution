@@ -11,4 +11,6 @@
   tasks:
     - name: Run tofu destroy force
       ansible.builtin.command: tofu apply -destroy -auto-approve
+      args:
+        chdir: terraform
 
