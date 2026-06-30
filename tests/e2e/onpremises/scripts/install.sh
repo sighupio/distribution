@@ -38,7 +38,19 @@ done
 [ "$ok" = 1 ] || { echo "furyctl apply failed after retries"; exit 1; }
 
 # second distribution apply, once the longhorn StorageClass is available, so the
-# storage-backed stateful components come up.
+# storage-backed stateful components come up. Retried: re-downloading modules can
+# hit transient GitHub blips.
 echo ">>> second distribution apply (storage-backed stateful components)"
 sleep 60
-furyctl apply -D --phase distribution --distro-location "$DISTRO_LOCATION"
+ok2=0
+for a in 1 2 3; do
+  echo ">>> second distribution apply attempt $a"
+  rm -rf /tmp/furyctl-* 2>/dev/null || true
+  if furyctl apply -D --phase distribution --distro-location "$DISTRO_LOCATION"; then
+    ok2=1
+    break
+  fi
+  echo ">>> second apply attempt $a failed; retry in 15s"
+  sleep 15
+done
+[ "$ok2" = 1 ] || { echo "second distribution apply failed after retries"; exit 1; }
