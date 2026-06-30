@@ -30,13 +30,13 @@
       ignore_errors: true
 
     # apt module needs python3-apt (not on the minimal cloud image at this point);
-    # use apt-get directly so the prereqs install on a bare node.
-    - name: Install node prerequisites (open-iscsi for longhorn, etc.)
+    # use apt-get directly so the prereq installs on a bare node.
+    - name: Install open-iscsi (longhorn volume attach)
       ansible.builtin.shell: |
         set -e
         export DEBIAN_FRONTEND=noninteractive
         apt-get update -qq
-        apt-get install -y -qq net-tools open-iscsi cryptsetup
+        apt-get install -y -qq open-iscsi
       changed_when: true
 
     - name: Ensure iscsid is enabled and running (longhorn volume attach)
@@ -45,9 +45,6 @@
         state: started
         enabled: true
 
-    - name: Load required kernel modules
-      ansible.builtin.command: "modprobe {{ item }}"
-      loop:
-        - dm_crypt
-        - iscsi_tcp
+    - name: Load the iscsi_tcp kernel module (longhorn volume attach)
+      ansible.builtin.command: modprobe iscsi_tcp
       changed_when: false

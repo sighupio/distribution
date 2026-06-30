@@ -17,12 +17,5 @@ LOG="${DIAG_DIR:+${DIAG_DIR}/bats-${DRONE_BUILD_NUMBER:-local}.log}"
 LOG="${LOG:-/tmp/bats.log}"
 mkdir -p "$(dirname "$LOG")" 2>/dev/null || true
 
-# install just succeeded -> everything is up; snapshot the real pod labels so we
-# can verify the bats queries actually match what's deployed (a mismatched
-# label/namespace makes a check hang for its whole loop_it budget).
-if [ -n "${DIAG_DIR:-}" ]; then
-  kubectl get pods -A --show-labels > "${DIAG_DIR}/pod-labels-${DRONE_BUILD_NUMBER:-local}.txt" 2>&1 || true
-fi
-
 timeout "$TIMEOUT" bats -t "$ONPREM/tests/e2e-onpremises.sh" 2>&1 | tee "$LOG"
 exit "${PIPESTATUS[0]}"

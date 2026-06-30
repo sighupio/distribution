@@ -29,7 +29,7 @@ locals {
   octet  = (tonumber(var.ci_number) % 200) + 10
   subnet = "10.10.${local.octet}"
 
-  # Hetzner HA topology: haproxy + 3 control planes + 3 infra + 2 workers.
+  # HA topology: haproxy + 3 control planes + 3 infra + 1 worker.
   # Sizes tuned for the worker (62GB/16 threads); control planes need >=2 vCPU
   # for the kubeadm preflight.
   nodes = {
