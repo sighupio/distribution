@@ -5,6 +5,11 @@
 
 # shellcheck disable=SC2154
 
+# Distribution smoke checks for the upgrade pipeline (calico + gatekeeper path).
+# Reused for both phases: post-install (v1.34.1) and post-upgrade (v1.35.0). The
+# haproxy ingress controller only exists after the upgrade adds it, so that single
+# check is skipped unless EXPECT_HAPROXY_INGRESS=1.
+
 load ./helper
 
 @test "Velero is Running" {
@@ -49,6 +54,8 @@ load ./helper
 
 @test "HAProxy Ingress Controller is Running" {
     info
+    # haproxy ingress is added by the upgrade; not present in the v1.34.1 base.
+    [ "${EXPECT_HAPROXY_INGRESS:-0}" = "1" ] || skip "haproxy ingress only after upgrade"
     test() {
         kubectl get pods -l app.kubernetes.io/name=kubernetes-ingress -o json -n ingress-haproxy |jq '.items[].status.containerStatuses[].ready' | uniq | grep -q true
     }
@@ -121,7 +128,6 @@ load ./helper
     info
     test() {
         kubectl get pods -l app.kubernetes.io/name=prometheus -o json -n monitoring | jq '.items[].status.containerStatuses[].ready' | uniq | grep -q true
-
     }
     loop_it test 160 10
     status=${loop_it_result}
@@ -137,14 +143,3 @@ load ./helper
     status=${loop_it_result}
     [ "$status" -eq 0 ]
 }
-
-# @test "tempo is Running" {
-#     info
-#     test(){
-#         data=$(kubectl get sts -n tracing -l app.kubernetes.io/component=ingester -o json | jq '.items[] | select(.metadata.name == "tempo-distributed-ingester" and .status.replicas == .status.readyReplicas)')
-#         if [ "${data}" == "" ]; then return 1; fi
-#     }
-#     loop_it test 60 10
-#     status=${loop_it_result}
-#     [[ "$status" -eq 0 ]]
-# }

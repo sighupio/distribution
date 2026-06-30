@@ -9,9 +9,11 @@ set -uo pipefail
 
 SCRIPTS="$(cd "$(dirname "$0")" && pwd)"
 ONPREM="$(dirname "$SCRIPTS")"
-TF="$ONPREM/terraform"
+# E2E_DIR lets the upgrades pipeline reuse this against its own tofu/config.
+E2E_DIR="${E2E_DIR:-$ONPREM}"
+TF="$E2E_DIR/tofu"
 
-INV="$ONPREM/config/prepare-hosts.ini"
+INV="$E2E_DIR/config/prepare-hosts.ini"
 {
   echo "[nodes]"
   for ip in $(cd "$TF" && tofu output -raw all_ips); do echo "$ip"; done

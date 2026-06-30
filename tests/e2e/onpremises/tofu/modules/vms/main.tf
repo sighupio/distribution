@@ -2,9 +2,10 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-# On-premises e2e infrastructure: real KVM VMs on the Drone worker via libvirt
-# (replaces the old Hetzner provider). Faithful to a bare-metal on-prem cluster —
-# full kernel, so cilium/longhorn/kube-bench behave as in production.
+# On-premises e2e infrastructure: real KVM VMs on the Drone worker via libvirt.
+# Faithful to a bare-metal on-prem cluster (full kernel) so cilium/calico,
+# longhorn and kube-bench behave as in production. Shared by the install and the
+# upgrade pipelines, parameterised so their resources never collide.
 
 terraform {
   required_providers {
@@ -15,18 +16,11 @@ terraform {
       version = "~> 0.8.0"
     }
   }
-  # Local state: the run is ephemeral and the apply/destroy steps share the Drone
-  # workspace, so no remote backend is needed.
-}
-
-provider "libvirt" {
-  uri = "qemu:///system"
 }
 
 locals {
-  # Derive a per-run /24 from the build number so concurrent CI runs get isolated
-  # networks/subnets on the shared worker and never collide.
-  octet  = (tonumber(var.ci_number) % 200) + 10
+  # Disjoint per-run /24 so concurrent runs (and the two pipelines) never collide.
+  octet  = (tonumber(var.ci_number) % var.octet_span) + var.octet_base
   subnet = "10.10.${local.octet}"
 
   # HA topology: haproxy + 3 control planes + 3 infra + 1 worker.
@@ -42,16 +36,21 @@ locals {
     infra-2        = { ip = "${local.subnet}.8", cpu = 4, mem = 12288 }
     worker-0       = { ip = "${local.subnet}.9", cpu = 2, mem = 4096 }
   }
+
+  # name_prefix-ci_number is unique per pipeline+run: domains are global in
+  # libvirt, so the prefix is what keeps install (e2e-*) and upgrade (e2eup-*)
+  # VMs from clashing. The role-prefixed name still matches the gate/cleanup regex.
+  tag = "${var.name_prefix}-${var.ci_number}"
 }
 
 resource "libvirt_pool" "p" {
-  name = "e2e-${var.ci_number}"
+  name = local.tag
   type = "dir"
-  target { path = "/var/lib/libvirt/images/e2e-${var.ci_number}" }
+  target { path = "/var/lib/libvirt/images/${local.tag}" }
 }
 
 resource "libvirt_network" "net" {
-  name      = "e2e-${var.ci_number}"
+  name      = local.tag
   mode      = "nat"
   addresses = ["${local.subnet}.0/24"]
   autostart = true
@@ -63,7 +62,7 @@ resource "libvirt_network" "net" {
 # rule it omits. A standalone disk needs only the one allow the libvirt role adds.
 resource "libvirt_volume" "disk" {
   for_each = local.nodes
-  name     = "${each.key}-${var.ci_number}.qcow2"
+  name     = "${each.key}-${local.tag}.qcow2"
   pool     = libvirt_pool.p.name
   source   = var.base_image
   format   = "qcow2"
@@ -71,7 +70,7 @@ resource "libvirt_volume" "disk" {
 
 resource "libvirt_cloudinit_disk" "ci" {
   for_each       = local.nodes
-  name           = "ci-${each.key}-${var.ci_number}.iso"
+  name           = "ci-${each.key}-${local.tag}.iso"
   pool           = libvirt_pool.p.name
   user_data      = <<-EOT
     #cloud-config
@@ -99,7 +98,7 @@ resource "libvirt_cloudinit_disk" "ci" {
 
 resource "libvirt_domain" "vm" {
   for_each  = local.nodes
-  name      = "${each.key}-${var.ci_number}"
+  name      = "${each.key}-${local.tag}"
   memory    = each.value.mem
   vcpu      = each.value.cpu
   cloudinit = libvirt_cloudinit_disk.ci[each.key].id
