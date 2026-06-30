@@ -985,7 +985,7 @@ volumes:
   - name: libvirt-base
     host:
       path: /root/libvirt_base
-  # install log + on-failure cluster snapshot; survives the teardown
+  # install + bats logs; survives the teardown so a failed run is debuggable
   - name: e2e-diag
     host:
       path: /root/e2e-diag
@@ -1128,25 +1128,6 @@ steps: # e2e-onpremises
     commands:
       - eval "$(mise activate bash --shims)"
       - bash tests/e2e/onpremises/scripts/kube-bench.sh
-
-  # on any failure, snapshot the cluster (pods/events/describe) before teardown
-  - name: diagnose
-    image: quay.io/sighup/mise:v2025.4.4
-    pull: always
-    network_mode: host
-    environment:
-      DIAG_DIR: /diag
-    volumes:
-      - name: mise-cache
-        path: /mise-data
-      - name: e2e-diag
-        path: /diag
-    commands:
-      - eval "$(mise activate bash --shims)"
-      - bash tests/e2e/onpremises/scripts/diagnose.sh
-    when:
-      status:
-        - failure
 
   - name: delete
     image: quay.io/sighup/mise:v2025.4.4
