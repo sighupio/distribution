@@ -5,6 +5,22 @@
 
 set -e
 
+wait_for_eks_active() {
+  cluster_name="$1"
+  region="$2"
+  echo "Waiting for EKS cluster ${cluster_name} to be ACTIVE with no in-progress updates..."
+  while true; do
+    status=$(aws eks describe-cluster --name "$cluster_name" --region "$region" --query 'cluster.status' --output text)
+    updates=$(aws eks list-updates --name "$cluster_name" --region "$region" --query 'updateIds' --output text)
+    if [ "$status" = "ACTIVE" ] && [ -z "$updates" ]; then
+      echo "Cluster ${cluster_name} is ACTIVE with no pending updates."
+      break
+    fi
+    echo "Cluster status: ${status}, pending updates: ${updates:-none}. Waiting 30s..."
+    sleep 30
+  done
+}
+
 echo "----------------------------------------------------------------------------"
 echo "Executing furyctl for the initial setup 1.34.1 with alinux2023"
 FURYCTL_YAML=tests/e2e/ekscluster-upgrades/manifests/furyctl-upgrade-version-1.34.1.yaml
@@ -50,6 +66,12 @@ if ! furyctl apply \
     --skip-vpn-confirmation \
     --no-tty
 fi
+
+# Wait for the cluster to be ACTIVE with no pending updates before upgrading.
+# Without this, UpdateClusterVersion fails with ResourceInUseException (HTTP 409)
+# when an update is still in progress from the initial cluster creation.
+EKS_REGION=$(yq '.spec.region' "$FURYCTL_YAML")
+wait_for_eks_active "$CLUSTER_NAME" "$EKS_REGION"
 
 echo "----------------------------------------------------------------------------"
 echo "Executing version upgrade to 1.35.0 (with alinux2023)"
