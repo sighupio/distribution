@@ -2,14 +2,37 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-output "haproxy_ip" {
-  value = hcloud_server.haproxy.ipv4_address
+locals {
+  # dashed form of the haproxy private IP for nip.io hostnames (e.g. 10-10-30-2.nip.io)
+  dash = "10-10-${local.octet}"
+}
+
+output "nodes" {
+  value = { for k, v in local.nodes : k => v.ip }
 }
 
 output "ingress_domain" {
-  value = "ingress.${replace(hcloud_server.haproxy.ipv4_address, ".", "-")}.nip.io"
+  value = "ingress.${local.dash}-2.nip.io"
 }
 
+# kube-bench runs on one representative node per role (all control planes / all
+# workers are configured identically), matching the original e2e.
+output "controlplane_0_ip" {
+  value = local.nodes["controlplane-0"].ip
+}
+
+output "worker_0_ip" {
+  value = local.nodes["worker-0"].ip
+}
+
+# all node IPs, for the prepare-nodes playbook (open-iscsi etc. on every host)
+output "all_ips" {
+  value = join(" ", [for k, v in local.nodes : v.ip])
+}
+
+# Rendered furyctl.yaml for this run's subnet. controlPlaneAddress/ingress use the
+# haproxy private IP via nip.io; node names embed their dashed IP so etcd peer URLs
+# resolve through the nip.io dnsZone. Real VMs => longhorn (iSCSI) works.
 output "furyctl_yaml" {
   value = <<EOF
 ---
@@ -18,22 +41,22 @@ kind: OnPremises
 metadata:
   name: reevo
 spec:
-  distributionVersion: v1.35.0-non-existent # to be sure we are not patching via furyctl patches
+  distributionVersion: v1.35.0
   kubernetes:
     pkiFolder: ./pki
     ssh:
       username: root
       keyPath: /cache/ci-ssh-key
     dnsZone: nip.io
-    controlPlaneAddress: ${replace(hcloud_server.haproxy.ipv4_address, ".", "-")}.nip.io:6443
+    controlPlaneAddress: ${local.dash}-2.nip.io:6443
     podCidr: 10.128.0.0/14
     svcCidr: 172.30.0.0/16
     loadBalancers:
       enabled: true
       selfmanagedRepositories: false
       hosts:
-        - name: haproxy-10-10-1-2
-          ip: 10.10.1.2
+        - name: haproxy-${local.dash}-2
+          ip: ${local.subnet}.2
       keepalived:
         enabled: false
         interface: enp0s6
@@ -46,32 +69,27 @@ spec:
       additionalConfig: "{file://./haproxy-additional.cfg}"
     masters:
       hosts:
-        - name: controlplane0-10-10-1-3
-          ip: 10.10.1.3
-        - name: controlplane1-10-10-1-4
-          ip: 10.10.1.4
-        - name: controlplane2-10-10-1-5
-          ip: 10.10.1.5
+        - name: controlplane0-${local.dash}-3
+          ip: ${local.subnet}.3
+        - name: controlplane1-${local.dash}-4
+          ip: ${local.subnet}.4
+        - name: controlplane2-${local.dash}-5
+          ip: ${local.subnet}.5
     nodes:
       - name: infra
         hosts:
-          - name: infra0-10-10-1-6
-            ip: 10.10.1.6
-          - name: infra1-10-10-1-7
-            ip: 10.10.1.7
-          - name: infra2-10-10-1-8
-            ip: 10.10.1.8
+          - name: infra0-${local.dash}-6
+            ip: ${local.subnet}.6
+          - name: infra1-${local.dash}-7
+            ip: ${local.subnet}.7
+          - name: infra2-${local.dash}-8
+            ip: ${local.subnet}.8
         taints: []
       - name: worker
         hosts:
-          - name: worker0-10-10-1-9
-            ip: 10.10.1.9
-          - name: worker1-10-10-1-10
-            ip: 10.10.1.10
+          - name: worker0-${local.dash}-9
+            ip: ${local.subnet}.9
         taints: []
-    #advancedAnsible:
-      #config: |
-      #  ansible_ssh_common_args='-o ProxyCommand="ssh -W %h:%p -q root@${hcloud_server.haproxy.ipv4_address}"'
     advanced:
       selfmanagedRepositories: false
       containerd:
@@ -81,17 +99,13 @@ spec:
   distribution:
     common:
       nodeSelector:
-         node.kubernetes.io/role: infra
-      #tolerations:
-      #  - effect: NoSchedule
-      #    key: node.kubernetes.io/role
-      #    value: infra
+        node.kubernetes.io/role: infra
       networkPoliciesEnabled: true
     modules:
       networking:
         type: cilium
       ingress:
-        baseDomain: ingress.${replace(hcloud_server.haproxy.ipv4_address, ".", "-")}.nip.io
+        baseDomain: ingress.${local.dash}-2.nip.io
         nginx:
           type: single
           tls:
@@ -111,18 +125,21 @@ spec:
         certManager:
           clusterIssuer:
             name: letsencrypt-fury
-            email: samuele.chiocca@reevo.it
+            email: example@sighup.io
             type: http01
-      logging: 
+      logging:
         type: loki
         opensearch:
           type: triple
-        loki: 
+        loki:
           backend: minio
           tsdbStartDate: "2024-11-18"
       monitoring:
-        type: mimir
-        mimir: 
+        # prometheus instead of mimir: mimir-distributed (+ its minio) is too heavy
+        # for a single-worker e2e -- minio + the distributed consumers can't come up
+        # within kapp's deadlines. prometheus keeps monitoring coverage, far lighter.
+        type: prometheus
+        mimir:
           retentionTime: 3d
           backend: minio
         prometheus:
@@ -131,15 +148,15 @@ spec:
           storageSize: 20Gi
         alertmanager:
           installDefaultRules: false
-      policy: 
+      policy:
         type: kyverno
         kyverno:
           additionalExcludedNamespaces: ["longhorn-system"]
           installDefaultPolicies: true
-          validationFailureAction: Audit    
+          validationFailureAction: Audit
       dr:
         type: on-premises
-        velero: 
+        velero:
           backend: minio
           schedules:
             install: true
@@ -148,15 +165,14 @@ spec:
                 snapshotMoveData: true
           snapshotController:
             install: true
-      tracing: 
-        type: tempo
-        tempo: 
+      tracing:
+        # none: tempo-distributed (+ its minio) is too heavy for a single-worker e2e.
+        type: none
+        tempo:
           backend: minio
       auth:
         provider:
           type: none
-
-
   plugins:
     helm:
       repositories:
@@ -170,9 +186,14 @@ spec:
           set:
             - name: persistence.defaultClassReplicaCount
               value: "1"
+            # e2e volumes are mostly empty; let longhorn over-provision so all the
+            # storage-backed modules' volumes schedule on the (thin) node disks.
+            - name: defaultSettings.storageOverProvisioningPercentage
+              value: "1000"
+            - name: defaultSettings.storageMinimalAvailablePercentage
+              value: "5"
 EOF
 }
-
 
 output "req_dns" {
   value = <<EOF
@@ -185,15 +206,29 @@ basicConstraints = CA:FALSE
 keyUsage = nonRepudiation, digitalSignature, keyEncipherment
 subjectAltName = @alt_names
 [alt_names]
-DNS.1 = ingress.${replace(hcloud_server.haproxy.ipv4_address, ".", "-")}.nip.io
-DNS.2 = *.ingress.${replace(hcloud_server.haproxy.ipv4_address, ".", "-")}.nip.io
+DNS.1 = ingress.${local.dash}-2.nip.io
+DNS.2 = *.ingress.${local.dash}-2.nip.io
 EOF
 }
 
-output "controlplane_0_ip" {
-  value = hcloud_server.controlplane[0].ipv4_address
-}
+# extra haproxy frontends/backends for ingress (referenced via {file://} in the
+# furyctl.yaml); backends are this run's worker nodePorts on its subnet.
+output "haproxy_additional" {
+  value = <<EOF
+frontend ingress-http
+    mode tcp
+    bind *:80
+    default_backend ingress-http
 
-output "worker_0_ip" {
-  value = hcloud_server.worker[0].ipv4_address
+backend ingress-http
+    server worker0 ${local.subnet}.9:31080 maxconn 256 check
+
+frontend ingress-https
+    mode tcp
+    bind *:443
+    default_backend ingress-https
+
+backend ingress-https
+    server worker0 ${local.subnet}.9:31443 maxconn 256 check
+EOF
 }
