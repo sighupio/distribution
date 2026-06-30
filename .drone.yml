@@ -1027,8 +1027,8 @@ steps: # e2e-onpremises
       - eval "$(mise activate bash --shims)"
       # host tools the libvirt provider (ISO build) + capacity gate need in the runner
       - apt-get update && apt-get install -y --no-install-recommends genisoimage libvirt-clients qemu-utils
-      # stay pending until the shared worker has RAM headroom for this run's VMs
-      - bash tests/e2e/onpremises/scripts/wait-for-capacity.sh
+      # serialize: wait until no other e2e VMs (install/upgrade) are running
+      - bash tests/e2e/onpremises/scripts/wait-for-free-worker.sh
       # cache the Ubuntu 24.04 base image on the worker (downloaded once, then reused)
       - |
         if [ ! -f /base/noble-20g.img ]; then
@@ -1048,7 +1048,7 @@ steps: # e2e-onpremises
       - tofu output -raw haproxy_additional > ../config/haproxy-additional.cfg
       - cd ../config && bash ../scripts/create_ingress_certs.sh
 
-  - name: install-and-test
+  - name: install
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
     network_mode: host
@@ -1065,8 +1065,38 @@ steps: # e2e-onpremises
         path: /mise-data
     commands:
       - eval "$(mise activate bash --shims)"
-      # furyctl create pki + apply (retry) + bats distribution checks + kube-bench
-      - bash tests/e2e/onpremises/scripts/run-e2e.sh
+      # furyctl create pki + apply, then a second distribution apply for the
+      # storage-backed stateful components (needs the longhorn StorageClass)
+      - bash tests/e2e/onpremises/scripts/install.sh
+
+  - name: itest
+    image: quay.io/sighup/mise:v2025.4.4
+    pull: always
+    network_mode: host
+    environment:
+      KUBECONFIG: /drone/src/tests/e2e/onpremises/config/kubeconfig
+    volumes:
+      - name: cache
+        path: /cache
+      - name: mise-cache
+        path: /mise-data
+    commands:
+      - eval "$(mise activate bash --shims)"
+      # bats distribution checks; bounded at 60m so a hang fails (then delete destroys)
+      - timeout 3600 bats -t tests/e2e/onpremises/tests/e2e-onpremises.sh
+
+  - name: kube-bench
+    image: quay.io/sighup/mise:v2025.4.4
+    pull: always
+    network_mode: host
+    volumes:
+      - name: cache
+        path: /cache
+      - name: mise-cache
+        path: /mise-data
+    commands:
+      - eval "$(mise activate bash --shims)"
+      - bash tests/e2e/onpremises/scripts/kube-bench.sh
 
   - name: delete
     image: quay.io/sighup/mise:v2025.4.4
@@ -1079,9 +1109,12 @@ steps: # e2e-onpremises
         path: /var/run/libvirt
     commands:
       - eval "$(mise activate bash --shims)"
+      # public_key is irrelevant for destroy but it's a required var; without it
+      # tofu would prompt and the destroy would silently fail, leaking VMs.
+      - export TF_VAR_public_key=unused
       - cd tests/e2e/onpremises/terraform
       - tofu init
-      - tofu destroy -auto-approve || true
+      - tofu destroy -auto-approve
     when:
       status:
         - success
