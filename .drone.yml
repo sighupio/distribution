@@ -1100,16 +1100,18 @@ steps: # e2e-onpremises
     pull: always
     network_mode: host
     environment:
-      KUBECONFIG: /drone/src/tests/e2e/onpremises/config/kubeconfig
+      DIAG_DIR: /diag
     volumes:
       - name: cache
         path: /cache
       - name: mise-cache
         path: /mise-data
+      - name: e2e-diag
+        path: /diag
     commands:
       - eval "$(mise activate bash --shims)"
-      # bats distribution checks; bounded at 60m so a hang fails (then delete destroys)
-      - timeout 3600 bats -t tests/e2e/onpremises/tests/e2e-onpremises.sh
+      # dumps real pod labels to /diag, then runs the bounded bats suite
+      - bash tests/e2e/onpremises/scripts/bats-test.sh
 
   - name: kube-bench
     image: quay.io/sighup/mise:v2025.4.4
