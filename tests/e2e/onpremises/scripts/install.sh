@@ -37,20 +37,7 @@ for a in 1 2 3; do
 done
 [ "$ok" = 1 ] || { echo "furyctl apply failed after retries"; exit 1; }
 
-# second distribution apply, once the longhorn StorageClass is available, so the
-# storage-backed stateful components come up. Retried: re-downloading modules can
-# hit transient GitHub blips.
-echo ">>> second distribution apply (storage-backed stateful components)"
-sleep 60
-ok2=0
-for a in 1 2 3; do
-  echo ">>> second distribution apply attempt $a"
-  rm -rf /tmp/furyctl-* 2>/dev/null || true
-  if furyctl apply -D --phase distribution --distro-location "$DISTRO_LOCATION"; then
-    ok2=1
-    break
-  fi
-  echo ">>> second apply attempt $a failed; retry in 15s"
-  sleep 15
-done
-[ "$ok2" = 1 ] || { echo "second distribution apply failed after retries"; exit 1; }
+# NOTE: no second distribution apply. open-iscsi (prepare-nodes) makes longhorn
+# attach volumes on the first pass, so a single apply brings the whole cluster up.
+# Re-applying afterwards only re-rolls a healthy cluster and overloads the
+# apiserver -- it was a workaround for the storage race that open-iscsi root-fixed.
