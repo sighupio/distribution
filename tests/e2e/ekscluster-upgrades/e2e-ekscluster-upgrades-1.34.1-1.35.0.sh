@@ -8,15 +8,14 @@ set -e
 wait_for_eks_active() {
   cluster_name="$1"
   region="$2"
-  echo "Waiting for EKS cluster ${cluster_name} to be ACTIVE with no in-progress updates..."
+  echo "Waiting for EKS cluster ${cluster_name} to be ACTIVE..."
   while true; do
     status=$(aws eks describe-cluster --name "$cluster_name" --region "$region" --query 'cluster.status' --output text)
-    updates=$(aws eks list-updates --name "$cluster_name" --region "$region" --query 'updateIds' --output text)
-    if [ "$status" = "ACTIVE" ] && [ -z "$updates" ]; then
-      echo "Cluster ${cluster_name} is ACTIVE with no pending updates."
+    if [ "$status" = "ACTIVE" ]; then
+      echo "Cluster ${cluster_name} is ACTIVE."
       break
     fi
-    echo "Cluster status: ${status}, pending updates: ${updates:-none}. Waiting 30s..."
+    echo "Cluster status: ${status}. Waiting 30s..."
     sleep 30
   done
 }
