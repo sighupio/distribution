@@ -13,14 +13,6 @@ variable "public_key" {
   description = "SSH public key injected into every VM via cloud-init (furyctl authenticates with the matching private key)."
 }
 
-# Kept for drop-in compatibility with the old Hetzner var contract; unused by the
-# libvirt provider (furyctl reads the private key from its keyPath directly).
-variable "private_key" {
-  type      = string
-  sensitive = true
-  default   = ""
-}
-
 variable "base_image" {
   type        = string
   default     = "/base/noble-100g.img"
