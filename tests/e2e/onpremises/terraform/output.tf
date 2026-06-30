@@ -84,8 +84,6 @@ spec:
         hosts:
           - name: worker0-${local.dash}-9
             ip: ${local.subnet}.9
-          - name: worker1-${local.dash}-10
-            ip: ${local.subnet}.10
         taints: []
     advanced:
       selfmanagedRepositories: false
@@ -209,7 +207,6 @@ frontend ingress-http
 
 backend ingress-http
     server worker0 ${local.subnet}.9:31080 maxconn 256 check
-    server worker1 ${local.subnet}.10:31080 maxconn 256 check
 
 frontend ingress-https
     mode tcp
@@ -218,6 +215,5 @@ frontend ingress-https
 
 backend ingress-https
     server worker0 ${local.subnet}.9:31443 maxconn 256 check
-    server worker1 ${local.subnet}.10:31443 maxconn 256 check
 EOF
 }

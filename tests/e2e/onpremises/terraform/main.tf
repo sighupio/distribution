@@ -37,11 +37,10 @@ locals {
     controlplane-0 = { ip = "${local.subnet}.3", cpu = 2, mem = 2560 }
     controlplane-1 = { ip = "${local.subnet}.4", cpu = 2, mem = 2560 }
     controlplane-2 = { ip = "${local.subnet}.5", cpu = 2, mem = 2560 }
-    infra-0        = { ip = "${local.subnet}.6", cpu = 3, mem = 8192 }
-    infra-1        = { ip = "${local.subnet}.7", cpu = 3, mem = 8192 }
-    infra-2        = { ip = "${local.subnet}.8", cpu = 3, mem = 8192 }
+    infra-0        = { ip = "${local.subnet}.6", cpu = 4, mem = 12288 }
+    infra-1        = { ip = "${local.subnet}.7", cpu = 4, mem = 12288 }
+    infra-2        = { ip = "${local.subnet}.8", cpu = 4, mem = 12288 }
     worker-0       = { ip = "${local.subnet}.9", cpu = 2, mem = 4096 }
-    worker-1       = { ip = "${local.subnet}.10", cpu = 2, mem = 4096 }
   }
 }
 
