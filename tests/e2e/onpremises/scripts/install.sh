@@ -43,13 +43,26 @@ apply_retry() {
   return 1
 }
 
-# 1. kubernetes phase
-apply_retry "kubernetes phase" --phase kubernetes --force migrations || { echo "kubernetes phase failed"; exit 1; }
+# 1. full apply: kubernetes + core distribution + plugins (longhorn). furyctl SKIPS
+#    the storage-backed modules (logging/tracing/dr/prometheus) here because no
+#    default StorageClass exists yet -- longhorn (a plugin) creates it only now.
+apply_retry "furyctl apply" --force migrations || { echo "furyctl apply failed"; exit 1; }
 
-# 2. full apply + distribution post-apply (deploys the storage-backed modules)
-apply_retry "distribution apply" --post-apply-phases distribution --force migrations || { echo "distribution apply failed"; exit 1; }
+# 2. wait for longhorn's default StorageClass before re-applying (a blind sleep is
+#    racy: longhorn-manager creates the SC a little after the plugin is installed).
+echo ">>> waiting for a default StorageClass"
+sc_ok=0
+for i in $(seq 1 60); do
+  if kubectl get storageclass 2>/dev/null | grep -qi '(default)'; then
+    echo ">>> default StorageClass present"
+    sc_ok=1
+    break
+  fi
+  echo ">>> no default StorageClass yet ($i/60); waiting 10s"
+  sleep 10
+done
+[ "$sc_ok" = 1 ] || { echo "no default StorageClass after waiting"; exit 1; }
 
-# 3. final distribution pass once the StorageClass is up (best-effort settle)
-echo ">>> final distribution settle"
-sleep 60
-furyctl apply -D --phase distribution --distro-location "$DISTRO_LOCATION" || echo ">>> final settle non-fatal failure"
+# 3. re-apply the distribution now that the StorageClass exists -> deploys the
+#    previously-skipped storage-backed modules.
+apply_retry "distribution re-apply" --phase distribution || { echo "distribution re-apply failed"; exit 1; }

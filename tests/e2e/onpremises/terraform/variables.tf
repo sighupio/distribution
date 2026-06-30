@@ -23,6 +23,6 @@ variable "private_key" {
 
 variable "base_image" {
   type        = string
-  default     = "/base/noble-20g.img"
-  description = "Path (inside the runner) to the pre-seeded, 20G-resized Ubuntu 24.04 cloud image the VMs are cloned from."
+  default     = "/base/noble-100g.img"
+  description = "Path (inside the runner) to the pre-seeded, 100G-resized (thin) Ubuntu 24.04 cloud image the VMs are cloned from."
 }

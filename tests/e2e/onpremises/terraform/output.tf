@@ -182,6 +182,12 @@ spec:
           set:
             - name: persistence.defaultClassReplicaCount
               value: "1"
+            # e2e volumes are mostly empty; let longhorn over-provision so all the
+            # storage-backed modules' volumes schedule on the (thin) node disks.
+            - name: defaultSettings.storageOverProvisioningPercentage
+              value: "1000"
+            - name: defaultSettings.storageMinimalAvailablePercentage
+              value: "5"
 EOF
 }
 

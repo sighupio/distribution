@@ -1033,12 +1033,15 @@ steps: # e2e-onpremises
       - apt-get update && apt-get install -y --no-install-recommends genisoimage libvirt-clients qemu-utils
       # serialize: wait until no other e2e VMs (install/upgrade) are running
       - bash tests/e2e/onpremises/scripts/wait-for-free-worker.sh
-      # cache the Ubuntu 24.04 base image on the worker (downloaded once, then reused)
+      # cache the Ubuntu 24.04 base image on the worker (downloaded once, then reused).
+      # 100G virtual but qcow2 is thin/sparse: it only consumes the data actually
+      # written, so longhorn gets room to schedule its volumes without eating the
+      # worker's free space.
       - |
-        if [ ! -f /base/noble-20g.img ]; then
+        if [ ! -f /base/noble-100g.img ]; then
           curl -fsSL https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img -o /base/noble.img
-          cp /base/noble.img /base/noble-20g.img
-          qemu-img resize /base/noble-20g.img 20G
+          cp /base/noble.img /base/noble-100g.img
+          qemu-img resize /base/noble-100g.img 100G
         fi
       # ssh key the VMs trust and furyctl authenticates with
       - ssh-keygen -N '' -t ed25519 -C "sighup" -f /cache/ci-ssh-key
