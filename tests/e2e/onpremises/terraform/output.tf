@@ -135,7 +135,10 @@ spec:
           backend: minio
           tsdbStartDate: "2024-11-18"
       monitoring:
-        type: mimir
+        # prometheus instead of mimir: mimir-distributed (+ its minio) is too heavy
+        # for a single-worker e2e -- minio + the distributed consumers can't come up
+        # within kapp's deadlines. prometheus keeps monitoring coverage, far lighter.
+        type: prometheus
         mimir:
           retentionTime: 3d
           backend: minio
@@ -163,7 +166,8 @@ spec:
           snapshotController:
             install: true
       tracing:
-        type: tempo
+        # none: tempo-distributed (+ its minio) is too heavy for a single-worker e2e.
+        type: none
         tempo:
           backend: minio
       auth:
