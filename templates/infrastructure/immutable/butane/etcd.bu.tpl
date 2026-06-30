@@ -13,6 +13,7 @@ storage:
 {{ template "network" . }}
 {{ template "python" . }}
 {{ template "sysupdate-noop" . }}
+{{ template "update-server-config" . }}
 {{ template "sshd-pq-configuration" . }}
 {{ template "containerd-sysext-files" . }}
 {{ template "etcd-sysext-files" . }}
