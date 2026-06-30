@@ -2,14 +2,31 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-output "haproxy_ip" {
-  value = hcloud_server.haproxy.ipv4_address
+output "nodes" {
+  value = module.vms.nodes
 }
 
 output "ingress_domain" {
-  value = "ingress.${replace(hcloud_server.haproxy.ipv4_address, ".", "-")}.nip.io"
+  value = "ingress.${module.vms.dash}-2.nip.io"
 }
 
+output "controlplane_0_ip" {
+  value = module.vms.controlplane_0_ip
+}
+
+output "worker_0_ip" {
+  value = module.vms.worker_0_ip
+}
+
+output "all_ips" {
+  value = module.vms.all_ips
+}
+
+# v1.34.1 base config: the cluster we install, then upgrade. calico + gatekeeper
+# (the real upgrade path, complementary to the install pipeline's cilium + kyverno).
+# Lightened for the single worker exactly like the install pipeline: monitoring is
+# prometheus (mimir-distributed won't fit), one worker, longhorn replica 1 with
+# over-provisioning. nginx-only ingress; haproxy ingress is added by the upgrade.
 output "furyctl_yaml" {
   value = <<EOF
 ---
@@ -25,14 +42,15 @@ spec:
       username: root
       keyPath: /cache/ci-ssh-key
     dnsZone: nip.io
-    controlPlaneAddress: ${replace(hcloud_server.haproxy.ipv4_address, ".", "-")}.nip.io:6443
+    controlPlaneAddress: ${module.vms.dash}-2.nip.io:6443
     podCidr: 10.128.0.0/14
     svcCidr: 172.30.0.0/16
     loadBalancers:
       enabled: true
+      selfmanagedRepositories: false
       hosts:
-        - name: haproxy-10-10-1-2
-          ip: 10.10.1.2
+        - name: haproxy-${module.vms.dash}-2
+          ip: ${module.vms.subnet}.2
       keepalived:
         enabled: false
         interface: enp0s6
@@ -45,49 +63,43 @@ spec:
       additionalConfig: "{file://./haproxy-additional.cfg}"
     masters:
       hosts:
-        - name: controlplane0-10-10-1-3
-          ip: 10.10.1.3
-        - name: controlplane1-10-10-1-4
-          ip: 10.10.1.4
-        - name: controlplane2-10-10-1-5
-          ip: 10.10.1.5
+        - name: controlplane0-${module.vms.dash}-3
+          ip: ${module.vms.subnet}.3
+        - name: controlplane1-${module.vms.dash}-4
+          ip: ${module.vms.subnet}.4
+        - name: controlplane2-${module.vms.dash}-5
+          ip: ${module.vms.subnet}.5
     nodes:
       - name: infra
         hosts:
-          - name: infra0-10-10-1-6
-            ip: 10.10.1.6
-          - name: infra1-10-10-1-7
-            ip: 10.10.1.7
-          - name: infra2-10-10-1-8
-            ip: 10.10.1.8
+          - name: infra0-${module.vms.dash}-6
+            ip: ${module.vms.subnet}.6
+          - name: infra1-${module.vms.dash}-7
+            ip: ${module.vms.subnet}.7
+          - name: infra2-${module.vms.dash}-8
+            ip: ${module.vms.subnet}.8
         taints: []
       - name: worker
         hosts:
-          - name: worker0-10-10-1-9
-            ip: 10.10.1.9
-          - name: worker1-10-10-1-10
-            ip: 10.10.1.10
+          - name: worker0-${module.vms.dash}-9
+            ip: ${module.vms.subnet}.9
         taints: []
-    #advancedAnsible:
-      #config: |
-      #  ansible_ssh_common_args='-o ProxyCommand="ssh -W %h:%p -q root@${hcloud_server.haproxy.ipv4_address}"'
-    advanced: 
+    advanced:
+      selfmanagedRepositories: false
+      containerd:
+        selfmanagedRepositories: false
       encryption:
         configuration: "{file://./encrypted-secret-config.yaml}"
   distribution:
     common:
       nodeSelector:
-         node.kubernetes.io/role: infra
-      #tolerations:
-      #  - effect: NoSchedule
-      #    key: node.kubernetes.io/role
-      #    value: infra
+        node.kubernetes.io/role: infra
       networkPoliciesEnabled: true
     modules:
       networking:
         type: calico
       ingress:
-        baseDomain: ingress.${replace(hcloud_server.haproxy.ipv4_address, ".", "-")}.nip.io
+        baseDomain: ingress.${module.vms.dash}-2.nip.io
         nginx:
           type: single
           tls:
@@ -101,16 +113,16 @@ spec:
             name: letsencrypt-fury
             email: samuele.chiocca@reevo.it
             type: http01
-      logging: 
+      logging:
         type: loki
         opensearch:
           type: triple
-        loki: 
+        loki:
           backend: minio
           tsdbStartDate: "2024-11-18"
       monitoring:
-        type: mimir
-        mimir: 
+        type: prometheus
+        mimir:
           retentionTime: 3d
           backend: minio
         prometheus:
@@ -119,14 +131,14 @@ spec:
           storageSize: 20Gi
         alertmanager:
           installDefaultRules: false
-      policy: 
+      policy:
         type: gatekeeper
         gatekeeper:
           enforcementAction: warn
-          installDefaultPolicies: true 
+          installDefaultPolicies: true
       dr:
         type: on-premises
-        velero: 
+        velero:
           backend: minio
           schedules:
             install: true
@@ -135,15 +147,13 @@ spec:
                 snapshotMoveData: true
           snapshotController:
             install: true
-      tracing: 
+      tracing:
         type: none
-        # tempo: 
-        #   backend: minio
+        tempo:
+          backend: minio
       auth:
         provider:
           type: none
-
-
   plugins:
     helm:
       repositories:
@@ -156,10 +166,16 @@ spec:
           version: '1.8.1'
           set:
             - name: persistence.defaultClassReplicaCount
-              value: "2"
+              value: "1"
+            - name: defaultSettings.storageOverProvisioningPercentage
+              value: "1000"
+            - name: defaultSettings.storageMinimalAvailablePercentage
+              value: "5"
 EOF
 }
 
+# v1.35.0 upgrade target: identical to the base config but the newer version and
+# with the haproxy ingress controller added (the upgrade's visible delta).
 output "furyctl_upgrade_yaml" {
   value = <<EOF
 ---
@@ -175,14 +191,15 @@ spec:
       username: root
       keyPath: /cache/ci-ssh-key
     dnsZone: nip.io
-    controlPlaneAddress: ${replace(hcloud_server.haproxy.ipv4_address, ".", "-")}.nip.io:6443
+    controlPlaneAddress: ${module.vms.dash}-2.nip.io:6443
     podCidr: 10.128.0.0/14
     svcCidr: 172.30.0.0/16
     loadBalancers:
       enabled: true
+      selfmanagedRepositories: false
       hosts:
-        - name: haproxy-10-10-1-2
-          ip: 10.10.1.2
+        - name: haproxy-${module.vms.dash}-2
+          ip: ${module.vms.subnet}.2
       keepalived:
         enabled: false
         interface: enp0s6
@@ -195,49 +212,43 @@ spec:
       additionalConfig: "{file://./haproxy-additional.cfg}"
     masters:
       hosts:
-        - name: controlplane0-10-10-1-3
-          ip: 10.10.1.3
-        - name: controlplane1-10-10-1-4
-          ip: 10.10.1.4
-        - name: controlplane2-10-10-1-5
-          ip: 10.10.1.5
+        - name: controlplane0-${module.vms.dash}-3
+          ip: ${module.vms.subnet}.3
+        - name: controlplane1-${module.vms.dash}-4
+          ip: ${module.vms.subnet}.4
+        - name: controlplane2-${module.vms.dash}-5
+          ip: ${module.vms.subnet}.5
     nodes:
       - name: infra
         hosts:
-          - name: infra0-10-10-1-6
-            ip: 10.10.1.6
-          - name: infra1-10-10-1-7
-            ip: 10.10.1.7
-          - name: infra2-10-10-1-8
-            ip: 10.10.1.8
+          - name: infra0-${module.vms.dash}-6
+            ip: ${module.vms.subnet}.6
+          - name: infra1-${module.vms.dash}-7
+            ip: ${module.vms.subnet}.7
+          - name: infra2-${module.vms.dash}-8
+            ip: ${module.vms.subnet}.8
         taints: []
       - name: worker
         hosts:
-          - name: worker0-10-10-1-9
-            ip: 10.10.1.9
-          - name: worker1-10-10-1-10
-            ip: 10.10.1.10
+          - name: worker0-${module.vms.dash}-9
+            ip: ${module.vms.subnet}.9
         taints: []
-    #advancedAnsible:
-      #config: |
-      #  ansible_ssh_common_args='-o ProxyCommand="ssh -W %h:%p -q root@${hcloud_server.haproxy.ipv4_address}"'
-    advanced: 
+    advanced:
+      selfmanagedRepositories: false
+      containerd:
+        selfmanagedRepositories: false
       encryption:
         configuration: "{file://./encrypted-secret-config.yaml}"
   distribution:
     common:
       nodeSelector:
-         node.kubernetes.io/role: infra
-      #tolerations:
-      #  - effect: NoSchedule
-      #    key: node.kubernetes.io/role
-      #    value: infra
+        node.kubernetes.io/role: infra
       networkPoliciesEnabled: true
     modules:
       networking:
         type: calico
       ingress:
-        baseDomain: ingress.${replace(hcloud_server.haproxy.ipv4_address, ".", "-")}.nip.io
+        baseDomain: ingress.${module.vms.dash}-2.nip.io
         nginx:
           type: single
           tls:
@@ -259,16 +270,16 @@ spec:
             name: letsencrypt-fury
             email: samuele.chiocca@reevo.it
             type: http01
-      logging: 
+      logging:
         type: loki
         opensearch:
           type: triple
-        loki: 
+        loki:
           backend: minio
           tsdbStartDate: "2024-11-18"
       monitoring:
-        type: mimir
-        mimir: 
+        type: prometheus
+        mimir:
           retentionTime: 3d
           backend: minio
         prometheus:
@@ -277,14 +288,14 @@ spec:
           storageSize: 20Gi
         alertmanager:
           installDefaultRules: false
-      policy: 
+      policy:
         type: gatekeeper
         gatekeeper:
           enforcementAction: warn
-          installDefaultPolicies: true 
+          installDefaultPolicies: true
       dr:
         type: on-premises
-        velero: 
+        velero:
           backend: minio
           schedules:
             install: true
@@ -293,15 +304,13 @@ spec:
                 snapshotMoveData: true
           snapshotController:
             install: true
-      tracing: 
+      tracing:
         type: none
-        # tempo: 
-        #   backend: minio
+        tempo:
+          backend: minio
       auth:
         provider:
           type: none
-
-
   plugins:
     helm:
       repositories:
@@ -314,7 +323,11 @@ spec:
           version: '1.8.1'
           set:
             - name: persistence.defaultClassReplicaCount
-              value: "2"
+              value: "1"
+            - name: defaultSettings.storageOverProvisioningPercentage
+              value: "1000"
+            - name: defaultSettings.storageMinimalAvailablePercentage
+              value: "5"
 EOF
 }
 
@@ -329,7 +342,27 @@ basicConstraints = CA:FALSE
 keyUsage = nonRepudiation, digitalSignature, keyEncipherment
 subjectAltName = @alt_names
 [alt_names]
-DNS.1 = ingress.${replace(hcloud_server.haproxy.ipv4_address, ".", "-")}.nip.io
-DNS.2 = *.ingress.${replace(hcloud_server.haproxy.ipv4_address, ".", "-")}.nip.io
+DNS.1 = ingress.${module.vms.dash}-2.nip.io
+DNS.2 = *.ingress.${module.vms.dash}-2.nip.io
+EOF
+}
+
+output "haproxy_additional" {
+  value = <<EOF
+frontend ingress-http
+    mode tcp
+    bind *:80
+    default_backend ingress-http
+
+backend ingress-http
+    server worker0 ${module.vms.subnet}.9:31080 maxconn 256 check
+
+frontend ingress-https
+    mode tcp
+    bind *:443
+    default_backend ingress-https
+
+backend ingress-https
+    server worker0 ${module.vms.subnet}.9:31443 maxconn 256 check
 EOF
 }

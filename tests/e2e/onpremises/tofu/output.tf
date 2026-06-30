@@ -2,32 +2,27 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-locals {
-  # dashed form of the haproxy private IP for nip.io hostnames (e.g. 10-10-30-2.nip.io)
-  dash = "10-10-${local.octet}"
-}
-
 output "nodes" {
-  value = { for k, v in local.nodes : k => v.ip }
+  value = module.vms.nodes
 }
 
 output "ingress_domain" {
-  value = "ingress.${local.dash}-2.nip.io"
+  value = "ingress.${module.vms.dash}-2.nip.io"
 }
 
 # kube-bench runs on one representative node per role (all control planes / all
 # workers are configured identically), matching the original e2e.
 output "controlplane_0_ip" {
-  value = local.nodes["controlplane-0"].ip
+  value = module.vms.controlplane_0_ip
 }
 
 output "worker_0_ip" {
-  value = local.nodes["worker-0"].ip
+  value = module.vms.worker_0_ip
 }
 
-# all node IPs, for the prepare-nodes playbook (open-iscsi etc. on every host)
+# all node IPs, for the prepare-nodes playbook (open-iscsi on every host)
 output "all_ips" {
-  value = join(" ", [for k, v in local.nodes : v.ip])
+  value = module.vms.all_ips
 }
 
 # Rendered furyctl.yaml for this run's subnet. controlPlaneAddress/ingress use the
@@ -48,15 +43,15 @@ spec:
       username: root
       keyPath: /cache/ci-ssh-key
     dnsZone: nip.io
-    controlPlaneAddress: ${local.dash}-2.nip.io:6443
+    controlPlaneAddress: ${module.vms.dash}-2.nip.io:6443
     podCidr: 10.128.0.0/14
     svcCidr: 172.30.0.0/16
     loadBalancers:
       enabled: true
       selfmanagedRepositories: false
       hosts:
-        - name: haproxy-${local.dash}-2
-          ip: ${local.subnet}.2
+        - name: haproxy-${module.vms.dash}-2
+          ip: ${module.vms.subnet}.2
       keepalived:
         enabled: false
         interface: enp0s6
@@ -69,26 +64,26 @@ spec:
       additionalConfig: "{file://./haproxy-additional.cfg}"
     masters:
       hosts:
-        - name: controlplane0-${local.dash}-3
-          ip: ${local.subnet}.3
-        - name: controlplane1-${local.dash}-4
-          ip: ${local.subnet}.4
-        - name: controlplane2-${local.dash}-5
-          ip: ${local.subnet}.5
+        - name: controlplane0-${module.vms.dash}-3
+          ip: ${module.vms.subnet}.3
+        - name: controlplane1-${module.vms.dash}-4
+          ip: ${module.vms.subnet}.4
+        - name: controlplane2-${module.vms.dash}-5
+          ip: ${module.vms.subnet}.5
     nodes:
       - name: infra
         hosts:
-          - name: infra0-${local.dash}-6
-            ip: ${local.subnet}.6
-          - name: infra1-${local.dash}-7
-            ip: ${local.subnet}.7
-          - name: infra2-${local.dash}-8
-            ip: ${local.subnet}.8
+          - name: infra0-${module.vms.dash}-6
+            ip: ${module.vms.subnet}.6
+          - name: infra1-${module.vms.dash}-7
+            ip: ${module.vms.subnet}.7
+          - name: infra2-${module.vms.dash}-8
+            ip: ${module.vms.subnet}.8
         taints: []
       - name: worker
         hosts:
-          - name: worker0-${local.dash}-9
-            ip: ${local.subnet}.9
+          - name: worker0-${module.vms.dash}-9
+            ip: ${module.vms.subnet}.9
         taints: []
     advanced:
       selfmanagedRepositories: false
@@ -105,7 +100,7 @@ spec:
       networking:
         type: cilium
       ingress:
-        baseDomain: ingress.${local.dash}-2.nip.io
+        baseDomain: ingress.${module.vms.dash}-2.nip.io
         nginx:
           type: single
           tls:
@@ -125,7 +120,7 @@ spec:
         certManager:
           clusterIssuer:
             name: letsencrypt-fury
-            email: example@sighup.io
+            email: samuele.chiocca@reevo.it
             type: http01
       logging:
         type: loki
@@ -206,8 +201,8 @@ basicConstraints = CA:FALSE
 keyUsage = nonRepudiation, digitalSignature, keyEncipherment
 subjectAltName = @alt_names
 [alt_names]
-DNS.1 = ingress.${local.dash}-2.nip.io
-DNS.2 = *.ingress.${local.dash}-2.nip.io
+DNS.1 = ingress.${module.vms.dash}-2.nip.io
+DNS.2 = *.ingress.${module.vms.dash}-2.nip.io
 EOF
 }
 
@@ -221,7 +216,7 @@ frontend ingress-http
     default_backend ingress-http
 
 backend ingress-http
-    server worker0 ${local.subnet}.9:31080 maxconn 256 check
+    server worker0 ${module.vms.subnet}.9:31080 maxconn 256 check
 
 frontend ingress-https
     mode tcp
@@ -229,6 +224,6 @@ frontend ingress-https
     default_backend ingress-https
 
 backend ingress-https
-    server worker0 ${local.subnet}.9:31443 maxconn 256 check
+    server worker0 ${module.vms.subnet}.9:31443 maxconn 256 check
 EOF
 }
