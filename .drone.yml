@@ -1069,7 +1069,7 @@ steps: # e2e-onpremises
       # storage-backed stateful components (needs the longhorn StorageClass)
       - bash tests/e2e/onpremises/scripts/install.sh
 
-  - name: itest
+  - name: bats-test-distribution
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
     network_mode: host

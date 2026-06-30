@@ -30,7 +30,7 @@ Mirrors the production HA layout, on a per-run `/24` (`10.10.<octet>.0/24`, wher
 3. **install** — `install.sh`: `furyctl create pki` → `furyctl apply` (retried) →
    a second `furyctl apply --phase distribution` once the longhorn StorageClass
    exists, so the storage-backed stateful components (minio/velero/loki/tempo) land.
-4. **itest** — bats distribution checks (`tests/e2e-onpremises.sh`), bounded at 60m.
+4. **bats-test-distribution** — bats distribution checks (`tests/e2e-onpremises.sh`), bounded at 60m.
 5. **kube-bench** — `kube-bench.sh`: CIS benchmark on controlplane-0 + worker-0.
 6. **delete** — `tofu destroy` (always, on success or failure).
 
