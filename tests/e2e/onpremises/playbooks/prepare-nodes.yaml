@@ -10,6 +10,11 @@
   gather_facts: false
 
   tasks:
+    - name: Wait for SSH to come up (VMs are still booting/cloud-init right after apply)
+      ansible.builtin.wait_for_connection:
+        delay: 5
+        timeout: 300
+
     - name: Disable unattended-upgrades to prevent unexpected SSH disruptions
       ansible.builtin.service:
         name: unattended-upgrades
