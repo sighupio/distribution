@@ -3,10 +3,14 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-# Install the distribution with furyctl. Runs the apply TWICE: the storage-backed
-# stateful components (minio/velero/loki/tempo) only schedule once the longhorn
-# StorageClass exists, which is created during the first apply. The second
-# distribution-phase apply lets them land -- mirrors the original Hetzner e2e.
+# Install the distribution with furyctl, mirroring the original Hetzner e2e
+# sequence (the known-good incantation):
+#   1. kubernetes phase
+#   2. full apply + distribution post-apply (retried until it succeeds) -- this is
+#      what actually rolls out the storage-backed modules (loki/tempo/velero/minio/
+#      prometheus); a plain single apply leaves them undeployed.
+#   3. a final distribution pass once the longhorn StorageClass is available.
+# (open-iscsi etc. is installed by the separate prepare-nodes step beforehand.)
 set -uo pipefail
 
 SCRIPTS="$(cd "$(dirname "$0")" && pwd)"
@@ -23,21 +27,29 @@ cd "$ONPREM/config"
 
 furyctl create pki -p ./pki || true
 
-# first full apply; retry transient apt/PPA/GitHub blips
-ok=0
-for a in 1 2 3; do
-  echo ">>> furyctl apply attempt $a"
-  rm -rf /tmp/furyctl-* 2>/dev/null || true
-  if furyctl apply -D --force migrations --distro-location "$DISTRO_LOCATION"; then
-    ok=1
-    break
-  fi
-  echo ">>> attempt $a failed; retry in 15s"
-  sleep 15
-done
-[ "$ok" = 1 ] || { echo "furyctl apply failed after retries"; exit 1; }
+apply_retry() {
+  # $1 = human label, rest = furyctl apply args; retried until success
+  local label="$1"; shift
+  local a
+  for a in 1 2 3 4 5; do
+    echo ">>> ${label} (attempt ${a})"
+    rm -rf /tmp/furyctl-* 2>/dev/null || true
+    if furyctl apply -D "$@" --distro-location "$DISTRO_LOCATION"; then
+      return 0
+    fi
+    echo ">>> ${label} attempt ${a} failed; retry in 60s"
+    sleep 60
+  done
+  return 1
+}
 
-# NOTE: no second distribution apply. open-iscsi (prepare-nodes) makes longhorn
-# attach volumes on the first pass, so a single apply brings the whole cluster up.
-# Re-applying afterwards only re-rolls a healthy cluster and overloads the
-# apiserver -- it was a workaround for the storage race that open-iscsi root-fixed.
+# 1. kubernetes phase
+apply_retry "kubernetes phase" --phase kubernetes --force migrations || { echo "kubernetes phase failed"; exit 1; }
+
+# 2. full apply + distribution post-apply (deploys the storage-backed modules)
+apply_retry "distribution apply" --post-apply-phases distribution --force migrations || { echo "distribution apply failed"; exit 1; }
+
+# 3. final distribution pass once the StorageClass is up (best-effort settle)
+echo ">>> final distribution settle"
+sleep 60
+furyctl apply -D --phase distribution --distro-location "$DISTRO_LOCATION" || echo ">>> final settle non-fatal failure"
