@@ -10,15 +10,17 @@ set -uo pipefail
 
 SCRIPTS="$(cd "$(dirname "$0")" && pwd)"
 ONPREM="$(dirname "$SCRIPTS")"
-TF="$ONPREM/terraform"
+# E2E_DIR lets the upgrades pipeline reuse this against its own tofu/config.
+E2E_DIR="${E2E_DIR:-$ONPREM}"
+TF="$E2E_DIR/tofu"
 
 # the playbook copies /cache/kubeconfig onto the nodes
-cp -f "$ONPREM/config/kubeconfig" /cache/kubeconfig
+cp -f "$E2E_DIR/config/kubeconfig" /cache/kubeconfig
 
 CP0="$(cd "$TF" && tofu output -raw controlplane_0_ip)"
 WK0="$(cd "$TF" && tofu output -raw worker_0_ip)"
 
-INV="$ONPREM/config/kube-bench-hosts.yaml"
+INV="$E2E_DIR/config/kube-bench-hosts.yaml"
 cat > "$INV" <<EOF
 all:
   children:
