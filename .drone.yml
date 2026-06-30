@@ -66,7 +66,7 @@ steps: # qa
     commands:
       - eval "$(mise activate bash --shims)"
       - bats -t tests/e2e/kfddistribution/schema.sh
-      - bats -t tests/e2e/onpremises/schema.sh
+      - bats -t tests/e2e/onpremises/tests/schema.sh
 
   - name: test-schema-immutable
     image: quay.io/sighup/mise:v2025.4.4
@@ -951,8 +951,9 @@ steps: #e2e-eks-upgrades
 name: e2e-onpremises
 kind: pipeline
 type: docker
-node:
-  performance: low
+# No node selector: like the e2e-kfddistribution pipeline, this lands on the
+# single bare-metal worker — the only one with /dev/kvm + libvirt (set up by the
+# infra `libvirt` ansible role).
 
 depends_on:
   - qa
@@ -976,6 +977,14 @@ volumes:
   - name: mise-cache
     host:
       path: /root/mise_data_dir
+  # talk to the worker's libvirtd
+  - name: libvirt-sock
+    host:
+      path: /var/run/libvirt
+  # cache the base cloud image on the worker so it's downloaded only once
+  - name: libvirt-base
+    host:
+      path: /root/libvirt_base
 
 steps: # e2e-onpremises
   - name: install-tools
@@ -996,51 +1005,59 @@ steps: # e2e-onpremises
       - "(flock -w 1800 9 || exit 1; mise install) 9>/mise-data/.mise-install.lock"
       - eval "$(mise activate bash --shims)"
 
-  - name: create-hetzner-infrastructure
+  - name: provision-vms
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
+    network_mode: host
     environment:
-      AWS_ACCESS_KEY_ID:
-        from_secret: aws_access_key_id
-      AWS_SECRET_ACCESS_KEY:
-        from_secret: aws_secret_access_key
-      AWS_REGION:
-        from_secret: aws_region
       MISE_GITHUB_TOKEN:
         from_secret: github_token
       GITHUB_TOKEN:
         from_secret: github_token
-      TF_VAR_hcloud_token:
-        from_secret: hcloud_token
     volumes:
       - name: cache
         path: /cache
       - name: mise-cache
         path: /mise-data
+      - name: libvirt-sock
+        path: /var/run/libvirt
+      - name: libvirt-base
+        path: /base
     commands:
       - eval "$(mise activate bash --shims)"
-      - cd tests/e2e/onpremises/
-      - ssh-keygen -N '' -t rsa -b 4096 -C "sighup" -f /cache/ci-ssh-key
+      # host tools the libvirt provider (ISO build) + capacity gate need in the runner
+      - apt-get update && apt-get install -y --no-install-recommends genisoimage libvirt-clients qemu-utils
+      # stay pending until the shared worker has RAM headroom for this run's VMs
+      - bash tests/e2e/onpremises/scripts/wait-for-capacity.sh
+      # cache the Ubuntu 24.04 base image on the worker (downloaded once, then reused)
+      - |
+        if [ ! -f /base/noble-20g.img ]; then
+          curl -fsSL https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img -o /base/noble.img
+          cp /base/noble.img /base/noble-20g.img
+          qemu-img resize /base/noble-20g.img 20G
+        fi
+      # ssh key the VMs trust and furyctl authenticates with
+      - ssh-keygen -N '' -t ed25519 -C "sighup" -f /cache/ci-ssh-key
       - export TF_VAR_public_key=$(cat /cache/ci-ssh-key.pub)
-      - export TF_VAR_private_key=$(cat /cache/ci-ssh-key)
-      - ansible-playbook 0.local-tofu-run.yaml
+      # provision the 9 VMs, then render furyctl.yaml + supporting files + certs
+      - cd tests/e2e/onpremises/terraform
+      - tofu init
+      - tofu apply -auto-approve
+      - tofu output -raw furyctl_yaml > ../config/furyctl.yaml
+      - tofu output -raw req_dns > ../config/req-dns.cnf
+      - tofu output -raw haproxy_additional > ../config/haproxy-additional.cfg
+      - cd ../config && bash ../scripts/create_ingress_certs.sh
 
-  - name: install-cluster-with-furyctl
+  - name: install-and-test
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
+    network_mode: host
     environment:
-      AWS_ACCESS_KEY_ID:
-        from_secret: aws_access_key_id
-      AWS_SECRET_ACCESS_KEY:
-        from_secret: aws_secret_access_key
-      AWS_REGION:
-        from_secret: aws_region
       MISE_GITHUB_TOKEN:
         from_secret: github_token
       GITHUB_TOKEN:
         from_secret: github_token
-      TF_VAR_hcloud_token:
-        from_secret: hcloud_token
+      DISTRO_LOCATION: /drone/src
     volumes:
       - name: cache
         path: /cache
@@ -1048,76 +1065,23 @@ steps: # e2e-onpremises
         path: /mise-data
     commands:
       - eval "$(mise activate bash --shims)"
-      - cd tests/e2e/onpremises/
-      - ansible-playbook 1.remote-furyctl-exec.yaml
-
-  - name: kube-bench-security-test
-    image: quay.io/sighup/mise:v2025.4.4
-    pull: always
-    environment:
-      AWS_ACCESS_KEY_ID:
-        from_secret: aws_access_key_id
-      AWS_SECRET_ACCESS_KEY:
-        from_secret: aws_secret_access_key
-      AWS_REGION:
-        from_secret: aws_region
-      MISE_GITHUB_TOKEN:
-        from_secret: github_token
-      GITHUB_TOKEN:
-        from_secret: github_token
-      TF_VAR_hcloud_token:
-        from_secret: hcloud_token
-    volumes:
-      - name: cache
-        path: /cache
-      - name: mise-cache
-        path: /mise-data
-    commands:
-      - eval "$(mise activate bash --shims)"
-      - cd tests/e2e/onpremises/
-      - ansible-playbook 2.remote-kube-bench-test.yaml
-
-  - name: bats-tests
-    image: quay.io/sighup/mise:v2025.4.4
-    pull: always
-    environment:
-      KUBECONFIG: /cache/kubeconfig
-    volumes:
-      - name: cache
-        path: /cache
-      - name: mise-cache
-        path: /mise-data
-    commands:
-      - eval "$(mise activate bash --shims)"
-      - ./tests/e2e/onpremises/e2e-onpremises.sh
+      # furyctl create pki + apply (retry) + bats distribution checks + kube-bench
+      - bash tests/e2e/onpremises/scripts/run-e2e.sh
 
   - name: delete
     image: quay.io/sighup/mise:v2025.4.4
     pull: always
-    environment:
-      AWS_ACCESS_KEY_ID:
-        from_secret: aws_access_key_id
-      AWS_SECRET_ACCESS_KEY:
-        from_secret: aws_secret_access_key
-      AWS_REGION:
-        from_secret: aws_region
-      MISE_GITHUB_TOKEN:
-        from_secret: github_token
-      GITHUB_TOKEN:
-        from_secret: github_token
-      TF_VAR_hcloud_token:
-        from_secret: hcloud_token
+    network_mode: host
     volumes:
-      - name: cache
-        path: /cache
       - name: mise-cache
         path: /mise-data
+      - name: libvirt-sock
+        path: /var/run/libvirt
     commands:
       - eval "$(mise activate bash --shims)"
-      - cd tests/e2e/onpremises/
-      - export TF_VAR_public_key=$(cat /cache/ci-ssh-key.pub)
-      - export TF_VAR_private_key=$(cat /cache/ci-ssh-key)
-      - ansible-playbook 3.local-tofu-destroy.yaml
+      - cd tests/e2e/onpremises/terraform
+      - tofu init
+      - tofu destroy -auto-approve || true
     when:
       status:
         - success
@@ -1139,10 +1103,12 @@ clone:
   depth: 1
 
 trigger:
+  # DISABLED pending its own libvirt refactor: this sentinel ref never matches, so
+  # the stale Hetzner-based upgrades pipeline no longer runs on e2e-onpremises-* /
+  # e2e-all-* tags. Restore the includes below when it's refactored.
   ref:
     include:
-      - refs/tags/e2e-onpremises-**
-      - refs/tags/e2e-all-**
+      - refs/tags/e2e-onpremises-upgrades-DISABLED-**
 
 environment:
   MISE_DATA_DIR: /mise-data
