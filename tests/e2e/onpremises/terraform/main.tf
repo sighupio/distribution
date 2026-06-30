@@ -34,9 +34,9 @@ locals {
   # for the kubeadm preflight.
   nodes = {
     haproxy        = { ip = "${local.subnet}.2", cpu = 1, mem = 1024 }
-    controlplane-0 = { ip = "${local.subnet}.3", cpu = 2, mem = 2560 }
-    controlplane-1 = { ip = "${local.subnet}.4", cpu = 2, mem = 2560 }
-    controlplane-2 = { ip = "${local.subnet}.5", cpu = 2, mem = 2560 }
+    controlplane-0 = { ip = "${local.subnet}.3", cpu = 4, mem = 4096 }
+    controlplane-1 = { ip = "${local.subnet}.4", cpu = 4, mem = 4096 }
+    controlplane-2 = { ip = "${local.subnet}.5", cpu = 4, mem = 4096 }
     infra-0        = { ip = "${local.subnet}.6", cpu = 4, mem = 12288 }
     infra-1        = { ip = "${local.subnet}.7", cpu = 4, mem = 12288 }
     infra-2        = { ip = "${local.subnet}.8", cpu = 4, mem = 12288 }
