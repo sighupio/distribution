@@ -14,6 +14,11 @@ ONPREM="$(dirname "$SCRIPTS")"
 DISTRO_LOCATION="${DISTRO_LOCATION:-/drone/src}"
 export KUBECONFIG="$ONPREM/config/kubeconfig"
 
+# tee everything to the host-mounted diag dir so the install log survives teardown
+if [ -n "${DIAG_DIR:-}" ] && mkdir -p "$DIAG_DIR" 2>/dev/null; then
+  exec > >(tee -a "$DIAG_DIR/install-${DRONE_BUILD_NUMBER:-local}.log") 2>&1
+fi
+
 cd "$ONPREM/config"
 
 furyctl create pki -p ./pki || true

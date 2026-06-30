@@ -985,6 +985,10 @@ volumes:
   - name: libvirt-base
     host:
       path: /root/libvirt_base
+  # install log + on-failure cluster snapshot; survives the teardown
+  - name: e2e-diag
+    host:
+      path: /root/e2e-diag
 
 steps: # e2e-onpremises
   - name: install-tools
@@ -1058,11 +1062,14 @@ steps: # e2e-onpremises
       GITHUB_TOKEN:
         from_secret: github_token
       DISTRO_LOCATION: /drone/src
+      DIAG_DIR: /diag
     volumes:
       - name: cache
         path: /cache
       - name: mise-cache
         path: /mise-data
+      - name: e2e-diag
+        path: /diag
     commands:
       - eval "$(mise activate bash --shims)"
       # furyctl create pki + apply, then a second distribution apply for the
@@ -1097,6 +1104,25 @@ steps: # e2e-onpremises
     commands:
       - eval "$(mise activate bash --shims)"
       - bash tests/e2e/onpremises/scripts/kube-bench.sh
+
+  # on any failure, snapshot the cluster (pods/events/describe) before teardown
+  - name: diagnose
+    image: quay.io/sighup/mise:v2025.4.4
+    pull: always
+    network_mode: host
+    environment:
+      DIAG_DIR: /diag
+    volumes:
+      - name: mise-cache
+        path: /mise-data
+      - name: e2e-diag
+        path: /diag
+    commands:
+      - eval "$(mise activate bash --shims)"
+      - bash tests/e2e/onpremises/scripts/diagnose.sh
+    when:
+      status:
+        - failure
 
   - name: delete
     image: quay.io/sighup/mise:v2025.4.4
