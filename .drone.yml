@@ -968,7 +968,6 @@ trigger:
 
 environment:
   MISE_DATA_DIR: /mise-data
-  FURYCTL_VERSION: "v0.35.0-rc.8"
   TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
 
 volumes:
@@ -1178,7 +1177,6 @@ trigger:
 
 environment:
   MISE_DATA_DIR: /mise-data
-  FURYCTL_VERSION: "v0.35.0-rc.8"
   TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
   # absolute so the scripts reused from onpremises/scripts target this pipeline's
   # own tofu/config/tests dirs instead of the install pipeline's.
