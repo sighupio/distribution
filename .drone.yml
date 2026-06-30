@@ -1052,6 +1052,25 @@ steps: # e2e-onpremises
       - tofu output -raw haproxy_additional > ../config/haproxy-additional.cfg
       - cd ../config && bash ../scripts/create_ingress_certs.sh
 
+  - name: prepare-nodes
+    image: quay.io/sighup/mise:v2025.4.4
+    pull: always
+    network_mode: host
+    environment:
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
+    volumes:
+      - name: cache
+        path: /cache
+      - name: mise-cache
+        path: /mise-data
+    commands:
+      - eval "$(mise activate bash --shims)"
+      # node prerequisites (open-iscsi for longhorn, kernel modules, ...)
+      - bash tests/e2e/onpremises/scripts/prepare-nodes.sh
+
   - name: install
     image: quay.io/sighup/mise:v2025.4.4
     pull: always

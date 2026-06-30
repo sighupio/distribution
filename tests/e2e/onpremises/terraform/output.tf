@@ -25,6 +25,11 @@ output "worker_0_ip" {
   value = local.nodes["worker-0"].ip
 }
 
+# all node IPs, for the prepare-nodes playbook (open-iscsi etc. on every host)
+output "all_ips" {
+  value = join(" ", [for k, v in local.nodes : v.ip])
+}
+
 # Rendered furyctl.yaml for this run's subnet. controlPlaneAddress/ingress use the
 # haproxy private IP via nip.io; node names embed their dashed IP so etcd peer URLs
 # resolve through the nip.io dnsZone. Real VMs => longhorn (iSCSI) works.

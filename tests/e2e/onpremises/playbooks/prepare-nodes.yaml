@@ -1,0 +1,48 @@
+---
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# Node prerequisites for the distribution, run after the VMs are up and before
+# furyctl. Notably installs open-iscsi + starts iscsid, which longhorn needs to
+# attach volumes (without it every volume stays "not ready for workloads").
+- hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Disable unattended-upgrades to prevent unexpected SSH disruptions
+      ansible.builtin.service:
+        name: unattended-upgrades
+        state: stopped
+        enabled: false
+      ignore_errors: true
+
+    - name: Configure needrestart to list-only mode to prevent SSH restarts during apt
+      ansible.builtin.replace:
+        path: /etc/needrestart/needrestart.conf
+        regexp: '^#?\$nrconf\{restart\}.*'
+        replace: "$nrconf{restart} = 'l';"
+      ignore_errors: true
+
+    # apt module needs python3-apt (not on the minimal cloud image at this point);
+    # use apt-get directly so the prereqs install on a bare node.
+    - name: Install node prerequisites (open-iscsi for longhorn, etc.)
+      ansible.builtin.shell: |
+        set -e
+        export DEBIAN_FRONTEND=noninteractive
+        apt-get update -qq
+        apt-get install -y -qq net-tools open-iscsi cryptsetup
+      changed_when: true
+
+    - name: Ensure iscsid is enabled and running (longhorn volume attach)
+      ansible.builtin.service:
+        name: iscsid
+        state: started
+        enabled: true
+
+    - name: Load required kernel modules
+      ansible.builtin.command: "modprobe {{ item }}"
+      loop:
+        - dm_crypt
+        - iscsi_tcp
+      changed_when: false
