@@ -171,6 +171,11 @@ spec:
               value: "1000"
             - name: defaultSettings.storageMinimalAvailablePercentage
               value: "5"
+            # the upgrade drains each node; with replica 1 longhorn's PDB would
+            # block evicting the instance-manager holding the only replica and the
+            # drain would time out. e2e data is disposable -> always allow the drain.
+            - name: defaultSettings.nodeDrainPolicy
+              value: "always-allow"
 EOF
 }
 
@@ -328,6 +333,11 @@ spec:
               value: "1000"
             - name: defaultSettings.storageMinimalAvailablePercentage
               value: "5"
+            # the upgrade drains each node; with replica 1 longhorn's PDB would
+            # block evicting the instance-manager holding the only replica and the
+            # drain would time out. e2e data is disposable -> always allow the drain.
+            - name: defaultSettings.nodeDrainPolicy
+              value: "always-allow"
 EOF
 }
 
