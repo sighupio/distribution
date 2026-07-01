@@ -14,16 +14,12 @@
   vars:
     etcd_upgrade: true
   pre_tasks:
-    # furyctl copies admin.conf into this work dir only in the later core phase, so a clean upgrade run (no
-    # leftover from a prior apply, e.g. after rm -rf .furyctl or without --skip-deps-download) has no
-    # kubeconfig for the localhost-delegated kubectl checks. Fetch it from a control plane up front; 54, 55
-    # and 56 share this work dir, so the health gate, drain and uncordon all find ./admin.conf.
-    - name: Fetch admin.conf to the controller for the upgrade run
+    # admin.conf lives only on control-planes; acquire it resiliently via the upgrade-gates role so dedicated etcd works too.
+    - name: Acquire admin.conf for the controller-side kubectl checks
       run_once: true
-      ansible.builtin.fetch:
-        src: /etc/kubernetes/admin.conf
-        dest: ./admin.conf
-        flat: true
+      ansible.builtin.include_role:
+        name: upgrade-gates
+        tasks_from: fetch_admin_conf.yml
     # G1 (add-immutable-upgrade-gates): pre-upgrade cluster-health gate. run_once so it gates the whole run
     # — asserting all nodes Ready, the API reachable, no partial upgrade, and etcd healthy — BEFORE the
     # first node is touched. Aborts here rather than starting on an already-degraded cluster.
