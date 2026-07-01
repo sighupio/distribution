@@ -21,15 +21,9 @@ fi
 
 cd "$E2E_DIR/config"
 
-for a in 1 2 3 4 5; do
-  echo ">>> furyctl upgrade (attempt ${a})"
-  rm -rf /tmp/furyctl-* 2>/dev/null || true
-  if furyctl apply -D --upgrade --force upgrades --config furyctl_upgrade.yaml --distro-location "$DISTRO_LOCATION"; then
-    echo ">>> upgrade succeeded"
-    exit 0
-  fi
-  echo ">>> upgrade attempt ${a} failed; retry in 60s"
-  sleep 60
-done
-echo "furyctl upgrade failed"
-exit 1
+# Single attempt: an upgrade failure (e.g. a node drain blocked by a PDB) is
+# deterministic, not a transient blip -- retrying only burns the pipeline's clock.
+# If it fails, it fails; the log shows where.
+echo ">>> furyctl upgrade"
+rm -rf /tmp/furyctl-* 2>/dev/null || true
+furyctl apply -D --upgrade --force upgrades --config furyctl_upgrade.yaml --distro-location "$DISTRO_LOCATION"
