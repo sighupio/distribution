@@ -11,12 +11,16 @@
     {{- $etcdInitialCluster = append $etcdInitialCluster (print $h.hostname "=https://" $h.hostname ":2380") }}
     {{- $etcdEndpoints = append $etcdEndpoints (print "https://" $h.hostname ":2379") }}
 {{- end }}
+{{- /* per-host architecture (x86-64/arm64) from infrastructure.nodes, so roles read node_arch instead of detecting at runtime */ -}}
+{{- $archByHost := dict }}
+{{- range $n := .spec.infrastructure.nodes }}{{- $archByHost = set $archByHost $n.hostname $n.arch }}{{- end }}
 all:
   children:
     control_plane:
       hosts:
         {{- range $h := .spec.kubernetes.controlPlane.members }}
         {{ $h.hostname }}:
+          node_arch: {{ index $archByHost $h.hostname }}
         {{- end }}
       vars:
         {{- if index .spec.kubernetes.controlPlane "keepalived" }}
@@ -139,6 +143,7 @@ all:
         {{- if not $etcdOnControlPlane }}
           {{- range $h := $etcdMembers }}
         {{ $h.hostname }}:
+          node_arch: {{ index $archByHost $h.hostname }}
           {{- end }}
         {{- end }}
     nodes:
@@ -148,6 +153,7 @@ all:
           hosts:
           {{- range $h := $n.nodes }}
             {{ $h.hostname }}:
+              node_arch: {{ index $archByHost $h.hostname }}
           {{- end }}
           vars:
             kubernetes_role: "{{ $n.name }}"

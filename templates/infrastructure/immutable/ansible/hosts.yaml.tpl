@@ -115,6 +115,7 @@ all:
       hosts:
         {{- range $n := .spec.infrastructure.nodes }}
         {{ $n.hostname }}:
+          node_arch: {{ $n.arch }}
           {{- if index $n "kernelParameters" }}
           sysctl_parameters:
             {{ $n.kernelParameters | toYaml | indent 12 | trim }}
