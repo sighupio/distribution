@@ -3,6 +3,7 @@
 # license that can be found in the LICENSE file.
 
 data:
+  customResources: []
   customPatches:
     configMapGenerator: []
     secretGenerator: []
@@ -228,6 +229,10 @@ data:
         tolerations: null
         ingresses:
           hubble:
+            disableAuth: false
+            host: ""
+            ingressClass: ""
+          whisker:
             disableAuth: false
             host: ""
             ingressClass: ""

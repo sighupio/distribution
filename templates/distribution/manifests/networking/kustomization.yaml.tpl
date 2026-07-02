@@ -6,6 +6,8 @@
 {{- $haproxyType := .spec.distribution.modules.ingress.haproxy.type }}
 {{- $isBYOIC := .spec.distribution.modules.ingress.byoic.enabled }}
 {{- $hasAnyIngress := or (ne .spec.distribution.modules.ingress.nginx.type "none") (ne $haproxyType "none") $isBYOIC }}
+{{- /* The `digAny` condition needs to be specified exactly as written below to properly check if the field has been populated */}}
+{{- $kubeProxyType := .spec | digAny "kubernetes" "advanced" "kubeProxy" "type" "ipvs" }}
 ---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
@@ -19,10 +21,11 @@ resources:
     {{- if eq .spec.distribution.modules.networking.type "calico" }}
   - {{ print $vendorPrefix "/modules/networking/katalog/tigera/on-prem" }}
   - resources/calico-ns.yml
-      {{- /* We assume that kubeProxy is enabled by default */}}
-      {{- /* The `digAny` condition needs to be specified exactly as written below to properly check if the field has been populated */}}
-      {{- if not (.spec | digAny "kubernetes" "advanced" "kubeProxy" "enabled" true) }}
+      {{- if eq $kubeProxyType "none" }}
   - resources/tigera-kubernetes-service.yaml
+      {{- end }}
+      {{- if $hasAnyIngress }}
+  - resources/whisker-ingress.yml
       {{- end }}
     {{- end }}
     {{- if eq .spec.distribution.modules.networking.type "cilium" }}
@@ -31,6 +34,10 @@ resources:
   - resources/ingress-infra.yml
       {{- end }}
     {{- end }}
+{{- end }}
+
+{{ if and (eq .spec.distribution.common.networkPoliciesEnabled true) (eq .spec.distribution.modules.networking.type "calico") $hasAnyIngress }}
+  - policies
 {{- end }}
 
 patches:
@@ -50,10 +57,10 @@ patches:
       name: tigera-operator
       namespace: tigera-operator
     path: patches/tigera/tigera-operator-tolerations.yaml
-  {{- /* We assume that kubeProxy is enabled by default */}}
-  {{- /* The `digAny` condition needs to be specified exactly as written below to properly check if the field has been populated */}}
-  {{- if not (.spec | digAny "kubernetes" "advanced" "kubeProxy" "enabled" true) }}
+  {{- if eq $kubeProxyType "none" }}
   - path: patches/tigera/ebpf-mode.yaml
+  {{- else if eq $kubeProxyType "nftables" }}
+  - path: patches/tigera/nfTables-dataplane.yaml
   {{- end }}
   {{- end }}
   {{- if eq .spec.distribution.modules.networking.type "cilium" }}
@@ -65,9 +72,7 @@ patches:
       name: cilium-operator
       namespace: kube-system
     path: patches/cilium/cilium-operator-tolerations.yaml
-    {{- /* We assume that kubeProxy is enabled by default */}}
-    {{- /* The `digAny` condition needs to be specified exactly as written below to properly check if the field has been populated */}}
-    {{- if not (.spec | digAny "kubernetes" "advanced" "kubeProxy" "enabled" true) }}
+    {{- if eq $kubeProxyType "none" }}
   - path: patches/cilium/kube-proxy-replacement.yaml
     {{- end }}
   {{- end }}
@@ -83,3 +88,4 @@ configMapGenerator:
     namespace: kube-system
   {{- end }}
 {{- end }}
+

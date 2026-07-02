@@ -17,7 +17,8 @@ resources:
 {{- /* common components for all the monitoring types */}}
   - kapp-configs/prometheus-operator-crd.yaml
   - {{ print $vendorPrefix "/modules/monitoring/katalog/prometheus-operator" }}
-{{- if .spec | digAny "kubernetes" "advanced" "kubeProxy" "enabled" true }}
+{{- /* The `digAny` condition needs to be specified exactly as written below to properly check if the field has been populated */}}
+{{- if ne (.spec | digAny "kubernetes" "advanced" "kubeProxy" "type" "ipvs") "none" }}
   - {{ print $vendorPrefix "/modules/monitoring/katalog/kube-proxy-metrics" }}
 {{- end }}
   - {{ print $vendorPrefix "/modules/monitoring/katalog/kube-state-metrics" }}
@@ -103,7 +104,33 @@ patches:
     {{- end }}
   {{- end }}
 {{- end }}
-{{- if not .spec.distribution.modules.monitoring.alertmanager.installDefaultRules }}
+{{- if .spec.distribution.modules.monitoring.alertmanager.installDefaultRules }}
+{{- if eq .spec.distribution.modules.monitoring.alertmanager.deadManSwitchWebhookUrl "" }}
+  - patch: |-
+      $patch: delete
+      apiVersion: monitoring.coreos.com/v1alpha1
+      kind: AlertmanagerConfig
+      metadata:
+        namespace: monitoring
+        name: deadmanswitch
+{{- end }}
+{{- if eq .spec.distribution.modules.monitoring.alertmanager.slackWebhookUrl "" }}
+  - patch: |-
+      $patch: delete
+      apiVersion: monitoring.coreos.com/v1alpha1
+      kind: AlertmanagerConfig
+      metadata:
+        namespace: monitoring
+        name: infra
+  - patch: |-
+      $patch: delete
+      apiVersion: monitoring.coreos.com/v1alpha1
+      kind: AlertmanagerConfig
+      metadata:
+        namespace: monitoring
+        name: k8s
+{{- end }}
+{{- else }}
 {{- if .spec.distribution.modules.monitoring.alertmanager.deadManSwitchWebhookUrl }}
   - patch: |-
       $patch: delete

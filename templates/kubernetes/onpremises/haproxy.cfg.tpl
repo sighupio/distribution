@@ -42,7 +42,7 @@ backend masters
     option httpchk GET /healthz
     balance roundrobin
     {{- range $h := .spec.kubernetes.masters.hosts }}
-    server {{ $h.name }}.{{ $dnsZone }} {{ $h.ip }}:6443 maxconn 256 check check-ssl ca-file /etc/ssl/certs/kubernetes.crt
+    server {{ $h.name }}.{{ default $dnsZone (index $h "dnsZone") }} {{ $h.ip }}:6443 maxconn 256 check check-ssl ca-file /etc/ssl/certs/kubernetes.crt
     {{- end }}
 
 {{- if index .spec.kubernetes.loadBalancers "additionalConfig" }}

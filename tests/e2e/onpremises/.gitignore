@@ -1,0 +1,22 @@
+# generated, ephemeral test artifacts — never commit
+# rendered by `tofu output` at run time:
+config/furyctl.yaml
+config/req-dns.cnf
+config/haproxy-additional.cfg
+config/kube-bench-hosts.yaml
+# produced by furyctl / the install:
+kubeconfig
+pki/
+tls.crt
+tls.key
+ca.crt
+ca-key.pem
+csr.pem
+*.srl
+*.log
+# tofu working files:
+.terraform/
+.terraform.lock.hcl
+terraform.plan
+terraform.tfstate
+terraform.tfstate.backup

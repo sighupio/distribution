@@ -9,6 +9,8 @@ resources:
   - ../../../vendor/modules/networking/katalog/tigera/on-prem
   - resources/calico-ns.yml
 
+
+
 patches:
   - path: patches/tigera/infra-nodes-and-mask.yaml
   - target:
@@ -18,3 +20,4 @@ patches:
       name: tigera-operator
       namespace: tigera-operator
     path: patches/tigera/tigera-operator-tolerations.yaml
+

@@ -945,6 +945,7 @@ Configuration for Pomerium, an identity-aware reverse proxy used for SSO.
 | [monitoringMinioConsole](#specdistributionmodulesauthpomeriumdefaultroutespolicymonitoringminioconsole)           | `array` | Optional |
 | [monitoringPrometheus](#specdistributionmodulesauthpomeriumdefaultroutespolicymonitoringprometheus)               | `array` | Optional |
 | [tracingMinioConsole](#specdistributionmodulesauthpomeriumdefaultroutespolicytracingminioconsole)                 | `array` | Optional |
+| [whisker](#specdistributionmodulesauthpomeriumdefaultroutespolicywhisker)                                         | `array` | Optional |
 
 ### Description
 
@@ -969,6 +970,8 @@ override default routes for SD components
 ## .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.monitoringPrometheus
 
 ## .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.tracingMinioConsole
+
+## .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.whisker
 
 ## .spec.distribution.modules.auth.pomerium.overrides
 
@@ -5756,10 +5759,10 @@ The value of the kernel parameter to edit. Example: `"15"`
 
 ### Properties
 
-| Property                                                                     | Type      | Required |
-|:-----------------------------------------------------------------------------|:----------|:---------|
-| [additionalProperties](#speckubernetesadvancedkubeproxyadditionalproperties) | `object`  | Optional |
-| [enabled](#speckubernetesadvancedkubeproxyenabled)                           | `boolean` | Optional |
+| Property                                                                     | Type     | Required |
+|:-----------------------------------------------------------------------------|:---------|:---------|
+| [additionalProperties](#speckubernetesadvancedkubeproxyadditionalproperties) | `object` | Optional |
+| [type](#speckubernetesadvancedkubeproxytype)                                 | `string` | Optional |
 
 ### Description
 
@@ -5767,13 +5770,23 @@ Configuration for the kube-proxy component.
 
 ## .spec.kubernetes.advanced.kubeProxy.additionalProperties
 
-## .spec.kubernetes.advanced.kubeProxy.enabled
+## .spec.kubernetes.advanced.kubeProxy.type
 
 ### Description
 
-Setting this option to `false` will skip the installation of the kube-proxy component and install the CNI plugin with the following configuration: Cilium in kube-proxy-replacement mode and Calico in eBPF mode. Default is `true`.
+The operating mode for kube-proxy. `none` skips kube-proxy installation and configures the CNI accordingly (Cilium in kube-proxy-replacement mode, Calico in eBPF mode). `ipvs` installs kube-proxy in IPVS mode (default). `nftables` installs kube-proxy in nftables mode.
 
-NOTE: Changing this option after the cluster has been created is not currently supported.
+NOTE: Changing to `type: none` after the cluster has been created is not currently supported.
+
+### Constraints
+
+**enum**: the value of this property must be equal to one of the following string values:
+
+| Value      |
+|:-----------|
+|`"none"`    |
+|`"ipvs"`    |
+|`"nftables"`|
 
 ## .spec.kubernetes.advanced.kubeletConfiguration
 
