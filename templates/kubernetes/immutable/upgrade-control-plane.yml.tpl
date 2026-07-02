@@ -2,7 +2,7 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 ---
-# Control-plane upgrade, serial 1: refresh only the kubeadm CLI + kubeadm apply before the post_tasks reboot (daemons activate at boot).
+# Control-plane upgrade, serial 1: refresh the kubernetes sysext, renew certs, and kubeadm upgrade apply (restarts the static pods in-band); the post_tasks reboot activates the staged OS (and the swapped kubelet binary, unless its config-patch handler restarted the kubelet first).
 - name: Upgrade the control plane
   hosts: control_plane
   serial: 1
