@@ -48,7 +48,7 @@ spec:
     - protocol: TCP
       port: 8080
 {{- end }}
-{{- if eq .spec.distribution.modules.auth.provider.type "basicAuth" }}
+{{- if and (ne .spec.distribution.modules.auth.provider.type "sso") (ne .spec.distribution.modules.ingress.haproxy.type "none") }}
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -75,7 +75,8 @@ spec:
     ports:
     - protocol: TCP
       port: 8080
-{{- if ne .spec.distribution.modules.ingress.nginx.type "none" }}
+{{- end }}
+{{- if and (ne .spec.distribution.modules.auth.provider.type "sso") (ne .spec.distribution.modules.ingress.nginx.type "none") }}
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -102,5 +103,4 @@ spec:
     ports:
     - protocol: TCP
       port: 8080
-{{- end }}
 {{- end }}
