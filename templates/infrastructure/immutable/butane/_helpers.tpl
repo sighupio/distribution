@@ -271,6 +271,7 @@ passwd:
         Description=Report node status to furyctl
         Requires=network-online.target
         After=network-online.target
+        After=sshd.service
         ConditionFirstBoot=yes
 
         [Service]
