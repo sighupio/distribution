@@ -47,8 +47,8 @@ spec:
     - from:
         - podSelector:
             matchLabels:
-              app.kubernetes.io/name: opensearch-dashboards
-              app.kubernetes.io/instance: opensearch-dashboards
+              app.kubernetes.io/name: opensearch-dashboards-patterns-job
+              app.kubernetes.io/instance: opensearch-dashboards-patterns-job
       ports:
         - port: 5601
           protocol: TCP
@@ -119,8 +119,8 @@ spec:
     - Egress
   podSelector:
     matchLabels:
-      app.kubernetes.io/name: opensearch-dashboards
-      app.kubernetes.io/instance: opensearch-dashboards
+      app.kubernetes.io/name: opensearch-dashboards-patterns-job
+      app.kubernetes.io/instance: opensearch-dashboards-patterns-job
   egress:
     - to:
         - podSelector:
