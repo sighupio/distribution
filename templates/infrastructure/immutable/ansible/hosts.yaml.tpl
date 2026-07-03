@@ -43,14 +43,9 @@ all:
               server {{ $h.hostname }} {{ $h.hostname }}:6443 check check-ssl ca-file /usr/local/etc/haproxy/kubernetes.crt
               {{- end }}
           {{- end }}
-        {{- if index .spec.infrastructure.loadBalancers "haproxy" }}
-          {{- if index .spec.infrastructure.loadBalancers.haproxy "image" }}
-        haproxy_container_image: "{{ .spec.infrastructure.loadBalancers.haproxy.image }}"
-          {{- end }}
-          {{- if index .spec.infrastructure.loadBalancers.haproxy "tag" }}
-        haproxy_container_tag: "{{ .spec.infrastructure.loadBalancers.haproxy.tag }}"
-          {{- end }}
-        {{- end }}
+        # haproxy image/tag: user value from furyctl.yaml wins; immutable.yaml pin is the fallback.
+        haproxy_container_image: "{{ .spec | digAny "infrastructure" "loadBalancers" "haproxy" "image" "" | default .versions.haproxy_container_image }}"
+        haproxy_container_tag: "{{ .spec | digAny "infrastructure" "loadBalancers" "haproxy" "tag" "" | default .versions.haproxy_container_tag }}"
         kubernetes_local_pki_dir: "{{ .spec.kubernetes.pkiPath }}/master"
         {{- if (index .spec.infrastructure.loadBalancers "containerd") }}
         {{- $containerd := .spec.infrastructure.loadBalancers.containerd }}
@@ -122,6 +117,8 @@ all:
           {{- end -}}
         {{- end }}
   vars:
+    # Version pin from immutable.yaml (single source); consumed by the containerd role.
+    containerd_sandbox_image: {{ .versions.containerd_sandbox_image }}
     ansible_python_interpreter: "{{ .spec | digAny "toolsConfiguration" "ansible" "pythonInterpreter" "python3" }}"
     ansible_ssh_private_key_file: "{{ .spec.infrastructure.ssh.privateKeyPath }}"
     ansible_user: "{{ .spec.infrastructure.ssh.username }}"
