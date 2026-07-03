@@ -11,7 +11,6 @@
   become: true
   vars:
     upgrade: true
-    k8s_upgrade: true
     os_update_apply: true
     os_update_reboot: true
     skip_pods_running_check: {{ .options | digAny "skipPodsRunningCheck" false }}
