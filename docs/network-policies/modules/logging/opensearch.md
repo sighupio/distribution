@@ -12,7 +12,8 @@ graph TD
         bucket[MinIO Bucket Setup<br/>app: minio-logging-buckets-setup]
         op[Logging Operator<br/>app.kubernetes.io/name: logging-operator]
         et[Event Tailer<br/>app.kubernetes.io/name: event-tailer]
-        job[OpenSearch Jobs]
+        ispj[Index Patterns Job<br/>app.kubernetes.io/name: opensearch-dashboards-patterns-job]
+        ismj[ISM Policy Job<br/>app.kubernetes.io/name: opensearch-ism-policy-job]
     end
 
     %% External and K8s Core Components
@@ -33,8 +34,8 @@ graph TD
     fd -->|"egress: all"| os
     osd -->|"9200/TCP"| os
     pom -->|"5601/TCP"| osd
-    job -->|"5601/TCP"| osd
-    job -->|"9200/TCP"| os
+    ispj -->|"5601/TCP"| osd
+    ismj -->|"9200/TCP"| os
     prom -->|"2020/TCP"| fb
     prom -->|"24231/TCP"| fd
     prom -->|"9108/TCP"| os
