@@ -8,16 +8,17 @@ For a complete list of all SD releases and their compatibility with Kubernetes v
 
 ℹ️ **Use the latest patch release for your desired version whenever it's possible**. See [the versioning file](VERSIONING.md) for more information.
 
-| SD / Kubernetes Version                                                  | v1.34.X            | v1.33.X            | v1.32.X            |
-| ------------------------------------------------------------------------ | ------------------ | ------------------ | ------------------ |
-| [v1.34.1](https://github.com/sighupio/distribution/releases/tag/v1.34.1) | :white_check_mark: |                    |                    |
-| [v1.34.0](https://github.com/sighupio/distribution/releases/tag/v1.34.0) | :white_check_mark: |                    |                    |
-| [v1.33.2](https://github.com/sighupio/distribution/releases/tag/v1.33.1) |                    | :white_check_mark: |                    |
-| [v1.33.1](https://github.com/sighupio/distribution/releases/tag/v1.33.1) |                    | :white_check_mark: |                    |
-| [v1.33.0](https://github.com/sighupio/distribution/releases/tag/v1.33.0) |                    | :white_check_mark: |                    |
-| [v1.32.2](https://github.com/sighupio/distribution/releases/tag/v1.32.2) |                    |                    | :white_check_mark: |
-| [v1.32.1](https://github.com/sighupio/distribution/releases/tag/v1.32.1) |                    |                    | :white_check_mark: |
-| [v1.32.0](https://github.com/sighupio/distribution/releases/tag/v1.32.0) |                    |                    | :white_check_mark: |
+| SD / Kubernetes Version                                                  | v1.35.x            | v1.34.X            | v1.33.X            | v1.32.X            |
+|--------------------------------------------------------------------------|--------------------|--------------------|--------------------|--------------------|
+| [v1.35.0](https://github.com/sighupio/distribution/releases/tag/v1.35.0) | :white_check_mark: |                    |                    |                    |
+| [v1.34.1](https://github.com/sighupio/distribution/releases/tag/v1.34.1) |                    | :white_check_mark: |                    |                    |
+| [v1.34.0](https://github.com/sighupio/distribution/releases/tag/v1.34.0) |                    | :white_check_mark: |                    |                    |
+| [v1.33.2](https://github.com/sighupio/distribution/releases/tag/v1.33.1) |                    |                    | :white_check_mark: |                    |
+| [v1.33.1](https://github.com/sighupio/distribution/releases/tag/v1.33.1) |                    |                    | :white_check_mark: |                    |
+| [v1.33.0](https://github.com/sighupio/distribution/releases/tag/v1.33.0) |                    |                    | :white_check_mark: |                    |
+| [v1.32.2](https://github.com/sighupio/distribution/releases/tag/v1.32.2) |                    |                    |                    | :white_check_mark: |
+| [v1.32.1](https://github.com/sighupio/distribution/releases/tag/v1.32.1) |                    |                    |                    | :white_check_mark: |
+| [v1.32.0](https://github.com/sighupio/distribution/releases/tag/v1.32.0) |                    |                    |                    | :white_check_mark: |
 
 |       Legend       | Meaning          |
 | :----------------: | ---------------- |
