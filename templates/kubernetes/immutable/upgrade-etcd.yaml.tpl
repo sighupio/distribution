@@ -18,8 +18,8 @@
     os_update_reboot: true
 {{- end }}
   pre_tasks:
-    # admin.conf lives only on control-planes; acquire it resiliently via the upgrade-gates role so dedicated etcd works too.
-    - name: Acquire admin.conf for the controller-side kubectl checks
+    # super-admin.conf lives only on control-planes; acquire it resiliently via the upgrade-gates role so dedicated etcd works too.
+    - name: Acquire super-admin.conf for the controller-side kubectl checks
       run_once: true
       ansible.builtin.include_role:
         name: upgrade-gates

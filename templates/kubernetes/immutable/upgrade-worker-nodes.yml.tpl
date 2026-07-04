@@ -16,6 +16,13 @@
     skip_pods_running_check: {{ .options | digAny "skipPodsRunningCheck" false }}
     pods_running_retries: {{ .options.podRunningTimeout | default 10 }}
   pre_tasks:
+    # Acquire super-admin.conf on the controller before any controller-side kubectl check. A single-node
+    # `--upgrade-node` runs ONLY this play, so it can't rely on the etcd play's fetch.
+    - name: Acquire super-admin.conf for the controller-side kubectl checks
+      run_once: true
+      ansible.builtin.include_role:
+        name: upgrade-gates
+        tasks_from: fetch_admin_conf.yml
     # G10 infra preflight (disk, .raw reachability, A/B rollback) before any disruptive work.
     - name: Infrastructure preflight before the upgrade
       ansible.builtin.include_role:
@@ -60,3 +67,15 @@
         msg: "{{ "{{ inventory_hostname }} upgraded to Kubernetes {{ kubernetes_version }} / Flatcar {{ ansible_facts['distribution_version'] | default('unknown') }}" }}"
   tags:
     - kube-worker
+
+# Remove the fetched super-admin.conf (system:masters) from the controller workdir once the whole worker phase
+# finishes. A dedicated localhost play (not a serial post_task), so it runs exactly once, after all nodes.
+- name: Clean up the controller super-admin.conf
+  hosts: localhost
+  gather_facts: false
+  become: false
+  tasks:
+    - name: Remove the fetched super-admin.conf from the controller
+      ansible.builtin.file:
+        path: ./super-admin.conf
+        state: absent

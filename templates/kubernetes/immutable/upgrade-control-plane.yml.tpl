@@ -60,3 +60,15 @@
         msg: "{{ "{{ inventory_hostname }} upgraded to Kubernetes {{ kubernetes_version }} / Flatcar {{ ansible_facts['distribution_version'] | default('unknown') }}" }}"
   tags:
     - kubeadm-upgrade
+
+# Clean up the fetched super-admin.conf for a control-plane-only upgrade (--skip-nodes-upgrade), where the worker
+# play that would otherwise clean it never runs. On a full upgrade the worker play re-fetches and cleans afterwards.
+- name: Clean up the controller super-admin.conf
+  hosts: localhost
+  gather_facts: false
+  become: false
+  tasks:
+    - name: Remove the fetched super-admin.conf from the controller
+      ansible.builtin.file:
+        path: ./super-admin.conf
+        state: absent
