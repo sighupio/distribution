@@ -68,14 +68,16 @@
   tags:
     - kube-worker
 
-# Remove the fetched super-admin.conf (system:masters) from the controller workdir once the whole worker phase
-# finishes. A dedicated localhost play (not a serial post_task), so it runs exactly once, after all nodes.
+# Remove the fetched super-admin.conf (system:masters) from the controller workdir once the worker phase finishes.
+# hosts: nodes (not localhost) so it survives the --limit that `--upgrade-node` adds; run_once + delegate to localhost.
 - name: Clean up the controller super-admin.conf
-  hosts: localhost
+  hosts: nodes
   gather_facts: false
   become: false
   tasks:
     - name: Remove the fetched super-admin.conf from the controller
+      run_once: true
+      delegate_to: localhost
       ansible.builtin.file:
         path: ./super-admin.conf
         state: absent

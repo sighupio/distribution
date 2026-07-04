@@ -62,13 +62,15 @@
     - kubeadm-upgrade
 
 # Clean up the fetched super-admin.conf for a control-plane-only upgrade (--skip-nodes-upgrade), where the worker
-# play that would otherwise clean it never runs. On a full upgrade the worker play re-fetches and cleans afterwards.
+# play that would otherwise clean it never runs. hosts: control_plane (not localhost) to survive any --limit; run_once + delegate.
 - name: Clean up the controller super-admin.conf
-  hosts: localhost
+  hosts: control_plane
   gather_facts: false
   become: false
   tasks:
     - name: Remove the fetched super-admin.conf from the controller
+      run_once: true
+      delegate_to: localhost
       ansible.builtin.file:
         path: ./super-admin.conf
         state: absent
