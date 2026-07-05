@@ -68,14 +68,15 @@
   tags:
     - kube-worker
 
-# Remove the fetched super-admin.conf (system:masters) from the controller workdir once the worker phase finishes.
-# hosts: nodes (not localhost) so it survives the --limit that `--upgrade-node` adds; run_once + delegate to localhost.
-- name: Clean up the controller super-admin.conf
+# Optionally scrub the fetched controller/bastion ./super-admin.conf (delegate_to localhost) — NOT the node file. Skipped by default; keep it local for ops.
+# TODO(security): default keeps a system:masters god-mode credential on the bastion (security risk) — revisit scrubbing it or running the gates node-side.
+- name: Remove the fetched controller-side super-admin.conf (bastion local temp, not the node file)
   hosts: nodes
   gather_facts: false
   become: false
   tasks:
-    - name: Remove the fetched super-admin.conf from the controller
+    - name: Remove ./super-admin.conf fetched to the controller workdir
+      when: (upgrade_delete_fetched_super_admin | default(false)) | bool
       run_once: true
       delegate_to: localhost
       ansible.builtin.file:
