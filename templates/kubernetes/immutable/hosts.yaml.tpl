@@ -203,7 +203,8 @@ all:
     # kubernetes_image_registry: user value from furyctl.yaml wins; immutable.yaml pin is the fallback.
     kubernetes_image_registry: "{{ .spec.kubernetes | digAny "advanced" "registry" "" | default .versions.kubernetes_image_registry }}"
     # Version pins from immutable.yaml (single source); consumed by containerd / kube-control-plane / os-upgrade / sysext roles.
-    containerd_sandbox_image: {{ .versions.containerd_sandbox_image }}
+    # Only the pause tag is pinned; the containerd role derives the image as {{ `{{ kubernetes_image_registry }}` }}/pause:<tag> so a custom registry wins.
+    containerd_sandbox_tag: {{ .versions.containerd_sandbox_tag }}
     coredns_image_prefix: {{ .versions.coredns_image_prefix }}
     kubelet_csr_approver_tag: {{ .versions.kubelet_csr_approver_tag }}
     os_update_target_version: {{ .versions.os_update_target_version }}

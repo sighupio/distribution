@@ -117,8 +117,12 @@ all:
           {{- end -}}
         {{- end }}
   vars:
-    # Version pin from immutable.yaml (single source); consumed by the containerd role.
-    containerd_sandbox_image: {{ .versions.containerd_sandbox_image }}
+    # kubernetes_image_registry: user value from furyctl.yaml wins; immutable.yaml pin is the fallback.
+    # The LB runs the containerd role, so it needs the registry to derive the sandbox image (the LB never
+    # pulls a CRI pod sandbox, so this is inert there, but keeps the derivation valid on any containerd host).
+    kubernetes_image_registry: "{{ .spec.kubernetes | digAny "advanced" "registry" "" | default .versions.kubernetes_image_registry }}"
+    # Only the pause tag is pinned; the containerd role derives the image so a custom registry wins.
+    containerd_sandbox_tag: {{ .versions.containerd_sandbox_tag }}
     ansible_python_interpreter: "{{ .spec | digAny "toolsConfiguration" "ansible" "pythonInterpreter" "python3" }}"
     ansible_ssh_private_key_file: "{{ .spec.infrastructure.ssh.privateKeyPath }}"
     ansible_user: "{{ .spec.infrastructure.ssh.username }}"
