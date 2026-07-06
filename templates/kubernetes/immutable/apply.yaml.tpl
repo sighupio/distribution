@@ -20,7 +20,6 @@
     - etcd
 {{- end }}
 
-# TODO: que pasa cuando no quiero usar keepalived entonces no lo especifico en el furyctl.yaml?
 - name: Set up Control Plane VIP
   become: true
   roles:

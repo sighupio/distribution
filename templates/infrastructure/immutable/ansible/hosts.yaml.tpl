@@ -43,14 +43,9 @@ all:
               server {{ $h.hostname }} {{ $h.hostname }}:6443 check check-ssl ca-file /usr/local/etc/haproxy/kubernetes.crt
               {{- end }}
           {{- end }}
-        {{- if index .spec.infrastructure.loadBalancers "haproxy" }}
-          {{- if index .spec.infrastructure.loadBalancers.haproxy "image" }}
-        haproxy_container_image: "{{ .spec.infrastructure.loadBalancers.haproxy.image }}"
-          {{- end }}
-          {{- if index .spec.infrastructure.loadBalancers.haproxy "tag" }}
-        haproxy_container_tag: "{{ .spec.infrastructure.loadBalancers.haproxy.tag }}"
-          {{- end }}
-        {{- end }}
+        # haproxy image/tag: user value from furyctl.yaml wins; immutable.yaml pin is the fallback.
+        haproxy_container_image: "{{ .spec | digAny "infrastructure" "loadBalancers" "haproxy" "image" "" | default .versions.haproxy_container_image }}"
+        haproxy_container_tag: "{{ .spec | digAny "infrastructure" "loadBalancers" "haproxy" "tag" "" | default .versions.haproxy_container_tag }}"
         kubernetes_local_pki_dir: "{{ .spec.kubernetes.pkiPath }}/master"
         {{- if (index .spec.infrastructure.loadBalancers "containerd") }}
         {{- $containerd := .spec.infrastructure.loadBalancers.containerd }}
@@ -115,12 +110,19 @@ all:
       hosts:
         {{- range $n := .spec.infrastructure.nodes }}
         {{ $n.hostname }}:
+          node_arch: {{ $n.arch }}
           {{- if index $n "kernelParameters" }}
           sysctl_parameters:
             {{ $n.kernelParameters | toYaml | indent 12 | trim }}
           {{- end -}}
         {{- end }}
   vars:
+    # kubernetes_image_registry: user value from furyctl.yaml wins; immutable.yaml pin is the fallback.
+    # The LB runs the containerd role, so it needs the registry to derive the sandbox image (the LB never
+    # pulls a CRI pod sandbox, so this is inert there, but keeps the derivation valid on any containerd host).
+    kubernetes_image_registry: "{{ .spec.kubernetes | digAny "advanced" "registry" "" | default .versions.kubernetes_image_registry }}"
+    # Only the pause tag is pinned; the containerd role derives the image so a custom registry wins.
+    containerd_sandbox_tag: {{ .versions.containerd_sandbox_tag }}
     ansible_python_interpreter: "{{ .spec | digAny "toolsConfiguration" "ansible" "pythonInterpreter" "python3" }}"
     ansible_ssh_private_key_file: "{{ .spec.infrastructure.ssh.privateKeyPath }}"
     ansible_user: "{{ .spec.infrastructure.ssh.username }}"
