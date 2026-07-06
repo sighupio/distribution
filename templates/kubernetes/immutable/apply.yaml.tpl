@@ -20,7 +20,6 @@
     - etcd
 {{- end }}
 
-# TODO: make keepalived optional — today the VIP role always runs even if the user omits keepalived from furyctl.yaml.
 - name: Set up Control Plane VIP
   become: true
   roles:
