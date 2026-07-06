@@ -6,7 +6,7 @@
   {{- $etcdOnControlPlane = false }}
 {{- end }}
 ---
-# etcd upgrade: align the etcd sysext + renew certs; stacked etcd rides the control-plane reboot, dedicated etcd stages+reboots the OS here (serial:1, quorum-guarded, snapshot first).
+# etcd upgrade: align the sysext + renew certs; stacked rides the CP reboot, dedicated stages+reboots here (serial:1, quorum-guarded, snapshot first).
 - name: Upgrade etcd
   hosts: {{ if $etcdOnControlPlane }}control_plane{{ else }}etcd{{ end }}
   serial: 1
@@ -24,9 +24,7 @@
       ansible.builtin.include_role:
         name: upgrade-gates
         tasks_from: fetch_admin_conf.yml
-    # G1 (add-immutable-upgrade-gates): pre-upgrade cluster-health gate. run_once so it gates the whole run
-    # — asserting all nodes Ready, the API reachable, no partial upgrade, and etcd healthy — BEFORE the
-    # first node is touched. Aborts here rather than starting on an already-degraded cluster.
+    # Pre-upgrade cluster-health gate (run_once): assert all nodes Ready, API reachable, no partial upgrade, etcd healthy — abort before touching any node.
     - name: Gate the upgrade on overall cluster health
       run_once: true
       ansible.builtin.include_role:

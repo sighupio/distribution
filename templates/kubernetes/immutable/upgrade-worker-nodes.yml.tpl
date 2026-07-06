@@ -2,9 +2,7 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 ---
-# Worker upgrade: stage, reboot to activate at boot, then kubeadm (reboot runs inside the kube-worker role).
-# serial defaults to 1; workers run no etcd, so raising it (opt-in) parallelizes the worker phase without
-# touching quorum — real concurrency is bounded by PodDisruptionBudgets + the drain --timeout.
+# Worker upgrade: stage sysext, drain, reboot to activate, then kubeadm; serial:1 (raise opt-in, bounded by PDBs + drain timeout).
 - name: Upgrade the worker nodes
   hosts: nodes
   serial: {{ .options | digAny "workerUpgradeSerial" 1 }}
@@ -16,19 +14,18 @@
     skip_pods_running_check: {{ .options | digAny "skipPodsRunningCheck" false }}
     pods_running_retries: {{ .options.podRunningTimeout | default 10 }}
   pre_tasks:
-    # Acquire super-admin.conf on the controller before any controller-side kubectl check. A single-node
-    # `--upgrade-node` runs ONLY this play, so it can't rely on the etcd play's fetch.
+    # Fetch super-admin.conf to the controller for the kubectl checks; a single-node --upgrade-node runs only this play, so it self-fetches.
     - name: Acquire super-admin.conf for the controller-side kubectl checks
       run_once: true
       ansible.builtin.include_role:
         name: upgrade-gates
         tasks_from: fetch_admin_conf.yml
-    # G10 infra preflight (disk, .raw reachability, A/B rollback) before any disruptive work.
+    # Infra preflight (disk, .raw reachability, A/B rollback) before any disruptive work.
     - name: Infrastructure preflight before the upgrade
       ansible.builtin.include_role:
         name: upgrade-gates
         tasks_from: infra_preflight.yml
-    # Launch the OS stage async so the Flatcar download overlaps the sysext staging and drain before the role reboots.
+    # Stage the OS update async so the Flatcar download overlaps the sysext staging + drain.
     - name: Stage the operating system update (async)
       ansible.builtin.include_role:
         name: os-upgrade
@@ -47,7 +44,7 @@
     - containerd
     - kube-worker
   post_tasks:
-    # G6 post-upgrade sanity (binaries/runtime/overlay/Ready) before the node is returned to service.
+    # Post-upgrade sanity (binaries/runtime/overlay/Ready) before returning the node to service.
     - name: Post-upgrade node sanity check
       ansible.builtin.include_role:
         name: upgrade-gates

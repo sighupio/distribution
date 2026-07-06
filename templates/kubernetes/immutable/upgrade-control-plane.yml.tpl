@@ -2,7 +2,7 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 ---
-# Control-plane upgrade, serial 1: refresh the kubernetes sysext, renew certs, and kubeadm upgrade apply (restarts the static pods in-band); the post_tasks reboot activates the staged OS (and the swapped kubelet binary, unless its config-patch handler restarted the kubelet first).
+# Control-plane upgrade (serial:1): sysext refresh, cert renewal, kubeadm upgrade apply (in-band static-pod restart), then reboot to activate the staged OS.
 - name: Upgrade the control plane
   hosts: control_plane
   serial: 1
@@ -12,7 +12,7 @@
     os_update_apply: true
     os_update_reboot: true
   pre_tasks:
-    # G10 infra preflight (disk, .raw reachability, A/B rollback) before any disruptive work.
+    # Infra preflight (disk, .raw reachability, A/B rollback) before any disruptive work.
     - name: Infrastructure preflight before the upgrade
       ansible.builtin.include_role:
         name: upgrade-gates
@@ -41,7 +41,7 @@
       ansible.builtin.include_role:
         name: os-upgrade
         tasks_from: os_reboot.yml
-    # G6 post-upgrade sanity (binaries/runtime/overlay/Ready) before the node is returned to service.
+    # Post-upgrade sanity (binaries/runtime/overlay/Ready) before the node is returned to service.
     - name: Post-upgrade node sanity check
       ansible.builtin.include_role:
         name: upgrade-gates

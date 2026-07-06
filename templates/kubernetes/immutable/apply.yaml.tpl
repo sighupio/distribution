@@ -20,7 +20,7 @@
     - etcd
 {{- end }}
 
-# TODO: que pasa cuando no quiero usar keepalived entonces no lo especifico en el furyctl.yaml?
+# TODO: make keepalived optional — today the VIP role always runs even if the user omits keepalived from furyctl.yaml.
 - name: Set up Control Plane VIP
   become: true
   roles:
