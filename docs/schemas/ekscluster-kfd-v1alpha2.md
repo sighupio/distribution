@@ -91,11 +91,12 @@ The name of the cluster. It will also be used as a prefix for all the other reso
 
 ### Properties
 
-| Property                                        | Type     | Required |
-|:------------------------------------------------|:---------|:---------|
-| [common](#specdistributioncommon)               | `object` | Optional |
-| [customPatches](#specdistributioncustompatches) | `object` | Optional |
-| [modules](#specdistributionmodules)             | `object` | Required |
+| Property                                            | Type     | Required |
+|:----------------------------------------------------|:---------|:---------|
+| [common](#specdistributioncommon)                   | `object` | Optional |
+| [customPatches](#specdistributioncustompatches)     | `object` | Optional |
+| [customResources](#specdistributioncustomresources) | `object` | Optional |
+| [modules](#specdistributionmodules)                 | `object` | Required |
 
 ## .spec.distribution.common
 
@@ -523,6 +524,12 @@ The labels of the secret
 ### Description
 
 The type of the secret
+
+## .spec.distribution.customResources
+
+### Description
+
+Add custom resources to the distribution phase. Each entry should point to a resource file, a kustomize base, or a remote resource (e.g. a git repository or URL). `customResources` should be used when you _need_ the resources to be applyed in the distribution phase together with the rest of the modules; prefer using Plugins instead when possible.
 
 ## .spec.distribution.modules
 

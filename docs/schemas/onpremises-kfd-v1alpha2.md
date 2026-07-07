@@ -87,11 +87,12 @@ The name of the cluster. It will also be used as a prefix for all the other reso
 
 ### Properties
 
-| Property                                        | Type     | Required |
-|:------------------------------------------------|:---------|:---------|
-| [common](#specdistributioncommon)               | `object` | Optional |
-| [customPatches](#specdistributioncustompatches) | `object` | Optional |
-| [modules](#specdistributionmodules)             | `object` | Required |
+| Property                                            | Type     | Required |
+|:----------------------------------------------------|:---------|:---------|
+| [common](#specdistributioncommon)                   | `object` | Optional |
+| [customPatches](#specdistributioncustompatches)     | `object` | Optional |
+| [customResources](#specdistributioncustomresources) | `object` | Optional |
+| [modules](#specdistributionmodules)                 | `object` | Required |
 
 ## .spec.distribution.common
 
@@ -526,6 +527,12 @@ The labels of the secret
 ### Description
 
 The type of the secret
+
+## .spec.distribution.customResources
+
+### Description
+
+Add custom resources to the distribution phase. Each entry should point to a resource file, a kustomize base, or a remote resource (e.g. a git repository or URL). `customResources` should be used when you _need_ the resources to be applyed in the distribution phase together with the rest of the modules; prefer using Plugins instead when possible.
 
 ## .spec.distribution.modules
 
@@ -5957,10 +5964,11 @@ Optional configuration for an etcd cluster on dedicated nodes. If omitted, etcd 
 
 ### Properties
 
-| Property                             | Type     | Required |
-|:-------------------------------------|:---------|:---------|
-| [ip](#speckubernetesetcdhostsip)     | `string` | Required |
-| [name](#speckubernetesetcdhostsname) | `string` | Required |
+| Property                                   | Type     | Required |
+|:-------------------------------------------|:---------|:---------|
+| [dnsZone](#speckubernetesetcdhostsdnszone) | `string` | Optional |
+| [ip](#speckubernetesetcdhostsip)           | `string` | Required |
+| [name](#speckubernetesetcdhostsname)       | `string` | Required |
 
 ### Description
 
@@ -5969,6 +5977,12 @@ List of nodes of the dedicated etcd cluster.
 ### Constraints
 
 **minimum number of items**: the minimum number of items for this array is: `1`
+
+## .spec.kubernetes.etcd.hosts.dnsZone
+
+### Description
+
+Optional per-host DNS zone override. When set, takes precedence over `.spec.kubernetes.dnsZone` when computing the FQDN for this etcd node.
 
 ## .spec.kubernetes.etcd.hosts.ip
 
@@ -5980,7 +5994,7 @@ The IP address of the etcd node.
 
 ### Description
 
-A name to identify the etcd node. This value will be concatenated to `.spec.kubernetes.dnsZone` to calculate the FQDN for the host as `<name>.<dnsZone>`.
+A name to identify the etcd node. This value will be concatenated to `.spec.kubernetes.dnsZone` (or the host-level `dnsZone` if set) to calculate the FQDN for the host as `<name>.<dnsZone>`.
 
 ## .spec.kubernetes.loadBalancers
 
@@ -6011,10 +6025,17 @@ Set to true to install HAProxy and configure it as a load balancer on the the lo
 
 ### Properties
 
-| Property                                      | Type     | Required |
-|:----------------------------------------------|:---------|:---------|
-| [ip](#speckubernetesloadbalancershostsip)     | `string` | Required |
-| [name](#speckubernetesloadbalancershostsname) | `string` | Required |
+| Property                                            | Type     | Required |
+|:----------------------------------------------------|:---------|:---------|
+| [dnsZone](#speckubernetesloadbalancershostsdnszone) | `string` | Optional |
+| [ip](#speckubernetesloadbalancershostsip)           | `string` | Required |
+| [name](#speckubernetesloadbalancershostsname)       | `string` | Required |
+
+## .spec.kubernetes.loadBalancers.hosts.dnsZone
+
+### Description
+
+Optional per-host DNS zone override. When set, takes precedence over `.spec.kubernetes.dnsZone` when computing the FQDN for this host.
 
 ## .spec.kubernetes.loadBalancers.hosts.ip
 
@@ -6026,7 +6047,7 @@ The IP address of the host.
 
 ### Description
 
-A name to identify the host. This value will be concatenated to `.spec.kubernetes.dnsZone` to calculate the FQDN for the host as `<name>.<dnsZone>`.
+A name to identify the host. This value will be concatenated to `.spec.kubernetes.dnsZone` (or the host-level `dnsZone` if set) to calculate the FQDN for the host as `<name>.<dnsZone>`.
 
 ## .spec.kubernetes.loadBalancers.keepalived
 
@@ -6132,10 +6153,17 @@ Optional additional Kubernetes annotations that will be added to the control-pla
 
 ### Properties
 
-| Property                                | Type     | Required |
-|:----------------------------------------|:---------|:---------|
-| [ip](#speckubernetesmastershostsip)     | `string` | Required |
-| [name](#speckubernetesmastershostsname) | `string` | Required |
+| Property                                      | Type     | Required |
+|:----------------------------------------------|:---------|:---------|
+| [dnsZone](#speckubernetesmastershostsdnszone) | `string` | Optional |
+| [ip](#speckubernetesmastershostsip)           | `string` | Required |
+| [name](#speckubernetesmastershostsname)       | `string` | Required |
+
+## .spec.kubernetes.masters.hosts.dnsZone
+
+### Description
+
+Optional per-host DNS zone override. When set, takes precedence over `.spec.kubernetes.dnsZone` when computing the FQDN for this host.
 
 ## .spec.kubernetes.masters.hosts.ip
 
@@ -6147,7 +6175,7 @@ The IP address of the host
 
 ### Description
 
-A name to identify the host. This value will be concatenated to `.spec.kubernetes.dnsZone` to calculate the FQDN for the host as `<name>.<dnsZone>`.
+A name to identify the host. This value will be concatenated to `.spec.kubernetes.dnsZone` (or the host-level `dnsZone` if set) to calculate the FQDN for the host as `<name>.<dnsZone>`.
 
 ## .spec.kubernetes.masters.kernelParameters
 
@@ -6279,14 +6307,21 @@ Optional additional Kubernetes annotations that will be added to the nodes in th
 
 ### Properties
 
-| Property                              | Type     | Required |
-|:--------------------------------------|:---------|:---------|
-| [ip](#speckubernetesnodeshostsip)     | `string` | Required |
-| [name](#speckubernetesnodeshostsname) | `string` | Required |
+| Property                                    | Type     | Required |
+|:--------------------------------------------|:---------|:---------|
+| [dnsZone](#speckubernetesnodeshostsdnszone) | `string` | Optional |
+| [ip](#speckubernetesnodeshostsip)           | `string` | Required |
+| [name](#speckubernetesnodeshostsname)       | `string` | Required |
 
 ### Constraints
 
 **minimum number of items**: the minimum number of items for this array is: `1`
+
+## .spec.kubernetes.nodes.hosts.dnsZone
+
+### Description
+
+Optional per-host DNS zone override. When set, takes precedence over `.spec.kubernetes.dnsZone` when computing the FQDN for this host.
 
 ## .spec.kubernetes.nodes.hosts.ip
 
@@ -6298,7 +6333,7 @@ The IP address of the host
 
 ### Description
 
-A name to identify the host. This value will be concatenated to `.spec.kubernetes.dnsZone` to calculate the FQDN for the host as `<name>.<dnsZone>`.
+A name to identify the host. This value will be concatenated to `.spec.kubernetes.dnsZone` (or the host-level `dnsZone` if set) to calculate the FQDN for the host as `<name>.<dnsZone>`.
 
 ## .spec.kubernetes.nodes.kernelParameters
 
