@@ -45,7 +45,7 @@ tools:
     yq:
       version: 4.34.1
     helm:
-      version: 3.19.0
+      version: 3.21.2
     helmfile:
       version: 1.2.3
     kapp:
