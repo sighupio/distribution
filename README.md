@@ -12,7 +12,7 @@
 <!-- markdownlint-enable MD033 MD045 -->
 
 [![Build Status](http://ci.sighup.io/api/badges/sighupio/distribution/status.svg?ref=refs/tags/v1.34.1)](http://ci.sighup.io/sighupio/distribution)
-[![Release](https://img.shields.io/badge/release-v1.34.1-blue?label=DistributionRelease)](https://github.com/sighupio/distribution/releases/latest)
+[![Release](https://img.shields.io/badge/release-v1.35.0-blue?label=DistributionRelease)](https://github.com/sighupio/distribution/releases/latest)
 [![Slack](https://img.shields.io/badge/slack-@kubernetes/fury-yellow.svg?logo=slack)](https://kubernetes.slack.com/archives/C0154HYTAQH)
 [![License](https://img.shields.io/github/license/sighupio/distribution)](https://github.com/sighupio/distribution/blob/main/LICENSE)
 
@@ -71,7 +71,7 @@ A SD production grade cluster will be composed of 3 node pools:
 #### Nodes sizing
 
 | Node Role      | CPU (cores) | RAM (GB) | Disk (GB) | Qty. |
-| -------------- | ----------- | -------- | --------- | ---- |
+|----------------|-------------|----------|-----------|------|
 | Control Plane  | 2           | 8        | 50        | 3    |
 | Infrastructure | 4           | 16       | 50        | 3    |
 | Load Balancer  | 2           | 2        | 50        | 2    |
@@ -81,7 +81,7 @@ A SD production grade cluster will be composed of 3 node pools:
 Some modules rely on persistent storage via PersistentVolumeClaims, by default (but configurable) the following capacity will be used:
 
 | Description                                | Size (GB) |
-| ------------------------------------------ | --------: |
+|--------------------------------------------|----------:|
 | Prometheus (metrics storage)               |       150 |
 | MinIO Monitoring (metrics storage, 20GBx6) |       120 |
 | MinIO Logging (logs storage, 20GBx6)       |       120 |
@@ -94,7 +94,7 @@ Some modules rely on persistent storage via PersistentVolumeClaims, by default (
 Core modules provide essential functionality to the distribution for production-grade clusters.
 
 | Module                          | Included Release               | Description                                                                                      |
-| ------------------------------- | ------------------------------ | ------------------------------------------------------------------------------------------------ |
+|---------------------------------|--------------------------------|--------------------------------------------------------------------------------------------------|
 | [Networking][networking-module] | ![Version][networking-version] | Networking functionality via Calico or Cilium CNIs                                               |
 | [Ingress][ingress-module]       | ![Version][ingress-version]    | Fast and reliable Ingress Controller and TLS certificate management                              |
 | [Logging][logging-module]       | ![Version][logging-version]    | A centralized logging solution based on the LoggingOperator + OpenSearch or Loki stacks          |
@@ -109,7 +109,7 @@ Core modules provide essential functionality to the distribution for production-
 Add-on modules provide additional functionality to the distribution. Their release cycle is independent of SD's.
 
 | Module                              | Description                                                                  |
-| ----------------------------------- | ---------------------------------------------------------------------------- |
+|-------------------------------------|------------------------------------------------------------------------------|
 | [Kong][kong-module]                 | Add Kong API Gateway for Kubernetes applications via Kong Ingress Controller |
 | [Service Mesh][service-mesh-module] | Deploy a service mesh on top of SD                                           |
 | [Registry][registry-module]         | Integrate a Container Registry solution                                      |
@@ -122,7 +122,7 @@ To get started with SD, please head to the [quickstart guides on the documentati
 
 ## Issues 🐛
 
-In case you experience any issues feel free to [open a new issue](https://github.com/sighupio/distribution/issues/new/choose).
+In case you experience any issues, feel free to [open a new issue](https://github.com/sighupio/distribution/issues/new/choose).
 
 If the problem is related to a specific module, open the issue in the module repository.
 
@@ -135,10 +135,10 @@ If you are looking to run SD in production and would like to learn more, SIGHUP 
 Current supported versions of SD are:
 
 |                                SD Version                                 | Kubernetes Version |
-| :-----------------------------------------------------------------------: | :----------------: |
+|:-------------------------------------------------------------------------:|:------------------:|
+| [`1.35.0`](https://github.com/sighupio/distribution/releases/tag/v1.35.0) |      `1.35.x`      |
 | [`1.34.1`](https://github.com/sighupio/distribution/releases/tag/v1.34.1) |      `1.34.x`      |
 | [`1.33.2`](https://github.com/sighupio/distribution/releases/tag/v1.33.2) |      `1.33.x`      |
-| [`1.32.2`](https://github.com/sighupio/distribution/releases/tag/v1.32.2) |      `1.32.x`      |
 
 Check the [compatibility matrix][compatibility-matrix] for additional information about previous releases of the Distribution and the compatibility with `furyctl`.
 
@@ -164,11 +164,11 @@ Find the updated roadmap in the [ROADMAP.md](ROADMAP.md) file.
 
 ## Contributing 🤝
 
-If you wish to contribute please read the [Contributing Guidelines](docs/CONTRIBUTING.md).
+If you wish to contribute, please read the [Contributing Guidelines](docs/CONTRIBUTING.md).
 
 ## License
 
-SD is open-source software and it's released under the following [LICENSE](LICENSE)
+SD is open-source software, and it's released under the following [LICENSE](LICENSE)
 
 <!-- Core Modules -->
 
@@ -180,14 +180,14 @@ SD is open-source software and it's released under the following [LICENSE](LICEN
 [dr-module]: https://github.com/sighupio/module-dr
 [policy-module]: https://github.com/sighupio/module-policy
 [auth-module]: https://github.com/sighupio/module-auth
-[networking-version]: https://img.shields.io/badge/release-v3.1.0-blue
-[ingress-version]: https://img.shields.io/badge/release-v5.0.1-blue
-[logging-version]: https://img.shields.io/badge/release-v5.3.0-blue
-[monitoring-version]: https://img.shields.io/badge/release-v4.1.0-blue
-[tracing-version]: https://img.shields.io/badge/release-v1.4.0-blue
-[dr-version]: https://img.shields.io/badge/release-v3.3.0-blue
-[policy-version]: https://img.shields.io/badge/release-v1.16.0-blue
-[auth-version]: https://img.shields.io/badge/release-v0.6.1-blue
+[networking-version]: https://img.shields.io/badge/release-v4.0.0-blue
+[ingress-version]: https://img.shields.io/badge/release-v5.1.0-blue
+[logging-version]: https://img.shields.io/badge/release-v5.4.0-blue
+[monitoring-version]: https://img.shields.io/badge/release-v4.2.0-blue
+[tracing-version]: https://img.shields.io/badge/release-v1.5.0-blue
+[dr-version]: https://img.shields.io/badge/release-v3.4.0-blue
+[policy-version]: https://img.shields.io/badge/release-v1.17.0-blue
+[auth-version]: https://img.shields.io/badge/release-v0.7.0-blue
 
 <!-- Addon Modules -->
 
