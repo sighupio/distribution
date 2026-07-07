@@ -42,15 +42,14 @@ With no further ado, the steps to release a new version are:
 ### fury-distribution
 
 > [!WARNING]
-> If you are releasing a new `x.y.0` version create a `release-vX.<y-1>` branch for the previous release (to be used later for backporting).
+> If you are releasing a new `x.y.0` version, create a `release-vX.<y-1>` branch for the previous release (to be used later for backporting) starting from the **latest stable tag** of that minor (e.g. `release-v1.34` from tag `v1.34.1`), **not** from `main`.
 
 1. Create a new branch `feat/release-vx.y.z` (`feat/release-v1.29.4`, for example) where to work on.
 2. Create the PRs fixing the issues or adding new features to the templates or other files of fury-distribution, test them and merge them.
-3. Update the `kfd.yaml` and `Furyfile.yaml` files, bumping the distribution version, adjusting the modules and installers versions where needed.
+3. Update the `kfd.yaml` file, bumping the distribution version, adjusting the modules and installers versions where needed.
 4. If the distribution schemas have been changed:
    1. If you haven't already, install the needed tools with `mise install`.
    2. Generate the new docs with `mise run generate-docs`.
-   3. Generate the go models with `mise run generate-go-models`
 5. Update the CI and e2e tests to point to the new version:
    1. `.drone.yaml`
    2. `tests/e2e-kfddistribution-*.yaml`
@@ -72,15 +71,9 @@ At this point, you'll need to switch to pushing some changes in furyctl
 10. Add the migration paths to the corresponding kinds in `configs/upgrades/{onpremises,kfddistribution,ekscluster}/`, creating the needed folders for each new version.
 11. Update the documentation:
     1. `README.md`.
-    2. `docs/COMPATIBLITY_MATRIX.md`.
+    2. `docs/COMPATIBILITY_MATRIX.md`.
 12. Update the compatibility unit tests with the new versions (`internal/distribution/compatibility_test.go`)
-13. Bump the version to the new `fury-distribution` go library that has been released as RC in step `7`.
-
-```bash
-go get -u github.com/sighupio/fury-distribution@v1.29.4
-go mod tidy
-```
-
+13. If the distribution schemas changed in fields that furyctl reads or injects, update furyctl's hand-maintained config types accordingly in `internal/apis/kfd/v1alpha2/<kind>/{public,private}/schema.go`, keeping the `yaml` **and** `json` struct tags in sync (the `json` tags drive the runtime Terraform/OpenTofu data injection). The distribution no longer ships generated Go types and furyctl no longer imports it as a Go module (see furyctl#674), so this is now a manual step instead of a `go get` of the `fury-distribution` library.
 14. Tag a release candidate with the changes. This will be used in the e2e tests of the distribution.
 
 ### Back to fury-distribution

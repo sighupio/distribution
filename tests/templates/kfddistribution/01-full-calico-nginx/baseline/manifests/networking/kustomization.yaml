@@ -8,6 +8,9 @@ kind: Kustomization
 resources:
   - ../../../vendor/modules/networking/katalog/tigera/on-prem
   - resources/calico-ns.yml
+  - resources/whisker-ingress.yml
+
+
 
 patches:
   - path: patches/tigera/infra-nodes-and-mask.yaml
@@ -18,3 +21,4 @@ patches:
       name: tigera-operator
       namespace: tigera-operator
     path: patches/tigera/tigera-operator-tolerations.yaml
+

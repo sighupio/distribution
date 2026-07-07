@@ -1,0 +1,77 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# Tests the following cases:
+
+# Given a valid OnPremises config
+# And some host entries under masters, etcd, workers, and loadBalancers have a per-host "dnsZone" field
+# When I validate the config against the schema
+# Then no errors are returned
+
+---
+apiVersion: kfd.sighup.io/v1alpha2
+kind: OnPremises
+metadata:
+  name: onpremises-test-per-host-dnszone
+spec:
+  distributionVersion: v1.35.0
+  kubernetes:
+    pkiFolder: /etc/pki
+    ssh:
+      username: user
+      keyPath: ~/.ssh/id_rsa
+    dnsZone: k8s.local
+    controlPlaneAddress: api.k8s.local
+    podCidr: 10.0.0.0/16
+    svcCidr: 10.1.0.0/16
+    loadBalancers:
+      enabled: true
+      hosts:
+        - name: lb-0
+          ip: 192.168.1.10
+          dnsZone: k8s.cloud
+      keepalived:
+        enabled: false
+      stats:
+        username: admin
+        password: admin
+    masters:
+      hosts:
+        - name: master-0
+          ip: 192.168.1.1
+        - name: master-1
+          ip: 192.168.1.2
+          dnsZone: k8s.cloud
+    etcd:
+      hosts:
+        - name: etcd-0
+          ip: 192.168.1.5
+        - name: etcd-1
+          ip: 192.168.1.6
+          dnsZone: k8s.cloud
+    nodes:
+      - name: workers
+        hosts:
+          - name: worker-0
+            ip: 192.168.1.20
+          - name: worker-1
+            ip: 192.168.1.21
+            dnsZone: k8s.cloud
+  distribution:
+    modules:
+      dr:
+        type: none
+      ingress:
+        baseDomain: example.local
+        nginx:
+          type: single
+        certManager:
+          clusterIssuer:
+            name: letsencrypt-example
+            email: example@example.local
+            type: http01
+      logging:
+        type: none
+      policy:
+        type: none

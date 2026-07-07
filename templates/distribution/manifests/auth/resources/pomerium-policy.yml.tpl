@@ -146,6 +146,19 @@ routes:
       {{- end }}
   {{- end }}
 
+  {{- if eq .spec.distribution.modules.networking.type "calico" }}
+  - from: https://{{ template "whiskerUrl" .spec }}
+    to: http://whisker.calico-system.svc.cluster.local:8081
+    policy:
+      {{- if and (index .spec.distribution.modules.auth.pomerium "defaultRoutesPolicy") (index .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy "whisker") }}
+      {{- .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.whisker | toYaml | nindent 6 }}
+      {{- else }}
+      - allow:
+          and:
+            - authenticated_user: true
+      {{- end }}
+  {{- end }}
+
   {{- if index .spec.distribution.modules.auth.pomerium "routes" }}
   {{- .spec.distribution.modules.auth.pomerium.routes | toYaml | nindent 2 }}
   {{- else if index .spec.distribution.modules.auth.pomerium "policy" }}

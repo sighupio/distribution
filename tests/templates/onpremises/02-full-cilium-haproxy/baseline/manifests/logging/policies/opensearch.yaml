@@ -137,8 +137,8 @@ spec:
     - from:
         - podSelector:
             matchLabels:
-              app.kubernetes.io/name: opensearch
-              app.kubernetes.io/instance: opensearch
+              app.kubernetes.io/name: opensearch-ism-policy-job
+              app.kubernetes.io/instance: opensearch-ism-policy-job
       ports:
         - port: 9200
           protocol: TCP
@@ -156,8 +156,8 @@ spec:
     - Egress
   podSelector:
     matchLabels:
-      app.kubernetes.io/name: opensearch
-      app.kubernetes.io/instance: opensearch
+      app.kubernetes.io/name: opensearch-ism-policy-job
+      app.kubernetes.io/instance: opensearch-ism-policy-job
   egress:
     - to:
         - podSelector:

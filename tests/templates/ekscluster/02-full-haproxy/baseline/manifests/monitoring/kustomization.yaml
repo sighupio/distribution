@@ -34,6 +34,27 @@ patches:
         name: x509-certificate-exporter-data-plane
   - path: patches/alertmanager-operated.yml
   - path: patches/prometheus-operated.yml
+  - patch: |-
+      $patch: delete
+      apiVersion: monitoring.coreos.com/v1alpha1
+      kind: AlertmanagerConfig
+      metadata:
+        namespace: monitoring
+        name: deadmanswitch
+  - patch: |-
+      $patch: delete
+      apiVersion: monitoring.coreos.com/v1alpha1
+      kind: AlertmanagerConfig
+      metadata:
+        namespace: monitoring
+        name: infra
+  - patch: |-
+      $patch: delete
+      apiVersion: monitoring.coreos.com/v1alpha1
+      kind: AlertmanagerConfig
+      metadata:
+        namespace: monitoring
+        name: k8s
 
 configMapGenerator:
 

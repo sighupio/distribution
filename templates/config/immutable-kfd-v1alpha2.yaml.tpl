@@ -297,7 +297,7 @@ spec:
           type: single
         certManager:
           clusterIssuer:
-            name: letsencrypt-prod
+            name: custom-issuer
             email: admin@example.com
             type: http01
 

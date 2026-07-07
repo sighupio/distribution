@@ -48,6 +48,25 @@ passwd:
           Path=/
 {{- end }}
 
+{{- define "update-server-config" }}
+    # Point Flatcar update-engine to a custom Nebraska/Omaha update server.
+    # OS updates are NOT applied automatically: update-engine.service and
+    # locksmithd.service are masked (see "disable-os-updates" and the locksmithd
+    # mask in each node config) and REBOOT_STRATEGY=off disables auto-reboot.
+    # To run an update manually on a node:
+    #   sudo systemctl unmask update-engine.service
+    #   sudo systemctl start update-engine.service
+    #   sudo update_engine_client -check_for_update
+    - path: /etc/flatcar/update.conf
+      overwrite: true
+      mode: 0644
+      contents:
+        inline: |
+          SERVER=https://public.update.sighup-prod.sighup.io/v1/update/
+          GROUP=stable
+          REBOOT_STRATEGY=off
+{{- end }}
+
 {{- define "network" }}
 {{- range $name, $iface := .node.network.ethernets }}
     - path: /etc/systemd/network/10-{{ $name }}.network
@@ -271,6 +290,7 @@ passwd:
         Description=Report node status to furyctl
         Requires=network-online.target
         After=network-online.target
+        After=sshd.service
         ConditionFirstBoot=yes
 
         [Service]

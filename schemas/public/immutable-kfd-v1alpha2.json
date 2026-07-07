@@ -1736,6 +1736,9 @@
         },
         "customPatches": {
           "$ref": "../public/spec-distribution-custompatches.json"
+        },
+        "customResources": {
+          "$ref": "../public/spec-distribution-customresources.json"
         }
       },
       "required": [

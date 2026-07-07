@@ -223,11 +223,15 @@
       "properties": {
         "name": {
           "type": "string",
-          "description": "A name to identify the host. This value will be concatenated to `.spec.kubernetes.dnsZone` to calculate the FQDN for the host as `<name>.<dnsZone>`."
+          "description": "A name to identify the host. This value will be concatenated to `.spec.kubernetes.dnsZone` (or the host-level `dnsZone` if set) to calculate the FQDN for the host as `<name>.<dnsZone>`."
         },
         "ip": {
           "type": "string",
           "description": "The IP address of the host."
+        },
+        "dnsZone": {
+          "type": "string",
+          "description": "Optional per-host DNS zone override. When set, takes precedence over `.spec.kubernetes.dnsZone` when computing the FQDN for this host."
         }
       },
       "required": [
@@ -346,11 +350,15 @@
       "properties": {
         "name": {
           "type": "string",
-          "description": "A name to identify the host. This value will be concatenated to `.spec.kubernetes.dnsZone` to calculate the FQDN for the host as `<name>.<dnsZone>`."
+          "description": "A name to identify the host. This value will be concatenated to `.spec.kubernetes.dnsZone` (or the host-level `dnsZone` if set) to calculate the FQDN for the host as `<name>.<dnsZone>`."
         },
         "ip": {
           "type": "string",
           "description": "The IP address of the host"
+        },
+        "dnsZone": {
+          "type": "string",
+          "description": "Optional per-host DNS zone override. When set, takes precedence over `.spec.kubernetes.dnsZone` when computing the FQDN for this host."
         }
       },
       "required": [
@@ -382,11 +390,15 @@
       "properties": {
         "name": {
           "type": "string",
-          "description": "A name to identify the etcd node. This value will be concatenated to `.spec.kubernetes.dnsZone` to calculate the FQDN for the host as `<name>.<dnsZone>`."
+          "description": "A name to identify the etcd node. This value will be concatenated to `.spec.kubernetes.dnsZone` (or the host-level `dnsZone` if set) to calculate the FQDN for the host as `<name>.<dnsZone>`."
         },
         "ip": {
           "type": "string",
           "description": "The IP address of the etcd node."
+        },
+        "dnsZone": {
+          "type": "string",
+          "description": "Optional per-host DNS zone override. When set, takes precedence over `.spec.kubernetes.dnsZone` when computing the FQDN for this etcd node."
         }
       },
       "required": [
@@ -452,11 +464,15 @@
       "additionalProperties": false,
       "properties": {
         "name": {
-          "description": "A name to identify the host. This value will be concatenated to `.spec.kubernetes.dnsZone` to calculate the FQDN for the host as `<name>.<dnsZone>`.",
+          "description": "A name to identify the host. This value will be concatenated to `.spec.kubernetes.dnsZone` (or the host-level `dnsZone` if set) to calculate the FQDN for the host as `<name>.<dnsZone>`.",
           "type": "string"
         },
         "ip": {
           "description": "The IP address of the host",
+          "type": "string"
+        },
+        "dnsZone": {
+          "description": "Optional per-host DNS zone override. When set, takes precedence over `.spec.kubernetes.dnsZone` when computing the FQDN for this host.",
           "type": "string"
         }
       },
@@ -516,9 +532,10 @@
           "description": "Configuration for the kube-proxy component.",
           "type": "object",
           "properties": {
-            "enabled": {
-              "type": "boolean",
-              "description": "Setting this option to `false` will skip the installation of the kube-proxy component and install the CNI plugin with the following configuration: Cilium in kube-proxy-replacement mode and Calico in eBPF mode. Default is `true`.\n\nNOTE: Changing this option after the cluster has been created is not currently supported."
+            "type": {
+              "type": "string",
+              "enum": ["none", "ipvs", "nftables"],
+              "description": "The operating mode for kube-proxy. `none` skips kube-proxy installation and configures the CNI accordingly (Cilium in kube-proxy-replacement mode, Calico in eBPF mode). `ipvs` installs kube-proxy in IPVS mode (default). `nftables` installs kube-proxy in nftables mode.\n\nNOTE: Changing to `type: none` after the cluster has been created is not currently supported."
             },
             "additionalProperties": false
           }
@@ -918,6 +935,9 @@
         },
         "customPatches": {
           "$ref": "../public/spec-distribution-custompatches.json"
+        },
+        "customResources": {
+          "$ref": "../public/spec-distribution-customresources.json"
         }
       },
       "required": [

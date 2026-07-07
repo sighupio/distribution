@@ -17,7 +17,9 @@
 - controller-manager-egress-kube-apiserver
 - controller-manager-ingress-kube-apiserver
 - gpm-egress-kube-apiserver
-- gpm-ingress-pomerium
+- gpm-ingress-pomerium (with SSO)
+- gpm-ingress-haproxy (if HAProxy is enabled, with basicAuth)
+- gpm-ingress-nginx (if NGINX is enabled, with basicAuth)
 - gatekeeper-ingress-prometheus-metrics
 
 ### Kyverno

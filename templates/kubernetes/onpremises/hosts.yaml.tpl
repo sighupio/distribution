@@ -7,9 +7,10 @@ all:
     haproxy:
       hosts:
         {{- range $h := .spec.kubernetes.loadBalancers.hosts }}
+        {{- $hostDnsZone := default $dnsZone (index $h "dnsZone") }}
         {{ $h.name }}:
           ansible_host: "{{ $h.ip }}"
-          kubernetes_hostname: "{{ $h.name }}.{{ $dnsZone }}"
+          kubernetes_hostname: "{{ $h.name }}.{{ $hostDnsZone }}"
         {{- end }}
       vars:
         keepalived_cluster: {{ .spec.kubernetes.loadBalancers.keepalived.enabled }}
@@ -25,14 +26,15 @@ all:
       hosts:
         {{- $etcdInitialCluster := list }}
         {{- range $h := .spec.kubernetes.masters.hosts }}
+        {{- $hostDnsZone := default $dnsZone (index $h "dnsZone") }}
         {{- if not (index $.spec.kubernetes "etcd") }}
-        {{- $etcdUri := print $h.name "=https://" $h.name "." $dnsZone ":2380" }}
+        {{- $etcdUri := print $h.name "=https://" $h.name "." $hostDnsZone ":2380" }}
         {{- $etcdInitialCluster = append $etcdInitialCluster $etcdUri }}
         {{- end }}
         {{ $h.name }}:
           ansible_host: "{{ $h.ip }}"
           kubernetes_apiserver_advertise_address: "{{ $h.ip }}"
-          kubernetes_hostname: "{{ $h.name }}.{{ $dnsZone }}"
+          kubernetes_hostname: "{{ $h.name }}.{{ $hostDnsZone }}"
           {{- if index $.spec.kubernetes.masters "labels" }}
           kubernetes_node_labels:
             {{ $.spec.kubernetes.masters.labels | toYaml | indent 12 | trim }}
@@ -54,7 +56,7 @@ all:
         etcd:
           endpoints:
             {{- range $h := .spec.kubernetes.etcd.hosts }}
-            - "https://{{ $h.name }}.{{ $dnsZone }}:2379"
+            - "https://{{ $h.name }}.{{ default $dnsZone (index $h "dnsZone") }}:2379"
             {{- end }}
           caFile: "/etc/etcd/pki/etcd/ca.crt"
           keyFile: "/etc/etcd/pki/apiserver-etcd-client.key"
@@ -130,10 +132,6 @@ all:
         {{- end }}
 
         {{- if index .spec.kubernetes "advanced" }}
-        {{- if and (index .spec.kubernetes.advanced "registry") (ne .spec.kubernetes.advanced.registry "") }}
-        kubernetes_image_registry: "{{ .spec.kubernetes.advanced.registry }}"
-        {{- end }}
-
         {{- if index .spec.kubernetes.advanced "eventRateLimits" }}
         eventratelimits:
           {{- range .spec.kubernetes.advanced.eventRateLimits }}
@@ -156,21 +154,24 @@ all:
         kubernetes_apiserver_certSANs:
 {{ .spec.kubernetes.advanced.apiServerCertSANs | toYaml | indent 10 }}
         {{- end }}
-        {{- /* We assume that kubeProxy is enabled by default */}}
         {{- /* The `digAny` condition needs to be specified exactly as written below to properly check if the field has been populated */}}
-        {{- if not (.spec | digAny "kubernetes" "advanced" "kubeProxy" "enabled" true) }}
+        {{- $kubeProxyType := .spec | digAny "kubernetes" "advanced" "kubeProxy" "type" "ipvs" }}
+        {{- if eq $kubeProxyType "none" }}
         kubeadm_skip_phases:
           - "addon/kube-proxy"
+        {{- else }}
+        kubernetes_kube_proxy_mode: {{ $kubeProxyType }}
         {{- end }}
     etcd:
       hosts:
         {{- if index $.spec.kubernetes "etcd" }}
         {{- range $h := .spec.kubernetes.etcd.hosts }}
-        {{- $etcdUri := print $h.name "=https://" $h.name "." $dnsZone ":2380" }}
+        {{- $hostDnsZone := default $dnsZone (index $h "dnsZone") }}
+        {{- $etcdUri := print $h.name "=https://" $h.name "." $hostDnsZone ":2380" }}
         {{- $etcdInitialCluster = append $etcdInitialCluster $etcdUri }}
         {{ $h.name }}:
           ansible_host: "{{ $h.ip }}"
-          kubernetes_hostname: "{{ $h.name }}.{{ $dnsZone }}"
+          kubernetes_hostname: "{{ $h.name }}.{{ $hostDnsZone }}"
           etcd_client_address: "{{ $h.ip }}"
         {{- end }}
       vars:
@@ -178,9 +179,10 @@ all:
         etcd_initial_cluster: "{{ $etcdInitialCluster | join "," }}"
         {{- else }}
         {{- range $h := .spec.kubernetes.masters.hosts }}
+        {{- $hostDnsZone := default $dnsZone (index $h "dnsZone") }}
         {{ $h.name }}:
           ansible_host: "{{ $h.ip }}"
-          kubernetes_hostname: "{{ $h.name }}.{{ $dnsZone }}"
+          kubernetes_hostname: "{{ $h.name }}.{{ $hostDnsZone }}"
         {{- end }}
       vars:
         dns_zone: "{{ $dnsZone }}"
@@ -191,9 +193,10 @@ all:
         {{ $n.name }}:
           hosts:
           {{- range $h := $n.hosts }}
+          {{- $hostDnsZone := default $dnsZone (index $h "dnsZone") }}
             {{ $h.name }}:
               ansible_host: "{{ $h.ip }}"
-              kubernetes_hostname: "{{ $h.name }}.{{ $dnsZone }}"
+              kubernetes_hostname: "{{ $h.name }}.{{ $hostDnsZone }}"
           {{- end }}
           vars:
             kubernetes_role: "{{ $n.name }}"
@@ -255,6 +258,9 @@ all:
     no_proxy: "{{ .spec.kubernetes.proxy.noProxy }}"
     {{- end }}
     {{- if (index .spec.kubernetes "advanced") }}
+    {{- if and (index .spec.kubernetes.advanced "registry") (ne .spec.kubernetes.advanced.registry "") }}
+    kubernetes_image_registry: "{{ .spec.kubernetes.advanced.registry }}"
+    {{- end }}
     {{- if (index .spec.kubernetes.advanced "containerd") }}
     {{- if (index .spec.kubernetes.advanced.containerd "registryConfigs") }}
     containerd_registry_configs:

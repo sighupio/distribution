@@ -9,6 +9,8 @@ resources:
   - ../../../vendor/modules/networking/katalog/cilium
   - resources/ingress-infra.yml
 
+
+
 patches:
   - path: patches/cilium/infra-nodes.yaml
   - target:
@@ -24,3 +26,4 @@ configMapGenerator:
     - patches/cilium/cilium-config.env
     name: cilium-config
     namespace: kube-system
+

@@ -11,12 +11,16 @@
     {{- $etcdInitialCluster = append $etcdInitialCluster (print $h.hostname "=https://" $h.hostname ":2380") }}
     {{- $etcdEndpoints = append $etcdEndpoints (print "https://" $h.hostname ":2379") }}
 {{- end }}
+{{- /* per-host architecture (x86-64/arm64) from infrastructure.nodes, so roles read node_arch instead of detecting at runtime */ -}}
+{{- $archByHost := dict }}
+{{- range $n := .spec.infrastructure.nodes }}{{- $archByHost = set $archByHost $n.hostname $n.arch }}{{- end }}
 all:
   children:
     control_plane:
       hosts:
         {{- range $h := .spec.kubernetes.controlPlane.members }}
         {{ $h.hostname }}:
+          node_arch: {{ index $archByHost $h.hostname }}
         {{- end }}
       vars:
         {{- if index .spec.kubernetes.controlPlane "keepalived" }}
@@ -139,6 +143,7 @@ all:
         {{- if not $etcdOnControlPlane }}
           {{- range $h := $etcdMembers }}
         {{ $h.hostname }}:
+          node_arch: {{ index $archByHost $h.hostname }}
           {{- end }}
         {{- end }}
     nodes:
@@ -148,6 +153,7 @@ all:
           hosts:
           {{- range $h := $n.nodes }}
             {{ $h.hostname }}:
+              node_arch: {{ index $archByHost $h.hostname }}
           {{- end }}
           vars:
             kubernetes_role: "{{ $n.name }}"
@@ -194,8 +200,26 @@ all:
     kubernetes_kubeconfig_path: ./
     kubernetes_version: "{{ .kubernetes.version }}"
     kubernetes_local_pki_dir: "{{ .spec.kubernetes.pkiPath }}/master"
-    {{- if (.spec.kubernetes | digAny "advanced" "registry" false) }}
-    kubernetes_image_registry: "{{ .spec.kubernetes.advanced.registry }}"
+    # kubernetes_image_registry: user value from furyctl.yaml wins; immutable.yaml pin is the fallback.
+    kubernetes_image_registry: "{{ .spec.kubernetes | digAny "advanced" "registry" "" | default .versions.kubernetes_image_registry }}"
+    # Version pins from immutable.yaml (single source); consumed by containerd / kube-control-plane / os-upgrade / sysext roles.
+    # Only the pause tag is pinned; the containerd role derives the image as {{ `{{ kubernetes_image_registry }}` }}/pause:<tag> so a custom registry wins.
+    containerd_sandbox_tag: {{ .versions.containerd_sandbox_tag }}
+    coredns_image_prefix: {{ .versions.coredns_image_prefix }}
+    kubelet_csr_approver_tag: {{ .versions.kubelet_csr_approver_tag }}
+    os_update_target_version: {{ .versions.os_update_target_version }}
+    {{- if .versions.kubectl_bin }}
+    kubectl_bin: {{ .versions.kubectl_bin }}
+    {{- end }}
+    sysext_targets:
+    {{- range $name, $t := .versions.sysext_targets }}
+      {{ $name }}:
+        version: {{ $t.version }}
+        arch:
+    {{- range $arch, $a := $t.arch }}
+          {{ $arch }}:
+            url: {{ $a.url }}
+    {{- end }}
     {{- end }}
     {{- /* We assume that kubeProxy is enabled by default */}}
     {{- /* The `digAny` condition needs to be specified exactly as written below to properly check if the field has been populated */}}

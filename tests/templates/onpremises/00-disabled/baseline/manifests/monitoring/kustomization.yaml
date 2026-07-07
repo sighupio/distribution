@@ -20,6 +20,27 @@ resources:
 
 patches:
   - path: patches/infra-nodes.yml
+  - patch: |-
+      $patch: delete
+      apiVersion: monitoring.coreos.com/v1alpha1
+      kind: AlertmanagerConfig
+      metadata:
+        namespace: monitoring
+        name: deadmanswitch
+  - patch: |-
+      $patch: delete
+      apiVersion: monitoring.coreos.com/v1alpha1
+      kind: AlertmanagerConfig
+      metadata:
+        namespace: monitoring
+        name: infra
+  - patch: |-
+      $patch: delete
+      apiVersion: monitoring.coreos.com/v1alpha1
+      kind: AlertmanagerConfig
+      metadata:
+        namespace: monitoring
+        name: k8s
 
 configMapGenerator:
 

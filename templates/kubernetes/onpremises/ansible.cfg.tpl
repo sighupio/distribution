@@ -9,6 +9,7 @@ roles_path = ../vendor/installers/onpremises/roles
 timeout = 90
 callback_result_format = yaml
 bin_ansible_callbacks = True
+deprecation_warnings = False
 {{- if and (index .spec.kubernetes "advancedAnsible") (index .spec.kubernetes.advancedAnsible "config") }}
 {{ .spec.kubernetes.advancedAnsible.config }}
 {{- end }}
