@@ -10,6 +10,7 @@ resources:
 
 
 
+
 patches:
   - path: patches/tigera/infra-nodes-and-mask.yaml
 
