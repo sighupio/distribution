@@ -36,7 +36,9 @@ resources:
     {{- end }}
 {{- end }}
 
-{{ if and (eq .spec.distribution.common.networkPoliciesEnabled true) (eq .spec.distribution.modules.networking.type "calico") $hasAnyIngress }}
+{{/* The Calico policies only grant the ingress controller access to the Whisker UI; they are not
+     SD network policies, so they don't depend on networkPoliciesEnabled field. */}}
+{{ if and (eq .spec.distribution.modules.networking.type "calico") $hasAnyIngress }}
   - policies
 {{- end }}
 
