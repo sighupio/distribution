@@ -49,7 +49,7 @@ systemd:
 
         [Service]
         Type=oneshot
-        ExecStart=/usr/bin/curl -X POST '{{ .ipxeServerURL }}/status?node={{ .hostname }}&status=installation-blocked'
+        ExecStart=/usr/bin/curl --retry 2 --retry-connrefused --connect-timeout 5 --max-time 15 --retry-max-time 40 -X POST '{{ .ipxeServerURL }}/status?node={{ .hostname }}&status=installation-blocked'
         RemainAfterExit=yes
 
         [Install]
@@ -67,20 +67,20 @@ systemd:
         [Service]
         Type=oneshot
         {{- if .ipxeServerPreInstallCommands }}
-        ExecStartPre=/usr/bin/curl -X POST '{{ .ipxeServerURL }}/status?node={{ .hostname }}&status=running%%20pre-install%%20commands'
+        ExecStartPre=/usr/bin/curl --retry 2 --retry-connrefused --connect-timeout 5 --max-time 15 --retry-max-time 40 -X POST '{{ .ipxeServerURL }}/status?node={{ .hostname }}&status=running%%20pre-install%%20commands'
         {{- range .ipxeServerPreInstallCommands }}
         ExecStartPre={{ . }}
         {{- end }}
         {{- end }}
-        ExecStartPre=/usr/bin/curl -X POST '{{ .ipxeServerURL }}/status?node={{ .hostname }}&status=installing'
+        ExecStartPre=/usr/bin/curl --retry 2 --retry-connrefused --connect-timeout 5 --max-time 15 --retry-max-time 40 -X POST '{{ .ipxeServerURL }}/status?node={{ .hostname }}&status=installing'
         ExecStart=/usr/bin/flatcar-install -d {{ .installDisk }} -i /opt/ignition/config.ign -b {{ .ipxeServerURL }}/assets/flatcar/{{ .arch }}
         {{- if .ipxeServerPostInstallCommands }}
-        ExecStartPost=/usr/bin/curl -X POST '{{ .ipxeServerURL }}/status?node={{ .hostname }}&status=running%%20post-install%%20commands'
+        ExecStartPost=/usr/bin/curl --retry 2 --retry-connrefused --connect-timeout 5 --max-time 15 --retry-max-time 40 -X POST '{{ .ipxeServerURL }}/status?node={{ .hostname }}&status=running%%20post-install%%20commands'
         {{- range .ipxeServerPostInstallCommands }}
         ExecStartPost={{ . }}
         {{- end }}
         {{- end }}
-        ExecStartPost=/usr/bin/curl -X POST '{{ .ipxeServerURL }}/status?node={{ .hostname }}&status=rebooting'
+        ExecStartPost=/usr/bin/curl --retry 2 --retry-connrefused --connect-timeout 5 --max-time 15 --retry-max-time 40 -X POST '{{ .ipxeServerURL }}/status?node={{ .hostname }}&status=rebooting'
         ExecStartPost=/usr/bin/systemctl --no-block reboot
         RemainAfterExit=yes
 
