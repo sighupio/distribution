@@ -295,9 +295,9 @@ passwd:
 
         [Service]
         Type=oneshot
-        ExecStart=/usr/bin/curl -X POST '{{ .ipxeServerURL }}/status?node={{ .node.hostname }}&status=booted'
+        ExecStart=/usr/bin/curl --retry 2 -X POST '{{ .ipxeServerURL }}/status?node={{ .node.hostname }}&status=booted'
         RemainAfterExit=yes
-        
+
 
         [Install]
         WantedBy=multi-user.target
