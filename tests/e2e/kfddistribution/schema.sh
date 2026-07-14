@@ -388,3 +388,21 @@ test_schema() {
 
     test_schema "public" "ekscluster-kfd-v1alpha2" "015-no" expect
 }
+
+@test "016 - ok (at least one of privateAccess/publicAccess is true)" {
+    info
+
+    test_schema "public" "ekscluster-kfd-v1alpha2" "016-ok" expect_ok
+}
+
+@test "016 - no (both privateAccess and publicAccess are false)" {
+    info
+
+    expect() {
+        expect_no "${1}"
+
+        assert_error_contains "/spec/kubernetes/apiServer" "anyOf" || return $?
+    }
+
+    test_schema "public" "ekscluster-kfd-v1alpha2" "016-no" expect
+}
