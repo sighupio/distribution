@@ -642,6 +642,22 @@
       "required": [
         "privateAccess",
         "publicAccess"
+      ],
+      "anyOf": [
+        {
+          "properties": {
+            "privateAccess": {
+              "const": true
+            }
+          }
+        },
+        {
+          "properties": {
+            "publicAccess": {
+              "const": true
+            }
+          }
+        }
       ]
     },
     "Spec.Kubernetes.NodePoolsCommon": {
