@@ -21,6 +21,7 @@ spec:
   probeSelector: {}
   serviceMonitorNamespaceSelector: {}
   serviceMonitorSelector: {}
+  serviceDiscoveryRole: EndpointSlice
   scrapeConfigSelector: {}
   tolerations:
     - effect: NoSchedule
