@@ -9,7 +9,7 @@ Welcome to the latest release of SD maintained by SIGHUP by ReeVo team.
 
 ## Bug fixes 🐞
 
-TBD
+- [[#555](https://github.com/sighupio/distribution/pull/555)] Monitoring templates: don't try to patch the alertmanagerConfigs when they are not being deployed at all.
 
 ## Breaking Changes 💔
 

@@ -105,6 +105,7 @@ patches:
   {{- end }}
 {{- end }}
 {{- if .spec.distribution.modules.monitoring.alertmanager.installDefaultRules }}
+{{- if eq $monitoringType "prometheus" "mimir" }}
 {{- if eq .spec.distribution.modules.monitoring.alertmanager.deadManSwitchWebhookUrl "" }}
   - patch: |-
       $patch: delete
@@ -155,6 +156,7 @@ patches:
       metadata:
         namespace: monitoring
         name: k8s-slack-webhook
+{{- end }}
 {{- end }}
 {{- end }}
 {{- if or (eq $monitoringType "prometheus") (eq $monitoringType "mimir") }}
