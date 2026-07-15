@@ -30,6 +30,7 @@ spec:
   probeSelector: {}
   serviceMonitorNamespaceSelector: {}
   serviceMonitorSelector: {}
+  serviceDiscoveryRole: EndpointSlice
   scrapeConfigSelector: {}
 
   {{- $prometheusAgentArgs := dict "module" "monitoring" "package" "prometheusAgent" "spec" .spec }}
