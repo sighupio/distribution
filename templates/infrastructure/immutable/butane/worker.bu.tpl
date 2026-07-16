@@ -40,6 +40,9 @@ storage:
 {{ .node.storage.directories | toYaml | indent 4 }}
 {{- end }}
 
+  # User-provided additional disks
+{{- template "additional-disks" . }}
+
 systemd:
   units:
     # Disable all automatic updates - sysext and OS updates are manual-only in production

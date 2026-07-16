@@ -99,6 +99,49 @@ passwd:
 {{- end }}
 {{- end }}
 
+{{- /*
+  User-provided additional disks: storage.disks + storage.filesystems + mount units.
+  Shared by every role — the schema puts additionalDisks on Node.Storage, which all four
+  roles share, so a role that omitted this block would accept the config and silently
+  drop it. Unlike network or systemd config, this cannot be worked around with
+  storage.files: Ignition runs disks -> filesystems -> files, so files are written after
+  the filesystem is already mounted and cannot partition a device.
+*/}}
+{{- define "additional-disks" }}
+{{- if hasKeyAny .node.storage "additionalDisks" }}
+  disks:
+{{- range .node.storage.additionalDisks }}
+    - device: {{ .device }}
+      wipe_table: true
+      partitions:
+{{- range .partitions }}
+        - label: {{ .label }}
+          number: {{ .number }}
+{{- if .sizeMiB }}
+          size_mib: {{ .sizeMiB }}
+{{- end }}
+{{- end }}
+{{- end }}
+  filesystems:
+{{- range .node.storage.additionalDisks }}
+{{- range .partitions }}
+    - device: /dev/disk/by-partlabel/{{ .label }}
+      format: {{ .filesystem.format }}
+      label: {{ .filesystem.label }}
+      path: {{ .filesystem.mountPoint }}
+      wipe_filesystem: true
+      with_mount_unit: true
+{{- if hasKeyAny .filesystem "mountOptions" }}
+      mount_options:
+{{- range .filesystem.mountOptions }}
+        - {{ . }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+
 {{- define "containerd-sysext-files" }}
     # containerd sysext download and sysupdate configuration
     - path: /opt/extensions/containerd/containerd-{{ .sysext.containerd.version }}-{{ .node.arch }}.raw
