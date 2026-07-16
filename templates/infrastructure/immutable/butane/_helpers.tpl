@@ -99,14 +99,7 @@ passwd:
 {{- end }}
 {{- end }}
 
-{{- /*
-  User-provided additional disks: storage.disks + storage.filesystems + mount units.
-  Shared by every role — the schema puts additionalDisks on Node.Storage, which all four
-  roles share, so a role that omitted this block would accept the config and silently
-  drop it. Unlike network or systemd config, this cannot be worked around with
-  storage.files: Ignition runs disks -> filesystems -> files, so files are written after
-  the filesystem is already mounted and cannot partition a device.
-*/}}
+{{- /* Shared by all roles: the schema puts additionalDisks on Node.Storage, which all four share. */}}
 {{- define "additional-disks" }}
 {{- if hasKeyAny .node.storage "additionalDisks" }}
   disks:
