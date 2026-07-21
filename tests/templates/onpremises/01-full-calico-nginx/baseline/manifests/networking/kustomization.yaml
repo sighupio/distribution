@@ -23,4 +23,3 @@ patches:
       name: tigera-operator
       namespace: tigera-operator
     path: patches/tigera/tigera-operator-tolerations.yaml
-
