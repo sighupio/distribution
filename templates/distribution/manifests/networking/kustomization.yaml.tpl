@@ -2,23 +2,29 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
+{{- $providerType := .spec.distribution.common.provider.type }}
+{{- $cni := .spec.distribution.modules.networking.type }}
 {{- $vendorPrefix := print "../" .spec.distribution.common.relativeVendorPath }}
 {{- $haproxyType := .spec.distribution.modules.ingress.haproxy.type }}
 {{- $isBYOIC := .spec.distribution.modules.ingress.byoic.enabled }}
 {{- $hasAnyIngress := or (ne .spec.distribution.modules.ingress.nginx.type "none") (ne $haproxyType "none") $isBYOIC }}
 {{- /* The `digAny` condition needs to be specified exactly as written below to properly check if the field has been populated */}}
-{{- $kubeProxyType := .spec | digAny "kubernetes" "advanced" "kubeProxy" "type" "ipvs" }}
+{{- $defaultKubeProxyType := "ipvs" }}
+{{- if eq $providerType "immutable" }}
+  {{- $defaultKubeProxyType = "nftables" }}
+{{- end }}
+{{- $kubeProxyType := .spec | digAny "kubernetes" "advanced" "kubeProxy" "type" $defaultKubeProxyType }}
 ---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-{{- if eq .spec.distribution.common.provider.type "eks" }}
+{{- if eq $providerType "eks" }}
   - {{ print $vendorPrefix "/modules/networking/katalog/tigera/eks-policy-only" }}
 {{- end }}
 
-{{- if eq .spec.distribution.common.provider.type "none" "immutable" }}{{/* none == on-prem, kfddistribution */}}
-    {{- if eq .spec.distribution.modules.networking.type "calico" }}
+{{- if eq $providerType "none" "immutable" }}{{/* none == on-prem, kfddistribution */}}
+    {{- if eq $cni "calico" }}
   - {{ print $vendorPrefix "/modules/networking/katalog/tigera/on-prem" }}
   - resources/calico-ns.yml
       {{- if eq $kubeProxyType "none" }}
@@ -28,7 +34,7 @@ resources:
   - resources/whisker-ingress.yml
       {{- end }}
     {{- end }}
-    {{- if eq .spec.distribution.modules.networking.type "cilium" }}
+    {{- if eq $cni "cilium" }}
   - {{ print $vendorPrefix "/modules/networking/katalog/cilium" }}
       {{- if $hasAnyIngress }}
   - resources/ingress-infra.yml
@@ -38,19 +44,16 @@ resources:
 
 {{/* The Calico policies only grant the ingress controller access to the Whisker UI; they are not
      SD network policies, so they don't depend on networkPoliciesEnabled field. */}}
-{{ if and (eq .spec.distribution.modules.networking.type "calico") $hasAnyIngress }}
+{{ if and (eq $cni "calico") $hasAnyIngress }}
   - policies
 {{- end }}
 
 patches:
-{{- if eq .spec.distribution.common.provider.type "eks" }}
+{{- if eq $providerType "eks" }}
   - path: patches/tigera/infra-nodes-and-mask.yaml
 {{- end }}
-{{- if eq .spec.distribution.common.provider.type "none" "immutable" }}
-  {{- if eq .spec.distribution.modules.networking.type "calico" }}
-    {{- if eq .spec.distribution.common.provider.type "immutable" }}
-  - path: patches/tigera/nfTables-dataplane.yaml
-    {{- end }}
+{{- if eq $providerType "none" "immutable" }}
+  {{- if eq $cni "calico" }}
   - path: patches/tigera/infra-nodes-and-mask.yaml
   - target:
       group: apps
@@ -59,13 +62,13 @@ patches:
       name: tigera-operator
       namespace: tigera-operator
     path: patches/tigera/tigera-operator-tolerations.yaml
-  {{- if eq $kubeProxyType "none" }}
+    {{- if eq $kubeProxyType "none" }}
   - path: patches/tigera/ebpf-mode.yaml
-  {{- else if eq $kubeProxyType "nftables" }}
+    {{- else if eq $kubeProxyType "nftables" }}
   - path: patches/tigera/nfTables-dataplane.yaml
+    {{- end }}
   {{- end }}
-  {{- end }}
-  {{- if eq .spec.distribution.modules.networking.type "cilium" }}
+  {{- if eq $cni "cilium" }}
   - path: patches/cilium/infra-nodes.yaml
   - target:
       group: apps
@@ -80,8 +83,8 @@ patches:
   {{- end }}
 {{- end }}
 
-{{- if eq .spec.distribution.common.provider.type "none" "immutable" }}
-  {{- if eq .spec.distribution.modules.networking.type "cilium" }}
+{{- if eq $providerType "none" "immutable" }}
+  {{- if eq $cni "cilium" }}
 configMapGenerator:
   - behavior: merge
     envs:
@@ -90,4 +93,3 @@ configMapGenerator:
     namespace: kube-system
   {{- end }}
 {{- end }}
-

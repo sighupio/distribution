@@ -1,4 +1,8 @@
 {{- $providerType := .spec.distribution.common.provider.type }}
+{{- $defaultKubeProxyType := "ipvs" }}
+{{- if eq $providerType "immutable" }}
+  {{- $defaultKubeProxyType = "nftables" }}
+{{- end }}
 
 {{- $podCIDR := "" }}
 {{- if and (eq $providerType "none") (hasKeyAny .spec "kubernetes") }}{{/* OnPremises */}}
@@ -14,6 +18,6 @@
 cluster-pool-ipv4-mask-size={{ .spec.distribution.modules.networking.cilium.maskSize }}
 cluster-pool-ipv4-cidr={{ $podCIDR }}
 {{- /* The `digAny` condition needs to be specified exactly as written below to properly check if the field has been populated */}}
-{{- if eq (.spec | digAny "kubernetes" "advanced" "kubeProxy" "type" "ipvs") "none" }}
+{{- if eq (.spec | digAny "kubernetes" "advanced" "kubeProxy" "type" $defaultKubeProxyType) "none" }}
 kube-proxy-replacement=true
 {{- end }}
