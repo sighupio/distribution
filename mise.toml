@@ -17,7 +17,7 @@ python = "3.12"
 pipx = "latest"
 ansible = "latest"
 awscli = "2.24.17"
-furyctl = "0.35.0-rc.8"
+furyctl = "0.35.1-rc.0"
 
 # Go-based CLI tools to work with the JSON schemas and docs (this repo has no Go code).
 "go:github.com/santhosh-tekuri/jsonschema/cmd/jv" = "v0.7.0"

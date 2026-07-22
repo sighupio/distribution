@@ -1,0 +1,29 @@
+# Copyright (c) 2024-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+---
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: PrometheusAgent
+metadata:
+  name: sender
+  namespace: monitoring
+spec:
+  # image should be the same as the one used in prometheus-operated
+  image: registry.sighup.io/fury/prometheus/prometheus:v3.10.0
+  # version: 2.46.0
+  replicas: 2
+  externalLabels:
+    k8s_cluster: no-modules-enabled
+  serviceAccountName: prometheus-agent
+  podMonitorNamespaceSelector: {}
+  podMonitorSelector: {}
+  probeNamespaceSelector: {}
+  probeSelector: {}
+  serviceMonitorNamespaceSelector: {}
+  serviceMonitorSelector: {}
+  serviceDiscoveryRole: EndpointSlice
+  scrapeConfigSelector: {}
+  tolerations:
+    null
+  nodeSelector:
+    null
