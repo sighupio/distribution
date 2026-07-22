@@ -15,7 +15,6 @@ resources:
   - policies
 
 patches:
-  - path: patches/tigera/nfTables-dataplane.yaml
   - path: patches/tigera/infra-nodes-and-mask.yaml
   - target:
       group: apps
@@ -24,4 +23,4 @@ patches:
       name: tigera-operator
       namespace: tigera-operator
     path: patches/tigera/tigera-operator-tolerations.yaml
-
+  - path: patches/tigera/nfTables-dataplane.yaml

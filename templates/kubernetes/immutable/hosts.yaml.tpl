@@ -223,7 +223,7 @@ all:
     {{- end }}
     {{- /* We assume that kubeProxy is enabled by default */}}
     {{- /* The `digAny` condition needs to be specified exactly as written below to properly check if the field has been populated */}}
-    {{- if not (.spec | digAny "kubernetes" "advanced" "kubeProxy" "enabled" true) }}
+    {{- if eq (.spec | digAny "kubernetes" "advanced" "kubeProxy" "type" "nftables") "none" }}
     kubeadm_skip_phases:
       - "addon/kube-proxy"
     {{- end }}

@@ -70,9 +70,10 @@ kubernetes:
   - path: .spec.kubernetes.controlPlane.members.*
     immutable: true
     description: "Control plane member configuration cannot be changed after cluster creation"
-  # kubeProxy can be disabled and reenabled in a live cluster, but requires manual intervention
+  # kubeProxy backend can be changed in a live cluster, but requires manual intervention
   # to reconfigure the kube-proxy DaemonSet. We could automate this in the future.
-  - path: .spec.kubernetes.advanced.kubeProxy.enabled
+  - path: .spec.kubernetes.advanced.kubeProxy.type
+    description: "Changes to kube-proxy backend are not currently supported"
     immutable: true
 
 distribution:

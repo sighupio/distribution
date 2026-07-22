@@ -27,4 +27,3 @@ configMapGenerator:
     - patches/cilium/cilium-config.env
     name: cilium-config
     namespace: kube-system
-

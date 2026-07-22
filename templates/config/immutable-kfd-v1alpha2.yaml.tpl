@@ -273,7 +273,7 @@ spec:
     #   encryption:
     #     configuration: "{file://./secrets/etcd-encryption-config.yaml}"
     #   kubeProxy:
-    #     enabled: true
+    #     type: none  # disables kube-proxy and sets Calico in eBPF mode / Cilium in kube-proxy-replacement mode.
 
   # SIGHUP Distribution modules
   distribution:

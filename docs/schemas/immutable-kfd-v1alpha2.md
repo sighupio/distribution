@@ -7245,10 +7245,10 @@ Type of limit to apply (Server, Namespace, User, SourceAndObject).
 
 ### Properties
 
-| Property                                                                     | Type      | Required |
-|:-----------------------------------------------------------------------------|:----------|:---------|
-| [additionalProperties](#speckubernetesadvancedkubeproxyadditionalproperties) | `object`  | Optional |
-| [enabled](#speckubernetesadvancedkubeproxyenabled)                           | `boolean` | Optional |
+| Property                                                                     | Type     | Required |
+|:-----------------------------------------------------------------------------|:---------|:---------|
+| [additionalProperties](#speckubernetesadvancedkubeproxyadditionalproperties) | `object` | Optional |
+| [type](#speckubernetesadvancedkubeproxytype)                                 | `string` | Optional |
 
 ### Description
 
@@ -7256,13 +7256,22 @@ Configuration for the kube-proxy component.
 
 ## .spec.kubernetes.advanced.kubeProxy.additionalProperties
 
-## .spec.kubernetes.advanced.kubeProxy.enabled
+## .spec.kubernetes.advanced.kubeProxy.type
 
 ### Description
 
-Setting this option to `false` will skip the installation of the kube-proxy component and install the CNI plugin with the following configuration: Cilium in kube-proxy-replacement mode and Calico in eBPF mode. Default is `true`.
+The operating mode for kube-proxy. `none` skips kube-proxy installation and configures the CNI accordingly (Cilium in kube-proxy-replacement mode, Calico in eBPF mode).  `nftables` (default) installs kube-proxy in nftables mode.
 
-NOTE: Changing this option after the cluster has been created is not currently supported.
+NOTE: Changing the `type` after the cluster has been created is not currently supported.
+
+### Constraints
+
+**enum**: the value of this property must be equal to one of the following string values:
+
+| Value      |
+|:-----------|
+|`"none"`    |
+|`"nftables"`|
 
 ## .spec.kubernetes.advanced.kubeletConfiguration
 
