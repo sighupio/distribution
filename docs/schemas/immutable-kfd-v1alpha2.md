@@ -7277,14 +7277,16 @@ NOTE: Changing the `type` after the cluster has been created is not currently su
 
 ### Properties
 
-| Property                                                                | Type      | Required |
-|:------------------------------------------------------------------------|:----------|:---------|
-| [maxPods](#speckubernetesadvancedkubeletconfigurationmaxpods)           | `integer` | Optional |
-| [podPidsLimit](#speckubernetesadvancedkubeletconfigurationpodpidslimit) | `integer` | Optional |
+| Property                                                                    | Type      | Required |
+|:----------------------------------------------------------------------------|:----------|:---------|
+| [maxPods](#speckubernetesadvancedkubeletconfigurationmaxpods)               | `integer` | Optional |
+| [systemReserved](#speckubernetesadvancedkubeletconfigurationsystemreserved) | `object`  | Optional |
 
 ### Description
 
-Kubelet configuration parameters. Ref: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/
+Kubelet configuration parameters. This open field allows users to specify any parameter supported by the `KubeletConfiguration` object. Examples of uses include controlling the maximum number of pods per node (`maxPods`), the maximum number of PIDs per pod (`podPidsLimit`), managing container logging (`containerLogMaxSize`), or Topology Manager options (`topologyManagerPolicyOptions`). All values must follow the official Kubelet specification: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/.
+
+NOTE: Content will **not** be validated by furyctl. To customize the TLS cipher suites of the Kubelet, set only the `Spec.Kubernetes.Advanced.Encryption.tlsCipherSuitesKubelet` field - do not configure them under this field.
 
 ## .spec.kubernetes.advanced.kubeletConfiguration.maxPods
 
@@ -7292,11 +7294,52 @@ Kubelet configuration parameters. Ref: https://kubernetes.io/docs/reference/conf
 
 Maximum number of pods per node. Example: 200
 
-## .spec.kubernetes.advanced.kubeletConfiguration.podPidsLimit
+## .spec.kubernetes.advanced.kubeletConfiguration.systemReserved
+
+### Properties
+
+| Property                                                                                        | Type     | Required |
+|:------------------------------------------------------------------------------------------------|:---------|:---------|
+| [cpu](#speckubernetesadvancedkubeletconfigurationsystemreservedcpu)                             | `string` | Optional |
+| [ephemeral-storage](#speckubernetesadvancedkubeletconfigurationsystemreservedephemeral-storage) | `string` | Optional |
+| [memory](#speckubernetesadvancedkubeletconfigurationsystemreservedmemory)                       | `string` | Optional |
+| [pid](#speckubernetesadvancedkubeletconfigurationsystemreservedpid)                             | `string` | Optional |
 
 ### Description
 
-Maximum number of PIDs per pod. Example: 8192
+Resources reserved for system daemons that are not managed by Kubernetes (e.g. the OS, sshd, container runtime). Values are Kubernetes resource quantities. Example:
+```yaml
+systemReserved:
+  cpu: "500m"
+  memory: "1Gi"
+  ephemeral-storage: "2Gi"
+  pid: "1000"
+```
+. Ref: https://kubernetes.io/docs/tasks/administer-cluster/reserve-compute-resources/#system-reserved
+
+## .spec.kubernetes.advanced.kubeletConfiguration.systemReserved.cpu
+
+### Description
+
+CPU reserved for system daemons. Example: `500m`
+
+## .spec.kubernetes.advanced.kubeletConfiguration.systemReserved.ephemeral-storage
+
+### Description
+
+Ephemeral storage reserved for system daemons. Example: `2Gi`
+
+## .spec.kubernetes.advanced.kubeletConfiguration.systemReserved.memory
+
+### Description
+
+Memory reserved for system daemons. Example: `1Gi`
+
+## .spec.kubernetes.advanced.kubeletConfiguration.systemReserved.pid
+
+### Description
+
+Process IDs reserved for system daemons. Example: `1000`
 
 ## .spec.kubernetes.advanced.oidc
 
@@ -7479,14 +7522,16 @@ The virtual router ID of Keepalived, an arbitrary unique number from 1 to 255 us
 
 ### Properties
 
-| Property                                                                    | Type      | Required |
-|:----------------------------------------------------------------------------|:----------|:---------|
-| [maxPods](#speckubernetescontrolplanekubeletconfigurationmaxpods)           | `integer` | Optional |
-| [podPidsLimit](#speckubernetescontrolplanekubeletconfigurationpodpidslimit) | `integer` | Optional |
+| Property                                                                        | Type      | Required |
+|:--------------------------------------------------------------------------------|:----------|:---------|
+| [maxPods](#speckubernetescontrolplanekubeletconfigurationmaxpods)               | `integer` | Optional |
+| [systemReserved](#speckubernetescontrolplanekubeletconfigurationsystemreserved) | `object`  | Optional |
 
 ### Description
 
-Kubelet configuration parameters. Ref: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/
+Kubelet configuration parameters. This open field allows users to specify any parameter supported by the `KubeletConfiguration` object. Examples of uses include controlling the maximum number of pods per node (`maxPods`), the maximum number of PIDs per pod (`podPidsLimit`), managing container logging (`containerLogMaxSize`), or Topology Manager options (`topologyManagerPolicyOptions`). All values must follow the official Kubelet specification: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/.
+
+NOTE: Content will **not** be validated by furyctl. To customize the TLS cipher suites of the Kubelet, set only the `Spec.Kubernetes.Advanced.Encryption.tlsCipherSuitesKubelet` field - do not configure them under this field.
 
 ## .spec.kubernetes.controlPlane.kubeletConfiguration.maxPods
 
@@ -7494,11 +7539,52 @@ Kubelet configuration parameters. Ref: https://kubernetes.io/docs/reference/conf
 
 Maximum number of pods per node. Example: 200
 
-## .spec.kubernetes.controlPlane.kubeletConfiguration.podPidsLimit
+## .spec.kubernetes.controlPlane.kubeletConfiguration.systemReserved
+
+### Properties
+
+| Property                                                                                            | Type     | Required |
+|:----------------------------------------------------------------------------------------------------|:---------|:---------|
+| [cpu](#speckubernetescontrolplanekubeletconfigurationsystemreservedcpu)                             | `string` | Optional |
+| [ephemeral-storage](#speckubernetescontrolplanekubeletconfigurationsystemreservedephemeral-storage) | `string` | Optional |
+| [memory](#speckubernetescontrolplanekubeletconfigurationsystemreservedmemory)                       | `string` | Optional |
+| [pid](#speckubernetescontrolplanekubeletconfigurationsystemreservedpid)                             | `string` | Optional |
 
 ### Description
 
-Maximum number of PIDs per pod. Example: 8192
+Resources reserved for system daemons that are not managed by Kubernetes (e.g. the OS, sshd, container runtime). Values are Kubernetes resource quantities. Example:
+```yaml
+systemReserved:
+  cpu: "500m"
+  memory: "1Gi"
+  ephemeral-storage: "2Gi"
+  pid: "1000"
+```
+. Ref: https://kubernetes.io/docs/tasks/administer-cluster/reserve-compute-resources/#system-reserved
+
+## .spec.kubernetes.controlPlane.kubeletConfiguration.systemReserved.cpu
+
+### Description
+
+CPU reserved for system daemons. Example: `500m`
+
+## .spec.kubernetes.controlPlane.kubeletConfiguration.systemReserved.ephemeral-storage
+
+### Description
+
+Ephemeral storage reserved for system daemons. Example: `2Gi`
+
+## .spec.kubernetes.controlPlane.kubeletConfiguration.systemReserved.memory
+
+### Description
+
+Memory reserved for system daemons. Example: `1Gi`
+
+## .spec.kubernetes.controlPlane.kubeletConfiguration.systemReserved.pid
+
+### Description
+
+Process IDs reserved for system daemons. Example: `1000`
 
 ## .spec.kubernetes.controlPlane.labels
 
@@ -7720,14 +7806,16 @@ Kubernetes annotations to apply to nodes in this group.
 
 ### Properties
 
-| Property                                                                  | Type      | Required |
-|:--------------------------------------------------------------------------|:----------|:---------|
-| [maxPods](#speckubernetesnodegroupskubeletconfigurationmaxpods)           | `integer` | Optional |
-| [podPidsLimit](#speckubernetesnodegroupskubeletconfigurationpodpidslimit) | `integer` | Optional |
+| Property                                                                      | Type      | Required |
+|:------------------------------------------------------------------------------|:----------|:---------|
+| [maxPods](#speckubernetesnodegroupskubeletconfigurationmaxpods)               | `integer` | Optional |
+| [systemReserved](#speckubernetesnodegroupskubeletconfigurationsystemreserved) | `object`  | Optional |
 
 ### Description
 
-Kubelet configuration parameters. Ref: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/
+Kubelet configuration parameters. This open field allows users to specify any parameter supported by the `KubeletConfiguration` object. Examples of uses include controlling the maximum number of pods per node (`maxPods`), the maximum number of PIDs per pod (`podPidsLimit`), managing container logging (`containerLogMaxSize`), or Topology Manager options (`topologyManagerPolicyOptions`). All values must follow the official Kubelet specification: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/.
+
+NOTE: Content will **not** be validated by furyctl. To customize the TLS cipher suites of the Kubelet, set only the `Spec.Kubernetes.Advanced.Encryption.tlsCipherSuitesKubelet` field - do not configure them under this field.
 
 ## .spec.kubernetes.nodeGroups.kubeletConfiguration.maxPods
 
@@ -7735,11 +7823,52 @@ Kubelet configuration parameters. Ref: https://kubernetes.io/docs/reference/conf
 
 Maximum number of pods per node. Example: 200
 
-## .spec.kubernetes.nodeGroups.kubeletConfiguration.podPidsLimit
+## .spec.kubernetes.nodeGroups.kubeletConfiguration.systemReserved
+
+### Properties
+
+| Property                                                                                          | Type     | Required |
+|:--------------------------------------------------------------------------------------------------|:---------|:---------|
+| [cpu](#speckubernetesnodegroupskubeletconfigurationsystemreservedcpu)                             | `string` | Optional |
+| [ephemeral-storage](#speckubernetesnodegroupskubeletconfigurationsystemreservedephemeral-storage) | `string` | Optional |
+| [memory](#speckubernetesnodegroupskubeletconfigurationsystemreservedmemory)                       | `string` | Optional |
+| [pid](#speckubernetesnodegroupskubeletconfigurationsystemreservedpid)                             | `string` | Optional |
 
 ### Description
 
-Maximum number of PIDs per pod. Example: 8192
+Resources reserved for system daemons that are not managed by Kubernetes (e.g. the OS, sshd, container runtime). Values are Kubernetes resource quantities. Example:
+```yaml
+systemReserved:
+  cpu: "500m"
+  memory: "1Gi"
+  ephemeral-storage: "2Gi"
+  pid: "1000"
+```
+. Ref: https://kubernetes.io/docs/tasks/administer-cluster/reserve-compute-resources/#system-reserved
+
+## .spec.kubernetes.nodeGroups.kubeletConfiguration.systemReserved.cpu
+
+### Description
+
+CPU reserved for system daemons. Example: `500m`
+
+## .spec.kubernetes.nodeGroups.kubeletConfiguration.systemReserved.ephemeral-storage
+
+### Description
+
+Ephemeral storage reserved for system daemons. Example: `2Gi`
+
+## .spec.kubernetes.nodeGroups.kubeletConfiguration.systemReserved.memory
+
+### Description
+
+Memory reserved for system daemons. Example: `1Gi`
+
+## .spec.kubernetes.nodeGroups.kubeletConfiguration.systemReserved.pid
+
+### Description
+
+Process IDs reserved for system daemons. Example: `1000`
 
 ## .spec.kubernetes.nodeGroups.labels
 

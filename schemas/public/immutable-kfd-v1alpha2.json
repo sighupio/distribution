@@ -1390,8 +1390,8 @@
     },
     "Spec.Kubernetes.KubeletConfiguration": {
       "type": "object",
-      "additionalProperties": false,
-      "description": "Kubelet configuration parameters. Ref: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/",
+      "additionalProperties": true,
+      "description": "Kubelet configuration parameters. This open field allows users to specify any parameter supported by the `KubeletConfiguration` object. Examples of uses include controlling the maximum number of pods per node (`maxPods`), the maximum number of PIDs per pod (`podPidsLimit`), managing container logging (`containerLogMaxSize`), or Topology Manager options (`topologyManagerPolicyOptions`). All values must follow the official Kubelet specification: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/.\n\nNOTE: Content will **not** be validated by furyctl. To customize the TLS cipher suites of the Kubelet, set only the `Spec.Kubernetes.Advanced.Encryption.tlsCipherSuitesKubelet` field - do not configure them under this field.",
       "properties": {
         "maxPods": {
           "type": "integer",
@@ -1399,10 +1399,32 @@
           "minimum": 1,
           "maximum": 1000
         },
-        "podPidsLimit": {
-          "type": "integer",
-          "description": "Maximum number of PIDs per pod. Example: 8192",
-          "minimum": 1
+        "systemReserved": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Resources reserved for system daemons that are not managed by Kubernetes (e.g. the OS, sshd, container runtime). Values are Kubernetes resource quantities. Example:\n```yaml\nsystemReserved:\n  cpu: \"500m\"\n  memory: \"1Gi\"\n  ephemeral-storage: \"2Gi\"\n  pid: \"1000\"\n```\n. Ref: https://kubernetes.io/docs/tasks/administer-cluster/reserve-compute-resources/#system-reserved",
+          "properties": {
+            "cpu": {
+              "type": "string",
+              "pattern": "^[0-9]+(\\.[0-9]+)?(m|)$",
+              "description": "CPU reserved for system daemons, in cores or millicores. Examples: `500m`, `1`, `0.5`"
+            },
+            "memory": {
+              "$ref": "#/$defs/Types.KubernetesQuantity",
+              "description": "Memory reserved for system daemons. Example: `1Gi`, `500Mi`"
+            },
+            "ephemeral-storage": {
+              "$ref": "#/$defs/Types.KubernetesQuantity",
+              "description": "Ephemeral storage reserved for system daemons. Example: `2Gi`"
+            },
+            "pid": {
+              "type": "string",
+              "pattern": "^[0-9]+$",
+              "description": "Process IDs reserved for system daemons. Example: `1000`"
+            }
+          }
         }
       }
     },
