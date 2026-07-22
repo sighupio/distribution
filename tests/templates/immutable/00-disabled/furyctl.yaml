@@ -1,0 +1,69 @@
+# yaml-language-server: $schema=../../../../schemas/public/immutable-kfd-v1alpha2.json
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# This is a test case furyctl.yaml to assert that the distribution templates are generating the right output
+# This test verifies output when no modules are enabled
+---
+apiVersion: kfd.sighup.io/v1alpha2
+kind: Immutable
+metadata:
+  name: no-modules-enabled
+spec:
+  distributionVersion: v1.35.0
+  infrastructure:
+    ssh:
+      username: core
+      privateKeyPath: dummy
+    nodes:
+      - hostname: dummy.example.com
+        macAddress: aa:bb:cc:dd:ee:ff
+        storage:
+          installDisk: /dev/sda
+        network:
+          ethernets:
+            eth0:
+              dhcp4: true
+  kubernetes:
+    pkiPath: ./pki
+    networking:
+      podCIDR: 10.32.0.0/18
+      serviceCIDR: 10.96.0.0/16
+    controlPlane:
+      address: cp1.exmaple.com:6443
+      members:
+        - hostname: cp1.example.com
+    nodeGroups: []
+  distribution:
+    modules:
+      networking:
+        type: calico
+      ingress:
+        baseDomain: internal.example.com
+        nginx:
+          type: none
+        haproxy:
+          type: none
+          tls:
+            provider: certManager
+        certManager:
+          clusterIssuer:
+            name: letsencrypt-fury
+            email: example@sighup.io
+            type: http01
+      logging:
+        type: none
+        minio:
+          storageSize: "20Gi"
+      monitoring:
+        type: none
+      tracing:
+        type: none
+      policy:
+        type: none
+      dr:
+        type: none
+      auth:
+        provider:
+          type: none
