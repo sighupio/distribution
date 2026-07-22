@@ -83,15 +83,17 @@ run = [
 description = "Update templates test suite baseline"
 usage = """
 flag "-f --force" help="Force overwrite of previous failed tests output folder"
+flag "-k --kind <kind>" help="Limit to specific kind. Matches also start of the name" default=""
+flag "-t --test <test>" help="Limit to specific test. Matches also start of the name" default=""
 """
 run = """
 #!/usr/bin/env bash
 set -euo pipefail
 pushd tests/templates
-for dir in */; do
+for dir in ${usage_kind}*/; do
   pushd "$dir"
   echo "Updating baseline for kind $dir..."
-  for subdir in */; do
+  for subdir in ${usage_test}*/; do
     pushd "$subdir"
     echo "Updating baseline for $subdir..."
     rm -rf baseline
@@ -110,15 +112,17 @@ popd
 description = "Run templates regressions tests"
 usage = """
 flag "-f --force" help="Force overwrite of previous failed tests output folder"
+flag "-k --kind <kind>" help="Limit to specific kind. Matches also start of the name" default=""
+flag "-t --test <test>" help="Limit to specific test. Matches also start of the name" default=""
 """
 run = """
 #!/usr/bin/env bash
 set -euo pipefail
 pushd tests/templates
-for dir in */; do
+for dir in ${usage_kind}*/; do
   pushd "$dir"
   echo "Running templates regressions tests for kind $dir..."
-  for subdir in */; do
+  for subdir in ${usage_test}*/; do
     pushd "$subdir"
     echo "Dumping templates for case $subdir..."
     furyctl dump template --distro-location {{config_root}} ${usage_force:+--no-overwrite=false}
