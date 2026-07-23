@@ -468,3 +468,27 @@ test_schema() {
 
     test_schema "public" "immutable-kfd-v1alpha2" "110-no" expect_no
 }
+
+@test "111 - ok" {
+    info
+
+    test_schema "public" "immutable-kfd-v1alpha2" "111-ok" expect_ok
+}
+
+@test "112 - ok" {
+    info
+
+    test_schema "public" "immutable-kfd-v1alpha2" "112-ok" expect_ok
+}
+
+@test "113 - no" {
+    info
+
+    test_schema "public" "immutable-kfd-v1alpha2" "113-no" expect_no
+}
+
+@test "114 - no" {
+    info
+
+    test_schema "public" "immutable-kfd-v1alpha2" "114-no" expect_no
+}

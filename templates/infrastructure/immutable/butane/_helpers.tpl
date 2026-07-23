@@ -99,6 +99,58 @@ passwd:
 {{- end }}
 {{- end }}
 
+{{- /* initramfs network kargs so Ignition can fetch sysext before switch-root; without them a
+node on a DHCP-less segment never boots. node.kernelArguments, if set, is emitted verbatim
+(manual override); otherwise ip=/nameserver= are derived from the node's static interfaces.
+Emit exactly ONE ip= (the gateway iface): dracut can't split two and powers off, and first_boot
+re-adds removed args, bricking the node. networkd configures the rest after switch-root. Node
+configs only, never install-flatcar (ignition-kargs-helper hard-fails on PXE). Read map keys
+with index, not $ka.foo: templates run missingkey=error, so an absent key aborts the render. */}}
+
+{{- define "initramfs-kargs" }}
+{{- if index .node "kernelArguments" }}
+{{- $ka := index .node "kernelArguments" }}
+{{- $se := index $ka "shouldExist" }}
+{{- $sne := index $ka "shouldNotExist" }}
+{{- if or $se $sne }}
+kernel_arguments:
+{{- if $se }}
+  should_exist:
+    {{- range $se }}
+    - {{ . }}
+    {{- end }}
+{{- end }}
+{{- if $sne }}
+  should_not_exist:
+    {{- range $sne }}
+    - {{ . }}
+    {{- end }}
+{{- end }}
+{{- end }}
+{{- else }}
+{{- $selName := "" }}
+{{- $sel := dict }}
+{{- range $name, $iface := (.node.network | digAny "ethernets" dict) }}
+{{- if and (not (index $iface "dhcp4")) (index $iface "addresses") }}
+{{- if or (eq $selName "") (and (not (index $sel "gateway")) (index $iface "gateway")) }}
+{{- $selName = $name }}
+{{- $sel = $iface }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- if $selName }}
+{{- $cidr := splitList "/" (first $sel.addresses) }}
+
+kernel_arguments:
+  should_exist:
+    - ip={{ first $cidr }}::{{ $sel | digAny "gateway" "" }}:{{ last $cidr }}:{{ $.node.hostname }}:{{ $selName }}:none
+{{- range ($sel | digAny "nameservers" "addresses" list) }}
+    - nameserver={{ . }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+
 {{- define "containerd-sysext-files" }}
     # containerd sysext download and sysupdate configuration
     - path: /opt/extensions/containerd/containerd-{{ .sysext.containerd.version }}-{{ .node.arch }}.raw

@@ -5831,6 +5831,7 @@ Optional IP address. If not specified, it is inferred from the node's network co
 |:-------------------------------------------------------------|:---------|:---------|
 | [arch](#specinfrastructurenodesarch)                         | `string` | Optional |
 | [hostname](#specinfrastructurenodeshostname)                 | `string` | Required |
+| [kernelArguments](#specinfrastructurenodeskernelarguments)   | `object` | Optional |
 | [kernelParameters](#specinfrastructurenodeskernelparameters) | `array`  | Optional |
 | [macAddress](#specinfrastructurenodesmacaddress)             | `string` | Required |
 | [network](#specinfrastructurenodesnetwork)                   | `object` | Required |
@@ -5878,6 +5879,31 @@ Fully qualified domain name for the node. Example: node01.k8s.example.com
 ```
 
 [try pattern](https://regexr.com/?expression=^\([a-zA-Z0-9]\([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9]\)?\.\)%2B[a-zA-Z]{2,}$)
+
+## .spec.infrastructure.nodes.kernelArguments
+
+### Properties
+
+| Property                                                                | Type    | Required |
+|:------------------------------------------------------------------------|:--------|:---------|
+| [shouldExist](#specinfrastructurenodeskernelargumentsshouldexist)       | `array` | Optional |
+| [shouldNotExist](#specinfrastructurenodeskernelargumentsshouldnotexist) | `array` | Optional |
+
+### Description
+
+Kernel arguments for this node, mirroring Butane's kernel_arguments (both lists optional). They are written to the bootloader and applied by Ignition on the node's first boot.
+
+## .spec.infrastructure.nodes.kernelArguments.shouldExist
+
+### Description
+
+Kernel arguments to add, rendered to Butane should_exist. Example: console=ttyS0,115200n8
+
+## .spec.infrastructure.nodes.kernelArguments.shouldNotExist
+
+### Description
+
+Kernel arguments to remove, rendered to Butane should_not_exist. Example: mitigations=auto
 
 ## .spec.infrastructure.nodes.kernelParameters
 
@@ -7321,25 +7347,65 @@ systemReserved:
 
 ### Description
 
-CPU reserved for system daemons. Example: `500m`
+CPU reserved for system daemons, in cores or millicores. Examples: `500m`, `1`, `0.5`
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[0-9]+(\.[0-9]+)?(m|)$
+```
+
+[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(m|\)$)
 
 ## .spec.kubernetes.advanced.kubeletConfiguration.systemReserved.ephemeral-storage
 
 ### Description
 
-Ephemeral storage reserved for system daemons. Example: `2Gi`
+Kubernetes resource quantity format. Examples: 50Gi, 100Mi, 1Ti
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[0-9]+(\.[0-9]+)?(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk])$
+```
+
+[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk]\)$)
 
 ## .spec.kubernetes.advanced.kubeletConfiguration.systemReserved.memory
 
 ### Description
 
-Memory reserved for system daemons. Example: `1Gi`
+Kubernetes resource quantity format. Examples: 50Gi, 100Mi, 1Ti
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[0-9]+(\.[0-9]+)?(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk])$
+```
+
+[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk]\)$)
 
 ## .spec.kubernetes.advanced.kubeletConfiguration.systemReserved.pid
 
 ### Description
 
 Process IDs reserved for system daemons. Example: `1000`
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[0-9]+$
+```
+
+[try pattern](https://regexr.com/?expression=^[0-9]%2B$)
 
 ## .spec.kubernetes.advanced.oidc
 
@@ -7566,25 +7632,65 @@ systemReserved:
 
 ### Description
 
-CPU reserved for system daemons. Example: `500m`
+CPU reserved for system daemons, in cores or millicores. Examples: `500m`, `1`, `0.5`
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[0-9]+(\.[0-9]+)?(m|)$
+```
+
+[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(m|\)$)
 
 ## .spec.kubernetes.controlPlane.kubeletConfiguration.systemReserved.ephemeral-storage
 
 ### Description
 
-Ephemeral storage reserved for system daemons. Example: `2Gi`
+Kubernetes resource quantity format. Examples: 50Gi, 100Mi, 1Ti
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[0-9]+(\.[0-9]+)?(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk])$
+```
+
+[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk]\)$)
 
 ## .spec.kubernetes.controlPlane.kubeletConfiguration.systemReserved.memory
 
 ### Description
 
-Memory reserved for system daemons. Example: `1Gi`
+Kubernetes resource quantity format. Examples: 50Gi, 100Mi, 1Ti
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[0-9]+(\.[0-9]+)?(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk])$
+```
+
+[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk]\)$)
 
 ## .spec.kubernetes.controlPlane.kubeletConfiguration.systemReserved.pid
 
 ### Description
 
 Process IDs reserved for system daemons. Example: `1000`
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[0-9]+$
+```
+
+[try pattern](https://regexr.com/?expression=^[0-9]%2B$)
 
 ## .spec.kubernetes.controlPlane.labels
 
@@ -7850,25 +7956,65 @@ systemReserved:
 
 ### Description
 
-CPU reserved for system daemons. Example: `500m`
+CPU reserved for system daemons, in cores or millicores. Examples: `500m`, `1`, `0.5`
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[0-9]+(\.[0-9]+)?(m|)$
+```
+
+[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(m|\)$)
 
 ## .spec.kubernetes.nodeGroups.kubeletConfiguration.systemReserved.ephemeral-storage
 
 ### Description
 
-Ephemeral storage reserved for system daemons. Example: `2Gi`
+Kubernetes resource quantity format. Examples: 50Gi, 100Mi, 1Ti
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[0-9]+(\.[0-9]+)?(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk])$
+```
+
+[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk]\)$)
 
 ## .spec.kubernetes.nodeGroups.kubeletConfiguration.systemReserved.memory
 
 ### Description
 
-Memory reserved for system daemons. Example: `1Gi`
+Kubernetes resource quantity format. Examples: 50Gi, 100Mi, 1Ti
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[0-9]+(\.[0-9]+)?(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk])$
+```
+
+[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk]\)$)
 
 ## .spec.kubernetes.nodeGroups.kubeletConfiguration.systemReserved.pid
 
 ### Description
 
 Process IDs reserved for system daemons. Example: `1000`
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[0-9]+$
+```
+
+[try pattern](https://regexr.com/?expression=^[0-9]%2B$)
 
 ## .spec.kubernetes.nodeGroups.labels
 

@@ -179,6 +179,27 @@
         "value"
       ]
     },
+    "Spec.Infrastructure.Node.KernelArguments": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Kernel arguments for this node, mirroring Butane's kernel_arguments (both lists optional). They are written to the bootloader and applied by Ignition on the node's first boot.",
+      "properties": {
+        "shouldExist": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Kernel arguments to add, rendered to Butane should_exist. Example: console=ttyS0,115200n8"
+        },
+        "shouldNotExist": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Kernel arguments to remove, rendered to Butane should_not_exist. Example: mitigations=auto"
+        }
+      }
+    },
     "Spec.Infrastructure.IpxeServer": {
       "type": "object",
       "additionalProperties": false,
@@ -310,6 +331,10 @@
         },
         "storage": {
           "$ref": "#/$defs/Spec.Infrastructure.Node.Storage"
+        },
+        "kernelArguments": {
+          "$ref": "#/$defs/Spec.Infrastructure.Node.KernelArguments",
+          "description": "Node-specific kernel arguments. When omitted, furyctl derives the initramfs network arguments (ip=/nameserver=) from the node's static interfaces so it can boot on a segment without DHCP. When set, these replace that derivation, so include the network arguments yourself if the node has no DHCP."
         },
         "kernelParameters": {
           "type": "array",
