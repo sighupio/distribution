@@ -11,14 +11,6 @@
         path: /etc/kubernetes/admin.conf
       register: admin_conf_stat
 
-    - name: Getting admin.conf kubeconfig
-      become: yes
-      fetch:
-        src: /etc/kubernetes/admin.conf
-        dest: "{{ kubernetes_kubeconfig_path }}/admin.conf"
-        flat: yes
-      when: admin_conf_stat.stat.exists
-
     - name: Set fact if admin.conf exists
       set_fact:
         admin_conf_exists: "{{ admin_conf_stat.stat.exists }}"
@@ -41,4 +33,19 @@
       fail:
         msg: "No master node has /etc/kubernetes/admin.conf"
       when: not any_master_has_conf
- 
+
+    - name: Group master nodes with admin.conf
+      group_by:
+        key: masters_with_admin_conf
+      when: admin_conf_stat.stat.exists
+
+- name: Fetch admin.conf from a single master that has it
+  hosts: masters_with_admin_conf
+  become: true
+  tasks:
+    - name: Getting admin.conf kubeconfig
+      run_once: true
+      fetch:
+        src: /etc/kubernetes/admin.conf
+        dest: "{{ kubernetes_kubeconfig_path }}/admin.conf"
+        flat: yes
