@@ -11,6 +11,7 @@ Welcome to the latest release of SD maintained by SIGHUP by ReeVo team.
 
 - [[#555](https://github.com/sighupio/distribution/pull/555)] Monitoring templates: don't try to patch the alertmanagerConfigs when they are not being deployed at all.
 - [[#561](https://github.com/sighupio/distribution/pull/561)] Immutable: align possible properties for Kubernetes phase `kubeletConfiguration` parameter with OnPremises, accepting all possible values now.
+- [[#564](https://github.com/sighupio/distribution/pull/564)] OnPremises: fixed a race in the preflight `verify-playbook.yaml` where fetching `admin.conf` from multiple masters in parallel could randomly fail with a checksum mismatch.
 
 ## Breaking Changes 💔
 
