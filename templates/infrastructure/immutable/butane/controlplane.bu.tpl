@@ -6,6 +6,7 @@ variant: flatcar
 version: 1.1.0
 
 {{ template "passwd" . }}
+{{ template "initramfs-kargs" . }}
 
 storage:
   files:
