@@ -12,12 +12,12 @@ storage:
   files:
 {{ template "hostname" . }}
 {{ template "network" . }}
-{{ template "python" . }}
 {{ template "sysupdate-noop" . }}
 {{ template "update-server-config" . }}
 {{ template "sshd-pq-configuration" . }}
 {{ template "containerd-sysext-files" . }}
 {{ template "keepalived-sysext-files" . }}
+{{ template "python-sysext-files" . }}
     # User-provided additional files
 {{- if hasKeyAny .node.storage "files" }}
 {{ .node.storage.files | toYaml | indent 4 }}
@@ -30,6 +30,7 @@ storage:
     # Enable custom sysexts
 {{ template "containerd-sysext-links" . }}
 {{ template "keepalived-sysext-links" . }}
+{{ template "python-sysext-links" . }}
     # User-provided additional links
 {{- if hasKeyAny .node.storage "links" }}
 {{ .node.storage.links | toYaml | indent 4 }}
