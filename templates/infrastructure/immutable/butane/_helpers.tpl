@@ -155,6 +155,42 @@ kernel_arguments:
 {{- end }}
 {{- end }}
 
+{{- /* Shared by all roles: the schema puts additionalDisks on Node.Storage, which all four share. */}}
+{{- define "additional-disks" }}
+{{- if hasKeyAny .node.storage "additionalDisks" }}
+  disks:
+{{- range .node.storage.additionalDisks }}
+    - device: {{ .device }}
+      wipe_table: true
+      partitions:
+{{- range .partitions }}
+        - label: {{ .label }}
+          number: {{ .number }}
+{{- if .sizeMiB }}
+          size_mib: {{ .sizeMiB }}
+{{- end }}
+{{- end }}
+{{- end }}
+  filesystems:
+{{- range .node.storage.additionalDisks }}
+{{- range .partitions }}
+    - device: /dev/disk/by-partlabel/{{ .label }}
+      format: {{ .filesystem.format }}
+      label: {{ .filesystem.label }}
+      path: {{ .filesystem.mountPoint }}
+      wipe_filesystem: true
+      with_mount_unit: true
+{{- if hasKeyAny .filesystem "mountOptions" }}
+      mount_options:
+{{- range .filesystem.mountOptions }}
+        - {{ . }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+
 {{- define "containerd-sysext-files" }}
     # containerd sysext download and sysupdate configuration
     - path: /opt/extensions/containerd/containerd-{{ .sysext.containerd.version }}-{{ .node.arch }}.raw
