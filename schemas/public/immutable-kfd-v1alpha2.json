@@ -363,18 +363,33 @@
     "Spec.Infrastructure.Node.Storage": {
       "type": "object",
       "additionalProperties": false,
-      "description": "Storage configuration for the node, including install disk and additional disks with partitions.",
+      "description": "Storage configuration for the node, including the install disk and an optional raw Butane storage fragment.",
       "properties": {
         "installDisk": {
           "$ref": "#/$defs/Types.DevicePath",
           "description": "The disk device where the OS will be installed. Example: /dev/sda"
         },
-        "additionalDisks": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/Spec.Infrastructure.Node.Storage.Disk"
-          },
-          "description": "Additional disks to partition and mount."
+        "additionalDisk": {
+          "type": "object",
+          "additionalProperties": false,
+          "minProperties": 1,
+          "description": "Additional disks passed verbatim to Butane storage, like storage.files. The disks and filesystems keys mirror Butane's and their items are not re-validated. See https://www.flatcar.org/docs/latest/provisioning/config-transpiler/configuration/",
+          "properties": {
+            "disks": {
+              "type": "array",
+              "description": "Butane storage.disks entries, passed through verbatim.",
+              "items": {
+                "type": "object"
+              }
+            },
+            "filesystems": {
+              "type": "array",
+              "description": "Butane storage.filesystems entries, passed through verbatim.",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
         },
         "files": {
           "type": "array",
@@ -678,112 +693,6 @@
       },
       "required": [
         "path"
-      ]
-    },
-    "Spec.Infrastructure.Node.Storage.Disk": {
-      "type": "object",
-      "additionalProperties": false,
-      "description": "Additional disk configuration with partitions.",
-      "properties": {
-        "device": {
-          "$ref": "#/$defs/Types.DevicePath",
-          "description": "The disk device path. Example: /dev/sdb"
-        },
-        "partitions": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/Spec.Infrastructure.Node.Storage.Partition"
-          },
-          "description": "Partitions to create on this disk.",
-          "minItems": 1
-        }
-      },
-      "required": [
-        "device",
-        "partitions"
-      ]
-    },
-    "Spec.Infrastructure.Node.Storage.Partition": {
-      "type": "object",
-      "additionalProperties": false,
-      "description": "Partition definition with filesystem and mount options.",
-      "properties": {
-        "label": {
-          "type": "string",
-          "description": "Partition label. Example: etcd-data",
-          "minLength": 1
-        },
-        "number": {
-          "type": "integer",
-          "description": "Partition number. Example: 1",
-          "minimum": 1,
-          "maximum": 128
-        },
-        "sizeMiB": {
-          "type": "integer",
-          "description": "Partition size in MiB. Use 0 to use all available space.",
-          "minimum": 0
-        },
-        "filesystem": {
-          "$ref": "#/$defs/Spec.Infrastructure.Node.Storage.Filesystem"
-        }
-      },
-      "required": [
-        "label",
-        "number",
-        "sizeMiB",
-        "filesystem"
-      ]
-    },
-    "Spec.Infrastructure.Node.Storage.Filesystem": {
-      "type": "object",
-      "additionalProperties": false,
-      "description": "Filesystem configuration for a partition.",
-      "properties": {
-        "format": {
-          "$ref": "#/$defs/Types.FilesystemType",
-          "description": "Filesystem type. Example: ext4, xfs"
-        },
-        "label": {
-          "type": "string",
-          "description": "Filesystem label (max 12 chars for XFS compatibility). Example: ETCD",
-          "minLength": 1,
-          "maxLength": 12,
-          "pattern": "^[A-Z0-9_-]+$"
-        },
-        "mountPoint": {
-          "type": "string",
-          "description": "Mount point path. Example: /var/lib/etcd",
-          "pattern": "^/[a-zA-Z0-9/_-]*$"
-        },
-        "mountOptions": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "enum": [
-              "noatime",
-              "nodiratime",
-              "relatime",
-              "strictatime",
-              "nodev",
-              "nosuid",
-              "noexec",
-              "ro",
-              "rw",
-              "sync",
-              "async",
-              "discard",
-              "nodiscard",
-              "defaults"
-            ]
-          },
-          "description": "Mount options (validated safe options only). Example: [\"noatime\", \"nodiratime\"]"
-        }
-      },
-      "required": [
-        "format",
-        "label",
-        "mountPoint"
       ]
     },
     "Spec.Infrastructure.Node.Network": {
@@ -4123,17 +4032,6 @@
       "type": "string",
       "pattern": "^/dev/[a-zA-Z0-9/]+$",
       "description": "Unix device path. Example: /dev/sda, /dev/nvme0n1"
-    },
-    "Types.FilesystemType": {
-      "type": "string",
-      "enum": [
-        "ext4",
-        "xfs",
-        "btrfs",
-        "ext3",
-        "vfat"
-      ],
-      "description": "Filesystem type"
     },
     "Types.BondMode": {
       "type": "string",

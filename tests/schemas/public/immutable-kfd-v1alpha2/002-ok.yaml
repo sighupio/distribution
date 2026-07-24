@@ -33,16 +33,6 @@ spec:
         macAddress: 52:54:00:10:00:01
         storage:
           installDisk: /dev/sda
-          additionalDisks:
-            - device: /dev/sdb
-              partitions:
-                - label: etcd-data
-                  number: 1
-                  sizeMiB: 0
-                  filesystem:
-                    format: ext4
-                    label: ETCD
-                    mountPoint: /var/lib/etcd
         # Node-specific kernel parameters (override global settings)
         # Control plane: tuning for high connection rates
         kernelParameters:
@@ -89,16 +79,6 @@ spec:
         macAddress: 52:54:00:10:00:02
         storage:
           installDisk: /dev/sda
-          additionalDisks:
-            - device: /dev/sdb
-              partitions:
-                - label: etcd-data
-                  number: 1
-                  sizeMiB: 0
-                  filesystem:
-                    format: ext4
-                    label: ETCD
-                    mountPoint: /var/lib/etcd
         kernelParameters:
           - name: fs.inotify.max_user_watches
             value: "1048576"
@@ -117,16 +97,6 @@ spec:
         macAddress: 52:54:00:10:00:03
         storage:
           installDisk: /dev/sda
-          additionalDisks:
-            - device: /dev/sdb
-              partitions:
-                - label: etcd-data
-                  number: 1
-                  sizeMiB: 0
-                  filesystem:
-                    format: ext4
-                    label: ETCD
-                    mountPoint: /var/lib/etcd
         kernelParameters:
           - name: fs.inotify.max_user_watches
             value: "1048576"
@@ -146,16 +116,6 @@ spec:
         macAddress: 52:54:00:30:00:01
         storage:
           installDisk: /dev/sda
-          additionalDisks:
-            - device: /dev/sdb
-              partitions:
-                - label: kubelet-data
-                  number: 1
-                  sizeMiB: 0
-                  filesystem:
-                    format: xfs
-                    label: KUBELET
-                    mountPoint: /var/lib/kubelet
         # Load balancer: kernel tuning for high connection tracking
         kernelParameters:
           - name: net.netfilter.nf_conntrack_max
@@ -175,16 +135,6 @@ spec:
         macAddress: 52:54:00:30:00:02
         storage:
           installDisk: /dev/sda
-          additionalDisks:
-            - device: /dev/sdb
-              partitions:
-                - label: kubelet-data
-                  number: 1
-                  sizeMiB: 0
-                  filesystem:
-                    format: xfs
-                    label: KUBELET
-                    mountPoint: /var/lib/kubelet
         kernelParameters:
           - name: net.netfilter.nf_conntrack_max
             value: "1000000"
@@ -204,16 +154,6 @@ spec:
         macAddress: 52:54:00:40:00:01
         storage:
           installDisk: /dev/sda
-          additionalDisks:
-            - device: /dev/sdb
-              partitions:
-                - label: kubelet-data
-                  number: 1
-                  sizeMiB: 0
-                  filesystem:
-                    format: xfs
-                    label: KUBELET
-                    mountPoint: /var/lib/kubelet
         # Infrastructure: kernel tuning for Elasticsearch/logging workloads
         kernelParameters:
           - name: vm.max_map_count
@@ -232,16 +172,6 @@ spec:
         macAddress: 52:54:00:40:00:02
         storage:
           installDisk: /dev/sda
-          additionalDisks:
-            - device: /dev/sdb
-              partitions:
-                - label: kubelet-data
-                  number: 1
-                  sizeMiB: 0
-                  filesystem:
-                    format: xfs
-                    label: KUBELET
-                    mountPoint: /var/lib/kubelet
         kernelParameters:
           - name: vm.max_map_count
             value: "262144"
@@ -259,16 +189,6 @@ spec:
         macAddress: 52:54:00:40:00:03
         storage:
           installDisk: /dev/sda
-          additionalDisks:
-            - device: /dev/sdb
-              partitions:
-                - label: kubelet-data
-                  number: 1
-                  sizeMiB: 0
-                  filesystem:
-                    format: xfs
-                    label: KUBELET
-                    mountPoint: /var/lib/kubelet
         kernelParameters:
           - name: vm.max_map_count
             value: "262144"
@@ -287,17 +207,6 @@ spec:
         macAddress: 52:54:00:50:00:01
         storage:
           installDisk: /dev/sda
-          additionalDisks:
-            - device: /dev/sdb
-              partitions:
-                - label: containerd-data
-                  number: 1
-                  sizeMiB: 0
-                  filesystem:
-                    format: xfs
-                    label: CONTAINERD
-                    mountPoint: /var/lib/containerd
-                    mountOptions: ["noatime", "nodiratime"]
         # Application: kernel tuning for network throughput
         kernelParameters:
           - name: net.core.rmem_max
@@ -316,17 +225,6 @@ spec:
         macAddress: 52:54:00:50:00:02
         storage:
           installDisk: /dev/sda
-          additionalDisks:
-            - device: /dev/sdb
-              partitions:
-                - label: containerd-data
-                  number: 1
-                  sizeMiB: 0
-                  filesystem:
-                    format: xfs
-                    label: CONTAINERD
-                    mountPoint: /var/lib/containerd
-                    mountOptions: ["noatime", "nodiratime"]
         kernelParameters:
           - name: net.core.rmem_max
             value: "16777216"
@@ -344,17 +242,6 @@ spec:
         macAddress: 52:54:00:50:00:03
         storage:
           installDisk: /dev/sda
-          additionalDisks:
-            - device: /dev/sdb
-              partitions:
-                - label: containerd-data
-                  number: 1
-                  sizeMiB: 0
-                  filesystem:
-                    format: xfs
-                    label: CONTAINERD
-                    mountPoint: /var/lib/containerd
-                    mountOptions: ["noatime", "nodiratime"]
         kernelParameters:
           - name: net.core.rmem_max
             value: "16777216"
@@ -373,16 +260,6 @@ spec:
         macAddress: 52:54:00:60:00:01
         storage:
           installDisk: /dev/sda
-          additionalDisks:
-            - device: /dev/sdb
-              partitions:
-                - label: kubelet-data
-                  number: 1
-                  sizeMiB: 0
-                  filesystem:
-                    format: xfs
-                    label: KUBELET
-                    mountPoint: /var/lib/kubelet
         # Database: kernel tuning for I/O optimization
         kernelParameters:
           - name: vm.swappiness
@@ -401,16 +278,6 @@ spec:
         macAddress: 52:54:00:60:00:02
         storage:
           installDisk: /dev/sda
-          additionalDisks:
-            - device: /dev/sdb
-              partitions:
-                - label: kubelet-data
-                  number: 1
-                  sizeMiB: 0
-                  filesystem:
-                    format: xfs
-                    label: KUBELET
-                    mountPoint: /var/lib/kubelet
         kernelParameters:
           - name: vm.swappiness
             value: "10"
@@ -428,16 +295,6 @@ spec:
         macAddress: 52:54:00:60:00:03
         storage:
           installDisk: /dev/sda
-          additionalDisks:
-            - device: /dev/sdb
-              partitions:
-                - label: kubelet-data
-                  number: 1
-                  sizeMiB: 0
-                  filesystem:
-                    format: xfs
-                    label: KUBELET
-                    mountPoint: /var/lib/kubelet
         kernelParameters:
           - name: vm.swappiness
             value: "10"
