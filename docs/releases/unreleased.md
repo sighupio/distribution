@@ -17,3 +17,5 @@ Welcome to the latest release of SD maintained by SIGHUP by ReeVo team.
 ## Breaking Changes 💔
 
 - [[#559](https://github.com/sighupio/distribution/pull/559)] Immutable: kube-proxy configuration in Kubernetes advanced configuration is now a `type` enum instead of an `enabled` boolean option, following OnPremises' schema. Disabling kube-proxy was actually not working for Immutable due to this inconsistency.
+- [[#570](https://github.com/sighupio/distribution/pull/570)] Immutable: removed unused from the schema (network bonds and global kernerlParameters).
+
