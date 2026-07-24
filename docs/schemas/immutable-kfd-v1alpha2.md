@@ -5831,6 +5831,7 @@ Optional IP address. If not specified, it is inferred from the node's network co
 |:-------------------------------------------------------------|:---------|:---------|
 | [arch](#specinfrastructurenodesarch)                         | `string` | Optional |
 | [hostname](#specinfrastructurenodeshostname)                 | `string` | Required |
+| [kernelArguments](#specinfrastructurenodeskernelarguments)   | `object` | Optional |
 | [kernelParameters](#specinfrastructurenodeskernelparameters) | `array`  | Optional |
 | [macAddress](#specinfrastructurenodesmacaddress)             | `string` | Required |
 | [network](#specinfrastructurenodesnetwork)                   | `object` | Required |
@@ -5878,6 +5879,31 @@ Fully qualified domain name for the node. Example: node01.k8s.example.com
 ```
 
 [try pattern](https://regexr.com/?expression=^\([a-zA-Z0-9]\([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9]\)?\.\)%2B[a-zA-Z]{2,}$)
+
+## .spec.infrastructure.nodes.kernelArguments
+
+### Properties
+
+| Property                                                                | Type    | Required |
+|:------------------------------------------------------------------------|:--------|:---------|
+| [shouldExist](#specinfrastructurenodeskernelargumentsshouldexist)       | `array` | Optional |
+| [shouldNotExist](#specinfrastructurenodeskernelargumentsshouldnotexist) | `array` | Optional |
+
+### Description
+
+Kernel arguments for this node, mirroring Butane's kernel_arguments (both lists optional). They are written to the bootloader and applied by Ignition on the node's first boot.
+
+## .spec.infrastructure.nodes.kernelArguments.shouldExist
+
+### Description
+
+Kernel arguments to add, rendered to Butane should_exist. Example: console=ttyS0,115200n8
+
+## .spec.infrastructure.nodes.kernelArguments.shouldNotExist
+
+### Description
+
+Kernel arguments to remove, rendered to Butane should_not_exist. Example: mitigations=auto
 
 ## .spec.infrastructure.nodes.kernelParameters
 
@@ -6135,183 +6161,42 @@ The user ID of the account.
 
 ### Properties
 
-| Property                                                          | Type     | Required |
-|:------------------------------------------------------------------|:---------|:---------|
-| [additionalDisks](#specinfrastructurenodesstorageadditionaldisks) | `array`  | Optional |
-| [directories](#specinfrastructurenodesstoragedirectories)         | `array`  | Optional |
-| [files](#specinfrastructurenodesstoragefiles)                     | `array`  | Optional |
-| [installDisk](#specinfrastructurenodesstorageinstalldisk)         | `string` | Required |
-| [links](#specinfrastructurenodesstoragelinks)                     | `array`  | Optional |
+| Property                                                        | Type     | Required |
+|:----------------------------------------------------------------|:---------|:---------|
+| [additionalDisk](#specinfrastructurenodesstorageadditionaldisk) | `object` | Optional |
+| [directories](#specinfrastructurenodesstoragedirectories)       | `array`  | Optional |
+| [files](#specinfrastructurenodesstoragefiles)                   | `array`  | Optional |
+| [installDisk](#specinfrastructurenodesstorageinstalldisk)       | `string` | Required |
+| [links](#specinfrastructurenodesstoragelinks)                   | `array`  | Optional |
 
 ### Description
 
-Storage configuration for the node, including install disk and additional disks with partitions.
+Storage configuration for the node, including the install disk and an optional raw Butane storage fragment.
 
-## .spec.infrastructure.nodes.storage.additionalDisks
+## .spec.infrastructure.nodes.storage.additionalDisk
 
 ### Properties
 
-| Property                                                               | Type     | Required |
-|:-----------------------------------------------------------------------|:---------|:---------|
-| [device](#specinfrastructurenodesstorageadditionaldisksdevice)         | `string` | Required |
-| [partitions](#specinfrastructurenodesstorageadditionaldiskspartitions) | `array`  | Required |
+| Property                                                                | Type    | Required |
+|:------------------------------------------------------------------------|:--------|:---------|
+| [disks](#specinfrastructurenodesstorageadditionaldiskdisks)             | `array` | Optional |
+| [filesystems](#specinfrastructurenodesstorageadditionaldiskfilesystems) | `array` | Optional |
 
 ### Description
 
-Additional disk configuration with partitions.
+Additional disks passed verbatim to Butane storage, like storage.files. The disks and filesystems keys mirror Butane's and their items are not re-validated. See https://www.flatcar.org/docs/latest/provisioning/config-transpiler/configuration/
 
-## .spec.infrastructure.nodes.storage.additionalDisks.device
-
-### Description
-
-Unix device path. Example: /dev/sda, /dev/nvme0n1
-
-### Constraints
-
-**pattern**: the string must match the following regular expression:
-
-```regexp
-^/dev/[a-zA-Z0-9/]+$
-```
-
-[try pattern](https://regexr.com/?expression=^\/dev\/[a-zA-Z0-9\/]%2B$)
-
-## .spec.infrastructure.nodes.storage.additionalDisks.partitions
-
-### Properties
-
-| Property                                                                         | Type      | Required |
-|:---------------------------------------------------------------------------------|:----------|:---------|
-| [filesystem](#specinfrastructurenodesstorageadditionaldiskspartitionsfilesystem) | `object`  | Required |
-| [label](#specinfrastructurenodesstorageadditionaldiskspartitionslabel)           | `string`  | Required |
-| [number](#specinfrastructurenodesstorageadditionaldiskspartitionsnumber)         | `integer` | Required |
-| [sizeMiB](#specinfrastructurenodesstorageadditionaldiskspartitionssizemib)       | `integer` | Required |
+## .spec.infrastructure.nodes.storage.additionalDisk.disks
 
 ### Description
 
-Partition definition with filesystem and mount options.
+Butane storage.disks entries, passed through verbatim.
 
-### Constraints
-
-**minimum number of items**: the minimum number of items for this array is: `1`
-
-## .spec.infrastructure.nodes.storage.additionalDisks.partitions.filesystem
-
-### Properties
-
-| Property                                                                                       | Type     | Required |
-|:-----------------------------------------------------------------------------------------------|:---------|:---------|
-| [format](#specinfrastructurenodesstorageadditionaldiskspartitionsfilesystemformat)             | `string` | Required |
-| [label](#specinfrastructurenodesstorageadditionaldiskspartitionsfilesystemlabel)               | `string` | Required |
-| [mountOptions](#specinfrastructurenodesstorageadditionaldiskspartitionsfilesystemmountoptions) | `array`  | Optional |
-| [mountPoint](#specinfrastructurenodesstorageadditionaldiskspartitionsfilesystemmountpoint)     | `string` | Required |
+## .spec.infrastructure.nodes.storage.additionalDisk.filesystems
 
 ### Description
 
-Filesystem configuration for a partition.
-
-## .spec.infrastructure.nodes.storage.additionalDisks.partitions.filesystem.format
-
-### Description
-
-Filesystem type
-
-### Constraints
-
-**enum**: the value of this property must be equal to one of the following string values:
-
-| Value   |
-|:--------|
-|`"ext4"` |
-|`"xfs"`  |
-|`"btrfs"`|
-|`"ext3"` |
-|`"vfat"` |
-
-## .spec.infrastructure.nodes.storage.additionalDisks.partitions.filesystem.label
-
-### Description
-
-Filesystem label (max 12 chars for XFS compatibility). Example: ETCD
-
-### Constraints
-
-**maximum length**: the maximum number of characters for this string is: `12`
-
-**minimum length**: the minimum number of characters for this string is: `1`
-
-**pattern**: the string must match the following regular expression:
-
-```regexp
-^[A-Z0-9_-]+$
-```
-
-[try pattern](https://regexr.com/?expression=^[A-Z0-9_-]%2B$)
-
-## .spec.infrastructure.nodes.storage.additionalDisks.partitions.filesystem.mountOptions
-
-### Description
-
-Mount options (validated safe options only). Example: ["noatime", "nodiratime"]
-
-### Constraints
-
-**enum**: the value of this property must be equal to one of the following string values:
-
-| Value         |
-|:--------------|
-|`"noatime"`    |
-|`"nodiratime"` |
-|`"relatime"`   |
-|`"strictatime"`|
-|`"nodev"`      |
-|`"nosuid"`     |
-|`"noexec"`     |
-|`"ro"`         |
-|`"rw"`         |
-|`"sync"`       |
-|`"async"`      |
-|`"discard"`    |
-|`"nodiscard"`  |
-|`"defaults"`   |
-
-## .spec.infrastructure.nodes.storage.additionalDisks.partitions.filesystem.mountPoint
-
-### Description
-
-Mount point path. Example: /var/lib/etcd
-
-### Constraints
-
-**pattern**: the string must match the following regular expression:
-
-```regexp
-^/[a-zA-Z0-9/_-]*$
-```
-
-[try pattern](https://regexr.com/?expression=^\/[a-zA-Z0-9\/_-]*$)
-
-## .spec.infrastructure.nodes.storage.additionalDisks.partitions.label
-
-### Description
-
-Partition label. Example: etcd-data
-
-### Constraints
-
-**minimum length**: the minimum number of characters for this string is: `1`
-
-## .spec.infrastructure.nodes.storage.additionalDisks.partitions.number
-
-### Description
-
-Partition number. Example: 1
-
-## .spec.infrastructure.nodes.storage.additionalDisks.partitions.sizeMiB
-
-### Description
-
-Partition size in MiB. Use 0 to use all available space.
+Butane storage.filesystems entries, passed through verbatim.
 
 ## .spec.infrastructure.nodes.storage.directories
 
@@ -7321,25 +7206,65 @@ systemReserved:
 
 ### Description
 
-CPU reserved for system daemons. Example: `500m`
+CPU reserved for system daemons, in cores or millicores. Examples: `500m`, `1`, `0.5`
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[0-9]+(\.[0-9]+)?(m|)$
+```
+
+[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(m|\)$)
 
 ## .spec.kubernetes.advanced.kubeletConfiguration.systemReserved.ephemeral-storage
 
 ### Description
 
-Ephemeral storage reserved for system daemons. Example: `2Gi`
+Kubernetes resource quantity format. Examples: 50Gi, 100Mi, 1Ti
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[0-9]+(\.[0-9]+)?(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk])$
+```
+
+[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk]\)$)
 
 ## .spec.kubernetes.advanced.kubeletConfiguration.systemReserved.memory
 
 ### Description
 
-Memory reserved for system daemons. Example: `1Gi`
+Kubernetes resource quantity format. Examples: 50Gi, 100Mi, 1Ti
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[0-9]+(\.[0-9]+)?(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk])$
+```
+
+[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk]\)$)
 
 ## .spec.kubernetes.advanced.kubeletConfiguration.systemReserved.pid
 
 ### Description
 
 Process IDs reserved for system daemons. Example: `1000`
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[0-9]+$
+```
+
+[try pattern](https://regexr.com/?expression=^[0-9]%2B$)
 
 ## .spec.kubernetes.advanced.oidc
 
@@ -7566,25 +7491,65 @@ systemReserved:
 
 ### Description
 
-CPU reserved for system daemons. Example: `500m`
+CPU reserved for system daemons, in cores or millicores. Examples: `500m`, `1`, `0.5`
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[0-9]+(\.[0-9]+)?(m|)$
+```
+
+[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(m|\)$)
 
 ## .spec.kubernetes.controlPlane.kubeletConfiguration.systemReserved.ephemeral-storage
 
 ### Description
 
-Ephemeral storage reserved for system daemons. Example: `2Gi`
+Kubernetes resource quantity format. Examples: 50Gi, 100Mi, 1Ti
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[0-9]+(\.[0-9]+)?(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk])$
+```
+
+[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk]\)$)
 
 ## .spec.kubernetes.controlPlane.kubeletConfiguration.systemReserved.memory
 
 ### Description
 
-Memory reserved for system daemons. Example: `1Gi`
+Kubernetes resource quantity format. Examples: 50Gi, 100Mi, 1Ti
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[0-9]+(\.[0-9]+)?(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk])$
+```
+
+[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk]\)$)
 
 ## .spec.kubernetes.controlPlane.kubeletConfiguration.systemReserved.pid
 
 ### Description
 
 Process IDs reserved for system daemons. Example: `1000`
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[0-9]+$
+```
+
+[try pattern](https://regexr.com/?expression=^[0-9]%2B$)
 
 ## .spec.kubernetes.controlPlane.labels
 
@@ -7850,25 +7815,65 @@ systemReserved:
 
 ### Description
 
-CPU reserved for system daemons. Example: `500m`
+CPU reserved for system daemons, in cores or millicores. Examples: `500m`, `1`, `0.5`
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[0-9]+(\.[0-9]+)?(m|)$
+```
+
+[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(m|\)$)
 
 ## .spec.kubernetes.nodeGroups.kubeletConfiguration.systemReserved.ephemeral-storage
 
 ### Description
 
-Ephemeral storage reserved for system daemons. Example: `2Gi`
+Kubernetes resource quantity format. Examples: 50Gi, 100Mi, 1Ti
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[0-9]+(\.[0-9]+)?(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk])$
+```
+
+[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk]\)$)
 
 ## .spec.kubernetes.nodeGroups.kubeletConfiguration.systemReserved.memory
 
 ### Description
 
-Memory reserved for system daemons. Example: `1Gi`
+Kubernetes resource quantity format. Examples: 50Gi, 100Mi, 1Ti
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[0-9]+(\.[0-9]+)?(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk])$
+```
+
+[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk]\)$)
 
 ## .spec.kubernetes.nodeGroups.kubeletConfiguration.systemReserved.pid
 
 ### Description
 
 Process IDs reserved for system daemons. Example: `1000`
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[0-9]+$
+```
+
+[try pattern](https://regexr.com/?expression=^[0-9]%2B$)
 
 ## .spec.kubernetes.nodeGroups.labels
 

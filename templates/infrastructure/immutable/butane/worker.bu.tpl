@@ -40,6 +40,9 @@ storage:
   directories:
 {{ .node.storage.directories | toYaml | indent 4 }}
 {{- end }}
+{{- if hasKeyAny .node.storage "additionalDisk" }}
+{{ .node.storage.additionalDisk | toYaml | indent 2 }}
+{{- end }}
 
 systemd:
   units:
