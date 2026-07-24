@@ -7,6 +7,7 @@ Welcome to the latest release of SD maintained by SIGHUP by ReeVo team.
 - [[#553](https://github.com/sighupio/distribution/pull/553)] EKSCluster: added schema validation to require at least one of `privateAccess` or `publicAccess` to be `true` in the Kubernetes API server configuration.
 - [[#554](https://github.com/sighupio/distribution/pull/554)] Monitoring: bump PrometheusAgent version to 3.10.0
 - [[#566](https://github.com/sighupio/distribution/pull/566)] Immutable: nodes can now boot on a segment without a DHCP server. furyctl derives an initramfs `ip=`/`nameserver=` kernel argument from a node's static interfaces, and a new optional node `kernelArguments` field (`shouldExist`/`shouldNotExist`, mirroring Butane's `kernel_arguments`) lets you set kernel arguments explicitly.
+- [[#567](https://github.com/sighupio/distribution/pull/567)] Immutable: the Python sysext is served from the local PXE server like the other sysexts, so air-gapped nodes no longer fetch it from the public Flatcar server at boot.
 
 ## Bug fixes 🐞
 

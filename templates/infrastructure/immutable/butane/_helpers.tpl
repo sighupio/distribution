@@ -25,15 +25,6 @@ passwd:
         inline: {{ .node.hostname }}
 {{- end }}
 
-{{- define  "python"}}
-    # Enable bundled Python sysext needed by Ansible
-    - path: /etc/flatcar/enabled-sysext.conf
-      mode: 0644
-      contents:
-        inline: |
-          python
-{{- end }}
-
 {{- define "sysupdate-noop"}}
     # This dummy sysupdate configuration is needed to prevent spurious error messages
     - path: /etc/sysupdate.d/noop.conf
@@ -297,6 +288,37 @@ kernel_arguments:
     # Enable etcd sysext
     - path: /etc/extensions/etcd.raw
       target: /opt/extensions/etcd/etcd-{{ .sysext.etcd.version }}-{{ .node.arch }}.raw
+      hard: false
+{{- end }}
+
+{{- define "python-sysext-files" }}
+    # python sysext download and sysupdate configuration
+    - path: /opt/extensions/python/python-{{ .sysext.python.version }}-{{ .node.arch }}.raw
+      mode: 0644
+      contents:
+        source: {{ .ipxeServerURL }}/assets/extensions/python-{{ .sysext.python.version }}-{{ .node.arch }}.raw
+    - path: /etc/sysupdate.python.d/python.conf
+      contents:
+        inline: |
+          [Transfer]
+          ProtectVersion=%A
+
+          [Source]
+          Type=regular-file
+          Path=/opt/extensions/python
+          MatchPattern=python-@v-@u.raw
+
+          [Target]
+          Type=regular-file
+          Path=/etc/extensions
+          MatchPattern=python-@v
+          CurrentSymlink=/etc/extensions/python.raw
+{{- end }}
+
+{{- define "python-sysext-links" }}
+    # Enable python sysext
+    - path: /etc/extensions/python.raw
+      target: /opt/extensions/python/python-{{ .sysext.python.version }}-{{ .node.arch }}.raw
       hard: false
 {{- end }}
 

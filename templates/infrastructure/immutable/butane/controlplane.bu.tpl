@@ -12,7 +12,6 @@ storage:
   files:
 {{ template "hostname" . }}
 {{ template "network" . }}
-{{ template "python" . }}
 {{ template "sysupdate-noop" . }}
 {{ template "update-server-config" . }}
 {{ template "sshd-pq-configuration" . }}
@@ -20,6 +19,7 @@ storage:
 {{ template "keepalived-sysext-files" . }}
 {{ template "kubernetes-sysext-files" . }}
 {{ template "etcd-sysext-files" . }}
+{{ template "python-sysext-files" . }}
     # User-provided additional files
 {{- if hasKeyAny .node.storage "files" }}
 {{ .node.storage.files | toYaml | indent 4 }}
@@ -34,6 +34,7 @@ storage:
 {{ template "keepalived-sysext-links" . }}
 {{ template "kubernetes-sysext-links" . }}
 {{ template "etcd-sysext-links" . }}
+{{ template "python-sysext-links" . }}
     # User-provided additional links
 {{- if hasKeyAny .node.storage "links" }}
 {{ .node.storage.links | toYaml | indent 4 }}
