@@ -66,24 +66,6 @@ spec:
               dhcp4: true
             ens1f1:
               dhcp4: true
-          bonds:
-            bond0:
-              addresses:
-              - "172.16.14.2/24"
-              nameservers:
-                addresses:
-                - 172.16.14.253
-                search:
-                - saas.rcn.internal
-              dhcp4: false
-              interfaces:
-              - ens1f1
-              - ens1f0
-              parameters:
-                mode: "active-backup"
-              routes:
-              - to: "default"
-                via: "172.16.14.254"
 
       - hostname: ctrl02.k8s.example.com
         macAddress: 52:54:00:10:00:02

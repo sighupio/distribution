@@ -111,7 +111,7 @@
         "kernelParameters": {
           "type": "array",
           "items": {
-            "$ref": "#/$defs/Spec.Infrastructure.KernelParameter"
+            "$ref": "#/$defs/Spec.Infrastructure.Node.KernelParameter"
           },
           "description": "Global kernel parameters applied to all nodes at infrastructure level. Node-specific parameters override these global values. Ref: https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/"
         },
@@ -154,49 +154,6 @@
         "noProxy": {
           "type": "string",
           "description": "Comma-separated list of hosts that should not use the HTTP(S) proxy. Example: localhost,127.0.0.1,10.0.0.0/8,.example.com"
-        }
-      }
-    },
-    "Spec.Infrastructure.KernelParameter": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "name": {
-          "type": "string",
-          "pattern": "^[a-z][a-z0-9_-]*([.][a-z][a-z0-9_-]*)+$",
-          "description": "The kernel parameter name (sysctl format). Example: net.ipv4.ip_forward, net.bridge.bridge-nf-call-iptables",
-          "minLength": 1,
-          "maxLength": 256
-        },
-        "value": {
-          "type": "string",
-          "description": "The kernel parameter value. Example: \"1\"",
-          "minLength": 1
-        }
-      },
-      "required": [
-        "name",
-        "value"
-      ]
-    },
-    "Spec.Infrastructure.Node.KernelArguments": {
-      "type": "object",
-      "additionalProperties": false,
-      "description": "Kernel arguments for this node, mirroring Butane's kernel_arguments (both lists optional). They are written to the bootloader and applied by Ignition on the node's first boot.",
-      "properties": {
-        "shouldExist": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Kernel arguments to add, rendered to Butane should_exist. Example: console=ttyS0,115200n8"
-        },
-        "shouldNotExist": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Kernel arguments to remove, rendered to Butane should_not_exist. Example: mitigations=auto"
         }
       }
     },
@@ -339,7 +296,7 @@
         "kernelParameters": {
           "type": "array",
           "items": {
-            "$ref": "#/$defs/Spec.Infrastructure.KernelParameter"
+            "$ref": "#/$defs/Spec.Infrastructure.Node.KernelParameter"
           },
           "description": "Node-specific kernel parameters that override global settings."
         },
@@ -359,6 +316,49 @@
         "storage",
         "network"
       ]
+    },
+    "Spec.Infrastructure.Node.KernelParameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_-]*([.][a-z][a-z0-9_-]*)+$",
+          "description": "The kernel parameter name (sysctl format). Example: net.ipv4.ip_forward, net.bridge.bridge-nf-call-iptables",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "value": {
+          "type": "string",
+          "description": "The kernel parameter value. Example: \"1\"",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "name",
+        "value"
+      ]
+    },
+    "Spec.Infrastructure.Node.KernelArguments": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Kernel arguments for this node, mirroring Butane's kernel_arguments (both lists optional). They are written to the bootloader and applied by Ignition on the node's first boot.",
+      "properties": {
+        "shouldExist": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Kernel arguments to add, rendered to Butane should_exist. Example: console=ttyS0,115200n8"
+        },
+        "shouldNotExist": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Kernel arguments to remove, rendered to Butane should_not_exist. Example: mitigations=auto"
+        }
+      }
     },
     "Spec.Infrastructure.Node.Storage": {
       "type": "object",
@@ -789,7 +789,7 @@
     "Spec.Infrastructure.Node.Network": {
       "type": "object",
       "additionalProperties": false,
-      "description": "Advanced network configuration with ethernets, bonds, and VLANs using networkd format.",
+      "description": "Advanced network configuration with ethernets using networkd format.",
       "properties": {
         "ethernets": {
           "type": "object",
@@ -801,24 +801,13 @@
             "$ref": "#/$defs/Spec.Infrastructure.Node.Network.Ethernet"
           },
           "description": "Ethernet interface configurations, keyed by interface name (e.g., eth0, ens3, eno49)."
-        },
-        "bonds": {
-          "type": "object",
-          "propertyNames": {
-            "pattern": "^bond[a-zA-Z0-9._-]*$",
-            "maxLength": 15
-          },
-          "additionalProperties": {
-            "$ref": "#/$defs/Spec.Infrastructure.Node.Network.Bond"
-          },
-          "description": "Bond interface configurations, keyed by bond name (e.g., bond0, bond1)."
         }
       }
     },
     "Spec.Infrastructure.Node.Network.Ethernet": {
       "type": "object",
       "additionalProperties": false,
-      "description": "Ethernet interface configuration.",
+      "description": "Ethernet interface configuration. Creates a `/etc/systemd/network/10-<interface name>.network` networkd configuration file for each defined interface",
       "properties": {
         "addresses": {
           "type": "array",
@@ -846,102 +835,6 @@
           "description": "Static routes for this interface."
         }
       },
-      "if": {
-        "anyOf": [
-          {
-            "not": {
-              "required": [
-                "dhcp4"
-              ]
-            }
-          },
-          {
-            "properties": {
-              "dhcp4": {
-                "const": false
-              }
-            }
-          }
-        ]
-      },
-      "then": {
-        "required": [
-          "addresses"
-        ],
-        "properties": {
-          "addresses": {
-            "minItems": 1
-          }
-        }
-      }
-    },
-    "Spec.Infrastructure.Node.Network.Bond": {
-      "type": "object",
-      "additionalProperties": false,
-      "description": "Bond interface configuration for link aggregation.",
-      "properties": {
-        "addresses": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/Types.Cidr"
-          },
-          "description": "List of IP addresses in CIDR notation for the bond."
-        },
-        "gateway": {
-          "$ref": "#/$defs/Types.IpAddress",
-          "description": "Default gateway IP address for the bond."
-        },
-        "nameservers": {
-          "$ref": "#/$defs/Spec.Infrastructure.Node.Network.Nameservers"
-        },
-        "dhcp4": {
-          "type": "boolean",
-          "description": "Enable DHCPv4 on the bond. Default is false."
-        },
-        "interfaces": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "pattern": "^(eth|ens|eno|enp|wlan|wlp|bond|br|vlan|lo|tun|tap)[a-zA-Z0-9._-]*$",
-            "maxLength": 15,
-            "description": "Member interface name (e.g., ens1f0, ens1f1). Must be valid Linux interface name."
-          },
-          "description": "List of member interfaces for the bond.",
-          "minItems": 1
-        },
-        "parameters": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "mode": {
-              "$ref": "#/$defs/Types.BondMode",
-              "description": "Bonding mode. Example: active-backup, 802.3ad"
-            },
-            "miiMonitorInterval": {
-              "type": "integer",
-              "description": "MII monitoring interval in milliseconds."
-            },
-            "minLinks": {
-              "type": "integer",
-              "description": "Minimum number of links that must be active before activating aggregate."
-            }
-          },
-          "required": [
-            "mode"
-          ]
-        },
-        "routes": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/Spec.Infrastructure.Node.Network.Route"
-          },
-          "description": "Static routes for this bond."
-        }
-      },
-      "required": [
-        "interfaces",
-        "parameters"
-      ],
       "if": {
         "anyOf": [
           {
@@ -1364,7 +1257,7 @@
         },
         "ip": {
           "$ref": "#/$defs/Types.IpAddress",
-          "description": "Optional IP address. If not specified, it is inferred from the node's network configuration."
+          "description": "Optional IP address. If not specified, it is inferred from the node's network configuration. NOTE: this field is currently ignored, left for future usage."
         }
       },
       "required": [
@@ -4135,23 +4028,6 @@
       ],
       "description": "Filesystem type"
     },
-    "Types.BondMode": {
-      "type": "string",
-      "enum": [
-        "balance-rr",
-        "active-backup",
-        "balance-xor",
-        "broadcast",
-        "802.3ad",
-        "balance-tlb",
-        "balance-alb"
-      ],
-      "description": "Linux bonding mode"
-    },
-    "Types.SemVer": {
-      "type": "string",
-      "pattern": "^v?(?P<major>0|[1-9]\\d*)\\.(?P<minor>0|[1-9]\\d*)\\.(?P<patch>0|[1-9]\\d*)(?:-(?P<prerelease>(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"
-    },
     "Types.IpAddress": {
       "type": "string",
       "pattern": "^((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)\\.){3}(25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)$"
@@ -4159,23 +4035,6 @@
     "Types.Cidr": {
       "type": "string",
       "pattern": "^((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)\\.){3}(25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)\\/(3[0-2]|[1-2][0-9]|[0-9])$"
-    },
-    "Types.FileRef": {
-      "type": "string",
-      "pattern": "^\\{file\\:\\/\\/.+\\}$"
-    },
-    "Types.EnvRef": {
-      "type": "string",
-      "pattern": "\\{^env\\:\\/\\/.*\\}$"
-    },
-    "Types.TcpPort": {
-      "type": "integer",
-      "minimum": 0,
-      "maximum": 65535
-    },
-    "Types.SshPubKey": {
-      "type": "string",
-      "pattern": "^ssh\\-(dsa|ecdsa|ecdsa-sk|ed25519|ed25519-sk|rsa)\\s+"
     },
     "Types.Uri": {
       "type": "string",
@@ -4328,11 +4187,6 @@
       "type": "string",
       "pattern": "^[0-9]+(\\.[0-9]+)?(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk])$",
       "description": "Kubernetes resource quantity format. Examples: 50Gi, 100Mi, 1Ti"
-    },
-    "Types.Duration": {
-      "type": "string",
-      "pattern": "^[0-9]+(\\.[0-9]+)?(ns|us|µs|ms|s|m|h|d)$",
-      "description": "Duration format with unit suffix. Examples: 720h, 15d, 30m, 5s"
     },
     "Types.FuryModuleOverrides": {
       "type": "object",

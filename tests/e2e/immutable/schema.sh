@@ -290,25 +290,7 @@ test_schema() {
     test_schema "public" "immutable-kfd-v1alpha2" "012-no" expect
 }
 
-# Networking Tests (026-027)
-
-@test "026 - ok" {
-    info
-
-    test_schema "public" "immutable-kfd-v1alpha2" "026-ok" expect_ok
-}
-
-@test "026 - no" {
-    info
-
-    expect() {
-        expect_no "${1}"
-
-        assert_error_contains "/spec/infrastructure/nodes/0/network" "validation failed" || return $?
-    }
-
-    test_schema "public" "immutable-kfd-v1alpha2" "026-no" expect
-}
+# Networking Tests (027)
 
 @test "027 - no" {
     info
