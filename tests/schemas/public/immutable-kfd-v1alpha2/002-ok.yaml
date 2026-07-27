@@ -12,15 +12,6 @@ spec:
   infrastructure:
     proxy: {}
 
-    # Global kernel parameters applied to all nodes at infrastructure level
-    # Node-specific parameters override these global values
-    # Ref: https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/
-    kernelParameters:
-      - name: net.ipv4.ip_forward
-        value: "1"
-      - name: net.bridge.bridge-nf-call-iptables
-        value: "1"
-
     # iPXE server for network boot provisioning
     # Ref: https://www.flatcar.org/docs/latest/setup/customization/
     ipxeServer:
