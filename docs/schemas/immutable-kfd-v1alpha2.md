@@ -5427,14 +5427,13 @@ Defines which SD version will be installed and, in consequence, the Kubernetes v
 
 ### Properties
 
-| Property                                                | Type     | Required |
-|:--------------------------------------------------------|:---------|:---------|
-| [ipxeServer](#specinfrastructureipxeserver)             | `object` | Optional |
-| [kernelParameters](#specinfrastructurekernelparameters) | `array`  | Optional |
-| [loadBalancers](#specinfrastructureloadbalancers)       | `object` | Optional |
-| [nodes](#specinfrastructurenodes)                       | `array`  | Required |
-| [proxy](#specinfrastructureproxy)                       | `object` | Optional |
-| [ssh](#specinfrastructuressh)                           | `object` | Required |
+| Property                                          | Type     | Required |
+|:--------------------------------------------------|:---------|:---------|
+| [ipxeServer](#specinfrastructureipxeserver)       | `object` | Optional |
+| [loadBalancers](#specinfrastructureloadbalancers) | `object` | Optional |
+| [nodes](#specinfrastructurenodes)                 | `array`  | Required |
+| [proxy](#specinfrastructureproxy)                 | `object` | Optional |
+| [ssh](#specinfrastructuressh)                     | `object` | Required |
 
 ### Description
 
@@ -5495,49 +5494,6 @@ The URL of the iPXE boot server. Example: https://ipxe.internal.example.com:8080
 ```
 
 [try pattern](https://regexr.com/?expression=^\(http|https\)\:\\/\\/.%2B$)
-
-## .spec.infrastructure.kernelParameters
-
-### Properties
-
-| Property                                          | Type     | Required |
-|:--------------------------------------------------|:---------|:---------|
-| [name](#specinfrastructurekernelparametersname)   | `string` | Required |
-| [value](#specinfrastructurekernelparametersvalue) | `string` | Required |
-
-### Description
-
-Global kernel parameters applied to all nodes at infrastructure level. Node-specific parameters override these global values. Ref: https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/
-
-## .spec.infrastructure.kernelParameters.name
-
-### Description
-
-The kernel parameter name (sysctl format). Example: net.ipv4.ip_forward, net.bridge.bridge-nf-call-iptables
-
-### Constraints
-
-**maximum length**: the maximum number of characters for this string is: `256`
-
-**minimum length**: the minimum number of characters for this string is: `1`
-
-**pattern**: the string must match the following regular expression:
-
-```regexp
-^[a-z][a-z0-9_-]*([.][a-z][a-z0-9_-]*)+$
-```
-
-[try pattern](https://regexr.com/?expression=^[a-z][a-z0-9_-]*\([.][a-z][a-z0-9_-]*\)%2B$)
-
-## .spec.infrastructure.kernelParameters.value
-
-### Description
-
-The kernel parameter value. Example: "1"
-
-### Constraints
-
-**minimum length**: the minimum number of characters for this string is: `1`
 
 ## .spec.infrastructure.loadBalancers
 
@@ -5811,7 +5767,7 @@ Hostname that must match an infrastructure node. Example: ctrl01.k8s.example.com
 
 ### Description
 
-Optional IP address. If not specified, it is inferred from the node's network configuration.
+Optional IP address. If not specified, it is inferred from the node's network configuration. NOTE: this field is currently ignored, left for future usage.
 
 ### Constraints
 
@@ -5831,6 +5787,7 @@ Optional IP address. If not specified, it is inferred from the node's network co
 |:-------------------------------------------------------------|:---------|:---------|
 | [arch](#specinfrastructurenodesarch)                         | `string` | Optional |
 | [hostname](#specinfrastructurenodeshostname)                 | `string` | Required |
+| [kernelArguments](#specinfrastructurenodeskernelarguments)   | `object` | Optional |
 | [kernelParameters](#specinfrastructurenodeskernelparameters) | `array`  | Optional |
 | [macAddress](#specinfrastructurenodesmacaddress)             | `string` | Required |
 | [network](#specinfrastructurenodesnetwork)                   | `object` | Required |
@@ -5878,6 +5835,31 @@ Fully qualified domain name for the node. Example: node01.k8s.example.com
 ```
 
 [try pattern](https://regexr.com/?expression=^\([a-zA-Z0-9]\([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9]\)?\.\)%2B[a-zA-Z]{2,}$)
+
+## .spec.infrastructure.nodes.kernelArguments
+
+### Properties
+
+| Property                                                                | Type    | Required |
+|:------------------------------------------------------------------------|:--------|:---------|
+| [shouldExist](#specinfrastructurenodeskernelargumentsshouldexist)       | `array` | Optional |
+| [shouldNotExist](#specinfrastructurenodeskernelargumentsshouldnotexist) | `array` | Optional |
+
+### Description
+
+Kernel arguments for this node, mirroring Butane's kernel_arguments (both lists optional). They are written to the bootloader and applied by Ignition on the node's first boot.
+
+## .spec.infrastructure.nodes.kernelArguments.shouldExist
+
+### Description
+
+Kernel arguments to add, rendered to Butane should_exist. Example: console=ttyS0,115200n8
+
+## .spec.infrastructure.nodes.kernelArguments.shouldNotExist
+
+### Description
+
+Kernel arguments to remove, rendered to Butane should_not_exist. Example: mitigations=auto
 
 ## .spec.infrastructure.nodes.kernelParameters
 
@@ -5944,18 +5926,11 @@ MAC address in format XX:XX:XX:XX:XX:XX
 
 | Property                                              | Type     | Required |
 |:------------------------------------------------------|:---------|:---------|
-| [bonds](#specinfrastructurenodesnetworkbonds)         | `object` | Optional |
 | [ethernets](#specinfrastructurenodesnetworkethernets) | `object` | Optional |
 
 ### Description
 
-Advanced network configuration with ethernets, bonds, and VLANs using networkd format.
-
-## .spec.infrastructure.nodes.network.bonds
-
-### Description
-
-Bond interface configurations, keyed by bond name (e.g., bond0, bond1).
+Advanced network configuration with ethernets using networkd format.
 
 ## .spec.infrastructure.nodes.network.ethernets
 
@@ -7321,25 +7296,65 @@ systemReserved:
 
 ### Description
 
-CPU reserved for system daemons. Example: `500m`
+CPU reserved for system daemons, in cores or millicores. Examples: `500m`, `1`, `0.5`
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[0-9]+(\.[0-9]+)?(m|)$
+```
+
+[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(m|\)$)
 
 ## .spec.kubernetes.advanced.kubeletConfiguration.systemReserved.ephemeral-storage
 
 ### Description
 
-Ephemeral storage reserved for system daemons. Example: `2Gi`
+Kubernetes resource quantity format. Examples: 50Gi, 100Mi, 1Ti
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[0-9]+(\.[0-9]+)?(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk])$
+```
+
+[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk]\)$)
 
 ## .spec.kubernetes.advanced.kubeletConfiguration.systemReserved.memory
 
 ### Description
 
-Memory reserved for system daemons. Example: `1Gi`
+Kubernetes resource quantity format. Examples: 50Gi, 100Mi, 1Ti
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[0-9]+(\.[0-9]+)?(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk])$
+```
+
+[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk]\)$)
 
 ## .spec.kubernetes.advanced.kubeletConfiguration.systemReserved.pid
 
 ### Description
 
 Process IDs reserved for system daemons. Example: `1000`
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[0-9]+$
+```
+
+[try pattern](https://regexr.com/?expression=^[0-9]%2B$)
 
 ## .spec.kubernetes.advanced.oidc
 
@@ -7566,25 +7581,65 @@ systemReserved:
 
 ### Description
 
-CPU reserved for system daemons. Example: `500m`
+CPU reserved for system daemons, in cores or millicores. Examples: `500m`, `1`, `0.5`
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[0-9]+(\.[0-9]+)?(m|)$
+```
+
+[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(m|\)$)
 
 ## .spec.kubernetes.controlPlane.kubeletConfiguration.systemReserved.ephemeral-storage
 
 ### Description
 
-Ephemeral storage reserved for system daemons. Example: `2Gi`
+Kubernetes resource quantity format. Examples: 50Gi, 100Mi, 1Ti
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[0-9]+(\.[0-9]+)?(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk])$
+```
+
+[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk]\)$)
 
 ## .spec.kubernetes.controlPlane.kubeletConfiguration.systemReserved.memory
 
 ### Description
 
-Memory reserved for system daemons. Example: `1Gi`
+Kubernetes resource quantity format. Examples: 50Gi, 100Mi, 1Ti
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[0-9]+(\.[0-9]+)?(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk])$
+```
+
+[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk]\)$)
 
 ## .spec.kubernetes.controlPlane.kubeletConfiguration.systemReserved.pid
 
 ### Description
 
 Process IDs reserved for system daemons. Example: `1000`
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[0-9]+$
+```
+
+[try pattern](https://regexr.com/?expression=^[0-9]%2B$)
 
 ## .spec.kubernetes.controlPlane.labels
 
@@ -7625,7 +7680,7 @@ Hostname that must match an infrastructure node. Example: ctrl01.k8s.example.com
 
 ### Description
 
-Optional IP address. If not specified, it is inferred from the node's network configuration.
+Optional IP address. If not specified, it is inferred from the node's network configuration. NOTE: this field is currently ignored, left for future usage.
 
 ### Constraints
 
@@ -7722,7 +7777,7 @@ Hostname that must match an infrastructure node. Example: ctrl01.k8s.example.com
 
 ### Description
 
-Optional IP address. If not specified, it is inferred from the node's network configuration.
+Optional IP address. If not specified, it is inferred from the node's network configuration. NOTE: this field is currently ignored, left for future usage.
 
 ### Constraints
 
@@ -7850,25 +7905,65 @@ systemReserved:
 
 ### Description
 
-CPU reserved for system daemons. Example: `500m`
+CPU reserved for system daemons, in cores or millicores. Examples: `500m`, `1`, `0.5`
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[0-9]+(\.[0-9]+)?(m|)$
+```
+
+[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(m|\)$)
 
 ## .spec.kubernetes.nodeGroups.kubeletConfiguration.systemReserved.ephemeral-storage
 
 ### Description
 
-Ephemeral storage reserved for system daemons. Example: `2Gi`
+Kubernetes resource quantity format. Examples: 50Gi, 100Mi, 1Ti
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[0-9]+(\.[0-9]+)?(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk])$
+```
+
+[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk]\)$)
 
 ## .spec.kubernetes.nodeGroups.kubeletConfiguration.systemReserved.memory
 
 ### Description
 
-Memory reserved for system daemons. Example: `1Gi`
+Kubernetes resource quantity format. Examples: 50Gi, 100Mi, 1Ti
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[0-9]+(\.[0-9]+)?(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk])$
+```
+
+[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk]\)$)
 
 ## .spec.kubernetes.nodeGroups.kubeletConfiguration.systemReserved.pid
 
 ### Description
 
 Process IDs reserved for system daemons. Example: `1000`
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[0-9]+$
+```
+
+[try pattern](https://regexr.com/?expression=^[0-9]%2B$)
 
 ## .spec.kubernetes.nodeGroups.labels
 
@@ -7917,7 +8012,7 @@ Hostname that must match an infrastructure node. Example: ctrl01.k8s.example.com
 
 ### Description
 
-Optional IP address. If not specified, it is inferred from the node's network configuration.
+Optional IP address. If not specified, it is inferred from the node's network configuration. NOTE: this field is currently ignored, left for future usage.
 
 ### Constraints
 

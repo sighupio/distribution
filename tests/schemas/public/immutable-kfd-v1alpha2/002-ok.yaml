@@ -12,15 +12,6 @@ spec:
   infrastructure:
     proxy: {}
 
-    # Global kernel parameters applied to all nodes at infrastructure level
-    # Node-specific parameters override these global values
-    # Ref: https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/
-    kernelParameters:
-      - name: net.ipv4.ip_forward
-        value: "1"
-      - name: net.bridge.bridge-nf-call-iptables
-        value: "1"
-
     # iPXE server for network boot provisioning
     # Ref: https://www.flatcar.org/docs/latest/setup/customization/
     ipxeServer:
@@ -66,24 +57,6 @@ spec:
               dhcp4: true
             ens1f1:
               dhcp4: true
-          bonds:
-            bond0:
-              addresses:
-              - "172.16.14.2/24"
-              nameservers:
-                addresses:
-                - 172.16.14.253
-                search:
-                - saas.rcn.internal
-              dhcp4: false
-              interfaces:
-              - ens1f1
-              - ens1f0
-              parameters:
-                mode: "active-backup"
-              routes:
-              - to: "default"
-                via: "172.16.14.254"
 
       - hostname: ctrl02.k8s.example.com
         macAddress: 52:54:00:10:00:02
