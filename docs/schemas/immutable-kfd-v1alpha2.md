@@ -6110,183 +6110,18 @@ The user ID of the account.
 
 ### Properties
 
-| Property                                                          | Type     | Required |
-|:------------------------------------------------------------------|:---------|:---------|
-| [additionalDisks](#specinfrastructurenodesstorageadditionaldisks) | `array`  | Optional |
-| [directories](#specinfrastructurenodesstoragedirectories)         | `array`  | Optional |
-| [files](#specinfrastructurenodesstoragefiles)                     | `array`  | Optional |
-| [installDisk](#specinfrastructurenodesstorageinstalldisk)         | `string` | Required |
-| [links](#specinfrastructurenodesstoragelinks)                     | `array`  | Optional |
+| Property                                                  | Type     | Required |
+|:----------------------------------------------------------|:---------|:---------|
+| [directories](#specinfrastructurenodesstoragedirectories) | `array`  | Optional |
+| [disks](#specinfrastructurenodesstoragedisks)             | `array`  | Optional |
+| [files](#specinfrastructurenodesstoragefiles)             | `array`  | Optional |
+| [filesystems](#specinfrastructurenodesstoragefilesystems) | `array`  | Optional |
+| [installDisk](#specinfrastructurenodesstorageinstalldisk) | `string` | Required |
+| [links](#specinfrastructurenodesstoragelinks)             | `array`  | Optional |
 
 ### Description
 
-Storage configuration for the node, including install disk and additional disks with partitions.
-
-## .spec.infrastructure.nodes.storage.additionalDisks
-
-### Properties
-
-| Property                                                               | Type     | Required |
-|:-----------------------------------------------------------------------|:---------|:---------|
-| [device](#specinfrastructurenodesstorageadditionaldisksdevice)         | `string` | Required |
-| [partitions](#specinfrastructurenodesstorageadditionaldiskspartitions) | `array`  | Required |
-
-### Description
-
-Additional disk configuration with partitions.
-
-## .spec.infrastructure.nodes.storage.additionalDisks.device
-
-### Description
-
-Unix device path. Example: /dev/sda, /dev/nvme0n1
-
-### Constraints
-
-**pattern**: the string must match the following regular expression:
-
-```regexp
-^/dev/[a-zA-Z0-9/]+$
-```
-
-[try pattern](https://regexr.com/?expression=^\/dev\/[a-zA-Z0-9\/]%2B$)
-
-## .spec.infrastructure.nodes.storage.additionalDisks.partitions
-
-### Properties
-
-| Property                                                                         | Type      | Required |
-|:---------------------------------------------------------------------------------|:----------|:---------|
-| [filesystem](#specinfrastructurenodesstorageadditionaldiskspartitionsfilesystem) | `object`  | Required |
-| [label](#specinfrastructurenodesstorageadditionaldiskspartitionslabel)           | `string`  | Required |
-| [number](#specinfrastructurenodesstorageadditionaldiskspartitionsnumber)         | `integer` | Required |
-| [sizeMiB](#specinfrastructurenodesstorageadditionaldiskspartitionssizemib)       | `integer` | Required |
-
-### Description
-
-Partition definition with filesystem and mount options.
-
-### Constraints
-
-**minimum number of items**: the minimum number of items for this array is: `1`
-
-## .spec.infrastructure.nodes.storage.additionalDisks.partitions.filesystem
-
-### Properties
-
-| Property                                                                                       | Type     | Required |
-|:-----------------------------------------------------------------------------------------------|:---------|:---------|
-| [format](#specinfrastructurenodesstorageadditionaldiskspartitionsfilesystemformat)             | `string` | Required |
-| [label](#specinfrastructurenodesstorageadditionaldiskspartitionsfilesystemlabel)               | `string` | Required |
-| [mountOptions](#specinfrastructurenodesstorageadditionaldiskspartitionsfilesystemmountoptions) | `array`  | Optional |
-| [mountPoint](#specinfrastructurenodesstorageadditionaldiskspartitionsfilesystemmountpoint)     | `string` | Required |
-
-### Description
-
-Filesystem configuration for a partition.
-
-## .spec.infrastructure.nodes.storage.additionalDisks.partitions.filesystem.format
-
-### Description
-
-Filesystem type
-
-### Constraints
-
-**enum**: the value of this property must be equal to one of the following string values:
-
-| Value   |
-|:--------|
-|`"ext4"` |
-|`"xfs"`  |
-|`"btrfs"`|
-|`"ext3"` |
-|`"vfat"` |
-
-## .spec.infrastructure.nodes.storage.additionalDisks.partitions.filesystem.label
-
-### Description
-
-Filesystem label (max 12 chars for XFS compatibility). Example: ETCD
-
-### Constraints
-
-**maximum length**: the maximum number of characters for this string is: `12`
-
-**minimum length**: the minimum number of characters for this string is: `1`
-
-**pattern**: the string must match the following regular expression:
-
-```regexp
-^[A-Z0-9_-]+$
-```
-
-[try pattern](https://regexr.com/?expression=^[A-Z0-9_-]%2B$)
-
-## .spec.infrastructure.nodes.storage.additionalDisks.partitions.filesystem.mountOptions
-
-### Description
-
-Mount options (validated safe options only). Example: ["noatime", "nodiratime"]
-
-### Constraints
-
-**enum**: the value of this property must be equal to one of the following string values:
-
-| Value         |
-|:--------------|
-|`"noatime"`    |
-|`"nodiratime"` |
-|`"relatime"`   |
-|`"strictatime"`|
-|`"nodev"`      |
-|`"nosuid"`     |
-|`"noexec"`     |
-|`"ro"`         |
-|`"rw"`         |
-|`"sync"`       |
-|`"async"`      |
-|`"discard"`    |
-|`"nodiscard"`  |
-|`"defaults"`   |
-
-## .spec.infrastructure.nodes.storage.additionalDisks.partitions.filesystem.mountPoint
-
-### Description
-
-Mount point path. Example: /var/lib/etcd
-
-### Constraints
-
-**pattern**: the string must match the following regular expression:
-
-```regexp
-^/[a-zA-Z0-9/_-]*$
-```
-
-[try pattern](https://regexr.com/?expression=^\/[a-zA-Z0-9\/_-]*$)
-
-## .spec.infrastructure.nodes.storage.additionalDisks.partitions.label
-
-### Description
-
-Partition label. Example: etcd-data
-
-### Constraints
-
-**minimum length**: the minimum number of characters for this string is: `1`
-
-## .spec.infrastructure.nodes.storage.additionalDisks.partitions.number
-
-### Description
-
-Partition number. Example: 1
-
-## .spec.infrastructure.nodes.storage.additionalDisks.partitions.sizeMiB
-
-### Description
-
-Partition size in MiB. Use 0 to use all available space.
+Storage configuration for the node, including the install disk and the Butane storage sections.
 
 ## .spec.infrastructure.nodes.storage.directories
 
@@ -6371,6 +6206,138 @@ The user ID of the owner.
 ### Description
 
 The username of the owner.
+
+## .spec.infrastructure.nodes.storage.disks
+
+### Properties
+
+| Property                                                     | Type      | Required |
+|:-------------------------------------------------------------|:----------|:---------|
+| [device](#specinfrastructurenodesstoragedisksdevice)         | `string`  | Required |
+| [partitions](#specinfrastructurenodesstoragediskspartitions) | `array`   | Optional |
+| [wipe_table](#specinfrastructurenodesstoragediskswipe_table) | `boolean` | Optional |
+
+### Description
+
+Represents a disk to be partitioned.
+
+## .spec.infrastructure.nodes.storage.disks.device
+
+### Description
+
+The absolute path to the device. Devices are typically referenced by the /dev/disk/by-* symlinks. Example: /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive1
+
+## .spec.infrastructure.nodes.storage.disks.partitions
+
+### Properties
+
+| Property                                                                                   | Type      | Required |
+|:-------------------------------------------------------------------------------------------|:----------|:---------|
+| [guid](#specinfrastructurenodesstoragediskspartitionsguid)                                 | `string`  | Optional |
+| [label](#specinfrastructurenodesstoragediskspartitionslabel)                               | `string`  | Optional |
+| [number](#specinfrastructurenodesstoragediskspartitionsnumber)                             | `integer` | Optional |
+| [resize](#specinfrastructurenodesstoragediskspartitionsresize)                             | `boolean` | Optional |
+| [should_exist](#specinfrastructurenodesstoragediskspartitionsshould_exist)                 | `boolean` | Optional |
+| [size_mib](#specinfrastructurenodesstoragediskspartitionssize_mib)                         | `integer` | Optional |
+| [start_mib](#specinfrastructurenodesstoragediskspartitionsstart_mib)                       | `integer` | Optional |
+| [type_guid](#specinfrastructurenodesstoragediskspartitionstype_guid)                       | `string`  | Optional |
+| [wipe_partition_entry](#specinfrastructurenodesstoragediskspartitionswipe_partition_entry) | `boolean` | Optional |
+
+### Description
+
+Represents a partition to be created on the disk.
+
+## .spec.infrastructure.nodes.storage.disks.partitions.guid
+
+### Description
+
+The GPT unique partition GUID.
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^(|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})$
+```
+
+[try pattern](https://regexr.com/?expression=^\(|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\)$)
+
+## .spec.infrastructure.nodes.storage.disks.partitions.label
+
+### Description
+
+The PARTLABEL for the partition, used to reference it from a filesystem as /dev/disk/by-partlabel/LABEL. Cannot contain a colon. Example: data
+
+### Constraints
+
+**maximum length**: the maximum number of characters for this string is: `36`
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^[^:]*$
+```
+
+[try pattern](https://regexr.com/?expression=^[^:]*$)
+
+## .spec.infrastructure.nodes.storage.disks.partitions.number
+
+### Description
+
+The partition number, which will change the partition table entry at that location. If not specified, the next available partition number will be used.
+
+## .spec.infrastructure.nodes.storage.disks.partitions.resize
+
+### Description
+
+Whether or not the existing partition should be resized. Defaults to false. If true, Ignition will resize an existing partition if it matches the config in all respects except the partition size.
+
+## .spec.infrastructure.nodes.storage.disks.partitions.should_exist
+
+### Description
+
+Whether or not the partition with the specified number should exist. Defaults to true. If false, Ignition will either delete the specified partition or fail, depending on wipe_partition_entry.
+
+## .spec.infrastructure.nodes.storage.disks.partitions.size_mib
+
+### Description
+
+The size of the partition with a unit of mebibytes. If zero, the partition will be made as large as possible.
+
+## .spec.infrastructure.nodes.storage.disks.partitions.start_mib
+
+### Description
+
+The start of the partition with a unit of mebibytes. If zero, the partition will be positioned at the start of the largest block available.
+
+## .spec.infrastructure.nodes.storage.disks.partitions.type_guid
+
+### Description
+
+The GPT partition type GUID. If omitted, the default will be 0FC63DAF-8483-4772-8E79-3D69D8477DE4 (Linux filesystem data).
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^(|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})$
+```
+
+[try pattern](https://regexr.com/?expression=^\(|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\)$)
+
+## .spec.infrastructure.nodes.storage.disks.partitions.wipe_partition_entry
+
+### Description
+
+If true, Ignition will clobber an existing partition if it does not match the config. If false, Ignition will fail instead. Defaults to false.
+
+## .spec.infrastructure.nodes.storage.disks.wipe_table
+
+### Description
+
+Whether or not the partition tables shall be wiped. When true, the partition tables are erased before any further manipulation. Otherwise, the existing entries are left intact. Defaults to false.
 
 ## .spec.infrastructure.nodes.storage.files
 
@@ -6641,6 +6608,93 @@ The user ID of the owner.
 ### Description
 
 The user name of the owner.
+
+## .spec.infrastructure.nodes.storage.filesystems
+
+### Properties
+
+| Property                                                                     | Type      | Required |
+|:-----------------------------------------------------------------------------|:----------|:---------|
+| [device](#specinfrastructurenodesstoragefilesystemsdevice)                   | `string`  | Required |
+| [format](#specinfrastructurenodesstoragefilesystemsformat)                   | `string`  | Optional |
+| [label](#specinfrastructurenodesstoragefilesystemslabel)                     | `string`  | Optional |
+| [mount_options](#specinfrastructurenodesstoragefilesystemsmount_options)     | `array`   | Optional |
+| [options](#specinfrastructurenodesstoragefilesystemsoptions)                 | `array`   | Optional |
+| [path](#specinfrastructurenodesstoragefilesystemspath)                       | `string`  | Optional |
+| [uuid](#specinfrastructurenodesstoragefilesystemsuuid)                       | `string`  | Optional |
+| [wipe_filesystem](#specinfrastructurenodesstoragefilesystemswipe_filesystem) | `boolean` | Optional |
+| [with_mount_unit](#specinfrastructurenodesstoragefilesystemswith_mount_unit) | `boolean` | Optional |
+
+### Description
+
+Represents a filesystem to be created on a device.
+
+## .spec.infrastructure.nodes.storage.filesystems.device
+
+### Description
+
+The absolute path to the device. Devices are typically referenced by the /dev/disk/by-* symlinks. Example: /dev/disk/by-partlabel/data
+
+## .spec.infrastructure.nodes.storage.filesystems.format
+
+### Description
+
+The filesystem format.
+
+### Constraints
+
+**enum**: the value of this property must be equal to one of the following string values:
+
+| Value   |
+|:--------|
+|`"ext4"` |
+|`"btrfs"`|
+|`"xfs"`  |
+|`"swap"` |
+|`"vfat"` |
+|`"none"` |
+
+## .spec.infrastructure.nodes.storage.filesystems.label
+
+### Description
+
+The label of the filesystem. Requires format to be set. Example: DATA
+
+## .spec.infrastructure.nodes.storage.filesystems.mount_options
+
+### Description
+
+Any special options to be passed to the mount command.
+
+## .spec.infrastructure.nodes.storage.filesystems.options
+
+### Description
+
+Any additional options to be passed to the format-specific mkfs utility.
+
+## .spec.infrastructure.nodes.storage.filesystems.path
+
+### Description
+
+The mount-point of the filesystem in the real root. Required unless the format is swap. Example: /var/lib/containerd
+
+## .spec.infrastructure.nodes.storage.filesystems.uuid
+
+### Description
+
+The UUID of the filesystem.
+
+## .spec.infrastructure.nodes.storage.filesystems.wipe_filesystem
+
+### Description
+
+Whether or not to wipe the device before filesystem creation. Defaults to false.
+
+## .spec.infrastructure.nodes.storage.filesystems.with_mount_unit
+
+### Description
+
+Whether to additionally generate a generic mount unit for this filesystem, or a swap unit for this swap area. Defaults to false.
 
 ## .spec.infrastructure.nodes.storage.installDisk
 
