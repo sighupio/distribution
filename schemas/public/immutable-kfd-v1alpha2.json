@@ -108,13 +108,6 @@
         "proxy": {
           "$ref": "#/$defs/Spec.Infrastructure.Proxy"
         },
-        "kernelParameters": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/Spec.Infrastructure.Node.KernelParameter"
-          },
-          "description": "Global kernel parameters applied to all nodes at infrastructure level. Node-specific parameters override these global values. Ref: https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/"
-        },
         "ipxeServer": {
           "$ref": "#/$defs/Spec.Infrastructure.IpxeServer"
         },
