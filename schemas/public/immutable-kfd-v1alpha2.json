@@ -568,7 +568,7 @@
                     "properties": {
                       "hash": {
                         "type": "string",
-                        "description": "The hash of the content, in the form <type>-<value> where type is either sha512 or sha256. Example: sha256-abcd1234..."
+                        "description": "The hash of the content, in the form `<type>-<value>` where type is either sha512 or sha256. Example: sha256-abcd1234..."
                       }
                     }
                   }
@@ -629,7 +629,7 @@
                       "properties": {
                         "hash": {
                           "type": "string",
-                          "description": "The hash of the content, in the form <type>-<value> where type is either sha512 or sha256."
+                          "description": "The hash of the content, in the form `<type>-<value>` where type is either sha512 or sha256."
                         }
                       }
                     }
