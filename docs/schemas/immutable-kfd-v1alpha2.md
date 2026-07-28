@@ -5,7 +5,7 @@ This document explains the full schema for the `kind: Immutable` for the `furyct
 An example configuration file can be created by running the following command:
 
 ```bash
-furyctl create config --kind Immutable --version v1.34.0 --name test-cluster
+furyctl create config --kind Immutable --version v1.35.0 --name test-cluster
 ```
 
 > [!NOTE]
@@ -6447,7 +6447,7 @@ Options related to the verification of the appended contents.
 
 ### Description
 
-The hash of the content, in the form <type>-<value> where type is either sha512 or sha256.
+The hash of the content, in the form `<type>-<value>` where type is either sha512 or sha256.
 
 ## .spec.infrastructure.nodes.storage.files.contents
 
@@ -6539,7 +6539,7 @@ Options related to the verification of the file contents.
 
 ### Description
 
-The hash of the content, in the form <type>-<value> where type is either sha512 or sha256. Example: sha256-abcd1234...
+The hash of the content, in the form `<type>-<value>` where type is either sha512 or sha256. Example: sha256-abcd1234...
 
 ## .spec.infrastructure.nodes.storage.files.group
 
