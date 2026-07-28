@@ -474,3 +474,41 @@ test_schema() {
 
     test_schema "public" "immutable-kfd-v1alpha2" "114-no" expect_no
 }
+
+# Node storage disks and filesystems (115-120)
+
+@test "115 - ok" {
+    info
+
+    test_schema "public" "immutable-kfd-v1alpha2" "115-ok" expect_ok
+}
+
+@test "116 - no" {
+    info
+
+    test_schema "public" "immutable-kfd-v1alpha2" "116-no" expect_no
+}
+
+@test "117 - no" {
+    info
+
+    test_schema "public" "immutable-kfd-v1alpha2" "117-no" expect_no
+}
+
+@test "118 - no" {
+    info
+
+    test_schema "public" "immutable-kfd-v1alpha2" "118-no" expect_no
+}
+
+@test "119 - no" {
+    info
+
+    test_schema "public" "immutable-kfd-v1alpha2" "119-no" expect_no
+}
+
+@test "120 - no" {
+    info
+
+    test_schema "public" "immutable-kfd-v1alpha2" "120-no" expect_no
+}

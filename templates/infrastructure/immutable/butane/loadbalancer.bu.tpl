@@ -40,6 +40,17 @@ storage:
   directories:
 {{ .node.storage.directories | toYaml | indent 4 }}
 {{- end }}
+  # User-provided additional disks
+{{- if hasKeyAny .node.storage "disks" }}
+  disks:
+{{ .node.storage.disks | toYaml | indent 4 }}
+{{- end }}
+
+  # User-provided additional filesystems
+{{- if hasKeyAny .node.storage "filesystems" }}
+  filesystems:
+{{ .node.storage.filesystems | toYaml | indent 4 }}
+{{- end }}
 
 systemd:
   units:

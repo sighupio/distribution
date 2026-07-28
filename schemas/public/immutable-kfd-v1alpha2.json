@@ -356,18 +356,148 @@
     "Spec.Infrastructure.Node.Storage": {
       "type": "object",
       "additionalProperties": false,
-      "description": "Storage configuration for the node, including install disk and additional disks with partitions.",
+      "description": "Storage configuration for the node, including the install disk and the Butane storage sections.",
       "properties": {
         "installDisk": {
           "$ref": "#/$defs/Types.DevicePath",
           "description": "The disk device where the OS will be installed. Example: /dev/sda"
         },
-        "additionalDisks": {
+        "disks": {
           "type": "array",
+          "description": "The list of disks to be partitioned. Every disk must have a unique device. See https://www.flatcar.org/docs/latest/provisioning/config-transpiler/configuration/",
           "items": {
-            "$ref": "#/$defs/Spec.Infrastructure.Node.Storage.Disk"
-          },
-          "description": "Additional disks to partition and mount."
+            "type": "object",
+            "additionalProperties": false,
+            "description": "Represents a disk to be partitioned.",
+            "properties": {
+              "device": {
+                "type": "string",
+                "description": "The absolute path to the device. Devices are typically referenced by the /dev/disk/by-* symlinks. Example: /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive1"
+              },
+              "wipe_table": {
+                "type": "boolean",
+                "description": "Whether or not the partition tables shall be wiped. When true, the partition tables are erased before any further manipulation. Otherwise, the existing entries are left intact. Defaults to false."
+              },
+              "partitions": {
+                "type": "array",
+                "description": "The list of partitions to be created on the disk. Every partition must have either a number or a label.",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "description": "Represents a partition to be created on the disk.",
+                  "properties": {
+                    "label": {
+                      "type": "string",
+                      "description": "The PARTLABEL for the partition, used to reference it from a filesystem as /dev/disk/by-partlabel/LABEL. Cannot contain a colon. Example: data",
+                      "maxLength": 36,
+                      "pattern": "^[^:]*$"
+                    },
+                    "number": {
+                      "type": "integer",
+                      "description": "The partition number, which will change the partition table entry at that location. If not specified, the next available partition number will be used."
+                    },
+                    "size_mib": {
+                      "type": "integer",
+                      "description": "The size of the partition with a unit of mebibytes. If zero, the partition will be made as large as possible."
+                    },
+                    "start_mib": {
+                      "type": "integer",
+                      "description": "The start of the partition with a unit of mebibytes. If zero, the partition will be positioned at the start of the largest block available."
+                    },
+                    "type_guid": {
+                      "type": "string",
+                      "description": "The GPT partition type GUID. If omitted, the default will be 0FC63DAF-8483-4772-8E79-3D69D8477DE4 (Linux filesystem data).",
+                      "pattern": "^(|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})$"
+                    },
+                    "guid": {
+                      "type": "string",
+                      "description": "The GPT unique partition GUID.",
+                      "pattern": "^(|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})$"
+                    },
+                    "wipe_partition_entry": {
+                      "type": "boolean",
+                      "description": "If true, Ignition will clobber an existing partition if it does not match the config. If false, Ignition will fail instead. Defaults to false."
+                    },
+                    "should_exist": {
+                      "type": "boolean",
+                      "description": "Whether or not the partition with the specified number should exist. Defaults to true. If false, Ignition will either delete the specified partition or fail, depending on wipe_partition_entry."
+                    },
+                    "resize": {
+                      "type": "boolean",
+                      "description": "Whether or not the existing partition should be resized. Defaults to false. If true, Ignition will resize an existing partition if it matches the config in all respects except the partition size."
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "device"
+            ]
+          }
+        },
+        "filesystems": {
+          "type": "array",
+          "description": "The list of filesystems to be created. Every filesystem must have a unique device. See https://www.flatcar.org/docs/latest/provisioning/config-transpiler/configuration/",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "Represents a filesystem to be created on a device.",
+            "properties": {
+              "device": {
+                "type": "string",
+                "description": "The absolute path to the device. Devices are typically referenced by the /dev/disk/by-* symlinks. Example: /dev/disk/by-partlabel/data"
+              },
+              "format": {
+                "type": "string",
+                "description": "The filesystem format.",
+                "enum": [
+                  "ext4",
+                  "btrfs",
+                  "xfs",
+                  "swap",
+                  "vfat",
+                  "none"
+                ]
+              },
+              "path": {
+                "type": "string",
+                "description": "The mount-point of the filesystem in the real root. Required unless the format is swap. Example: /var/lib/containerd"
+              },
+              "wipe_filesystem": {
+                "type": "boolean",
+                "description": "Whether or not to wipe the device before filesystem creation. Defaults to false."
+              },
+              "label": {
+                "type": "string",
+                "description": "The label of the filesystem. Requires format to be set. Example: DATA"
+              },
+              "uuid": {
+                "type": "string",
+                "description": "The UUID of the filesystem."
+              },
+              "options": {
+                "type": "array",
+                "description": "Any additional options to be passed to the format-specific mkfs utility.",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "mount_options": {
+                "type": "array",
+                "description": "Any special options to be passed to the mount command.",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "with_mount_unit": {
+                "type": "boolean",
+                "description": "Whether to additionally generate a generic mount unit for this filesystem, or a swap unit for this swap area. Defaults to false."
+              }
+            },
+            "required": [
+              "device"
+            ]
+          }
         },
         "files": {
           "type": "array",
@@ -671,112 +801,6 @@
       },
       "required": [
         "path"
-      ]
-    },
-    "Spec.Infrastructure.Node.Storage.Disk": {
-      "type": "object",
-      "additionalProperties": false,
-      "description": "Additional disk configuration with partitions.",
-      "properties": {
-        "device": {
-          "$ref": "#/$defs/Types.DevicePath",
-          "description": "The disk device path. Example: /dev/sdb"
-        },
-        "partitions": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/Spec.Infrastructure.Node.Storage.Partition"
-          },
-          "description": "Partitions to create on this disk.",
-          "minItems": 1
-        }
-      },
-      "required": [
-        "device",
-        "partitions"
-      ]
-    },
-    "Spec.Infrastructure.Node.Storage.Partition": {
-      "type": "object",
-      "additionalProperties": false,
-      "description": "Partition definition with filesystem and mount options.",
-      "properties": {
-        "label": {
-          "type": "string",
-          "description": "Partition label. Example: etcd-data",
-          "minLength": 1
-        },
-        "number": {
-          "type": "integer",
-          "description": "Partition number. Example: 1",
-          "minimum": 1,
-          "maximum": 128
-        },
-        "sizeMiB": {
-          "type": "integer",
-          "description": "Partition size in MiB. Use 0 to use all available space.",
-          "minimum": 0
-        },
-        "filesystem": {
-          "$ref": "#/$defs/Spec.Infrastructure.Node.Storage.Filesystem"
-        }
-      },
-      "required": [
-        "label",
-        "number",
-        "sizeMiB",
-        "filesystem"
-      ]
-    },
-    "Spec.Infrastructure.Node.Storage.Filesystem": {
-      "type": "object",
-      "additionalProperties": false,
-      "description": "Filesystem configuration for a partition.",
-      "properties": {
-        "format": {
-          "$ref": "#/$defs/Types.FilesystemType",
-          "description": "Filesystem type. Example: ext4, xfs"
-        },
-        "label": {
-          "type": "string",
-          "description": "Filesystem label (max 12 chars for XFS compatibility). Example: ETCD",
-          "minLength": 1,
-          "maxLength": 12,
-          "pattern": "^[A-Z0-9_-]+$"
-        },
-        "mountPoint": {
-          "type": "string",
-          "description": "Mount point path. Example: /var/lib/etcd",
-          "pattern": "^/[a-zA-Z0-9/_-]*$"
-        },
-        "mountOptions": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "enum": [
-              "noatime",
-              "nodiratime",
-              "relatime",
-              "strictatime",
-              "nodev",
-              "nosuid",
-              "noexec",
-              "ro",
-              "rw",
-              "sync",
-              "async",
-              "discard",
-              "nodiscard",
-              "defaults"
-            ]
-          },
-          "description": "Mount options (validated safe options only). Example: [\"noatime\", \"nodiratime\"]"
-        }
-      },
-      "required": [
-        "format",
-        "label",
-        "mountPoint"
       ]
     },
     "Spec.Infrastructure.Node.Network": {
@@ -4009,17 +4033,6 @@
       "type": "string",
       "pattern": "^/dev/[a-zA-Z0-9/]+$",
       "description": "Unix device path. Example: /dev/sda, /dev/nvme0n1"
-    },
-    "Types.FilesystemType": {
-      "type": "string",
-      "enum": [
-        "ext4",
-        "xfs",
-        "btrfs",
-        "ext3",
-        "vfat"
-      ],
-      "description": "Filesystem type"
     },
     "Types.IpAddress": {
       "type": "string",
