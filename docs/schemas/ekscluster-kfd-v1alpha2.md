@@ -4044,7 +4044,7 @@ The value of the toleration
 
 Set this option to ship the collected metrics to a remote Prometheus receiver.
 
-`remoteWrite` is an array of objects that allows configuring the [remoteWrite](https://prometheus.io/docs/specs/remote_write_spec/) options for Prometheus. The objects in the array follow [the same schema as in the prometheus operator](https://prometheus-operator.dev/docs/operator/api/#monitoring.coreos.com/v1.RemoteWriteSpec).
+`remoteWrite` is an array of objects that allows configuring the [remoteWrite](https://prometheus.io/docs/specs/remote_write_spec/) options for Prometheus. The objects in the array follow [the same schema as in the prometheus operator](https://prometheus-operator.dev/docs/api-reference/api/#monitoring.coreos.com/v1.RemoteWriteSpec).
 
 ## .spec.distribution.modules.monitoring.prometheus.resources
 
@@ -4196,7 +4196,7 @@ The memory request for the Pod. Example: `500M`.
 
 Set this option to ship the collected metrics to a remote Prometheus receiver.
 
-`remoteWrite` is an array of objects that allows configuring the [remoteWrite](https://prometheus.io/docs/specs/remote_write_spec/) options for Prometheus. The objects in the array follow [the same schema as in the prometheus operator](https://prometheus-operator.dev/docs/operator/api/#monitoring.coreos.com/v1.RemoteWriteSpec).
+`remoteWrite` is an array of objects that allows configuring the [remoteWrite](https://prometheus.io/docs/specs/remote_write_spec/) options for Prometheus. The objects in the array follow [the same schema as in the prometheus operator](https://prometheus-operator.dev/docs/api-reference/api/#monitoring.coreos.com/v1.RemoteWriteSpec).
 
 ## .spec.distribution.modules.monitoring.prometheusAgent.resources
 
