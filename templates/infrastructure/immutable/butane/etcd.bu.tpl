@@ -12,12 +12,12 @@ storage:
   files:
 {{ template "hostname" . }}
 {{ template "network" . }}
-{{ template "python" . }}
 {{ template "sysupdate-noop" . }}
 {{ template "update-server-config" . }}
 {{ template "sshd-pq-configuration" . }}
 {{ template "containerd-sysext-files" . }}
 {{ template "etcd-sysext-files" . }}
+{{ template "python-sysext-files" . }}
     # kubeadm - needed for configuring etcd
     - path: /opt/extensions/kubeadm/kubeadm-{{ .sysext.kubeadm.version }}-{{ .node.arch }}.raw
       contents:
@@ -34,6 +34,7 @@ storage:
     # Enable custom sysexts
 {{ template "containerd-sysext-links" . }}
 {{ template "etcd-sysext-links" . }}
+{{ template "python-sysext-links" . }}
     # Kubeadm
     - target: /opt/extensions/kubeadm/kubeadm-{{ .sysext.kubeadm.version }}-{{ .node.arch }}.raw
       path: /etc/extensions/kubeadm.raw
