@@ -25,15 +25,6 @@ passwd:
         inline: {{ .node.hostname }}
 {{- end }}
 
-{{- define  "python"}}
-    # Enable bundled Python sysext needed by Ansible
-    - path: /etc/flatcar/enabled-sysext.conf
-      mode: 0644
-      contents:
-        inline: |
-          python
-{{- end }}
-
 {{- define "sysupdate-noop"}}
     # This dummy sysupdate configuration is needed to prevent spurious error messages
     - path: /etc/sysupdate.d/noop.conf
@@ -301,6 +292,37 @@ kernel_arguments:
     # Enable etcd sysext
     - path: /etc/extensions/etcd.raw
       target: /opt/extensions/etcd/etcd-{{ .sysext.etcd.version }}-{{ .node.arch }}.raw
+      hard: false
+{{- end }}
+
+{{- define "python-sysext-files" }}
+    # flatcar-python sysext download and sysupdate configuration (name matches the raw's extension-release)
+    - path: /opt/extensions/flatcar-python/flatcar-python-{{ (index .sysext "flatcar-python").version }}-{{ .node.arch }}.raw
+      mode: 0644
+      contents:
+        source: {{ .ipxeServerURL }}/assets/extensions/flatcar-python-{{ (index .sysext "flatcar-python").version }}-{{ .node.arch }}.raw
+    - path: /etc/sysupdate.flatcar-python.d/flatcar-python.conf
+      contents:
+        inline: |
+          [Transfer]
+          ProtectVersion=%A
+
+          [Source]
+          Type=regular-file
+          Path=/opt/extensions/flatcar-python
+          MatchPattern=flatcar-python-@v-@u.raw
+
+          [Target]
+          Type=regular-file
+          Path=/etc/extensions
+          MatchPattern=flatcar-python-@v
+          CurrentSymlink=/etc/extensions/flatcar-python.raw
+{{- end }}
+
+{{- define "python-sysext-links" }}
+    # Enable the flatcar-python sysext
+    - path: /etc/extensions/flatcar-python.raw
+      target: /opt/extensions/flatcar-python/flatcar-python-{{ (index .sysext "flatcar-python").version }}-{{ .node.arch }}.raw
       hard: false
 {{- end }}
 
