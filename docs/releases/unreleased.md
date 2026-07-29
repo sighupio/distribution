@@ -16,6 +16,8 @@ Welcome to the latest release of SD maintained by SIGHUP by ReeVo team.
 - [[#561](https://github.com/sighupio/distribution/pull/561)] Immutable: align possible properties for Kubernetes phase `kubeletConfiguration` parameter with OnPremises, accepting all possible values now.
 - [[#564](https://github.com/sighupio/distribution/pull/564)] OnPremises: fixed a race in the preflight `verify-playbook.yaml` where fetching `admin.conf` from multiple masters in parallel could randomly fail with a checksum mismatch.
 - [[#568](https://github.com/sighupio/distribution/pull/568)] Immutable: actually set the search domains for an interface if it is defined in the node configuration, this value was being ignored until now.
+- [[#577](https://github.com/sighupio/distribution/pull/577)] Makes the admin.conf fetch in verify-playbook.yaml pick the right master, and stops the playbook from failing on purpose to signal "cluster doesn't exist".
+
 
 ## Breaking Changes 💔
 
