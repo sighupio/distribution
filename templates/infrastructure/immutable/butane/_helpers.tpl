@@ -87,7 +87,7 @@ passwd:
           {{- if hasKeyAny $iface "routes" }}
             {{- range $iface.routes }}
           [Route]
-          Destination={{ .to }}
+          Destination={{ if eq .to "default"}}0.0.0.0/0{{ else }}{{ .to }}{{ end }}
           Gateway={{ .via }}
             {{- end }}
           {{- end }}
