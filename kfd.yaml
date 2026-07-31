@@ -22,7 +22,7 @@ kubernetes:
     installer: v1.35.5
   immutable:
     version: 1.35.5
-    installer: v1.35.5-rev.1
+    installer: v1.35.5-rev.2
 furyctlSchemas:
   eks:
     - apiVersion: kfd.sighup.io/v1alpha2
