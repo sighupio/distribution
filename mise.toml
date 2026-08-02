@@ -16,7 +16,7 @@ opentofu = "1.10.0"
 python = "3.12"
 pipx = "latest"
 ansible = "latest"
-awscli = "2.24.17"
+aws-cli = "2.24.17"
 furyctl = "0.35.1-rc.2"
 
 # Go-based CLI tools to work with the JSON schemas and docs (this repo has no Go code).
