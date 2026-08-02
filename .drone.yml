@@ -26,7 +26,7 @@ volumes:
 
 steps: # qa
   - name: install-tools
-    image: quay.io/sighup/mise:v2026.4.14
+    image: quay.io/sighup/mise:v2026.6.14
     pull: always
     environment:
       MISE_GITHUB_TOKEN:
