@@ -73,8 +73,8 @@ EKS_REGION=$(yq '.spec.region' "$FURYCTL_YAML")
 wait_for_eks_active "$CLUSTER_NAME" "$EKS_REGION"
 
 echo "----------------------------------------------------------------------------"
-echo "Executing version upgrade to 1.35.0 (with alinux2023)"
-FURYCTL_YAML=tests/e2e/ekscluster-upgrades/manifests/furyctl-upgrade-version-1.35.0.yaml
+echo "Executing version upgrade to 1.35.1 (with alinux2023)"
+FURYCTL_YAML=tests/e2e/ekscluster-upgrades/manifests/furyctl-upgrade-version-1.35.1.yaml
 tests/e2e/ekscluster/replace_variables.sh --cluster-name "$CLUSTER_NAME" --furyctl-yaml "$FURYCTL_YAML"
 furyctl apply --upgrade \
   --outdir /furyctl-outdir \

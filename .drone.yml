@@ -55,7 +55,8 @@ steps: # qa
       - eval "$(mise activate bash --shims)"
       - mise run license-check
 
-  - name: test-schema
+  - &test-schema
+    name: test-schema-kfddistribution
     image: quay.io/sighup/mise:v2026.6.14
     pull: always
     depends_on:
@@ -66,21 +67,21 @@ steps: # qa
     commands:
       - eval "$(mise activate bash --shims)"
       - bats -t tests/e2e/kfddistribution/schema.sh
+
+  - <<: *test-schema
+    name: test-schema-onpremises
+    commands:
+      - eval "$(mise activate bash --shims)"
       - bats -t tests/e2e/onpremises/tests/schema.sh
 
-  - name: test-schema-immutable
-    image: quay.io/sighup/mise:v2026.6.14
-    pull: always
-    depends_on:
-      - license-check
-    volumes:
-      - name: mise-cache
-        path: /mise-data
+  - <<: *test-schema
+    name: test-schema-immutable
     commands:
       - eval "$(mise activate bash --shims)"
       - bats -t tests/e2e/immutable/schema.sh
 
-  - name: test-create-config
+  - &test-create-config
+    name: test-create-config-kfddistribution
     image: quay.io/sighup/mise:v2026.6.14
     pull: always
     depends_on:
@@ -96,10 +97,28 @@ steps: # qa
     commands:
       - eval "$(mise activate bash --shims)"
       - mkdir -p /tmp/test-kfddistribution /tmp/test-ekscluster /tmp/test-onpremises /tmp/test-immutable
-      - furyctl create config --kind KFDDistribution --version v1.35.0 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-kfddistribution
-      - furyctl create config --kind EKSCluster --version v1.35.0 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-ekscluster
-      - furyctl create config --kind OnPremises --version v1.35.0 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-onpremises
-      - furyctl create config --kind Immutable --version v1.35.0 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-immutable
+      - furyctl create config --kind KFDDistribution --version v1.35.1 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-kfddistribution
+
+  - <<: *test-create-config
+    name: test-create-config-ekscluster
+    commands:
+      - eval "$(mise activate bash --shims)"
+      - mkdir -p /tmp/test-kfddistribution /tmp/test-ekscluster /tmp/test-onpremises /tmp/test-immutable
+      - furyctl create config --kind EKSCluster --version v1.35.1 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-ekscluster
+
+  - <<: *test-create-config
+    name: test-create-config-onpremises
+    commands:
+      - eval "$(mise activate bash --shims)"
+      - mkdir -p /tmp/test-kfddistribution /tmp/test-ekscluster /tmp/test-onpremises /tmp/test-immutable
+      - furyctl create config --kind OnPremises --version v1.35.1 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-onpremises
+
+  - <<: *test-create-config
+    name: test-create-config-immutable
+    commands:
+      - eval "$(mise activate bash --shims)"
+      - mkdir -p /tmp/test-kfddistribution /tmp/test-ekscluster /tmp/test-onpremises /tmp/test-immutable
+      - furyctl create config --kind Immutable --version v1.35.1 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-immutable
 
   - name: test-templates-regressions
     image: quay.io/sighup/mise:v2026.6.14
@@ -131,7 +150,7 @@ steps: # qa
       FURYCTL_OUTDIR: ./
       FURYCTL_DISABLE_ANALYTICS: "true"
       KUBECONFIG: ./dummy
-      KUBECTL_VERSION: "1.34.1"
+      KUBECTL_VERSION: "1.35.1"
       MISE_GITHUB_TOKEN:
         from_secret: github_token
       GITHUB_TOKEN:
@@ -278,7 +297,7 @@ steps: # e2e-kfddistribution-1.34
 
 ---
 # We test 1.34.1 -> 1.35.0 upgrade pipeline
-name: e2e-kfddistribution-1.34.1-to-1.35.0
+name: e2e-kfddistribution-1.34.1-to-1.35.1
 kind: pipeline
 type: docker
 
@@ -402,7 +421,7 @@ steps: # e2e-kfddistribution-1.34.1-to-1.35.0
         - failure
 
 ---
-name: e2e-ekscluster-1.35.0
+name: e2e-ekscluster-1.35.1
 kind: pipeline
 type: docker
 
@@ -420,7 +439,7 @@ trigger:
 
 environment:
   MISE_DATA_DIR: /mise-data
-  DISTRIBUTION_VERSION: "v1.35.0"
+  DISTRIBUTION_VERSION: "v1.35.1"
   CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}
 
 volumes:
@@ -584,7 +603,7 @@ steps: # e2e-ekscluster-1.34.1
         - failure
 
 ---
-name: e2e-ekscluster-selfmanaged-alinux2023-1.35.0
+name: e2e-ekscluster-selfmanaged-alinux2023-1.35.1
 kind: pipeline
 type: docker
 
@@ -602,7 +621,7 @@ trigger:
 
 environment:
   MISE_DATA_DIR: /mise-data
-  DISTRIBUTION_VERSION: "v1.35.0"
+  DISTRIBUTION_VERSION: "v1.35.1"
   CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-selfmanaged
 
 volumes:
@@ -766,7 +785,7 @@ steps: # e2e-ekscluster-selfmanaged-alinux2023-1.34.1
         - failure
 
 ---
-name: e2e-ekscluster-upgrades-1.34.1-1.35.0
+name: e2e-ekscluster-upgrades-1.34.1-1.35.1
 kind: pipeline
 type: docker
 
@@ -784,7 +803,7 @@ trigger:
 
 environment:
   MISE_DATA_DIR: /mise-data
-  DISTRIBUTION_VERSION: "v1.35.0"
+  DISTRIBUTION_VERSION: "v1.35.1"
   CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-upgrades
 
 volumes:
@@ -834,7 +853,7 @@ steps: #e2e-eks-upgrades
         path: /furyctl-outdir
     commands:
       - eval "$(mise activate bash --shims)"
-      - ./tests/e2e/ekscluster-upgrades/e2e-ekscluster-upgrades-1.34.1-1.35.0.sh
+      - ./tests/e2e/ekscluster-upgrades/e2e-ekscluster-upgrades-1.34.1-1.35.1.sh
 
   - name: furyctl-delete
     image: quay.io/sighup/mise:v2026.6.14
@@ -1154,7 +1173,7 @@ steps: # e2e-onpremises
 # On-premises upgrade pipeline: install v1.34.1, then upgrade to v1.35.0, on the
 # same local libvirt VMs as e2e-onpremises (calico + gatekeeper path). Disjoint
 # subnet range (e2eup / 110..199) so it never collides with the install pipeline.
-name: e2e-onpremises-upgrades-1.34.1-1.35.0
+name: e2e-onpremises-upgrades-1.34.1-1.35.1
 kind: pipeline
 type: docker
 # No node selector: like e2e-onpremises, lands on the single bare-metal worker --
@@ -1198,7 +1217,7 @@ volumes:
     host:
       path: /root/e2e-diag
 
-steps: # e2e-onpremises-upgrades-1.34.1-1.35.0
+steps: # e2e-onpremises-upgrades-1.34.1-1.35.1
   - name: install-tools
     image: quay.io/sighup/mise:v2026.6.14
     pull: always
@@ -1314,7 +1333,7 @@ steps: # e2e-onpremises-upgrades-1.34.1-1.35.0
       # post-install checks (haproxy ingress not yet present -> its check skips)
       - bash tests/e2e/onpremises/scripts/bats-test.sh
 
-  - name: upgrade-1.35.0
+  - name: upgrade-1.35.1
     image: quay.io/sighup/mise:v2026.6.14
     pull: always
     network_mode: host
@@ -1336,7 +1355,7 @@ steps: # e2e-onpremises-upgrades-1.34.1-1.35.0
       - eval "$(mise activate bash --shims)"
       - bash tests/e2e/onpremises/scripts/upgrade.sh
 
-  - name: bats-test-1.35.0
+  - name: bats-test-1.35.1
     image: quay.io/sighup/mise:v2026.6.14
     pull: always
     network_mode: host
