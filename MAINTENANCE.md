@@ -52,13 +52,12 @@ With no further ado, the steps to release a new version are:
    2. Generate the new docs with `mise run generate-docs`.
 5. Update the CI and e2e tests to point to the new version:
    1. `.drone.yaml`
-   2. `tests/e2e-kfddistribution-*.yaml`
-   3. `tests/e2e-kfddistribution-upgrades.sh`
-   4. `tests/e2e/kfddistribution-upgrades/furyctl-init-cluster-1.29.4.yaml`
+   2. `tests/e2e/{ekscluster,kfddistribution,onpremises,immutable}/*.yaml`
+   3. `tests/e2e/{ekscluster,kfddistribution,onpremises,immutable}/upgrades/`
+   4. `tests/e2e/{ekscluster,kfddistribution,onpremises,immutable}upgrades/furyctl-init-cluster.yaml`
 6. Update the documentation:
    1. `README.md`
    2. `docs/COMPATIBILITY_MATRIX.md`
-   3. `docs/VERSIONING.md`
    4. Write the release notes for the new version (`docs/releases/vx.y.z.md`)
 7. Use the `e2e-all-*` tag pattern to trigger all the e2e tests, fix eventual problems and finally tag a release candidate
 
