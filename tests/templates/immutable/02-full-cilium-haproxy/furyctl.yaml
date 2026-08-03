@@ -11,7 +11,7 @@ kind: Immutable
 metadata:
   name: no-modules-enabled
 spec:
-  distributionVersion: v1.35.0
+  distributionVersion: dummy
   infrastructure:
     ssh:
       username: core
