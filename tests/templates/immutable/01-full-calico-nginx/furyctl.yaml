@@ -11,13 +11,13 @@ kind: Immutable
 metadata:
   name: no-modules-enabled
 spec:
-  distributionVersion: v1.35.0
+  distributionVersion: dummy
   infrastructure:
     ssh:
       username: core
       privateKeyPath: dummy
     nodes:
-      - hostname: dummy.example.com
+      - hostname: cp1.example.com
         macAddress: aa:bb:cc:dd:ee:ff
         storage:
           installDisk: /dev/sda
@@ -31,7 +31,7 @@ spec:
       podCIDR: 10.32.0.0/18
       serviceCIDR: 10.96.0.0/16
     controlPlane:
-      address: cp1.exmaple.com:6443
+      address: cp1.example.com:6443
       members:
         - hostname: cp1.example.com
     nodeGroups: []

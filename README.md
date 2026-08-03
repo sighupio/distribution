@@ -11,8 +11,7 @@
 <p align="center">SIGHUP Distribution (SD) is a certified battle-tested Kubernetes distribution based purely on upstream Kubernetes.</p>
 <!-- markdownlint-enable MD033 MD045 -->
 
-[![Build Status](http://ci.sighup.io/api/badges/sighupio/distribution/status.svg?ref=refs/tags/v1.34.1)](http://ci.sighup.io/sighupio/distribution)
-[![Release](https://img.shields.io/badge/release-v1.35.0-blue?label=DistributionRelease)](https://github.com/sighupio/distribution/releases/latest)
+[![Release](https://img.shields.io/badge/release-v1.35.1-blue?label=Latest%20Release)](https://github.com/sighupio/distribution/releases/latest)
 [![Slack](https://img.shields.io/badge/slack-@kubernetes/fury-yellow.svg?logo=slack)](https://kubernetes.slack.com/archives/C0154HYTAQH)
 [![License](https://img.shields.io/github/license/sighupio/distribution)](https://github.com/sighupio/distribution/blob/main/LICENSE)
 
@@ -52,42 +51,15 @@ SIGHUP Distribution is structured on modules, and each module has a set of packa
 
 The standard way to deploy SD is to:
 
+- Create a cluster using one of the supported providers (EKS, On-Premises, Immutable), or bring your own cluster using the `KFDDistribution` provider.
 - Deploy all the [Core Modules](#core-modules-) of the distribution using [furyctl][furyctl].
 - Deploy (if needed) any of the [Addon modules](#add-on-modules-) using [furyctl plugin][furyctl-plugins] feature.
 
 See the getting started section below for more information.
 
-### Recommended Hardware Requirements
+### Requirements
 
-SD is a modular and composable system, so hardware requirements ultimately depend on the modules and configuration chosen. Having said that, for a production-grade cluster a good starting point would be:
-
-A SD production grade cluster will be composed of 3 node pools:
-
-- Control Plane: 3 nodes in HA.
-- Infrastructure: 3 nodes dedicated to running the infrastructural components of SD (monitoring, logging, policy enforcement, etc., i.e. the modules).
-- Workers: where the application workload will run. This is up to you.
-- Load Balancers (optional): for on-premises installations, 2 load balancers in HA can be deployed to forward traffic to the control plane and the ingress controllers running in the infrastructure nodes.
-
-#### Nodes sizing
-
-| Node Role      | CPU (cores) | RAM (GB) | Disk (GB) | Qty. |
-|----------------|-------------|----------|-----------|------|
-| Control Plane  | 2           | 8        | 50        | 3    |
-| Infrastructure | 4           | 16       | 50        | 3    |
-| Load Balancer  | 2           | 2        | 50        | 2    |
-
-#### Storage
-
-Some modules rely on persistent storage via PersistentVolumeClaims, by default (but configurable) the following capacity will be used:
-
-| Description                                | Size (GB) |
-|--------------------------------------------|----------:|
-| Prometheus (metrics storage)               |       150 |
-| MinIO Monitoring (metrics storage, 20GBx6) |       120 |
-| MinIO Logging (logs storage, 20GBx6)       |       120 |
-| OpenSearch (logs storage)                  |        30 |
-| MinIO Tracing (traces storage)             |       120 |
-| **Total**                                  |   **540** |
+SD is a modular and composable system, so hardware requirements ultimately depend on the modules and configuration chosen and on the provider. Refer to the [requirements section][sd-docs-requirements] of the documentation site for more details.
 
 ### Core Modules 📦
 
@@ -136,7 +108,7 @@ Current supported versions of SD are:
 
 |                                SD Version                                 | Kubernetes Version |
 |:-------------------------------------------------------------------------:|:------------------:|
-| [`1.35.0`](https://github.com/sighupio/distribution/releases/tag/v1.35.0) |      `1.35.x`      |
+| [`1.35.1`](https://github.com/sighupio/distribution/releases/tag/v1.35.1) |      `1.35.x`      |
 | [`1.34.2`](https://github.com/sighupio/distribution/releases/tag/v1.34.2) |      `1.34.x`      |
 | [`1.33.3`](https://github.com/sighupio/distribution/releases/tag/v1.33.3) |      `1.33.x`      |
 
@@ -206,6 +178,7 @@ SD is open-source software, and it's released under the following [LICENSE](LICE
 
 <!-- Misc -->
 
+[sd-docs-requirements]: https://docs.sighup.io/docs/installation/requirements/
 [furyctl]: https://github.com/sighupio/furyctl
 [furyctl-plugins]: https://github.com/sighupio/furyctl?tab=readme-ov-file#plugins
 [sighup-site]: https://sighup.io

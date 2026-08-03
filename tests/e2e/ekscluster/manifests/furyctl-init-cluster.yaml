@@ -1,21 +1,13 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/sighupio/fury-distribution/v1.32.0/schemas/public/ekscluster-kfd-v1alpha2.json
 # Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
-
-
-# This is a sample configuration file to be used as a starting point. For the
-# complete reference of the configuration file schema, please refer to the
-# official documentation:
-# https://docs.kubernetesfury.com/docs/furyctl/providers/ekscluster
-
 ---
 apiVersion: kfd.sighup.io/v1alpha2
 kind: EKSCluster
 metadata:
   name: e2e-test-eks
 spec:
-  distributionVersion: v1.33.1
+  distributionVersion: replaced-programmatically
   toolsConfiguration:
     opentofu:
       state:

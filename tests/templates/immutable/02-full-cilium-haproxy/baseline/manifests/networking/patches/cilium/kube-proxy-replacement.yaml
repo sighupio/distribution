@@ -14,20 +14,20 @@ spec:
         - name: config
           env:
             - name: KUBERNETES_SERVICE_HOST
-              value: "cp1.exmaple.com"
+              value: "cp1.example.com"
             - name: KUBERNETES_SERVICE_PORT
               value: "6443"
         - name: clean-cilium-state
           env:
             - name: KUBERNETES_SERVICE_HOST
-              value: "cp1.exmaple.com"
+              value: "cp1.example.com"
             - name: KUBERNETES_SERVICE_PORT
               value: "6443"
       containers:
         - name: cilium-agent
           env:
             - name: KUBERNETES_SERVICE_HOST
-              value: "cp1.exmaple.com"
+              value: "cp1.example.com"
             - name: KUBERNETES_SERVICE_PORT
               value: "6443"
 ---
@@ -43,6 +43,6 @@ spec:
         - name: cilium-operator
           env:
             - name: KUBERNETES_SERVICE_HOST
-              value: "cp1.exmaple.com"
+              value: "cp1.example.com"
             - name: KUBERNETES_SERVICE_PORT
               value: "6443"

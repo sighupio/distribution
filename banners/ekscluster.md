@@ -5,7 +5,7 @@ This document explains the full schema for the `kind: EKSCluster` for the `furyc
 An example configuration file can be created by running the following command:
 
 ```bash
-furyctl create config --kind EKSCluster --version v1.29.4 --name example-cluster
+furyctl create config --kind EKSCluster --version v1.35.1 --name example-cluster
 ```
 
 > [!NOTE]
