@@ -6700,17 +6700,17 @@ Whether to additionally generate a generic mount unit for this filesystem, or a 
 
 ### Description
 
-Unix device path. Example: /dev/sda, /dev/nvme0n1
+Absolute, clean Unix device path, validated like Butane/Ignition does for device fields: it must be absolute and must not contain empty, '.' or '..' path segments. Example: /dev/sda, /dev/nvme0n1, /dev/disk/by-id/wwn-0x5000c500a1b2c3d4
 
 ### Constraints
 
 **pattern**: the string must match the following regular expression:
 
 ```regexp
-^/dev/[a-zA-Z0-9/]+$
+^(/([^/.][^/]*|\.[^/.][^/]*|\.\.[^/]+))+$
 ```
 
-[try pattern](https://regexr.com/?expression=^\/dev\/[a-zA-Z0-9\/]%2B$)
+[try pattern](https://regexr.com/?expression=^\(\/\([^\/.][^\/]*|\.[^\/.][^\/]*|\.\.[^\/]%2B\)\)%2B$)
 
 ## .spec.infrastructure.nodes.storage.links
 

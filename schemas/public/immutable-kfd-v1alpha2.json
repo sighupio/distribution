@@ -4032,8 +4032,8 @@
     },
     "Types.DevicePath": {
       "type": "string",
-      "pattern": "^/dev/[a-zA-Z0-9/]+$",
-      "description": "Unix device path. Example: /dev/sda, /dev/nvme0n1"
+      "pattern": "^(/([^/.][^/]*|\\.[^/.][^/]*|\\.\\.[^/]+))+$",
+      "description": "Absolute, clean Unix device path, validated like Butane/Ignition does for device fields: it must be absolute and must not contain empty, '.' or '..' path segments. Example: /dev/sda, /dev/nvme0n1, /dev/disk/by-id/wwn-0x5000c500a1b2c3d4"
     },
     "Types.IpAddress": {
       "type": "string",
