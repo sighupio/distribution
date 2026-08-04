@@ -513,7 +513,7 @@ test_schema() {
     test_schema "public" "immutable-kfd-v1alpha2" "120-no" expect_no
 }
 
-# PKI folder (121)
+# PKI folder (121-122)
 
 @test "121 - no" {
     info
@@ -526,4 +526,16 @@ test_schema() {
     }
 
     test_schema "public" "immutable-kfd-v1alpha2" "121-no" expect
+}
+
+@test "122 - no" {
+    info
+
+    expect() {
+        expect_no "${1}"
+
+        assert_error_contains "/spec/kubernetes/pkiPath" "minLength" || return $?
+    }
+
+    test_schema "public" "immutable-kfd-v1alpha2" "122-no" expect
 }

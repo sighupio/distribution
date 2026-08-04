@@ -8114,6 +8114,10 @@ Kubernetes taints to apply to nodes in this group.
 
 Path to the PKI directory where to find the certificates and keys for Kubernetes Control Plane and etcd. Must have the `master` and `etcd` folders inside.
 
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
+
 ## .spec.kubernetes.version
 
 ### Description

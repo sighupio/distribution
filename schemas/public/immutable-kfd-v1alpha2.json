@@ -1139,6 +1139,7 @@
         },
         "pkiPath": {
           "type": "string",
+          "minLength": 1,
           "description": "Path to the PKI directory where to find the certificates and keys for Kubernetes Control Plane and etcd. Must have the `master` and `etcd` folders inside."
         },
         "controlPlane": {
