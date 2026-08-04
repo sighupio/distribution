@@ -512,3 +512,18 @@ test_schema() {
 
     test_schema "public" "immutable-kfd-v1alpha2" "120-no" expect_no
 }
+
+# PKI folder (121)
+
+@test "121 - no" {
+    info
+
+    expect() {
+        expect_no "${1}"
+
+        assert_error_contains "/spec/kubernetes" "missing property" || return $?
+        assert_error_contains "/spec/kubernetes" "'pkiPath'" || return $?
+    }
+
+    test_schema "public" "immutable-kfd-v1alpha2" "121-no" expect
+}
