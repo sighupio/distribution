@@ -6433,6 +6433,10 @@ Name for the node group. It will be also used as the node role label. It should 
 
 The path to the folder where the PKI files for Kubernetes and etcd are stored.
 
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
+
 ## .spec.kubernetes.podCidr
 
 ### Description

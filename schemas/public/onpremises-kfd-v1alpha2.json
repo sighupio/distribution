@@ -77,6 +77,7 @@
       "properties": {
         "pkiFolder": {
           "type": "string",
+          "minLength": 1,
           "description": "The path to the folder where the PKI files for Kubernetes and etcd are stored."
         },
         "ssh": {
