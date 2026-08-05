@@ -5908,7 +5908,7 @@ The kernel parameter value. Example: "1"
 
 ### Description
 
-MAC address in format XX:XX:XX:XX:XX:XX
+MAC address for PXE boot identification. Not case-sensitive, accepts `:` or `-` as separator. Example: 52:54:00:10:00:01
 
 ### Constraints
 

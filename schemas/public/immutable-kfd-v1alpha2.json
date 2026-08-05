@@ -277,7 +277,7 @@
         },
         "macAddress": {
           "$ref": "#/$defs/Types.MacAddress",
-          "description": "MAC address for PXE boot identification. Example: 52:54:00:10:00:01"
+          "description": "MAC address for PXE boot identification. Not case-sensitive, accepts `:` or `-` as separator. Example: 52:54:00:10:00:01"
         },
         "storage": {
           "$ref": "#/$defs/Spec.Infrastructure.Node.Storage"
@@ -4026,8 +4026,7 @@
     },
     "Types.MacAddress": {
       "type": "string",
-      "pattern": "^([0-9A-Fa-f]{2}:){5}([0-9A-Fa-f]{2})$",
-      "description": "MAC address in format XX:XX:XX:XX:XX:XX"
+      "pattern": "^([0-9A-Fa-f]{2}:){5}([0-9A-Fa-f]{2})$"
     },
     "Types.DevicePath": {
       "type": "string",
