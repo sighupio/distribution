@@ -229,6 +229,10 @@ spec:
 
   # Kubernetes cluster configuration
   kubernetes:
+    # Folder that holds the CA certificates and keys for the control plane and etcd.
+    # It must have a `master` and an `etcd` subfolder. Create it with `furyctl create pki`.
+    # A path that starts with `./` is relative to this file.
+    pkiPath: ./pki
     # Kubernetes Cluster basic networking configuration independent of the CNI.
     # More advanced configuration can be defined in the distribution.modules.networking section
     networking:

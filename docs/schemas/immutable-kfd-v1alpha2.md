@@ -6920,7 +6920,7 @@ SSH username. Example: core
 | [etcd](#speckubernetesetcd)                 | `object` | Optional |
 | [networking](#speckubernetesnetworking)     | `object` | Required |
 | [nodeGroups](#speckubernetesnodegroups)     | `array`  | Optional |
-| [pkiPath](#speckubernetespkipath)           | `string` | Optional |
+| [pkiPath](#speckubernetespkipath)           | `string` | Required |
 | [version](#speckubernetesversion)           | `string` | Optional |
 
 ### Description
@@ -8113,6 +8113,10 @@ Kubernetes taints to apply to nodes in this group.
 ### Description
 
 Path to the PKI directory where to find the certificates and keys for Kubernetes Control Plane and etcd. Must have the `master` and `etcd` folders inside.
+
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
 
 ## .spec.kubernetes.version
 

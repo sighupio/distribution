@@ -28,6 +28,7 @@ spec:
       privateKeyPath: ~/.ssh/id_rsa
 
   kubernetes:
+    pkiPath: ./pki
     controlPlane:
       address: aio.k8s.example.com:6443
       members:
