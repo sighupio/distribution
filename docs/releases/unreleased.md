@@ -4,7 +4,7 @@ Welcome to the latest release of SD maintained by SIGHUP by ReeVo team.
 
 ## New features 🌟
 
-TBD
+- [[#575](https://github.com/sighupio/furyctl/issues/575)] OnPremises and Immutable: add support for the new [`furyctl renew kubeconfigs`](https://github.com/sighupio/distribution/pull/588) command. It renews the kubeconfig file of the admin and the kubeconfig files of the users in `spec.kubernetes.advanced.users.names`. Then it downloads them to the working directory. A user that you add to the configuration file gets a kubeconfig file. It is not necessary to apply the kubernetes phase.
 
 ## Bug fixes 🐞
 
