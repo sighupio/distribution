@@ -21,6 +21,7 @@ resources:
   - ../../../vendor/modules/ingress/katalog/cert-manager
   - resources/cert-manager-clusterissuer.yml
   - resources/ingress-infra.yml
+  - resources/haproxy-loadbalancerclass-rebase.yml
 
 
 patches:

@@ -5,7 +5,7 @@ This document explains the full schema for the `kind: Immutable` for the `furyct
 An example configuration file can be created by running the following command:
 
 ```bash
-furyctl create config --kind Immutable --version v1.35.0 --name test-cluster
+furyctl create config --kind Immutable --version v1.35.1 --name test-cluster
 ```
 
 > [!NOTE]
@@ -5908,7 +5908,7 @@ The kernel parameter value. Example: "1"
 
 ### Description
 
-MAC address in format XX:XX:XX:XX:XX:XX
+MAC address for PXE boot identification. Not case-sensitive, accepts `:` or `-` as separator. Example: 52:54:00:10:00:01
 
 ### Constraints
 
@@ -6700,17 +6700,17 @@ Whether to additionally generate a generic mount unit for this filesystem, or a 
 
 ### Description
 
-Unix device path. Example: /dev/sda, /dev/nvme0n1
+Absolute, clean Unix device path, validated like Butane/Ignition does for device fields: it must be absolute and must not contain empty, '.' or '..' path segments. Example: /dev/sda, /dev/nvme0n1, /dev/disk/by-id/wwn-0x5000c500a1b2c3d4
 
 ### Constraints
 
 **pattern**: the string must match the following regular expression:
 
 ```regexp
-^/dev/[a-zA-Z0-9/]+$
+^(/([^/.][^/]*|\.[^/.][^/]*|\.\.[^/]+))+$
 ```
 
-[try pattern](https://regexr.com/?expression=^\/dev\/[a-zA-Z0-9\/]%2B$)
+[try pattern](https://regexr.com/?expression=^\(\/\([^\/.][^\/]*|\.[^\/.][^\/]*|\.\.[^\/]%2B\)\)%2B$)
 
 ## .spec.infrastructure.nodes.storage.links
 
@@ -6920,7 +6920,7 @@ SSH username. Example: core
 | [etcd](#speckubernetesetcd)                 | `object` | Optional |
 | [networking](#speckubernetesnetworking)     | `object` | Required |
 | [nodeGroups](#speckubernetesnodegroups)     | `array`  | Optional |
-| [pkiPath](#speckubernetespkipath)           | `string` | Optional |
+| [pkiPath](#speckubernetespkipath)           | `string` | Required |
 | [version](#speckubernetesversion)           | `string` | Optional |
 
 ### Description
@@ -8113,6 +8113,10 @@ Kubernetes taints to apply to nodes in this group.
 ### Description
 
 Path to the PKI directory where to find the certificates and keys for Kubernetes Control Plane and etcd. Must have the `master` and `etcd` folders inside.
+
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
 
 ## .spec.kubernetes.version
 

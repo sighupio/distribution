@@ -512,3 +512,96 @@ test_schema() {
 
     test_schema "public" "immutable-kfd-v1alpha2" "120-no" expect_no
 }
+
+# PKI folder (121-122)
+
+@test "121 - no" {
+    info
+
+    expect() {
+        expect_no "${1}"
+
+        assert_error_contains "/spec/kubernetes" "missing property" || return $?
+        assert_error_contains "/spec/kubernetes" "'pkiPath'" || return $?
+    }
+
+    test_schema "public" "immutable-kfd-v1alpha2" "121-no" expect
+}
+
+@test "122 - no" {
+    info
+
+    expect() {
+        expect_no "${1}"
+
+        assert_error_contains "/spec/kubernetes/pkiPath" "minLength" || return $?
+    }
+
+    test_schema "public" "immutable-kfd-v1alpha2" "122-no" expect
+}
+
+# Node storage installDisk device paths (123-128)
+
+@test "123 - ok" {
+    info
+
+    test_schema "public" "immutable-kfd-v1alpha2" "123-ok" expect_ok
+}
+
+@test "124 - ok" {
+    info
+
+    test_schema "public" "immutable-kfd-v1alpha2" "124-ok" expect_ok
+}
+
+@test "125 - no" {
+    info
+
+    expect() {
+        expect_no "${1}"
+
+        # relative path
+        assert_error_contains "/spec/infrastructure/nodes/0/storage/installDisk" "does not match pattern" || return $?
+    }
+
+    test_schema "public" "immutable-kfd-v1alpha2" "125-no" expect
+}
+
+@test "126 - no" {
+    info
+
+    expect() {
+        expect_no "${1}"
+
+        # trailing slash, not a clean path
+        assert_error_contains "/spec/infrastructure/nodes/0/storage/installDisk" "does not match pattern" || return $?
+    }
+
+    test_schema "public" "immutable-kfd-v1alpha2" "126-no" expect
+}
+
+@test "127 - no" {
+    info
+
+    expect() {
+        expect_no "${1}"
+
+        # empty path segment, not a clean path
+        assert_error_contains "/spec/infrastructure/nodes/0/storage/installDisk" "does not match pattern" || return $?
+    }
+
+    test_schema "public" "immutable-kfd-v1alpha2" "127-no" expect
+}
+
+@test "128 - no" {
+    info
+
+    expect() {
+        expect_no "${1}"
+
+        # '..' path segment, not a clean path
+        assert_error_contains "/spec/infrastructure/nodes/0/storage/installDisk" "does not match pattern" || return $?
+    }
+
+    test_schema "public" "immutable-kfd-v1alpha2" "128-no" expect
+}

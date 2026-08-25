@@ -5,7 +5,7 @@ This document explains the full schema for the `kind: Immutable` for the `furyct
 An example configuration file can be created by running the following command:
 
 ```bash
-furyctl create config --kind Immutable --version v1.35.0 --name test-cluster
+furyctl create config --kind Immutable --version v1.35.1 --name test-cluster
 ```
 
 > [!NOTE]

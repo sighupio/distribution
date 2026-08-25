@@ -277,7 +277,7 @@
         },
         "macAddress": {
           "$ref": "#/$defs/Types.MacAddress",
-          "description": "MAC address for PXE boot identification. Example: 52:54:00:10:00:01"
+          "description": "MAC address for PXE boot identification. Not case-sensitive, accepts `:` or `-` as separator. Example: 52:54:00:10:00:01"
         },
         "storage": {
           "$ref": "#/$defs/Spec.Infrastructure.Node.Storage"
@@ -1139,6 +1139,7 @@
         },
         "pkiPath": {
           "type": "string",
+          "minLength": 1,
           "description": "Path to the PKI directory where to find the certificates and keys for Kubernetes Control Plane and etcd. Must have the `master` and `etcd` folders inside."
         },
         "controlPlane": {
@@ -1162,6 +1163,7 @@
         }
       },
       "required": [
+        "pkiPath",
         "controlPlane",
         "networking"
       ]
@@ -4026,13 +4028,12 @@
     },
     "Types.MacAddress": {
       "type": "string",
-      "pattern": "^([0-9A-Fa-f]{2}:){5}([0-9A-Fa-f]{2})$",
-      "description": "MAC address in format XX:XX:XX:XX:XX:XX"
+      "pattern": "^([0-9A-Fa-f]{2}:){5}([0-9A-Fa-f]{2})$"
     },
     "Types.DevicePath": {
       "type": "string",
-      "pattern": "^/dev/[a-zA-Z0-9/]+$",
-      "description": "Unix device path. Example: /dev/sda, /dev/nvme0n1"
+      "pattern": "^(/([^/.][^/]*|\\.[^/.][^/]*|\\.\\.[^/]+))+$",
+      "description": "Absolute, clean Unix device path, validated like Butane/Ignition does for device fields: it must be absolute and must not contain empty, '.' or '..' path segments. Example: /dev/sda, /dev/nvme0n1, /dev/disk/by-id/wwn-0x5000c500a1b2c3d4"
     },
     "Types.IpAddress": {
       "type": "string",

@@ -73,7 +73,7 @@ systemd:
         {{- end }}
         {{- end }}
         ExecStartPre=/usr/bin/curl --retry 2 --retry-connrefused --connect-timeout 5 --max-time 15 --retry-max-time 40 -X POST '{{ .ipxeServerURL }}/status?node={{ .hostname }}&status=installing'
-        ExecStart=/usr/bin/flatcar-install -d {{ .installDisk }} -i /opt/ignition/config.ign -b {{ .ipxeServerURL }}/assets/flatcar/{{ .arch }}
+        ExecStart=/usr/bin/flatcar-install -d '{{ .installDisk }}' -i /opt/ignition/config.ign -b {{ .ipxeServerURL }}/assets/flatcar/{{ .arch }}
         {{- if .ipxeServerPostInstallCommands }}
         ExecStartPost=/usr/bin/curl --retry 2 --retry-connrefused --connect-timeout 5 --max-time 15 --retry-max-time 40 -X POST '{{ .ipxeServerURL }}/status?node={{ .hostname }}&status=running%%20post-install%%20commands'
         {{- range .ipxeServerPostInstallCommands }}

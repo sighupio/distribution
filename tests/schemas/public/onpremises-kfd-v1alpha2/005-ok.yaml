@@ -15,7 +15,7 @@ kind: OnPremises
 metadata:
   name: onpremises-test-per-host-dnszone
 spec:
-  distributionVersion: v1.35.0
+  distributionVersion: dummy
   kubernetes:
     pkiFolder: /etc/pki
     ssh:

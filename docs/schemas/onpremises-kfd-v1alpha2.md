@@ -5,7 +5,7 @@ This document explains the full schema for the `kind: OnPremises` for the `furyc
 An example configuration file can be created by running the following command:
 
 ```bash
-furyctl create config --kind OnPremises --version v1.29.4 --name example-cluster
+furyctl create config --kind OnPremises --version v1.35.1 --name example-cluster
 ```
 
 > [!NOTE]
@@ -6432,6 +6432,10 @@ Name for the node group. It will be also used as the node role label. It should 
 ### Description
 
 The path to the folder where the PKI files for Kubernetes and etcd are stored.
+
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
 
 ## .spec.kubernetes.podCidr
 

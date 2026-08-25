@@ -4,23 +4,13 @@ Welcome to the latest release of SD maintained by SIGHUP by ReeVo team.
 
 ## New features 🌟
 
-- [[#553](https://github.com/sighupio/distribution/pull/553)] EKSCluster: added schema validation to require at least one of `privateAccess` or `publicAccess` to be `true` in the Kubernetes API server configuration.
-- [[#554](https://github.com/sighupio/distribution/pull/554)] Monitoring: bump PrometheusAgent version to 3.10.0
-- [[#566](https://github.com/sighupio/distribution/pull/566)] Immutable: nodes can now boot on a segment without a DHCP server. furyctl derives an initramfs `ip=`/`nameserver=` kernel argument from a node's static interfaces, and a new optional node `kernelArguments` field (`shouldExist`/`shouldNotExist`, mirroring Butane's `kernel_arguments`) lets you set kernel arguments explicitly.
-- [[#567](https://github.com/sighupio/distribution/pull/567)] Immutable: the Python sysext is served from the local PXE server like the other sysexts, so nodes no longer fetch it from the public Flatcar server at first boot.
-- [[#569](https://github.com/sighupio/distribution/pull/569)] Immutable: new optional node `storage.disks` and `storage.filesystems` fields, mirroring Butane's own sections like `storage.files` already does, so extra disks can be partitioned, formatted and mounted declaratively. They replace the previous `storage.additionalDisks` field, which was never rendered.
+- [[#575](https://github.com/sighupio/furyctl/issues/575)] OnPremises and Immutable: add support for the new [`furyctl renew kubeconfigs`](https://github.com/sighupio/distribution/pull/588) command. It renews the kubeconfig file of the admin and the kubeconfig files of the users in `spec.kubernetes.advanced.users.names`. Then it downloads them to the working directory. A user that you add to the configuration file gets a kubeconfig file. It is not necessary to apply the kubernetes phase.
 
 ## Bug fixes 🐞
 
-- [[#555](https://github.com/sighupio/distribution/pull/555)] Monitoring templates: don't try to patch the alertmanagerConfigs when they are not being deployed at all.
-- [[#561](https://github.com/sighupio/distribution/pull/561)] Immutable: align possible properties for Kubernetes phase `kubeletConfiguration` parameter with OnPremises, accepting all possible values now.
-- [[#564](https://github.com/sighupio/distribution/pull/564)] OnPremises: fixed a race in the preflight `verify-playbook.yaml` where fetching `admin.conf` from multiple masters in parallel could randomly fail with a checksum mismatch.
-- [[#568](https://github.com/sighupio/distribution/pull/568)] Immutable: actually set the search domains for an interface if it is defined in the node configuration, this value was being ignored until now.
+- [[#581](https://github.com/sighupio/distribution/issues/581)] Immutable: node `storage.installDisk` now accepts persistent device paths like `/dev/disk/by-id/wwn-...`, `/dev/disk/by-path/...` and `/dev/mapper/...`. The field is validated the same way Butane/Ignition validates its own device fields — the path must be absolute and clean — instead of the previous alphanumeric-only pattern that rejected every `/dev/disk/by-*` symlink.
 - [[#577](https://github.com/sighupio/distribution/pull/577)] Makes the admin.conf fetch in verify-playbook.yaml pick the right master, and stops the playbook from failing on purpose to signal "cluster doesn't exist".
-
 
 ## Breaking Changes 💔
 
-- [[#559](https://github.com/sighupio/distribution/pull/559)] Immutable: kube-proxy configuration in Kubernetes advanced configuration is now a `type` enum instead of an `enabled` boolean option, following OnPremises' schema. Disabling kube-proxy was actually not working for Immutable due to this inconsistency.
-- [[#570](https://github.com/sighupio/distribution/pull/570)] Immutable: removed unused from the schema (network bonds and global kernerlParameters).
-
+TBD

@@ -6,7 +6,7 @@
 # shellcheck disable=SC2154
 
 # Distribution smoke checks for the upgrade pipeline (calico + gatekeeper path).
-# Reused for both phases: post-install (v1.34.1) and post-upgrade (v1.35.0). The
+# Reused for both phases: post-install (v1.34.1) and post-upgrade (v1.35.1). The
 # haproxy ingress controller only exists after the upgrade adds it, so that single
 # check is skipped unless EXPECT_HAPROXY_INGRESS=1.
 

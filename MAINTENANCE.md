@@ -52,13 +52,12 @@ With no further ado, the steps to release a new version are:
    2. Generate the new docs with `mise run generate-docs`.
 5. Update the CI and e2e tests to point to the new version:
    1. `.drone.yaml`
-   2. `tests/e2e-kfddistribution-*.yaml`
-   3. `tests/e2e-kfddistribution-upgrades.sh`
-   4. `tests/e2e/kfddistribution-upgrades/furyctl-init-cluster-1.29.4.yaml`
+   2. `tests/e2e/{ekscluster,kfddistribution,onpremises,immutable}/*.yaml`
+   3. `tests/e2e/{ekscluster,kfddistribution,onpremises,immutable}/upgrades/`
+   4. `tests/e2e/{ekscluster,kfddistribution,onpremises,immutable}upgrades/furyctl-init-cluster.yaml`
 6. Update the documentation:
    1. `README.md`
    2. `docs/COMPATIBILITY_MATRIX.md`
-   3. `docs/VERSIONING.md`
    4. Write the release notes for the new version (`docs/releases/vx.y.z.md`)
 7. Use the `e2e-all-*` tag pattern to trigger all the e2e tests, fix eventual problems and finally tag a release candidate
 
@@ -72,6 +71,7 @@ At this point, you'll need to switch to pushing some changes in furyctl
 11. Update the documentation:
     1. `README.md`.
     2. `docs/COMPATIBILITY_MATRIX.md`.
+    3. `docs/relases/unreleased.md`.
 12. Update the compatibility unit tests with the new versions (`internal/distribution/compatibility_test.go`)
 13. If the distribution schemas changed in fields that furyctl reads or injects, update furyctl's hand-maintained config types accordingly in `internal/apis/kfd/v1alpha2/<kind>/{public,private}/schema.go`, keeping the `yaml` **and** `json` struct tags in sync (the `json` tags drive the runtime Terraform/OpenTofu data injection). The distribution no longer ships generated Go types and furyctl no longer imports it as a Go module (see furyctl#674), so this is now a manual step instead of a `go get` of the `fury-distribution` library.
 14. Tag a release candidate with the changes. This will be used in the e2e tests of the distribution.

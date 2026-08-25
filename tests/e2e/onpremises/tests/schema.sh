@@ -166,3 +166,9 @@ test_schema() {
 
     test_schema "public" "onpremises-kfd-v1alpha2" "005-ok" expect_ok
 }
+
+@test "006 - no (empty pkiFolder)" {
+    info
+
+    test_schema "public" "onpremises-kfd-v1alpha2" "006-no" expect_no
+}
