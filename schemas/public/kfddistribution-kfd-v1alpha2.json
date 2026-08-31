@@ -83,6 +83,9 @@
         },
         "customPatches": {
           "$ref": "../public/spec-distribution-custompatches.json"
+        },
+        "customResources": {
+          "$ref": "../public/spec-distribution-customresources.json"
         }
       },
       "required": [
@@ -1278,7 +1281,7 @@
           "description": "The storage size for the `k8s` Prometheus instance."
         },
         "remoteWrite": {
-          "description": "Set this option to ship the collected metrics to a remote Prometheus receiver.\n\n`remoteWrite` is an array of objects that allows configuring the [remoteWrite](https://prometheus.io/docs/specs/remote_write_spec/) options for Prometheus. The objects in the array follow [the same schema as in the prometheus operator](https://prometheus-operator.dev/docs/operator/api/#monitoring.coreos.com/v1.RemoteWriteSpec).",
+          "description": "Set this option to ship the collected metrics to a remote Prometheus receiver.\n\n`remoteWrite` is an array of objects that allows configuring the [remoteWrite](https://prometheus.io/docs/specs/remote_write_spec/) options for Prometheus. The objects in the array follow [the same schema as in the prometheus operator](https://prometheus-operator.dev/docs/api-reference/api/#monitoring.coreos.com/v1.RemoteWriteSpec).",
           "type": "array",
           "items": {
             "type": "object"
@@ -1307,7 +1310,7 @@
           "$ref": "#/$defs/Types.KubeResources"
         },
         "remoteWrite": {
-          "description": "Set this option to ship the collected metrics to a remote Prometheus receiver.\n\n`remoteWrite` is an array of objects that allows configuring the [remoteWrite](https://prometheus.io/docs/specs/remote_write_spec/) options for Prometheus. The objects in the array follow [the same schema as in the prometheus operator](https://prometheus-operator.dev/docs/operator/api/#monitoring.coreos.com/v1.RemoteWriteSpec).",
+          "description": "Set this option to ship the collected metrics to a remote Prometheus receiver.\n\n`remoteWrite` is an array of objects that allows configuring the [remoteWrite](https://prometheus.io/docs/specs/remote_write_spec/) options for Prometheus. The objects in the array follow [the same schema as in the prometheus operator](https://prometheus-operator.dev/docs/api-reference/api/#monitoring.coreos.com/v1.RemoteWriteSpec).",
           "type": "array",
           "items": {
             "type": "object"
@@ -2094,10 +2097,19 @@
           "description": "Set to override the tolerations that will be added to the pods of the Auth module."
         },
         "ingresses": {
+          "additionalProperties": false,
           "type": "object",
           "description": "Override the definition of the Auth module ingresses.",
-          "additionalProperties": {
-            "$ref": "#/$defs/Spec.Distribution.Modules.Auth.Overrides.Ingress"
+          "properties": {
+            "gangplank": {
+              "$ref": "#/$defs/Spec.Distribution.Modules.Auth.Overrides.Ingress"
+            },
+            "dex": {
+              "$ref": "#/$defs/Spec.Distribution.Modules.Auth.Overrides.Ingress"
+            },
+            "pomerium": {
+              "$ref": "#/$defs/Spec.Distribution.Modules.Auth.Overrides.Ingress"
+            }
           }
         }
       }

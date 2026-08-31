@@ -1,0 +1,8 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "array",
+  "items": {
+    "type": "string"
+  },
+  "description": "Add custom resources to the distribution phase. Each entry should point to a resource file, a kustomize base, or a remote resource (e.g. a git repository or URL). `customResources` should be used when you _need_ the resources to be applyed in the distribution phase together with the rest of the modules; prefer using Plugins instead when possible."
+}

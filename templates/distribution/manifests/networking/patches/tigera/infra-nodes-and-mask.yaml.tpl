@@ -30,11 +30,13 @@ spec:
       - blockSize: {{ .spec.distribution.modules.networking.tigeraOperator.blockSize }}
     {{- if index .spec.distribution.modules.networking.tigeraOperator "podCidr" }}
         cidr: {{ .spec.distribution.modules.networking.tigeraOperator.podCidr }}
-    {{- else }}
+    {{- else if index .spec.kubernetes "podCidr" }}
         cidr: {{ .spec.kubernetes.podCidr }}
+    {{- else if index .spec.kubernetes.networking "podCIDR" }}
+        cidr: {{ .spec.kubernetes.networking.podCIDR }}
     {{- end }}
         name: default-ipv4-ippool
-  {{/* Here we're handling the KFDDistribution part. The idea is avoid outputting anything if the user 
+  {{/* Here we're handling the KFDDistribution part. The idea is avoid outputting anything if the user
   leaves `podCidr` unfilled, since the Tigera operator doesn't like very much the null value as a pod CIDR. */}}
   {{- else if index .spec.distribution.modules.networking.tigeraOperator "podCidr" }}
   calicoNetwork:

@@ -1,0 +1,155 @@
+# yaml-language-server: $schema=../../../../schemas/public/ekscluster-kfd-v1alpha2.json
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# This is a test case furyctl.yaml to assert that the distribution templates are generating the right output
+---
+apiVersion: kfd.sighup.io/v1alpha2
+kind: EKSCluster
+metadata:
+  name: full-calico-nginx
+spec:
+  toolsConfiguration:
+    opentofu:
+      state:
+        s3:
+          bucketName: dummybucket
+          keyPrefix: dummy_keyPrefix
+          region: eu-central-1
+  region: eu-west-1
+  distributionVersion: v1.34.1 # config based on v1.34.1, but we check against main anyways
+  infrastructure:
+    vpc:
+      network:
+        cidr: 10.1.0.0/16
+        subnetsCidrs:
+          private:
+            - 10.1.0.0/20
+            - 10.1.16.0/20
+            - 10.1.32.0/20
+          public:
+            - 10.1.48.0/24
+            - 10.1.49.0/24
+  kubernetes:
+    nodeAllowedSshPublicKey: "ssh-ed25519 XYZ"
+    nodePoolsLaunchKind: "launch_templates"
+    nodePoolGlobalAmiType: "alinux2023"
+    apiServer:
+      privateAccess: true
+      publicAccess: false
+      privateAccessCidrs: ["0.0.0.0/0"]
+      publicAccessCidrs: ["0.0.0.0/0"]
+    nodePools:
+      - name: infra
+        type: self-managed
+        size:
+          min: 1
+          max: 3
+        instance:
+          type: t3.xlarge
+          spot: false
+          volumeSize: 50
+          volumeType: gp2
+        labels:
+          nodepool: infra
+          node.kubernetes.io/role: infra
+        taints:
+          - node.kubernetes.io/role=infra:NoSchedule
+        tags:
+          k8s.io/cluster-autoscaler/node-template/label/nodepool: "infra"
+          k8s.io/cluster-autoscaler/node-template/label/node.kubernetes.io/role: "infra"
+    awsAuth: {}
+  distribution:
+    common:
+      nodeSelector:
+        node.kubernetes.io/role: infra
+      tolerations:
+        - effect: NoSchedule
+          key: node.kubernetes.io/role
+          value: infra
+    modules:
+      networking:
+        tigeraOperator:
+          overrides:
+            tolerations:
+              - effect: NoExecute
+                key: dummyKey
+                operator: Equal
+                value: dummyValue
+      ingress:
+        baseDomain: internal.example.com
+        dns:
+          public:
+            name: "example.com"
+            create: false
+          private:
+            name: "internal.example.com"
+            create: false
+        nginx:
+          type: dual
+          tls:
+            provider: secret
+            secret:
+              cert: "cert.pem"
+              key: "key.pem"
+              ca: "ca.pem"
+        haproxy:
+          type: none
+        certManager:
+          clusterIssuer:
+            name: letsencrypt-fury
+            email: example@sighup.io
+            type: http01
+      logging:
+        type: loki
+        minio:
+          storageSize: "20Gi"
+      monitoring:
+        type: mimir
+        prometheus:
+          retentionTime: "15d"
+        mimir:
+          externalEndpoint:
+            bucketName: dummy
+            accessKeyId: secret
+            secretAccessKey: secret
+            endpoint: s3.example.com
+      tracing:
+        type: tempo
+        minio:
+          storageSize: "20Gi"
+      policy:
+        type: gatekeeper
+        gatekeeper:
+          additionalExcludedNamespaces: ["dummy"]
+          installDefaultPolicies: true
+          enforcementAction: deny
+      dr:
+        type: eks
+        velero:
+          eks:
+            bucketName: example-velero
+            region: eu-west-1
+      auth:
+        provider:
+          type: sso
+        baseDomain: example.com
+        pomerium:
+          secrets:
+            COOKIE_SECRET: dummy_cookie
+            IDP_CLIENT_SECRET: dummy_idp
+            SHARED_SECRET: dummy_shared
+            SIGNING_KEY: dummy_signing
+        dex:
+          connectors:
+            - type: oidc
+              id: oidc
+              name: OIDC
+              config:
+                clientID: client-id
+                clientSecret: client-secret
+                issuer: https://dex.example.com
+    customPatches:
+      patches:
+        - path: dummy/folder

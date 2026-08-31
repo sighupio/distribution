@@ -60,6 +60,10 @@ resources:
   - resources/ingress-infra.yml
 {{- end }}
 
+{{- if and (eq .spec.distribution.common.provider.type "eks") (ne $haproxyType "none") }}
+  - resources/haproxy-loadbalancerclass-rebase.yml
+{{- end }}
+
 {{- $nginxUsesSecret := and (ne .spec.distribution.modules.ingress.nginx.type "none") (eq .spec.distribution.modules.ingress.nginx.tls.provider "secret") }}
 {{- $haproxyUsesSecret := and (ne $haproxyType "none") (eq .spec.distribution.modules.ingress.haproxy.tls.provider "secret") }}
 {{- if or $nginxUsesSecret $haproxyUsesSecret }}

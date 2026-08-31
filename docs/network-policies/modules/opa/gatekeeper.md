@@ -24,3 +24,5 @@ graph TD
     prom -->|"8888/TCP"| audit & cm
     api -->|"8443,443/TCP"| cm
 ```
+
+> Note: the diagram above shows the SSO configuration where Pomerium proxies traffic to GPM. With `basicAuth`, the ingress controller (HAProxy or NGINX) connects directly to GPM on port `8080/TCP` instead.
