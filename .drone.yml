@@ -137,7 +137,7 @@ steps: # qa
       FURYCTL_OUTDIR: ./
       FURYCTL_DISABLE_ANALYTICS: "true"
       KUBECONFIG: ./dummy
-      KUBECTL_VERSION: "1.34.11"
+      KUBECTL_VERSION: "1.34.8"
       MISE_GITHUB_TOKEN:
         from_secret: github_token
       GITHUB_TOKEN:
