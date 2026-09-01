@@ -91,21 +91,21 @@ steps: # qa
     commands:
       - eval "$(mise activate bash --shims)"
       - mkdir -p /tmp/test-kfddistribution /tmp/test-ekscluster /tmp/test-onpremises
-      - furyctl create config --kind KFDDistribution --version v1.35.1 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-kfddistribution
+      - furyctl create config --kind KFDDistribution --version v1.34.2 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-kfddistribution
 
   - <<: *test-create-config
     name: test-create-config-ekscluster
     commands:
       - eval "$(mise activate bash --shims)"
       - mkdir -p /tmp/test-kfddistribution /tmp/test-ekscluster /tmp/test-onpremises
-      - furyctl create config --kind EKSCluster --version v1.35.1 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-ekscluster
+      - furyctl create config --kind EKSCluster --version v1.34.2 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-ekscluster
 
   - <<: *test-create-config
     name: test-create-config-onpremises
     commands:
       - eval "$(mise activate bash --shims)"
       - mkdir -p /tmp/test-kfddistribution /tmp/test-ekscluster /tmp/test-onpremises
-      - furyctl create config --kind OnPremises --version v1.35.1 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-onpremises
+      - furyctl create config --kind OnPremises --version v1.34.2 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-onpremises
 
   - name: test-templates-regressions
     image: quay.io/sighup/mise:v2026.6.14
@@ -137,7 +137,7 @@ steps: # qa
       FURYCTL_OUTDIR: ./
       FURYCTL_DISABLE_ANALYTICS: "true"
       KUBECONFIG: ./dummy
-      KUBECTL_VERSION: "1.35.1"
+      KUBECTL_VERSION: "1.34.11"
       MISE_GITHUB_TOKEN:
         from_secret: github_token
       GITHUB_TOKEN:
@@ -1193,7 +1193,7 @@ steps: # e2e-onpremises
         - failure
 
 ---
-# On-premises upgrade pipeline: install v1.34.1, then upgrade to v1.35.0, on the
+# On-premises upgrade pipeline: install v1.33.3, then upgrade to v1.34.2, on the
 # same local libvirt VMs as e2e-onpremises (calico + gatekeeper path). Disjoint
 # subnet range (e2eup / 110..199) so it never collides with the install pipeline.
 name: e2e-onpremises-upgrades-1.33.3-1.34.2
