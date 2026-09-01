@@ -436,7 +436,7 @@ volumes:
   - name: furyctl-outdir-eks
     temp: {}
 
-steps: # e2e-ekscluster-1.34.1
+steps: # e2e-ekscluster-1.34.2
   - name: install-tools
     image: quay.io/sighup/mise:v2026.6.14
     pull: always
