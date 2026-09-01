@@ -5,7 +5,7 @@
 
 # Upgrade the cluster to the target distribution version with furyctl, using the
 # rendered furyctl_upgrade.yaml. Run after install.sh (which left the pki +
-# kubeconfig in config/ and a working v1.34.1 cluster). The longhorn StorageClass
+# kubeconfig in config/ and a working v1.33.3 cluster). The longhorn StorageClass
 # already exists from the base install, so a single apply rolls out everything.
 set -uo pipefail
 

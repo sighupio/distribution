@@ -22,7 +22,7 @@ output "all_ips" {
   value = module.vms.all_ips
 }
 
-# v1.34.1 base config: the cluster we install, then upgrade. calico + gatekeeper
+# v1.33.3 base config: the cluster we install, then upgrade. calico + gatekeeper
 # (the real upgrade path, complementary to the install pipeline's cilium + kyverno).
 # Lightened for the single worker exactly like the install pipeline: monitoring is
 # prometheus (mimir-distributed won't fit), one worker, longhorn replica 1 with
@@ -35,7 +35,7 @@ kind: OnPremises
 metadata:
   name: reevo
 spec:
-  distributionVersion: v1.34.1
+  distributionVersion: v1.33.3
   kubernetes:
     pkiFolder: ./pki
     ssh:
