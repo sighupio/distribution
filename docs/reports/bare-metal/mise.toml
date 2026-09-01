@@ -14,4 +14,4 @@ run = ['kube-burner init -c kubelet-density-heavy.yml']
 
 [tools]
 'ubi:kube-burner/kube-burner' = '1.17.7'
-furyctl = "0.33.1"
+furyctl = "0.35.1"
