@@ -83,6 +83,6 @@ this PR can be used as context for that.
 - [ ] I've updated the `docs/releases/unreleased.md` file (or equivalent)
 - [ ] I've tested the proposed changes and wrote the tests performed in the section above
 - [ ] My branch is up-to-date with the target branch and there are no conflicts
-- [ ] I've considered all the different cluster kinds (KFDDistribution, OnPremises, EKSCluster, Immutable) that may be affected by this change
+- [ ] I've considered all the different cluster kinds (KFDDistribution, OnPremises, EKSCluster) that may be affected by this change
 - [ ] CI is green
 

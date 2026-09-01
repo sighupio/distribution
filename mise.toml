@@ -58,7 +58,6 @@ addlicense -c "SIGHUP s.r.l" -y 2017-present -v -l bsd \
 description = "generate documentation from schemas"
 run = [
   "md-gen gen --input schemas/public/ekscluster-kfd-v1alpha2.json --output docs/schemas/ekscluster-kfd-v1alpha2.md --overwrite --banner banners/ekscluster.md",
-  "md-gen gen --input schemas/public/immutable-kfd-v1alpha2.json --output docs/schemas/immutable-kfd-v1alpha2.md --overwrite --banner banners/immutable.md",
   "md-gen gen --input schemas/public/kfddistribution-kfd-v1alpha2.json --output docs/schemas/kfddistribution-kfd-v1alpha2.md --overwrite --banner banners/kfddistribution.md",
   "md-gen gen --input schemas/public/onpremises-kfd-v1alpha2.json --output docs/schemas/onpremises-kfd-v1alpha2.md --overwrite --banner banners/onpremises.md"
 ]

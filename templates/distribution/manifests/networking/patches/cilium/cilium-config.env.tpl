@@ -1,15 +1,9 @@
 {{- $providerType := .spec.distribution.common.provider.type }}
 {{- $defaultKubeProxyType := "ipvs" }}
-{{- if eq $providerType "immutable" }}
-  {{- $defaultKubeProxyType = "nftables" }}
-{{- end }}
 
 {{- $podCIDR := "" }}
 {{- if and (eq $providerType "none") (hasKeyAny .spec "kubernetes") }}{{/* OnPremises */}}
 {{- $podCIDR = .spec.kubernetes.podCidr }}
-{{- end }}
-{{- if eq $providerType "immutable" }}
-{{- $podCIDR = .spec.kubernetes.networking.podCIDR }}
 {{- end }}
 {{- if .spec.distribution.modules.networking.cilium.podCidr }}
 {{- $podCIDR = .spec.distribution.modules.networking.cilium.podCidr }}

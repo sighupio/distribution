@@ -51,7 +51,7 @@ SIGHUP Distribution is structured on modules, and each module has a set of packa
 
 The standard way to deploy SD is to:
 
-- Create a cluster using one of the supported providers (EKS, On-Premises, Immutable), or bring your own cluster using the `KFDDistribution` provider.
+- Create a cluster using one of the supported providers (EKS, On-Premises), or bring your own cluster using the `KFDDistribution` provider.
 - Deploy all the [Core Modules](#core-modules-) of the distribution using [furyctl][furyctl].
 - Deploy (if needed) any of the [Addon modules](#add-on-modules-) using [furyctl plugin][furyctl-plugins] feature.
 
