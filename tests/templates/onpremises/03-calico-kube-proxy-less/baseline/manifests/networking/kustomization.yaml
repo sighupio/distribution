@@ -1,0 +1,25 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../../vendor/modules/networking/katalog/tigera/on-prem
+  - resources/calico-ns.yml
+  - resources/tigera-kubernetes-service.yaml
+
+
+
+
+patches:
+  - path: patches/tigera/infra-nodes-and-mask.yaml
+  - target:
+      group: apps
+      version: v1
+      kind: Deployment
+      name: tigera-operator
+      namespace: tigera-operator
+    path: patches/tigera/tigera-operator-tolerations.yaml
+  - path: patches/tigera/ebpf-mode.yaml

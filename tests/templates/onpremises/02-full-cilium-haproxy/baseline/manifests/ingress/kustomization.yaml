@@ -1,0 +1,39 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+
+
+  - ../../../vendor/modules/ingress/katalog/haproxy/dual
+
+
+
+
+  - ../../../vendor/modules/ingress/katalog/forecastle
+  - ../../../vendor/modules/ingress/katalog/cert-manager
+  - resources/cert-manager-clusterissuer.yml
+  - resources/ingress-infra.yml
+
+
+patches:
+  - path: patches/cert-manager-kapp-group.yml
+  # cert-manager is always deployed, so we need to patch at least it to include the selectors
+  - path: patches/infra-nodes.yml
+  - target:
+      group: apps
+      version: v1
+      kind: Deployment
+      name: cert-manager
+      namespace: cert-manager
+    patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/args/-
+        value: "--dns01-recursive-nameservers-only"
+      - op: add
+        path: /spec/template/spec/containers/0/args/-
+        value: "--dns01-recursive-nameservers=8.8.8.8:53,1.1.1.1:53"

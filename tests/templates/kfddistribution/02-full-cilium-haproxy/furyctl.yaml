@@ -1,0 +1,66 @@
+# yaml-language-server: $schema=../../../../schemas/public/kfddistribution-kfd-v1alpha2.json
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# This is a test case furyctl.yaml to assert that the distribution templates are generating the right output
+---
+apiVersion: kfd.sighup.io/v1alpha2
+kind: KFDDistribution
+metadata:
+  name: full-cilium-haproxy
+spec:
+  distributionVersion: dummy # config based on v1.34.1, but we check against main
+  distribution:
+    kubeconfig: path/to/kubeconfig
+    modules:
+      networking:
+        type: cilium
+        cilium:
+          podCidr: "172.16.0.0/16"
+          maskSize: "24"
+      ingress:
+        baseDomain: internal.example.com
+        nginx:
+          type: none
+        haproxy:
+          type: dual
+          tls:
+            provider: certManager
+        certManager:
+          clusterIssuer:
+            name: letsencrypt-fury
+            email: example@sighup.io
+            type: http01
+      logging:
+        type: loki
+        minio:
+          storageSize: "20Gi"
+      monitoring:
+        type: prometheus
+      tracing:
+        type: none
+        minio:
+          storageSize: "20Gi"
+      policy:
+        type: kyverno
+        kyverno:
+          additionalExcludedNamespaces: ["dummy"]
+          installDefaultPolicies: true
+          validationFailureAction: Enforce
+      dr:
+        type: on-premises
+        velero: {}
+      auth:
+        provider:
+          type: none
+          # We can't test basicAuth because the `htpasswd` hashing functions has
+          # a random salt and the value changes every time we render the template.
+          # type: basicAuth
+          # basicAuth:
+          #   username: admin
+          #   password: admin
+        baseDomain: example.com
+    customPatches:
+      patches:
+        - path: dummy/folder

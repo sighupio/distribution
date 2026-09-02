@@ -18,7 +18,7 @@ kind: OnPremises
 metadata:
   name: reevo
 spec:
-  distributionVersion: v1.32.1
+  distributionVersion: v1.33.2
   kubernetes:
     pkiFolder: ./pki
     ssh:
@@ -96,21 +96,29 @@ spec:
               cert: "{file://tls.crt}"
               key: "{file://tls.key}"
               ca: "{file://ca.crt}"
+        haproxy:
+          type: single
+          tls:
+            provider: secret
+            secret:
+              cert: "{file://tls.crt}"
+              key: "{file://tls.key}"
+              ca: "{file://ca.crt}"
         certManager:
           clusterIssuer:
             name: letsencrypt-fury
             email: samuele.chiocca@reevo.it
             type: http01
-      logging: 
+      logging:
         type: loki
         opensearch:
           type: triple
-        loki: 
+        loki:
           backend: minio
           tsdbStartDate: "2024-11-18"
       monitoring:
         type: mimir
-        mimir: 
+        mimir:
           retentionTime: 3d
           backend: minio
         prometheus:
@@ -119,14 +127,14 @@ spec:
           storageSize: 20Gi
         alertmanager:
           installDefaultRules: false
-      policy: 
+      policy:
         type: gatekeeper
         gatekeeper:
           enforcementAction: warn
-          installDefaultPolicies: true 
+          installDefaultPolicies: true
       dr:
         type: on-premises
-        velero: 
+        velero:
           backend: minio
           schedules:
             install: true
@@ -135,9 +143,9 @@ spec:
                 snapshotMoveData: true
           snapshotController:
             install: true
-      tracing: 
+      tracing:
         type: none
-        # tempo: 
+        # tempo:
         #   backend: minio
       auth:
         provider:
@@ -168,7 +176,7 @@ kind: OnPremises
 metadata:
   name: reevo
 spec:
-  distributionVersion: v1.33.2
+  distributionVersion: v1.33.3
   kubernetes:
     pkiFolder: ./pki
     ssh:

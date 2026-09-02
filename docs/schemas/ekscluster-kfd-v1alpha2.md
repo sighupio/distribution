@@ -5,7 +5,7 @@ This document explains the full schema for the `kind: EKSCluster` for the `furyc
 An example configuration file can be created by running the following command:
 
 ```bash
-furyctl create config --kind EKSCluster --version v1.29.4 --name example-cluster
+furyctl create config --kind EKSCluster --version v1.33.3 --name example-cluster
 ```
 
 > [!NOTE]
@@ -91,11 +91,12 @@ The name of the cluster. It will also be used as a prefix for all the other reso
 
 ### Properties
 
-| Property                                        | Type     | Required |
-|:------------------------------------------------|:---------|:---------|
-| [common](#specdistributioncommon)               | `object` | Optional |
-| [customPatches](#specdistributioncustompatches) | `object` | Optional |
-| [modules](#specdistributionmodules)             | `object` | Required |
+| Property                                            | Type     | Required |
+|:----------------------------------------------------|:---------|:---------|
+| [common](#specdistributioncommon)                   | `object` | Optional |
+| [customPatches](#specdistributioncustompatches)     | `object` | Optional |
+| [customResources](#specdistributioncustomresources) | `object` | Optional |
+| [modules](#specdistributionmodules)                 | `object` | Required |
 
 ## .spec.distribution.common
 
@@ -524,6 +525,12 @@ The labels of the secret
 
 The type of the secret
 
+## .spec.distribution.customResources
+
+### Description
+
+Add custom resources to the distribution phase. Each entry should point to a resource file, a kustomize base, or a remote resource (e.g. a git repository or URL). `customResources` should be used when you _need_ the resources to be applyed in the distribution phase together with the rest of the modules; prefer using Plugins instead when possible.
+
 ## .spec.distribution.modules
 
 ### Properties
@@ -709,9 +716,80 @@ Override the common configuration with a particular configuration for the Auth m
 
 ## .spec.distribution.modules.auth.overrides.ingresses
 
+### Properties
+
+| Property                                                             | Type     | Required |
+|:---------------------------------------------------------------------|:---------|:---------|
+| [dex](#specdistributionmodulesauthoverridesingressesdex)             | `object` | Optional |
+| [gangplank](#specdistributionmodulesauthoverridesingressesgangplank) | `object` | Optional |
+| [pomerium](#specdistributionmodulesauthoverridesingressespomerium)   | `object` | Optional |
+
 ### Description
 
 Override the definition of the Auth module ingresses.
+
+## .spec.distribution.modules.auth.overrides.ingresses.dex
+
+### Properties
+
+| Property                                                                      | Type     | Required |
+|:------------------------------------------------------------------------------|:---------|:---------|
+| [host](#specdistributionmodulesauthoverridesingressesdexhost)                 | `string` | Required |
+| [ingressClass](#specdistributionmodulesauthoverridesingressesdexingressclass) | `string` | Required |
+
+## .spec.distribution.modules.auth.overrides.ingresses.dex.host
+
+### Description
+
+Use this host for the ingress instead of the default one.
+
+## .spec.distribution.modules.auth.overrides.ingresses.dex.ingressClass
+
+### Description
+
+Use this ingress class for the ingress instead of the default one.
+
+## .spec.distribution.modules.auth.overrides.ingresses.gangplank
+
+### Properties
+
+| Property                                                                            | Type     | Required |
+|:------------------------------------------------------------------------------------|:---------|:---------|
+| [host](#specdistributionmodulesauthoverridesingressesgangplankhost)                 | `string` | Required |
+| [ingressClass](#specdistributionmodulesauthoverridesingressesgangplankingressclass) | `string` | Required |
+
+## .spec.distribution.modules.auth.overrides.ingresses.gangplank.host
+
+### Description
+
+Use this host for the ingress instead of the default one.
+
+## .spec.distribution.modules.auth.overrides.ingresses.gangplank.ingressClass
+
+### Description
+
+Use this ingress class for the ingress instead of the default one.
+
+## .spec.distribution.modules.auth.overrides.ingresses.pomerium
+
+### Properties
+
+| Property                                                                           | Type     | Required |
+|:-----------------------------------------------------------------------------------|:---------|:---------|
+| [host](#specdistributionmodulesauthoverridesingressespomeriumhost)                 | `string` | Required |
+| [ingressClass](#specdistributionmodulesauthoverridesingressespomeriumingressclass) | `string` | Required |
+
+## .spec.distribution.modules.auth.overrides.ingresses.pomerium.host
+
+### Description
+
+Use this host for the ingress instead of the default one.
+
+## .spec.distribution.modules.auth.overrides.ingresses.pomerium.ingressClass
+
+### Description
+
+Use this ingress class for the ingress instead of the default one.
 
 ## .spec.distribution.modules.auth.overrides.nodeSelector
 
@@ -801,6 +879,7 @@ Configuration for Pomerium, an identity-aware reverse proxy used for SSO.
 | [monitoringMinioConsole](#specdistributionmodulesauthpomeriumdefaultroutespolicymonitoringminioconsole)           | `array` | Optional |
 | [monitoringPrometheus](#specdistributionmodulesauthpomeriumdefaultroutespolicymonitoringprometheus)               | `array` | Optional |
 | [tracingMinioConsole](#specdistributionmodulesauthpomeriumdefaultroutespolicytracingminioconsole)                 | `array` | Optional |
+| [whisker](#specdistributionmodulesauthpomeriumdefaultroutespolicywhisker)                                         | `array` | Optional |
 
 ### Description
 
@@ -825,6 +904,8 @@ override default routes for SD components
 ## .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.monitoringPrometheus
 
 ## .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.tracingMinioConsole
+
+## .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.whisker
 
 ## .spec.distribution.modules.auth.pomerium.overrides
 
@@ -3963,7 +4044,7 @@ The value of the toleration
 
 Set this option to ship the collected metrics to a remote Prometheus receiver.
 
-`remoteWrite` is an array of objects that allows configuring the [remoteWrite](https://prometheus.io/docs/specs/remote_write_spec/) options for Prometheus. The objects in the array follow [the same schema as in the prometheus operator](https://prometheus-operator.dev/docs/operator/api/#monitoring.coreos.com/v1.RemoteWriteSpec).
+`remoteWrite` is an array of objects that allows configuring the [remoteWrite](https://prometheus.io/docs/specs/remote_write_spec/) options for Prometheus. The objects in the array follow [the same schema as in the prometheus operator](https://prometheus-operator.dev/docs/api-reference/api/#monitoring.coreos.com/v1.RemoteWriteSpec).
 
 ## .spec.distribution.modules.monitoring.prometheus.resources
 
@@ -4115,7 +4196,7 @@ The memory request for the Pod. Example: `500M`.
 
 Set this option to ship the collected metrics to a remote Prometheus receiver.
 
-`remoteWrite` is an array of objects that allows configuring the [remoteWrite](https://prometheus.io/docs/specs/remote_write_spec/) options for Prometheus. The objects in the array follow [the same schema as in the prometheus operator](https://prometheus-operator.dev/docs/operator/api/#monitoring.coreos.com/v1.RemoteWriteSpec).
+`remoteWrite` is an array of objects that allows configuring the [remoteWrite](https://prometheus.io/docs/specs/remote_write_spec/) options for Prometheus. The objects in the array follow [the same schema as in the prometheus operator](https://prometheus-operator.dev/docs/api-reference/api/#monitoring.coreos.com/v1.RemoteWriteSpec).
 
 ## .spec.distribution.modules.monitoring.prometheusAgent.resources
 

@@ -36,6 +36,10 @@ resources:
   - tracing
 {{- end }}
 
+{{- if .spec.distribution.customResources }}
+  {{ .spec.distribution.customResources | toYaml | indent 2 | trim -}}
+{{- end }}
+
 {{- if .spec.distribution.customPatches.patchesStrategicMerge }}
 patchesStrategicMerge:
   {{ .spec.distribution.customPatches.patchesStrategicMerge | toYaml | indent 2 | trim -}}
