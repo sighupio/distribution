@@ -197,11 +197,19 @@ steps: # e2e-kfddistribution-1.33
   - name: install-tools
     image: quay.io/sighup/mise:v2026.6.14
     pull: always
+    environment:
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
     volumes:
       - name: mise-cache
         path: /mise-data
     commands:
-      - mise install
+      # Serialize concurrent `mise install` across parallel pipelines that share
+      # the host MISE_DATA_DIR (/mise-data) on the same Drone worker, otherwise
+      # they corrupt each other. flock on a lockfile in the shared dir.
+      - "(flock -w 1800 9 || exit 1; mise install) 9>/mise-data/.mise-install.lock"
       - eval "$(mise activate bash --shims)"
 
   - name: create Kind cluster
@@ -305,11 +313,19 @@ steps: # e2e-kfddistribution-1.33.2-to-1.33.3
   - name: install-tools
     image: quay.io/sighup/mise:v2026.6.14
     pull: always
+    environment:
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
     volumes:
       - name: mise-cache
         path: /mise-data
     commands:
-      - mise install
+      # Serialize concurrent `mise install` across parallel pipelines that share
+      # the host MISE_DATA_DIR (/mise-data) on the same Drone worker, otherwise
+      # they corrupt each other. flock on a lockfile in the shared dir.
+      - "(flock -w 1800 9 || exit 1; mise install) 9>/mise-data/.mise-install.lock"
       - eval "$(mise activate bash --shims)"
 
   - name: create Kind cluster
@@ -407,11 +423,19 @@ steps: # e2e-ekscluster-1.33.3
   - name: install-tools
     image: quay.io/sighup/mise:v2026.6.14
     pull: always
+    environment:
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
     volumes:
       - name: mise-cache
         path: /mise-data
     commands:
-      - mise install
+      # Serialize concurrent `mise install` across parallel pipelines that share
+      # the host MISE_DATA_DIR (/mise-data) on the same Drone worker, otherwise
+      # they corrupt each other. flock on a lockfile in the shared dir.
+      - "(flock -w 1800 9 || exit 1; mise install) 9>/mise-data/.mise-install.lock"
       - eval "$(mise activate bash --shims)"
 
   - name: run-tests
@@ -562,11 +586,19 @@ steps: # e2e-ekscluster-selfmanaged-alinux2023-1.33.3
   - name: install-tools
     image: quay.io/sighup/mise:v2026.6.14
     pull: always
+    environment:
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
     volumes:
       - name: mise-cache
         path: /mise-data
     commands:
-      - mise install
+      # Serialize concurrent `mise install` across parallel pipelines that share
+      # the host MISE_DATA_DIR (/mise-data) on the same Drone worker, otherwise
+      # they corrupt each other. flock on a lockfile in the shared dir.
+      - "(flock -w 1800 9 || exit 1; mise install) 9>/mise-data/.mise-install.lock"
       - eval "$(mise activate bash --shims)"
 
   - name: run-tests
@@ -717,11 +749,19 @@ steps: #e2e-eks-upgrades
   - name: install-tools
     image: quay.io/sighup/mise:v2026.6.14
     pull: always
+    environment:
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
     volumes:
       - name: mise-cache
         path: /mise-data
     commands:
-      - mise install
+      # Serialize concurrent `mise install` across parallel pipelines that share
+      # the host MISE_DATA_DIR (/mise-data) on the same Drone worker, otherwise
+      # they corrupt each other. flock on a lockfile in the shared dir.
+      - "(flock -w 1800 9 || exit 1; mise install) 9>/mise-data/.mise-install.lock"
       - eval "$(mise activate bash --shims)"
 
   - name: run-tests
@@ -870,11 +910,19 @@ steps: # e2e-onpremises
   - name: install-tools
     image: quay.io/sighup/mise:v2026.6.14
     pull: always
+    environment:
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
     volumes:
       - name: mise-cache
         path: /mise-data
     commands:
-      - mise install
+      # Serialize concurrent `mise install` across parallel pipelines that share
+      # the host MISE_DATA_DIR (/mise-data) on the same Drone worker, otherwise
+      # they corrupt each other. flock on a lockfile in the shared dir.
+      - "(flock -w 1800 9 || exit 1; mise install) 9>/mise-data/.mise-install.lock"
       - eval "$(mise activate bash --shims)"
 
   - name: create-hetzner-infrastructure
@@ -1026,11 +1074,19 @@ steps: # e2e-onpremises-upgrades-1.33.2-1.33.3
   - name: install-tools
     image: quay.io/sighup/mise:v2026.6.14
     pull: always
+    environment:
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
     volumes:
       - name: mise-cache
         path: /mise-data
     commands:
-      - mise install
+      # Serialize concurrent `mise install` across parallel pipelines that share
+      # the host MISE_DATA_DIR (/mise-data) on the same Drone worker, otherwise
+      # they corrupt each other. flock on a lockfile in the shared dir.
+      - "(flock -w 1800 9 || exit 1; mise install) 9>/mise-data/.mise-install.lock"
       - eval "$(mise activate bash --shims)"
 
   - name: create-hetzner-infrastructure
