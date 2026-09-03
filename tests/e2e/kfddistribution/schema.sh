@@ -350,3 +350,59 @@ test_schema() {
 
     test_schema "public" "ekscluster-kfd-v1alpha2" "013-no" expect
 }
+
+@test "014 - ok (pomerium override accepted)" {
+    info
+
+    test_schema "public" "ekscluster-kfd-v1alpha2" "014-ok" expect_ok
+}
+
+@test "014 - no (pomerium override missing ingressClass)" {
+    info
+
+    expect() {
+        expect_no "${1}"
+
+        assert_error_contains "/spec/distribution/modules/auth/overrides/ingresses/pomerium" "missing property" || return $?
+        assert_error_contains "/spec/distribution/modules/auth/overrides/ingresses/pomerium" "'ingressClass'" || return $?
+    }
+
+    test_schema "public" "ekscluster-kfd-v1alpha2" "014-no" expect
+}
+
+@test "015 - ok (dex + gangplank + pomerium overrides)" {
+    info
+
+    test_schema "public" "ekscluster-kfd-v1alpha2" "015-ok" expect_ok
+}
+
+@test "015 - no (unknown key under ingresses overrides)" {
+    info
+
+    expect() {
+        expect_no "${1}"
+
+        assert_error_contains "/spec/distribution/modules/auth/overrides/ingresses" "additional propert" || return $?
+        assert_error_contains "/spec/distribution/modules/auth/overrides/ingresses" "'pomeriun'" || return $?
+    }
+
+    test_schema "public" "ekscluster-kfd-v1alpha2" "015-no" expect
+}
+
+@test "016 - ok (at least one of privateAccess/publicAccess is true)" {
+    info
+
+    test_schema "public" "ekscluster-kfd-v1alpha2" "016-ok" expect_ok
+}
+
+@test "016 - no (both privateAccess and publicAccess are false)" {
+    info
+
+    expect() {
+        expect_no "${1}"
+
+        assert_error_contains "/spec/kubernetes/apiServer" "anyOf" || return $?
+    }
+
+    test_schema "public" "ekscluster-kfd-v1alpha2" "016-no" expect
+}
