@@ -1,0 +1,142 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# yaml-language-server: $schema=https://raw.githubusercontent.com/sighupio/distribution/v1.33.1/schemas/public/onpremises-kfd-v1alpha2.json
+---
+apiVersion: kfd.sighup.io/v1alpha2
+kind: OnPremises
+metadata:
+  name: kube-burner-cluster
+spec:
+  distributionVersion: v1.33.1
+  kubernetes:
+    pkiFolder: ./pki
+    ssh:
+      username: "{env://SSH_USER}"
+      keyPath: "{env://SSH_KEY}"
+    dnsZone: example.com
+    controlPlaneAddress: api.example.com:6443
+    podCidr: 172.17.128.0/17
+    svcCidr: 172.17.0.0/17
+    loadBalancers:
+      enabled: true
+      hosts:
+        - name: haproxy01
+          ip: 192.168.10.43
+      keepalived:
+        enabled: false
+        interface: eth0
+        ip: 192.168.10.240/24
+        virtualRouterId: "205"
+        passphrase: "password"
+      stats:
+        username: admin
+        password: password
+      additionalConfig: "{file://./configs/haproxy-nginx-dual.cfg}" # create this file and insert the configuration you need for your environment
+    masters:
+      labels:
+        node-role.kubernetes.io/master: ""
+        node-role.kubernetes.io/infra: ""
+        node-role.kubernetes.io/worker: ""
+        node.kubernetes.io/role: infra
+      taints: []
+      hosts:
+        - name: node01
+          ip: 192.168.10.1
+        - name: node02
+          ip: 192.168.10.2
+        - name: node03
+          ip: 192.168.10.3
+    nodes:
+      - name: worker
+        hosts:
+          - name: node04
+            ip: 192.168.10.4
+        labels:
+          node-role.kubernetes.io/infra: ""
+          node-role.kubernetes.io/worker: ""
+          node.kubernetes.io/role: infra
+    advanced:
+      kernelParameters:
+        - name: "fs.inotify.max_user_instances"
+          value: "8192"
+        - name: "fs.inotify.max_user_watches"
+          value: "524288"
+      kubeletConfiguration:
+        maxPods: 500
+        systemReserved:
+          cpu: 2000m
+          memory: 4Gi
+          ephemeral-storage: 1Gi
+      encryption:
+        configuration: |
+          apiVersion: apiserver.config.k8s.io/v1
+          kind: EncryptionConfiguration
+          resources:
+            - resources:
+              - secrets
+              providers:
+              - aescbc:
+                  keys:
+                  - name: mykey
+                    secret: {env://ETCD_ENCRYPTION_KEY}        
+  distribution:
+    common:
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Equal
+    modules:
+      networking:
+        type: cilium
+        cilium:
+          maskSize: "23"
+      ingress:
+        baseDomain: internal.example.com
+        nginx:
+          type: dual
+          tls:
+            provider: certManager
+        certManager:
+          clusterIssuer:
+            name: letsencrypt-sd
+            email: hdbm@sighup.io
+            type: http01
+      logging:
+        type: none
+        minio:
+          storageSize: "1Gi"
+      monitoring:
+        type: "prometheus"
+        prometheusAdapter:
+          installEnhancedHPAMetrics: false
+          resources:
+            limits:
+              cpu: 2000m
+        prometheus:
+          retentionSize: 8GiB
+          retentionTime: 3d
+          storageSize: 10Gi
+        alertmanager:
+          installDefaultRules: false
+      tracing:
+        type: none
+      policy:
+        type: kyverno
+        kyverno:
+          validationFailureAction: Audit
+          installDefaultPolicies: true
+      dr:
+        type: none
+      auth:
+        provider:
+          type: none
+  plugins:
+    kustomize:
+      - name: csi-operator
+        folder: ./plugins/kustomize/csi/operator
+      - name: csi-backend
+        folder: ./plugins/kustomize/csi/backend
+      - name: storageclass
+        folder: ./plugins/kustomize/csi/storageclass

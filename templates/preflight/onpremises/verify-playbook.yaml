@@ -18,6 +18,7 @@
         dest: "{{ kubernetes_kubeconfig_path }}/admin.conf"
         flat: yes
       when: admin_conf_stat.stat.exists
+      run_once: true
 
     - name: Set fact if admin.conf exists
       set_fact:

@@ -2,30 +2,36 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
+{{- $providerType := .spec.distribution.common.provider.type }}
+{{- $cni := .spec.distribution.modules.networking.type }}
 {{- $vendorPrefix := print "../" .spec.distribution.common.relativeVendorPath }}
 {{- $haproxyType := .spec.distribution.modules.ingress.haproxy.type }}
 {{- $isBYOIC := .spec.distribution.modules.ingress.byoic.enabled }}
 {{- $hasAnyIngress := or (ne .spec.distribution.modules.ingress.nginx.type "none") (ne $haproxyType "none") $isBYOIC }}
+{{- /* The `digAny` condition needs to be specified exactly as written below to properly check if the field has been populated */}}
+{{- $defaultKubeProxyType := "ipvs" }}
+{{- $kubeProxyType := .spec | digAny "kubernetes" "advanced" "kubeProxy" "type" $defaultKubeProxyType }}
 ---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-{{- if eq .spec.distribution.common.provider.type "eks" }}
+{{- if eq $providerType "eks" }}
   - {{ print $vendorPrefix "/modules/networking/katalog/tigera/eks-policy-only" }}
 {{- end }}
 
-{{- if eq .spec.distribution.common.provider.type "none" }}{{/* none == on-prem, kfddistribution */}}
-    {{- if eq .spec.distribution.modules.networking.type "calico" }}
+{{- if eq $providerType "none" }}{{/* none == on-prem, kfddistribution */}}
+    {{- if eq $cni "calico" }}
   - {{ print $vendorPrefix "/modules/networking/katalog/tigera/on-prem" }}
   - resources/calico-ns.yml
-      {{- /* We assume that kubeProxy is enabled by default */}}
-      {{- /* The `digAny` condition needs to be specified exactly as written below to properly check if the field has been populated */}}
-      {{- if not (.spec | digAny "kubernetes" "advanced" "kubeProxy" "enabled" true) }}
+      {{- if eq $kubeProxyType "none" }}
   - resources/tigera-kubernetes-service.yaml
       {{- end }}
+      {{- if $hasAnyIngress }}
+  - resources/whisker-ingress.yml
+      {{- end }}
     {{- end }}
-    {{- if eq .spec.distribution.modules.networking.type "cilium" }}
+    {{- if eq $cni "cilium" }}
   - {{ print $vendorPrefix "/modules/networking/katalog/cilium" }}
       {{- if $hasAnyIngress }}
   - resources/ingress-infra.yml
@@ -33,12 +39,18 @@ resources:
     {{- end }}
 {{- end }}
 
+{{/* The Calico policies only grant the ingress controller access to the Whisker UI; they are not
+     SD network policies, so they don't depend on networkPoliciesEnabled field. */}}
+{{ if and (eq $cni "calico") $hasAnyIngress }}
+  - policies
+{{- end }}
+
 patches:
-{{- if eq .spec.distribution.common.provider.type "eks" }}
+{{- if eq $providerType "eks" }}
   - path: patches/tigera/infra-nodes-and-mask.yaml
 {{- end }}
-{{- if eq .spec.distribution.common.provider.type "none" }}
-  {{- if eq .spec.distribution.modules.networking.type "calico" }}
+{{- if eq $providerType "none" }}
+  {{- if eq $cni "calico" }}
   - path: patches/tigera/infra-nodes-and-mask.yaml
   - target:
       group: apps
@@ -47,13 +59,13 @@ patches:
       name: tigera-operator
       namespace: tigera-operator
     path: patches/tigera/tigera-operator-tolerations.yaml
-  {{- /* We assume that kubeProxy is enabled by default */}}
-  {{- /* The `digAny` condition needs to be specified exactly as written below to properly check if the field has been populated */}}
-  {{- if not (.spec | digAny "kubernetes" "advanced" "kubeProxy" "enabled" true) }}
+    {{- if eq $kubeProxyType "none" }}
   - path: patches/tigera/ebpf-mode.yaml
+    {{- else if eq $kubeProxyType "nftables" }}
+  - path: patches/tigera/nfTables-dataplane.yaml
+    {{- end }}
   {{- end }}
-  {{- end }}
-  {{- if eq .spec.distribution.modules.networking.type "cilium" }}
+  {{- if eq $cni "cilium" }}
   - path: patches/cilium/infra-nodes.yaml
   - target:
       group: apps
@@ -62,16 +74,14 @@ patches:
       name: cilium-operator
       namespace: kube-system
     path: patches/cilium/cilium-operator-tolerations.yaml
-    {{- /* We assume that kubeProxy is enabled by default */}}
-    {{- /* The `digAny` condition needs to be specified exactly as written below to properly check if the field has been populated */}}
-    {{- if not (.spec | digAny "kubernetes" "advanced" "kubeProxy" "enabled" true) }}
+    {{- if eq $kubeProxyType "none" }}
   - path: patches/cilium/kube-proxy-replacement.yaml
     {{- end }}
   {{- end }}
 {{- end }}
 
-{{- if eq .spec.distribution.common.provider.type "none" }}
-  {{- if eq .spec.distribution.modules.networking.type "cilium" }}
+{{- if eq $providerType "none" }}
+  {{- if eq $cni "cilium" }}
 configMapGenerator:
   - behavior: merge
     envs:

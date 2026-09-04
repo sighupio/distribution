@@ -1,0 +1,100 @@
+# yaml-language-server: $schema=../../../../schemas/public/ekscluster-kfd-v1alpha2.json
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# This is a test case furyctl.yaml to assert that the distribution templates are generating the right output
+# This test verifies output when no modules are enabled
+---
+apiVersion: kfd.sighup.io/v1alpha2
+kind: EKSCluster
+metadata:
+  name: no-modules-enabled
+spec:
+  distributionVersion: v1.34.1 # config based on v1.34.1, but we check against main anyways
+  toolsConfiguration:
+    opentofu:
+      state:
+        s3:
+          bucketName: dummybucket
+          keyPrefix: dummy_keyPrefix
+          region: eu-central-1
+  region: eu-west-1
+  infrastructure:
+    vpc:
+      network:
+        cidr: 10.1.0.0/16
+        subnetsCidrs:
+          private:
+            - 10.1.0.0/20
+            - 10.1.16.0/20
+            - 10.1.32.0/20
+          public:
+            - 10.1.48.0/24
+            - 10.1.49.0/24
+  kubernetes:
+    nodeAllowedSshPublicKey: "ssh-ed25519 XYZ"
+    nodePoolsLaunchKind: "launch_templates"
+    nodePoolGlobalAmiType: "alinux2023"
+    apiServer:
+      privateAccess: true
+      publicAccess: false
+      privateAccessCidrs: ["0.0.0.0/0"]
+      publicAccessCidrs: ["0.0.0.0/0"]
+    nodePools:
+      - name: infra
+        type: self-managed
+        size:
+          min: 1
+          max: 3
+        instance:
+          type: t3.xlarge
+          spot: false
+          volumeSize: 50
+          volumeType: gp2
+        labels:
+          nodepool: infra
+          node.kubernetes.io/role: infra
+        taints:
+          - node.kubernetes.io/role=infra:NoSchedule
+        tags:
+          k8s.io/cluster-autoscaler/node-template/label/nodepool: "infra"
+          k8s.io/cluster-autoscaler/node-template/label/node.kubernetes.io/role: "infra"
+    awsAuth: {}
+  distribution:
+    common:
+      nodeSelector:
+        node.kubernetes.io/role: infra
+      tolerations:
+        - effect: NoSchedule
+          key: node.kubernetes.io/role
+          value: infra
+    modules:
+      ingress:
+        baseDomain: internal.example.com
+        nginx:
+          type: none
+        haproxy:
+          type: none
+          tls:
+            provider: certManager
+        certManager:
+          clusterIssuer:
+            name: letsencrypt-fury
+            email: example@sighup.io
+            type: http01
+      logging:
+        type: none
+        minio:
+          storageSize: "20Gi"
+      monitoring:
+        type: none
+      tracing:
+        type: none
+      policy:
+        type: none
+      dr:
+        type: none
+      auth:
+        provider:
+          type: none

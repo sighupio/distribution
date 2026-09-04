@@ -113,6 +113,22 @@ stringData:
 {{- end }}
 {{- end }}
 
+{{ if eq .spec.distribution.modules.networking.type "calico" }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: basic-auth
+  namespace: calico-system
+type: Opaque
+stringData:
+{{- if $useHAProxyFormat }}
+  {{ $username }}: '{{ $hashOnly }}'
+{{- else }}
+  auth: {{ $htpasswdFull }}
+{{- end }}
+{{- end }}
+
 {{ if eq .spec.distribution.modules.networking.type "cilium" }}
 ---
 apiVersion: v1

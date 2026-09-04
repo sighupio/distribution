@@ -1,0 +1,49 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../../vendor/modules/ingress/katalog/dual-nginx
+
+
+
+
+  - ../../../vendor/modules/ingress/katalog/external-dns/namespace
+  - ../../../vendor/modules/ingress/katalog/external-dns/private
+  - ../../../vendor/modules/ingress/katalog/external-dns/public
+
+
+  - ../../../vendor/modules/ingress/katalog/forecastle
+  - ../../../vendor/modules/ingress/katalog/cert-manager
+  - resources/ingress-infra.yml
+  - secrets/tls.yml
+
+
+patches:
+  - path: patches/cert-manager-kapp-group.yml
+  # cert-manager is always deployed, so we need to patch at least it to include the selectors
+  - path: patches/infra-nodes.yml
+  - path: patches/nginx-kapp-group.yml
+  - path: patches/eks-ingress-nginx-external.yml
+  - path: patches/eks-ingress-nginx-internal.yml
+
+  
+  - path: patches/external-dns.yml
+  - target:
+      group: apps
+      version: v1
+      kind: DaemonSet
+      name: ingress-nginx-controller-external
+      namespace: ingress-nginx
+    path: patchesJson/ingress-nginx.yml
+  - target:
+      group: apps
+      version: v1
+      kind: DaemonSet
+      name: ingress-nginx-controller-internal
+      namespace: ingress-nginx
+    path: patchesJson/ingress-nginx.yml

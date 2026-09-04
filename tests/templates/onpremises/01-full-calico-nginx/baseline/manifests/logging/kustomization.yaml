@@ -1,0 +1,42 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../../vendor/modules/logging/katalog/logging-operator
+  - ../../../vendor/modules/logging/katalog/logging-operated
+  - kapp-configs/logging-operator-crd.yaml
+  - ../../../vendor/modules/logging/katalog/minio-ha
+  - resources/ingress-infra.yml
+  - ../../../vendor/modules/logging/katalog/loki-configs/audit
+  - ../../../vendor/modules/logging/katalog/loki-configs/events
+  - ../../../vendor/modules/logging/katalog/loki-configs/infra
+  - ../../../vendor/modules/logging/katalog/loki-configs/ingress-nginx
+  - ../../../vendor/modules/logging/katalog/loki-configs/kubernetes
+  - ../../../vendor/modules/logging/katalog/loki-configs/systemd
+  - ../../../vendor/modules/logging/katalog/loki-distributed
+  - kapp-configs/loki-hpa.yaml
+
+patches:
+  - path: patches/infra-nodes.yml
+  - path: patches/minio.yml
+secretGenerator:
+  - name: loki
+    namespace: logging
+    behavior: merge
+    files:
+      - config.yaml=patches/loki-config.yaml
+  - name: minio-credentials-loki
+    namespace: logging
+    behavior: replace
+    envs:
+      - patches/minio.credentials.loki.env
+  - name: minio-logging
+    namespace: logging
+    behavior: replace
+    envs:
+      - patches/minio.root.env

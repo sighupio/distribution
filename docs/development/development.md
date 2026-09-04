@@ -1,19 +1,38 @@
 # Development FAQ
 
-## **What are the points of the library used by furyctl that are not automatically generated and what's their purpose?**
+> **Note:** this repository is **data-only**. It no longer contains Go code, a
+> `go.mod`, or code-generated config types. The Go structs that `furyctl` uses
+> to read a `furyctl.yaml` are now **hand-maintained inside furyctl**
+> (`internal/apis/kfd/v1alpha2/<provider>/...` and `internal/apis/config`). See
+> furyctl's `internal/apis/kfd/v1alpha2/README.md` for where to act when a field
+> furyctl reads changes. The JSON **public** schemas here remain the source of
+> truth for runtime validation.
+
+## **What does this repository provide to furyctl?**
 
 <details>
   <summary>Answer</summary>
 
-The files used by `furyctl`, in addition to the schema generated in `pkg/apis`, are:
+- **Public JSON schemas** (`schemas/public`): the source of truth used by
+  `furyctl` to validate `furyctl.yaml` at runtime, and the reference for the
+  hand-maintained Go structs in furyctl. (There is no longer a `private` schema
+  — see below.)
 
-- **Defaults for the distribution**: These are contained in the `defaults` folder. These files define the default values and settings that are used for the configuration, ensuring that the distribution behaves in a predictable manner when no explicit configurations are provided.
+- **Defaults** (`defaults` folder): default values and settings applied when no
+  explicit configuration is provided, so the distribution behaves predictably.
 
-- **Templates for the distribution**: These are found in the `templates` folder and include specific templates like Terraform for `EKSCluster`. These templates serve as blueprints for configuring and deploying components (like cloud resources), enabling customizations for different environments.
+- **Templates** (`templates` folder): blueprints (e.g. Terraform for
+  `EKSCluster`) used to configure and deploy components across environments.
 
-- **Rules for `furyctl.yaml` changes**: The rules determine which changes are permitted in the `furyctl.yaml` file after initial deployment. These rules are critical for ensuring that modifications to the configuration are safe and consistent with the intended deployment workflow, particularly when managing state changes across environments.
+- **Rules for `furyctl.yaml` changes** (`rules` folder): which changes are
+  permitted after the initial deployment (immutable fields, migration paths).
 
-- **Basic models for SD and `furyctl.yaml` kind and version**: These are contained in the `pkg/apis/config` folder. These Go structures are used to parse the `kfd.yaml` file and the initial information such as `Kind` and `APIVersion` from the `furyctl.yaml`.
+- **`kfd.yaml`**: the distribution manifest (versions, modules, tools,
+  dependencies) that furyctl reads.
+
+There is **no Go code** here anymore. In particular, `pkg/apis` (the
+code-generated config types and the hand-written `config` models) has been moved
+into furyctl.
 </details>
 
 ---
@@ -27,13 +46,22 @@ Once you install fury for the first time, if you change mind about a configurati
 
 The rules for immutable fields and migrations are evaluated within the core logic of the `furyctl` tool. These rules are defined in the configuration files and enforced by the tool to ensure consistency and prevent misconfigurations.
 
-These rules serve as safety mechanisms during module changes (e.g., switching from the Loki logging system to OpenSearch). Some changes are allowed, while others are not. For example, fields marked as `immutable` will return an error if an attempt is made to change them.
+These rules serve as safety mechanisms during module changes (e.g., switching from the Loki logging system to OpenSearch). Some changes are allowed, while others are not.
 
-The rules are configured in the `rules` folder, and the commands/scripts executed for each rule are found in `templates/distribution/scripts/pre-apply.sh.tpl`.
+The rules live in the `rules/<kind>-kfd-v1alpha2.yaml` files, one per phase section (`infrastructure`, `kubernetes`, `distribution`). Each rule targets a config `path` and can carry three independent kinds of behaviour:
 
-Additionally, **Reducers** are special fields rendered inside the template engine that indicate whether a particular feature or module of the distribution has changed. The `.to` and `.from` strings indicate these changes precisely.
+- **`immutable: true`** — the field cannot change after the first apply; any change returns an error at preflight.
+- **`unsupported`** — a list of forbidden transitions, each with `from`/`to`/`reason`. furyctl blocks the change at preflight when a diff matches a condition (`from` only, `to` only, or both). A rule can declare `unsupported` **without** any reducer: the block does not depend on reducers being present. `from: none`/`to: none` here match the string value `"none"`, not an absent (nil) field.
+- **`reducers`** — a list of `{key, lifecycle}` entries. When the targeted path changes, furyctl fills the reducer's `.from`/`.to` from the diff and runs the artifact named after its `lifecycle`. Reducers are how "when this changes, run that" is expressed, fully data-driven from the rules (no Go changes needed to add one).
 
-For example from logging `loki` to `opensearch` the `.form` key contains the previous value `loki` and the key `.to` contains `opensearch` so you can run the `deleteLoki` script by checking the `.from` key. The new module `opensearch` will then be installed by the standard apply flow. (`templates/distribution/scripts/pre-apply.sh.tpl:106`)
+A single rule can combine all three (e.g. `kubeProxy.type` is `immutable: false` with several `unsupported` directions **and** a `reducers` entry for the allowed direction).
+
+**How reducers run, per phase:**
+
+- **distribution phase** — the reducers are injected into the template engine as `reducers.<key>.{from,to}`, the templates are re-rendered, and the script `templates/distribution/scripts/<lifecycle>.sh` is executed. Example: switching logging from `loki` to `opensearch`, the reducer's `.from` is `loki` and `.to` is `opensearch`, so `pre-apply.sh` can run the `deleteLoki` step by checking `.from`; the new module is then installed by the standard apply flow (`templates/distribution/scripts/pre-apply.sh.tpl`).
+- **kubernetes phase (onpremises)** — the analogue uses Ansible: furyctl writes the reducers to an extra-vars file and runs the playbook `templates/kubernetes/onpremises/migrations/<lifecycle>.yaml`, passing `reducers.<key>.{from,to}`. Example: `kubeProxy.type` carries a reducer with `lifecycle: post-kubernetes`, so `migrations/post-kubernetes.yaml` performs the `ipvs`/`nil` → `nftables` migration on the cluster. Adding a new kubernetes-phase migration only requires a new rule with a `reducers` block plus a new `migrations/<lifecycle>.yaml` playbook — no furyctl code changes.
+
+> Note on new fields: when a field is added to a config that never had it (e.g. the new `kubeProxy.type`), the stored config has no value for it, so the diff is `nil -> <value>`. furyctl expands the parent-object change down to the leaf so leaf-targeted reducers/unsupported rules still match this case.
 
 </details>
 
@@ -59,13 +87,13 @@ Once identified, `furyctl` downloads or references these dependencies from eithe
 <details>
   <summary>Answer</summary>
 
-The important mise tasks are:
+The important mise task is:
 
-- **`mise install`**: This command installs all the tools required for the subsequent commands. Tool versions are managed in the `mise.toml` file.
+- **`mise run generate-docs`**: generates Markdown documentation from the JSON
+  schema files, the primary reference for configuring the distribution.
 
-- **`mise run generate-go-models`**: This command generates Go code from the JSON schema files. The generated code defines the data models used in the codebase, providing a structured representation of the resources and configurations used by `furyctl`. It essentially converts the schema into Go structs, which are essential for interacting with the configuration data programmatically. The tool used to generate the code is https://github.com/sighupio/go-jsonschema.
-
-- **`mise run generate-docs`**: This command generates Markdown documentation from the schema files. It extracts the necessary information from the schemas and formats it into human-readable documentation, helping developers and users understand how to configure and use the distribution and resources. This documentation serves as the primary reference for anyone interacting with `furyctl`.
+There is no longer a Go code-generation task: the config types are hand-written
+in furyctl and this repository ships only data.
 
 To have a working dev environment you need to launch `mise install`. The required tool versions are managed in `mise.toml`.
 
@@ -73,15 +101,28 @@ To have a working dev environment you need to launch `mise install`. The require
 
 ---
 
-## **What's the purpose of a private schema, and what are the differences from the public schema?**
+## **What happened to the private schema and the generated Go library?**
 
 <details>
   <summary>Answer</summary>
 
-The `public` schema serves as the base schema, which is shared and visible to all users. It defines the core structure and expected properties for a particular resource or configuration.
+They were removed. Previously, the config Go types were code-generated from the
+JSON schemas with `go-jsonschema`, and the `EKSCluster` resource had a `private`
+schema (a JSON patch over the public one) that added internal-only fields.
 
-The `private` schema is a modified version of the public schema, typically used internally within `furyctl`. It includes additional fields or configurations that should not be exposed in the public configuration files (like `furyctl.yaml`), but are still necessary for certain internal operations or customizations within the codebase.
+That whole pipeline is gone:
 
-A notable case where the private schema is used is with the `EKSCluster` resource. Here, a patch (`schemas/private/ekscluster-kfd-v1alpha2.patch.json`) is applied to the public schema (`schemas/public/ekscluster-kfd-v1alpha2.json`) with `json-patch` and `jq` to add internal fields that are required for `furyctl` to function but are not intended for end-user modification. This separation ensures that sensitive or internal details remain private while maintaining flexibility for internal customization. Note that this process is automatic and managed by the `mise run generate-go-models` command. To configure a new private schema / patch create a new configuration in the `mise.toml` [tasks._generate-go-models] section and a patch like `schemas/private/ekscluster-kfd-v1alpha2.patch.json` that is a standard json patch (https://jsonpatch.com).
+- furyctl no longer depends on this repository as a Go module; it hand-maintains
+  curated structs that model only the fields it reads.
+- The fields that the old `private` schema added (IAM role ARNs, VPC id, …) were
+  never user input — furyctl computes them from infrastructure (Terraform /
+  OpenTofu) outputs and injects them at runtime. They now live as
+  furyctl-owned fields in furyctl's `ekscluster/private` package.
+- Runtime validation of `furyctl.yaml` uses the **public** schema only (it
+  already did); the private schema was only ever consumed by code generation.
+
+To change a field furyctl reads, edit the curated struct in furyctl (see
+furyctl's `internal/apis/kfd/v1alpha2/README.md`) and, if it is a user-facing
+field, the corresponding **public** JSON schema here.
 
 </details>

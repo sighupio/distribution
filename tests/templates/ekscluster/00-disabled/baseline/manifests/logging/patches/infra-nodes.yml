@@ -1,0 +1,44 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: infra
+spec:
+  fluentd:
+    nodeSelector:
+      node.kubernetes.io/role: infra
+    tolerations:
+      - effect: NoSchedule
+        key: node.kubernetes.io/role
+        value: infra
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logging-operator
+  namespace: logging
+spec:
+  template:
+    spec:
+      nodeSelector:
+        node.kubernetes.io/role: infra
+      tolerations:
+        - effect: NoSchedule
+          key: node.kubernetes.io/role
+          value: infra
+---
+apiVersion: logging-extensions.banzaicloud.io/v1alpha1
+kind: EventTailer
+metadata:
+  name: kubernetes
+spec:
+  workloadOverrides:
+    nodeSelector:
+      node.kubernetes.io/role: infra
+    tolerations:
+      - effect: NoSchedule
+        key: node.kubernetes.io/role
+        value: infra

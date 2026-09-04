@@ -2,13 +2,14 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
+{{- $providerType := .spec.distribution.common.provider.type }}
 {{- $vendorPrefix := print "../" .spec.distribution.common.relativeVendorPath }}
 {{- $monitoringType := .spec.distribution.modules.monitoring.type }}
 {{- $installEnhancedHPAMetrics := .spec.distribution.modules.monitoring.prometheusAdapter.installEnhancedHPAMetrics }}
 {{- $haproxyType := .spec.distribution.modules.ingress.haproxy.type }}
 {{- $isBYOIC := .spec.distribution.modules.ingress.byoic.enabled }}
 {{- $hasAnyIngress := or (ne .spec.distribution.modules.ingress.nginx.type "none") (ne $haproxyType "none") $isBYOIC }}
-# rendering Kustomization file for monitoring type {{ $monitoringType }}
+{{- $defaultKubeProxyType := "ipvs" }}
 ---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
@@ -17,26 +18,25 @@ resources:
 {{- /* common components for all the monitoring types */}}
   - kapp-configs/prometheus-operator-crd.yaml
   - {{ print $vendorPrefix "/modules/monitoring/katalog/prometheus-operator" }}
-{{- if .spec | digAny "kubernetes" "advanced" "kubeProxy" "enabled" true }}
+{{- /* The `digAny` condition needs to be specified exactly as written below to properly check if the field has been populated */}}
+{{- if ne (.spec | digAny "kubernetes" "advanced" "kubeProxy" "type" $defaultKubeProxyType) "none" }}
   - {{ print $vendorPrefix "/modules/monitoring/katalog/kube-proxy-metrics" }}
 {{- end }}
   - {{ print $vendorPrefix "/modules/monitoring/katalog/kube-state-metrics" }}
   - {{ print $vendorPrefix "/modules/monitoring/katalog/node-exporter" }}
   - {{ print $vendorPrefix "/modules/monitoring/katalog/x509-exporter" }}
   - {{ print $vendorPrefix "/modules/monitoring/katalog/blackbox-exporter" }}
-{{- if eq .spec.distribution.common.provider.type "none" }}{{/* none === on-premises and kfddistribution */}}
+{{- if eq $providerType "none" }}{{/* none === on-premises and kfddistribution */}}
   - {{ print $vendorPrefix "/modules/monitoring/katalog/kubeadm-sm" }}
-  {{- if hasKeyAny .spec "kubernetes" }}
-    {{- if .spec.kubernetes.loadBalancers.enabled }}
+  {{- if or (.spec | digAny "kubernetes" "loadBalancers" "enabled" false) (gt (.spec | digAny "infrastructure" "loadBalancers" "members" list | len) 0) }}
   - {{ print $vendorPrefix "/modules/monitoring/katalog/haproxy" }}
   - resources/haproxy-scrapeConfig.yaml
-    {{- end }}
   {{- end }}
   {{- if .spec | digAny "kubernetes" "etcd" nil }}
   - resources/etcd-scrapeConfig.yaml
   {{- end }}
 {{- end }}
-{{- if eq .spec.distribution.common.provider.type "eks" }}
+{{- if eq $providerType "eks" }}
   - {{ print $vendorPrefix "/modules/monitoring/katalog/eks-sm" }}
 {{- end }}
 {{- if or (eq $monitoringType "prometheus") (eq $monitoringType "mimir") }}
@@ -86,7 +86,7 @@ patches:
         name: etcd-metrics
         namespace: kube-system
 {{- end }}
-{{- if eq .spec.distribution.common.provider.type "eks" }}{{/* in EKS there are no files to monitor on nodes */}}
+{{- if eq $providerType "eks" }}{{/* in EKS there are no files to monitor on nodes */}}
   - patch: |-
       $patch: delete
       apiVersion: apps/v1
@@ -105,7 +105,34 @@ patches:
     {{- end }}
   {{- end }}
 {{- end }}
-{{- if not .spec.distribution.modules.monitoring.alertmanager.installDefaultRules }}
+{{- if .spec.distribution.modules.monitoring.alertmanager.installDefaultRules }}
+{{- if eq $monitoringType "prometheus" "mimir" }}
+{{- if eq .spec.distribution.modules.monitoring.alertmanager.deadManSwitchWebhookUrl "" }}
+  - patch: |-
+      $patch: delete
+      apiVersion: monitoring.coreos.com/v1alpha1
+      kind: AlertmanagerConfig
+      metadata:
+        namespace: monitoring
+        name: deadmanswitch
+{{- end }}
+{{- if eq .spec.distribution.modules.monitoring.alertmanager.slackWebhookUrl "" }}
+  - patch: |-
+      $patch: delete
+      apiVersion: monitoring.coreos.com/v1alpha1
+      kind: AlertmanagerConfig
+      metadata:
+        namespace: monitoring
+        name: infra
+  - patch: |-
+      $patch: delete
+      apiVersion: monitoring.coreos.com/v1alpha1
+      kind: AlertmanagerConfig
+      metadata:
+        namespace: monitoring
+        name: k8s
+{{- end }}
+{{- else }}
 {{- if .spec.distribution.modules.monitoring.alertmanager.deadManSwitchWebhookUrl }}
   - patch: |-
       $patch: delete
@@ -130,6 +157,7 @@ patches:
       metadata:
         namespace: monitoring
         name: k8s-slack-webhook
+{{- end }}
 {{- end }}
 {{- end }}
 {{- if or (eq $monitoringType "prometheus") (eq $monitoringType "mimir") }}
