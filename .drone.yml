@@ -1335,7 +1335,7 @@ steps: # e2e-onpremises-upgrades-1.33.3-1.34.2
         path: /diag
     commands:
       - eval "$(mise activate bash --shims)"
-      # pki + apply v1.34.2, StorageClass-wait, distribution re-apply (see install.sh)
+      # pki + apply v1.33.3, StorageClass-wait, distribution re-apply (see install.sh)
       - bash tests/e2e/onpremises/scripts/install.sh
 
   - name: bats-test-1.33.3
