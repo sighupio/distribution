@@ -161,7 +161,7 @@ steps: # qa
       - render
     commands:
       # we use --ignore-deprecations because we don't want the CI to fail when the API has not been removed yet.
-      - /pluto detect distribution.yml --ignore-deprecations --target-versions=k8s=v1.33.7
+      - /pluto detect distribution.yml --ignore-deprecations --target-versions=k8s=v1.33.12
 
 ---
 name: e2e-kfddistribution-1.33
@@ -190,7 +190,7 @@ environment:
   MISE_DATA_DIR: /mise-data
   CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}
   KUBECONFIG: /drone/src/kubeconfig
-  CLUSTER_VERSION: v1.33.7
+  CLUSTER_VERSION: v1.33.12
 
 volumes:
   - name: dockersock
@@ -1253,9 +1253,6 @@ steps: # e2e-onpremises-upgrades-1.33.2-1.33.3
       - name: mise-cache
         path: /mise-data
     commands:
-      # Serialize concurrent `mise install` across parallel pipelines that share
-      # the host MISE_DATA_DIR (/mise-data) on the same Drone worker, otherwise
-      # they corrupt each other. flock on a lockfile in the shared dir.
       - "(flock -w 1800 9 || exit 1; mise install) 9>/mise-data/.mise-install.lock"
       - eval "$(mise activate bash --shims)"
 
