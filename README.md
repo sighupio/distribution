@@ -178,6 +178,7 @@ SD is open-source software, and it's released under the following [LICENSE](LICE
 
 <!-- Misc -->
 
+[sd-docs-requirements]: https://docs.sighup.io/docs/installation/requirements/
 [furyctl]: https://github.com/sighupio/furyctl
 [furyctl-plugins]: https://github.com/sighupio/furyctl?tab=readme-ov-file#plugins
 [sighup-site]: https://sighup.io
