@@ -1,0 +1,21 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../../vendor/modules/opa/katalog/kyverno/core
+  - ../../../vendor/modules/opa/katalog/kyverno/policies
+
+patches:
+  - path: patches/infra-nodes.yml
+  - path: patches/kyverno-whitelist-namespace.yml
+  - patch: |-
+      - op: replace
+        path: /spec/validationFailureAction
+        value: Enforce
+    target:
+      kind: ClusterPolicy

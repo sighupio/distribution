@@ -1,0 +1,44 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    cluster.kfd.sighup.io/useful-link.enable: "true"
+  annotations:
+    cluster.kfd.sighup.io/useful-link.url: https://hubble.internal.example.com
+    cluster.kfd.sighup.io/useful-link.name: "Cilium Hubble UI"
+    forecastle.stakater.com/expose: "true"
+    forecastle.stakater.com/appName: "Cilium Hubble UI"
+    forecastle.stakater.com/icon: "https://cilium.io/static/hubble-light-1-812e65cbb72a7f4efed59fcea48df840.svg"
+    
+    
+    cert-manager.io/cluster-issuer: letsencrypt-fury
+    
+
+  name: hubble
+  
+  namespace: kube-system
+  
+spec:
+  ingressClassName: haproxy-internal
+  rules:
+    - host: hubble.internal.example.com
+      http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+          
+            service:
+              name: hubble-ui
+              port:
+                name: http
+          
+  tls:
+    - hosts:
+      - hubble.internal.example.com
+      secretName: hubble-tls

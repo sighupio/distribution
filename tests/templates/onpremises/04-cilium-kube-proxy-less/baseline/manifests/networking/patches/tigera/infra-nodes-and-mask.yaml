@@ -1,0 +1,41 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.---
+apiVersion: operator.tigera.io/v1
+kind: Installation
+metadata:
+  name: default
+spec:
+  controlPlaneNodeSelector:
+    null
+  controlPlaneTolerations:
+    null
+  typhaDeployment:
+    spec:
+      template:
+        spec:
+          nodeSelector:
+            null
+          tolerations:
+            null
+  
+  calicoNetwork:
+    ipPools:
+      - blockSize: 26
+        cidr: 10.0.0.0/16
+        name: default-ipv4-ippool
+  
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tigera-operator
+  namespace: tigera-operator
+spec:
+  template:
+    spec:
+      nodeSelector:
+        null
+      tolerations:
+        null

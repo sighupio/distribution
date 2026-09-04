@@ -1,0 +1,55 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kyverno-admission-controller
+  namespace: kyverno
+spec:
+  template:
+    spec:
+      nodeSelector:
+        null
+      tolerations:
+        null
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kyverno-background-controller
+  namespace: kyverno
+spec:
+  template:
+    spec:
+      nodeSelector:
+        null
+      tolerations:
+        null
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kyverno-cleanup-controller
+  namespace: kyverno
+spec:
+  template:
+    spec:
+      nodeSelector:
+        null
+      tolerations:
+        null
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kyverno-reports-controller
+  namespace: kyverno
+spec:
+  template:
+    spec:
+      nodeSelector:
+        null
+      tolerations:
+        null

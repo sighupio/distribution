@@ -17,11 +17,11 @@ vendorPath="{{ .paths.vendorPath }}"
 
 # Text generated with: https://www.patorjk.com/software/taag/#p=display&f=ANSI%20Regular&t=TRACING%20TYPE
 
-# ███    ██ ███████ ████████ ██     ██  ██████  ██████  ██   ██     ██████   ██████  ██      ██  ██████ ██ ███████ ███████ 
-# ████   ██ ██         ██    ██     ██ ██    ██ ██   ██ ██  ██      ██   ██ ██    ██ ██      ██ ██      ██ ██      ██      
-# ██ ██  ██ █████      ██    ██  █  ██ ██    ██ ██████  █████       ██████  ██    ██ ██      ██ ██      ██ █████   ███████ 
-# ██  ██ ██ ██         ██    ██ ███ ██ ██    ██ ██   ██ ██  ██      ██      ██    ██ ██      ██ ██      ██ ██           ██ 
-# ██   ████ ███████    ██     ███ ███   ██████  ██   ██ ██   ██     ██       ██████  ███████ ██  ██████ ██ ███████ ███████ 
+# ███    ██ ███████ ████████ ██     ██  ██████  ██████  ██   ██     ██████   ██████  ██      ██  ██████ ██ ███████ ███████
+# ████   ██ ██         ██    ██     ██ ██    ██ ██   ██ ██  ██      ██   ██ ██    ██ ██      ██ ██      ██ ██      ██
+# ██ ██  ██ █████      ██    ██  █  ██ ██    ██ ██████  █████       ██████  ██    ██ ██      ██ ██      ██ █████   ███████
+# ██  ██ ██ ██         ██    ██ ███ ██ ██    ██ ██   ██ ██  ██      ██      ██    ██ ██      ██ ██      ██ ██           ██
+# ██   ████ ███████    ██     ███ ███   ██████  ██   ██ ██   ██     ██       ██████  ███████ ██  ██████ ██ ███████ ███████
 
 {{- if index .reducers "distributionCommonNetworkPoliciesEnabled" }}
 
@@ -250,8 +250,12 @@ deleteGatekeeperDefaultPolicies
 {{- if index .reducers "distributionModulesPolicyKyvernoInstallDefaultPolicies" }}
 
 deleteKyvernoDefaultPolicies() {
-  $kustomizebin build $vendorPath/modules/opa/katalog/kyverno/policies | $kubectlbin delete --ignore-not-found --wait --timeout=600s -f -
-  echo "Kyverno default policies resources deleted"
+  if $kubectlbin get crd clusterpolicies.kyverno.io > /dev/null 2>&1; then
+    $kustomizebin build $vendorPath/modules/opa/katalog/kyverno/policies | $kubectlbin delete --ignore-not-found --wait --timeout=600s -f -
+    echo "Kyverno default policies resources deleted"
+  else
+    echo "Kyverno CRDs not found, skipping deleteKyvernoDefaultPolicies"
+  fi
 }
 
 # from enabled
@@ -426,12 +430,8 @@ deleteMonitoringCommon() {
   $kustomizebin build $vendorPath/modules/monitoring/katalog/kube-state-metrics | $kubectlbin delete --ignore-not-found --wait --timeout=600s -f -
   $kustomizebin build $vendorPath/modules/monitoring/katalog/node-exporter | $kubectlbin delete --ignore-not-found --wait --timeout=600s -f -
   $kustomizebin build $vendorPath/modules/monitoring/katalog/x509-exporter | $kubectlbin delete --ignore-not-found --wait --timeout=600s -f -
-  {{- if eq .spec.distribution.common.provider.type "none" }}
-  {{- if hasKeyAny .spec "kubernetes" }}
-  {{- if .spec.kubernetes.loadBalancers.enabled }}
+  {{- if or (.spec | digAny "kubernetes" "loadBalancers" "enabled" false) (gt (.spec | digAny  "infrastructure" "loadBalancers" "members" list | len) 0) }}
   $kustomizebin build $vendorPath/modules/monitoring/katalog/haproxy | $kubectlbin delete --ignore-not-found --wait --timeout=600s -f -
-  {{- end }}
-  {{- end }}
   {{- end }}
   echo "Monitoring common resources deleted."
 }
@@ -526,11 +526,11 @@ deleteMimir() {
 {{- if index .reducers "distributionModulesMonitoringGrafanaBasicAuthIngress" }}
 
 
-#  ██████  ██████   █████  ███████  █████  ███    ██  █████      ██████   █████  ███████ ██  ██████      █████  ██    ██ ████████ ██   ██     ██ ███    ██  ██████  ██████  ███████ ███████ ███████ 
-# ██       ██   ██ ██   ██ ██      ██   ██ ████   ██ ██   ██     ██   ██ ██   ██ ██      ██ ██          ██   ██ ██    ██    ██    ██   ██     ██ ████   ██ ██       ██   ██ ██      ██      ██      
-# ██   ███ ██████  ███████ █████   ███████ ██ ██  ██ ███████     ██████  ███████ ███████ ██ ██          ███████ ██    ██    ██    ███████     ██ ██ ██  ██ ██   ███ ██████  █████   ███████ ███████ 
-# ██    ██ ██   ██ ██   ██ ██      ██   ██ ██  ██ ██ ██   ██     ██   ██ ██   ██      ██ ██ ██          ██   ██ ██    ██    ██    ██   ██     ██ ██  ██ ██ ██    ██ ██   ██ ██           ██      ██ 
-#  ██████  ██   ██ ██   ██ ██      ██   ██ ██   ████ ██   ██     ██████  ██   ██ ███████ ██  ██████     ██   ██  ██████     ██    ██   ██     ██ ██   ████  ██████  ██   ██ ███████ ███████ ███████ 
+#  ██████  ██████   █████  ███████  █████  ███    ██  █████      ██████   █████  ███████ ██  ██████      █████  ██    ██ ████████ ██   ██     ██ ███    ██  ██████  ██████  ███████ ███████ ███████
+# ██       ██   ██ ██   ██ ██      ██   ██ ████   ██ ██   ██     ██   ██ ██   ██ ██      ██ ██          ██   ██ ██    ██    ██    ██   ██     ██ ████   ██ ██       ██   ██ ██      ██      ██
+# ██   ███ ██████  ███████ █████   ███████ ██ ██  ██ ███████     ██████  ███████ ███████ ██ ██          ███████ ██    ██    ██    ███████     ██ ██ ██  ██ ██   ███ ██████  █████   ███████ ███████
+# ██    ██ ██   ██ ██   ██ ██      ██   ██ ██  ██ ██ ██   ██     ██   ██ ██   ██      ██ ██ ██          ██   ██ ██    ██    ██    ██   ██     ██ ██  ██ ██ ██    ██ ██   ██ ██           ██      ██
+#  ██████  ██   ██ ██   ██ ██      ██   ██ ██   ████ ██   ██     ██████  ██   ██ ███████ ██  ██████     ██   ██  ██████     ██    ██   ██     ██ ██   ████  ██████  ██   ██ ███████ ███████ ███████
 
 {{- if eq .reducers.distributionModulesMonitoringGrafanaBasicAuthIngress.from true }}
   {{- if eq .reducers.distributionModulesMonitoringGrafanaBasicAuthIngress.to false }}
@@ -541,12 +541,12 @@ deleteMimir() {
 
 {{- end }} # end distributionModulesMonitoringGrafanaBasicAuthIngress
 
-# ███    ███ ██ ███    ███ ██ ██████      ██████   █████   ██████ ██   ██ ███████ ███    ██ ██████  
-# ████  ████ ██ ████  ████ ██ ██   ██     ██   ██ ██   ██ ██      ██  ██  ██      ████   ██ ██   ██ 
-# ██ ████ ██ ██ ██ ████ ██ ██ ██████      ██████  ███████ ██      █████   █████   ██ ██  ██ ██   ██ 
-# ██  ██  ██ ██ ██  ██  ██ ██ ██   ██     ██   ██ ██   ██ ██      ██  ██  ██      ██  ██ ██ ██   ██ 
-# ██      ██ ██ ██      ██ ██ ██   ██     ██████  ██   ██  ██████ ██   ██ ███████ ██   ████ ██████  
-                                                                                                                                  
+# ███    ███ ██ ███    ███ ██ ██████      ██████   █████   ██████ ██   ██ ███████ ███    ██ ██████
+# ████  ████ ██ ████  ████ ██ ██   ██     ██   ██ ██   ██ ██      ██  ██  ██      ████   ██ ██   ██
+# ██ ████ ██ ██ ██ ████ ██ ██ ██████      ██████  ███████ ██      █████   █████   ██ ██  ██ ██   ██
+# ██  ██  ██ ██ ██  ██  ██ ██ ██   ██     ██   ██ ██   ██ ██      ██  ██  ██      ██  ██ ██ ██   ██
+# ██      ██ ██ ██      ██ ██ ██   ██     ██████  ██   ██  ██████ ██   ██ ███████ ██   ████ ██████
+
 
 
 {{- if index .reducers "distributionModulesMonitoringMimirBackend" }}
