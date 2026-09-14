@@ -187,10 +187,6 @@ all:
                 {{- end }}
               {{- end }}
             {{- end }}
-            {{- if index $n "kernelParameters" }}
-            sysctl_parameters:
-              {{ $n.kernelParameters | toYaml | indent 14 | trim }}
-            {{- end -}}
       {{- end }}
   vars:
     ansible_python_interpreter: "{{ .spec | digAny "toolsConfiguration" "ansible" "pythonInterpreter" "python3" }}"
