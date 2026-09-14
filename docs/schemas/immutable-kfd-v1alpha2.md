@@ -5785,7 +5785,7 @@ Optional IP address. If not specified, it is inferred from the node's network co
 
 | Property                                                     | Type     | Required |
 |:-------------------------------------------------------------|:---------|:---------|
-| [arch](#specinfrastructurenodesarch)                         | `string` | Optional |
+| [arch](#specinfrastructurenodesarch)                         | `string` | Required |
 | [hostname](#specinfrastructurenodeshostname)                 | `string` | Required |
 | [kernelArguments](#specinfrastructurenodeskernelarguments)   | `object` | Optional |
 | [kernelParameters](#specinfrastructurenodeskernelparameters) | `array`  | Optional |
@@ -5807,7 +5807,7 @@ Definition of a bare metal node with storage, network, and hardware configuratio
 
 ### Description
 
-CPU architecture for the node. Determines which Flatcar artifacts and sysext packages are downloaded. Supports mixed-architecture clusters where different nodes can run different architectures. Kubernetes automatically labels nodes with kubernetes.io/arch. Examples: x86-64 (Intel/AMD amd64), arm64 (ARM aarch64). See examples/immutable-mixed-arch-example.yaml for mixed-architecture cluster configuration.
+CPU architecture for the node. Determines which Flatcar artifacts and sysext packages are downloaded. Supports mixed-architecture clusters where different nodes can run different architectures. Kubernetes automatically labels nodes with kubernetes.io/arch. Examples: x86-64 (Intel/AMD amd64), arm64 (ARM aarch64).
 
 ### Constraints
 
