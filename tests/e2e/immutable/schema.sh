@@ -605,3 +605,16 @@ test_schema() {
 
     test_schema "public" "immutable-kfd-v1alpha2" "128-no" expect
 }
+
+@test "129 - no" {
+    info
+
+    expect() {
+        expect_no "${1}"
+
+        assert_error_contains "/spec/infrastructure/nodes/0" "missing property" || return $?
+        assert_error_contains "/spec/infrastructure/nodes/0" "'arch'" || return $?
+    }
+
+    test_schema "public" "immutable-kfd-v1alpha2" "129-no" expect
+}

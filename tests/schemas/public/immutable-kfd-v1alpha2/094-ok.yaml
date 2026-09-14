@@ -14,6 +14,7 @@ spec:
   infrastructure:
     nodes:
       - hostname: cp01.k8s.example.com
+        arch: x86-64
         macAddress: 52:54:00:10:00:01
         storage:
           installDisk: /dev/sda
@@ -23,6 +24,7 @@ spec:
               addresses:
                 - "192.168.1.11/24"
       - hostname: cp02.k8s.example.com
+        arch: x86-64
         macAddress: 52:54:00:10:00:02
         storage:
           installDisk: /dev/sda
@@ -32,6 +34,7 @@ spec:
               addresses:
                 - "192.168.1.12/24"
       - hostname: cp03.k8s.example.com
+        arch: x86-64
         macAddress: 52:54:00:10:00:03
         storage:
           installDisk: /dev/sda
@@ -41,6 +44,7 @@ spec:
               addresses:
                 - "192.168.1.13/24"
       - hostname: worker01.k8s.example.com
+        arch: x86-64
         macAddress: 52:54:00:10:00:11
         storage:
           installDisk: /dev/sda
@@ -50,6 +54,7 @@ spec:
               addresses:
                 - "192.168.1.21/24"
       - hostname: worker02.k8s.example.com
+        arch: x86-64
         macAddress: 52:54:00:10:00:12
         storage:
           installDisk: /dev/sda
@@ -59,6 +64,7 @@ spec:
               addresses:
                 - "192.168.1.22/24"
       - hostname: worker03.k8s.example.com
+        arch: x86-64
         macAddress: 52:54:00:10:00:13
         storage:
           installDisk: /dev/sda
@@ -68,6 +74,7 @@ spec:
               addresses:
                 - "192.168.1.23/24"
       - hostname: worker04.k8s.example.com
+        arch: x86-64
         macAddress: 52:54:00:10:00:14
         storage:
           installDisk: /dev/sda
@@ -77,6 +84,7 @@ spec:
               addresses:
                 - "192.168.1.24/24"
       - hostname: worker05.k8s.example.com
+        arch: x86-64
         macAddress: 52:54:00:10:00:15
         storage:
           installDisk: /dev/sda

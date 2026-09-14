@@ -10,6 +10,7 @@ Welcome to the latest release of SD maintained by SIGHUP by ReeVo team.
 
 - [[#581](https://github.com/sighupio/distribution/issues/581)] Immutable: node `storage.installDisk` now accepts persistent device paths like `/dev/disk/by-id/wwn-...`, `/dev/disk/by-path/...` and `/dev/mapper/...`. The field is validated the same way Butane/Ignition validates its own device fields — the path must be absolute and clean — instead of the previous alphanumeric-only pattern that rejected every `/dev/disk/by-*` symlink.
 - [[#577](https://github.com/sighupio/distribution/pull/577)] Makes the admin.conf fetch in fetch-admin-conf-playbook.yaml pick the right master, and stops the playbook from failing on purpose to signal "cluster doesn't exist".
+- [[#573](https://github.com/sighupio/distribution/issues/573)] Immutable: you can now apply the configuration file that `furyctl create config` generates without changes to it. Each node must now declare `arch`, and the generated file sets it on all the nodes. The schema declared a default of `x86-64` for `arch`, but nothing applied that default. A node without the field made `furyctl apply` stop with a template error.
 
 ## Breaking Changes 💔
 

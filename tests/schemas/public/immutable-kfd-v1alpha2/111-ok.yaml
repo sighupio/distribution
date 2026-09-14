@@ -15,6 +15,7 @@ spec:
   infrastructure:
     nodes:
       - hostname: node01.k8s.example.com
+        arch: x86-64
         macAddress: 52:54:00:10:00:01
         kernelArguments:
           shouldExist:
