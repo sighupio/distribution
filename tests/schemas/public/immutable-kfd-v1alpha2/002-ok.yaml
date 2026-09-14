@@ -415,7 +415,7 @@ spec:
             - resources:
               - secrets
               providers:
-              - aescbc:
+              - secretbox:
                   keys:
                   - name: key1
                     secret: YourBase64EncodedSecretKeyHere32Bytes==

@@ -7168,21 +7168,27 @@ Maximum number of terminated Pods retained by the controller-manager before auto
 
 ### Description
 
-etcd's encryption at rest configuration. Must be a string with the EncryptionConfiguration object in YAML. Example:
+etcd's encryption at rest configuration. Must be a string with the EncryptionConfiguration object in YAML. Check the [Kubernetes documentation](https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/) for the providers that the API server accepts and for the properties of each one.
+
+Example:
 
 ```yaml
-
 apiVersion: apiserver.config.k8s.io/v1
 kind: EncryptionConfiguration
 resources:
   - resources:
-    - secrets
+      - secrets
     providers:
-    - aescbc:
-        keys:
-        - name: mykey
-          secret: base64_encoded_secret
+      - secretbox:
+          keys:
+            - name: key1
+              secret: base64_encoded_key
+      - identity: {}
 ```
+
+The `secretbox` provider of the example needs a 256-bit key in base64. To generate a random key, run the following command: `head -c32 /dev/urandom | base64`
+
+The `identity` provider comes last in the example, whatever the provider before it is: without `identity`, the API server cannot read the secrets that etcd holds with no encryption.
 
 
 ## .spec.kubernetes.advanced.encryption.tlsCipherSuites

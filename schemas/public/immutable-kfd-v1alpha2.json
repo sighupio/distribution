@@ -1669,7 +1669,7 @@
         },
         "configuration": {
           "type": "string",
-          "description": "etcd's encryption at rest configuration. Must be a string with the EncryptionConfiguration object in YAML. Example:\n\n```yaml\n\napiVersion: apiserver.config.k8s.io/v1\nkind: EncryptionConfiguration\nresources:\n  - resources:\n    - secrets\n    providers:\n    - aescbc:\n        keys:\n        - name: mykey\n          secret: base64_encoded_secret\n```\n"
+          "description": "etcd's encryption at rest configuration. Must be a string with the EncryptionConfiguration object in YAML. Check the [Kubernetes documentation](https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/) for the providers that the API server accepts and for the properties of each one.\n\nExample:\n\n```yaml\napiVersion: apiserver.config.k8s.io/v1\nkind: EncryptionConfiguration\nresources:\n  - resources:\n      - secrets\n    providers:\n      - secretbox:\n          keys:\n            - name: key1\n              secret: base64_encoded_key\n      - identity: {}\n```\n\nThe `secretbox` provider of the example needs a 256-bit key in base64. To generate a random key, run the following command: `head -c32 /dev/urandom | base64`\n\nThe `identity` provider comes last in the example, whatever the provider before it is: without `identity`, the API server cannot read the secrets that etcd holds with no encryption.\n"
         }
       }
     },
