@@ -90,18 +90,22 @@ spec:
     #       - "TLS_AES_128_GCM_SHA256"
     #       - "TLS_AES_256_GCM_SHA384"
     #       - "TLS_CHACHA20_POLY1305_SHA256"
-    #     # This section adds secrets encryption feature in etcd
+    #     # This section adds secrets encryption feature in etcd.
+    #     # The secretbox provider needs a 256-bit key in base64: head -c32 /dev/urandom | base64
     #     configuration: |
     #       apiVersion: apiserver.config.k8s.io/v1
     #       kind: EncryptionConfiguration
     #       resources:
     #         - resources:
-    #           - secrets
+    #             - secrets
     #           providers:
-    #           - aescbc:
-    #               keys:
-    #               - name: mykey
-    #                 secret: base64_encoded_secret
+    #             - secretbox:
+    #                 keys:
+    #                   - name: key1
+    #                     secret: base64_encoded_key
+    #             # Keep identity last: without it the API server cannot read the
+    #             # secrets that etcd holds from before the encryption was on.
+    #             - identity: {}
   # This section describes how the KFD distribution will be installed
   distribution:
     # This common configuration will be applied to all the packages that will be installed in the cluster
