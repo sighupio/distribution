@@ -21,6 +21,7 @@ spec:
       # Control plane nodes (3)
       # Ref: https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/setup-ha-etcd-with-kubeadm/
       - hostname: ctrl01.k8s.example.com
+        arch: x86-64
         macAddress: 52:54:00:10:00:01
         storage:
           installDisk: /dev/sda
@@ -49,6 +50,7 @@ spec:
               dhcp4: true
 
       - hostname: ctrl02.k8s.example.com
+        arch: x86-64
         macAddress: 52:54:00:10:00:02
         storage:
           installDisk: /dev/sda
@@ -67,6 +69,7 @@ spec:
                 search:
                 - saas.rcn.internal 
       - hostname: ctrl03.k8s.example.com
+        arch: x86-64
         macAddress: 52:54:00:10:00:03
         storage:
           installDisk: /dev/sda
@@ -86,6 +89,7 @@ spec:
 
       # Load balancer nodes (2) with Keepalived VIP
       - hostname: lb01.k8s.example.com
+        arch: x86-64
         macAddress: 52:54:00:30:00:01
         storage:
           installDisk: /dev/sda
@@ -105,6 +109,7 @@ spec:
                   - 192.168.100.53
 
       - hostname: lb02.k8s.example.com
+        arch: x86-64
         macAddress: 52:54:00:30:00:02
         storage:
           installDisk: /dev/sda
@@ -124,6 +129,7 @@ spec:
 
       # Infrastructure workers (3) for cluster services
       - hostname: infra01.k8s.example.com
+        arch: x86-64
         macAddress: 52:54:00:40:00:01
         storage:
           installDisk: /dev/sda
@@ -142,6 +148,7 @@ spec:
                 - 192.168.100.53
 
       - hostname: infra02.k8s.example.com
+        arch: x86-64
         macAddress: 52:54:00:40:00:02
         storage:
           installDisk: /dev/sda
@@ -159,6 +166,7 @@ spec:
                 - 192.168.100.53
 
       - hostname: infra03.k8s.example.com
+        arch: x86-64
         macAddress: 52:54:00:40:00:03
         storage:
           installDisk: /dev/sda
@@ -177,6 +185,7 @@ spec:
 
       # Application workers (3) with dedicated containerd partition
       - hostname: app01.k8s.example.com
+        arch: x86-64
         macAddress: 52:54:00:50:00:01
         storage:
           installDisk: /dev/sda
@@ -195,6 +204,7 @@ spec:
                   - 192.168.100.53
 
       - hostname: app02.k8s.example.com
+        arch: x86-64
         macAddress: 52:54:00:50:00:02
         storage:
           installDisk: /dev/sda
@@ -212,6 +222,7 @@ spec:
                   - 192.168.100.53
 
       - hostname: app03.k8s.example.com
+        arch: x86-64
         macAddress: 52:54:00:50:00:03
         storage:
           installDisk: /dev/sda
@@ -230,6 +241,7 @@ spec:
 
       # Database workers (3) optimized for stateful workloads
       - hostname: db01.k8s.example.com
+        arch: x86-64
         macAddress: 52:54:00:60:00:01
         storage:
           installDisk: /dev/sda
@@ -248,6 +260,7 @@ spec:
                   - 192.168.100.53
 
       - hostname: db02.k8s.example.com
+        arch: x86-64
         macAddress: 52:54:00:60:00:02
         storage:
           installDisk: /dev/sda
@@ -265,6 +278,7 @@ spec:
                   - 192.168.100.53
 
       - hostname: db03.k8s.example.com
+        arch: x86-64
         macAddress: 52:54:00:60:00:03
         storage:
           installDisk: /dev/sda

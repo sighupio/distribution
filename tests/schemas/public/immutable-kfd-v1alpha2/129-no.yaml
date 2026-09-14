@@ -6,27 +6,17 @@
 apiVersion: kfd.sighup.io/v1alpha2
 kind: Immutable
 metadata:
-  name: minimal-cluster
+  name: missing-node-arch
 spec:
   distributionVersion: v1.32.1
 
   infrastructure:
     nodes:
       - hostname: node01.k8s.example.com
-        arch: x86-64
+        # ERROR: Missing required 'arch' field
         macAddress: 52:54:00:10:00:01
         storage:
           installDisk: /dev/sda
-          directories:
-            - path: /var/lib/required-only
-            - path: /var/lib/partial
-              mode: 493
-              overwrite: false
-            - path: /var/lib/named-only
-              user:
-                name: appuser
-              group:
-                name: appgroup
         network:
           ethernets:
             eth0:

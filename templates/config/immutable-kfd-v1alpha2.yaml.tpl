@@ -37,7 +37,10 @@ spec:
     nodes:
       - hostname: lb1.example.com
         macAddress: "52:54:00:00:00:01" # MAC address is used for iPXE booting and inventory generation
-        # arch: x86-64  # Optional: CPU architecture (x86-64|arm64). Default: x86-64.
+        # CPU architecture of this node. Required on every node.
+        # If all your nodes are the same, a YAML anchor avoids the repetition:
+        # write `arch: &arch x86-64` here and `arch: *arch` on the other nodes.
+        arch: x86-64
         storage:
           installDisk: /dev/sda
         network:
@@ -54,6 +57,7 @@ spec:
 
       - hostname: lb2.example.com
         macAddress: "52:54:00:00:00:02"
+        arch: x86-64
         storage:
           installDisk: /dev/sda
         network:
@@ -65,7 +69,7 @@ spec:
       # Control Plane Nodes
       - hostname: cp1.example.com
         macAddress: "52:54:00:01:00:01"
-        # arch: x86-64  # Optional: Each node can have different arch for mixed clusters
+        arch: x86-64
         storage:
           installDisk: /dev/sda
           # directories: # Optional: extra directories to create on the node's filesystem.
@@ -91,6 +95,7 @@ spec:
 
       - hostname: cp2.example.com
         macAddress: "52:54:00:01:00:02"
+        arch: x86-64
         storage:
           installDisk: /dev/sda
         network:
@@ -106,6 +111,7 @@ spec:
 
       - hostname: cp3.example.com
         macAddress: "52:54:00:01:00:03"
+        arch: x86-64
         storage:
           installDisk: /dev/sda
         network:
@@ -122,7 +128,7 @@ spec:
       # Infrastructure Worker Nodes
       - hostname: infra1.example.com
         macAddress: "52:54:00:02:00:01"
-        # arch: arm64  # Example: ARM64 node in mixed-architecture cluster
+        arch: x86-64 # A cluster can mix architectures: set arm64 here for an ARM node.
         storage:
           installDisk: /dev/sda
         network:
@@ -138,6 +144,7 @@ spec:
 
       - hostname: infra2.example.com
         macAddress: "52:54:00:02:00:02"
+        arch: x86-64
         storage:
           installDisk: /dev/sda
         network:
@@ -153,6 +160,7 @@ spec:
 
       - hostname: infra3.example.com
         macAddress: "52:54:00:02:00:03"
+        arch: x86-64
         storage:
           installDisk: /dev/sda
         network:
@@ -169,7 +177,7 @@ spec:
       # Application Worker Nodes
       - hostname: worker1.example.com
         macAddress: "52:54:00:03:00:01"
-        # arch: x86-64  # Optional: Specify per-node architecture
+        arch: x86-64
         storage:
           installDisk: /dev/sda
         network:
@@ -185,6 +193,7 @@ spec:
 
       - hostname: worker2.example.com
         macAddress: "52:54:00:03:00:02"
+        arch: x86-64
         storage:
           installDisk: /dev/sda
         network:
@@ -200,6 +209,7 @@ spec:
 
       - hostname: worker3.example.com
         macAddress: "52:54:00:03:00:03"
+        arch: x86-64
         storage:
           installDisk: /dev/sda
         network:

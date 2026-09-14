@@ -18,6 +18,7 @@ spec:
       privateKeyPath: dummy
     nodes:
       - hostname: cp1.example.com
+        arch: x86-64
         macAddress: aa:bb:cc:dd:ee:ff
         storage:
           installDisk: /dev/sda
