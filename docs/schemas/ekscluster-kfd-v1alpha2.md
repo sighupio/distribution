@@ -529,7 +529,7 @@ The type of the secret
 
 ### Description
 
-Add custom resources to the distribution phase. Each entry should point to a resource file, a kustomize base, or a remote resource (e.g. a git repository or URL). `customResources` should be used when you _need_ the resources to be applyed in the distribution phase together with the rest of the modules; prefer using Plugins instead when possible.
+Add custom resources to the distribution phase. This field is a list of strings. Each entry points to a resource file, a kustomize base, or a remote resource, for example a Git repository or a URL. Use `customResources` only when furyctl must apply the resources in the distribution phase, together with the other modules. For all the other resources, use Plugins.
 
 ## .spec.distribution.modules
 
