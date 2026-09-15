@@ -24,6 +24,9 @@ resources:
   {{- if $hasAnyIngress }}
   - resources/ingress-infra.yml
   {{- end }}
+  {{- if eq .spec.distribution.modules.auth.provider.type "sso" }}
+  - resources/gpm-rbac.yml
+  {{- end }}
 {{- end }}
 {{- if eq .spec.distribution.modules.policy.type "kyverno" }}
   - {{ print $vendorPrefix "/modules/opa/katalog/kyverno/core" }}

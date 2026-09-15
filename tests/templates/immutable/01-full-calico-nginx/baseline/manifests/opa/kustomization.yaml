@@ -12,6 +12,7 @@ resources:
   - ../../../vendor/modules/opa/katalog/gatekeeper/rules
   - ../../../vendor/modules/opa/katalog/gatekeeper/monitoring
   - resources/ingress-infra.yml
+  - resources/gpm-rbac.yml
 
 patches:
   - path: patches/infra-nodes.yml
