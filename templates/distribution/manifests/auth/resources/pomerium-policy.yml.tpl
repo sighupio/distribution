@@ -123,6 +123,9 @@ routes:
   {{- if eq .spec.distribution.modules.policy.type "gatekeeper" }}
   - from: https://{{ template "gpmUrl" .spec }}
     to: http://gatekeeper-policy-manager.gatekeeper-system.svc.cluster.local
+    # GPM verifies this assertion from 2.1.0. Pomerium sends the identity headers only when the
+    # route asks for them, and GPM then refuses every request with "did not receive an identity".
+    pass_identity_headers: true
     policy:
       {{- if and (index .spec.distribution.modules.auth.pomerium "defaultRoutesPolicy") (index .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy "gatekeeperPolicyManager") }}
       {{- .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.gatekeeperPolicyManager | toYaml | nindent 6 }}

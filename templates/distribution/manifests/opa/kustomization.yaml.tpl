@@ -53,6 +53,9 @@ patches:
 {{- end }}
 {{- if eq .spec.distribution.modules.policy.type "gatekeeper" }}
   - path: patches/gatekeeper-kapp-ordering.yml
+  {{- if eq .spec.distribution.modules.auth.provider.type "sso" }}
+  - path: patches/gpm-jwt-auth.yml
+  {{- end }}
   {{- if .spec.distribution.modules.policy.gatekeeper.installDefaultPolicies }}
   - patch: |-
       - op: replace

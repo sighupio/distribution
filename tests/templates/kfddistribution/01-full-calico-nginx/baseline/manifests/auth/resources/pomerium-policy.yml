@@ -66,6 +66,9 @@ routes:
             - authenticated_user: true
   - from: https://gpm.internal.example.com
     to: http://gatekeeper-policy-manager.gatekeeper-system.svc.cluster.local
+    # GPM verifies this assertion from 2.1.0. Pomerium sends the identity headers only when the
+    # route asks for them, and GPM then refuses every request with "did not receive an identity".
+    pass_identity_headers: true
     policy:
       - allow:
           and:

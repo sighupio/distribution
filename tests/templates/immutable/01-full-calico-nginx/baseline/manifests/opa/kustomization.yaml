@@ -16,6 +16,7 @@ resources:
 patches:
   - path: patches/infra-nodes.yml
   - path: patches/gatekeeper-kapp-ordering.yml
+  - path: patches/gpm-jwt-auth.yml
   - patch: |-
       - op: replace
         path: /spec/enforcementAction
