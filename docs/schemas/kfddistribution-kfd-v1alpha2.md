@@ -90,7 +90,7 @@ The name of the cluster. It will also be used as a prefix for all the other reso
 |:----------------------------------------------------|:---------|:---------|
 | [common](#specdistributioncommon)                   | `object` | Optional |
 | [customPatches](#specdistributioncustompatches)     | `object` | Optional |
-| [customResources](#specdistributioncustomresources) | `object` | Optional |
+| [customResources](#specdistributioncustomresources) | `array`  | Optional |
 | [kubeconfig](#specdistributionkubeconfig)           | `string` | Required |
 | [modules](#specdistributionmodules)                 | `object` | Required |
 
