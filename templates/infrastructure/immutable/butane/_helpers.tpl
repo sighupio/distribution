@@ -25,6 +25,39 @@ passwd:
         inline: {{ .node.hostname }}
 {{- end }}
 
+{{- /* Every proxy field is optional, so read them with index and not .proxy.http:
+templates run missingkey=error and an omitted key aborts the whole render.
+systemd parses DefaultEnvironment as a whitespace separated list, hence the quotes
+and the trailing space after each assignment. Each variable is written twice because
+curl reads only the lower case http_proxy, while Go reads either case. */}}
+
+{{- define "global-http-proxy" }}
+{{- if .proxy }}
+{{- $http := index .proxy "http" }}
+{{- $https := index .proxy "https" }}
+{{- $noProxy := index .proxy "noProxy" }}
+    - path: /etc/systemd/system.conf.d/10-default-env.conf
+      mode: 0644
+      contents:
+        inline: |
+          [Manager]
+          DefaultEnvironment={{ if $http }}"HTTP_PROXY={{ $http }}" "http_proxy={{ $http }}" {{ end }}{{ if $https }}"HTTPS_PROXY={{ $https }}" "https_proxy={{ $https }}" {{ end }}{{ if $noProxy }}"NO_PROXY={{ $noProxy }}" "no_proxy={{ $noProxy }}"{{ end }}
+    - path: /etc/profile.env
+      mode: 0644
+      contents:
+        inline: |
+          {{- if $http }}
+          export HTTP_PROXY={{ $http }}
+          {{- end }}
+          {{- if $https }}
+          export HTTPS_PROXY={{ $https }}
+          {{- end }}
+          {{- if $noProxy }}
+          export NO_PROXY={{ $noProxy }}
+          {{- end }}
+{{- end }}
+{{- end }}
+
 {{- define "sysupdate-noop"}}
     # This dummy sysupdate configuration is needed to prevent spurious error messages
     - path: /etc/sysupdate.d/noop.conf
