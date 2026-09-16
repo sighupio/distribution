@@ -12,6 +12,7 @@ storage:
   files:
 {{ template "hostname" . }}
 {{ template "network" . }}
+{{ template "global-http-proxy" . }}
 {{ template "sysupdate-noop" . }}
 {{ template "update-server-config" . }}
 {{ template "sshd-pq-configuration" . }}
