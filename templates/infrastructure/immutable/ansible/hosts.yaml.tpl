@@ -123,6 +123,19 @@ all:
     kubernetes_image_registry: "{{ .spec.kubernetes | digAny "advanced" "registry" "" | default .versions.kubernetes_image_registry }}"
     # Only the pause tag is pinned; the containerd role derives the image so a custom registry wins.
     containerd_sandbox_tag: {{ .versions.containerd_sandbox_tag }}
+    # The load balancer upgrade stages the Flatcar update and aligns its extensions, so it needs the
+    # same pins the kubernetes phase uses. The create path never reads them.
+    os_update_target_version: {{ .versions.os_update_target_version }}
+    sysext_targets:
+    {{- range $name, $t := .versions.sysext_targets }}
+      {{ $name }}:
+        version: {{ $t.version }}
+        arch:
+    {{- range $arch, $a := $t.arch }}
+          {{ $arch }}:
+            url: {{ $a.url }}
+    {{- end }}
+    {{- end }}
     ansible_python_interpreter: "{{ .spec | digAny "toolsConfiguration" "ansible" "pythonInterpreter" "python3" }}"
     ansible_ssh_private_key_file: "{{ .spec.infrastructure.ssh.privateKeyPath }}"
     ansible_user: "{{ .spec.infrastructure.ssh.username }}"
