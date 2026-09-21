@@ -66,6 +66,9 @@ systemd:
 
         [Service]
         Type=oneshot
+        # flatcar-install's own os-release check misses the quoted ID= of Flatcar 4757+,
+        # so it falls back to a "current" version directory the iPXE server does not serve.
+        EnvironmentFile=/etc/os-release
         {{- if .ipxeServerPreInstallCommands }}
         ExecStartPre=/usr/bin/curl --retry 2 --retry-connrefused --connect-timeout 5 --max-time 15 --retry-max-time 40 -X POST '{{ .ipxeServerURL }}/status?node={{ .hostname }}&status=running%%20pre-install%%20commands'
         {{- range .ipxeServerPreInstallCommands }}
@@ -73,7 +76,7 @@ systemd:
         {{- end }}
         {{- end }}
         ExecStartPre=/usr/bin/curl --retry 2 --retry-connrefused --connect-timeout 5 --max-time 15 --retry-max-time 40 -X POST '{{ .ipxeServerURL }}/status?node={{ .hostname }}&status=installing'
-        ExecStart=/usr/bin/flatcar-install -d '{{ .installDisk }}' -i /opt/ignition/config.ign -b {{ .ipxeServerURL }}/assets/flatcar/{{ .arch }}
+        ExecStart=/usr/bin/flatcar-install -d '{{ .installDisk }}' -i /opt/ignition/config.ign -V ${VERSION_ID} -b {{ .ipxeServerURL }}/assets/flatcar/{{ .arch }}
         {{- if .ipxeServerPostInstallCommands }}
         ExecStartPost=/usr/bin/curl --retry 2 --retry-connrefused --connect-timeout 5 --max-time 15 --retry-max-time 40 -X POST '{{ .ipxeServerURL }}/status?node={{ .hostname }}&status=running%%20post-install%%20commands'
         {{- range .ipxeServerPostInstallCommands }}
