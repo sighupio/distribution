@@ -8,6 +8,8 @@ Welcome to the latest release of SD maintained by SIGHUP by ReeVo team.
 
 - [[#600](https://github.com/sighupio/distribution/pull/600)] Immutable: `spec.infrastructure.proxy` now applies to the whole node and not only to containerd. kubelet, etcd, the system extension downloads and command line tools like `curl` now use the proxy. Note that proxy configuration does not apply to the operating system installation step.
 
+- [[#601](https://github.com/sighupio/distribution/pull/601)] Immutable: the infrastructure phase now upgrades the load balancers. The new `upgrade-load-balancers.yml` playbook updates the operating system, the system extensions and the configuration. It upgrades one load balancer at a time, so the virtual IP address stays available. The playbook stops before it changes anything when a load balancer does not answer.
+
 ## Bug fixes 🐞
 
 - [[#581](https://github.com/sighupio/distribution/issues/581)] Immutable: node `storage.installDisk` now accepts persistent device paths like `/dev/disk/by-id/wwn-...`, `/dev/disk/by-path/...` and `/dev/mapper/...`. The field is validated the same way Butane/Ignition validates its own device fields — the path must be absolute and clean — instead of the previous alphanumeric-only pattern that rejected every `/dev/disk/by-*` symlink.
