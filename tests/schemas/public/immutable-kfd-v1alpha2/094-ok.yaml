@@ -119,6 +119,15 @@ spec:
         - hostname: cp03.k8s.example.com
           ip: 192.168.1.13
 
+    nodeGroups:
+      - name: workers
+        nodes:
+          - hostname: worker01.k8s.example.com
+          - hostname: worker02.k8s.example.com
+          - hostname: worker03.k8s.example.com
+          - hostname: worker04.k8s.example.com
+          - hostname: worker05.k8s.example.com
+
     networking:
       podCIDR: 10.244.0.0/16
       serviceCIDR: 10.96.0.0/12

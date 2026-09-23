@@ -1165,6 +1165,7 @@
       "required": [
         "pkiPath",
         "controlPlane",
+        "nodeGroups",
         "networking"
       ]
     },

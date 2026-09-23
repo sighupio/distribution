@@ -6,34 +6,45 @@
 apiVersion: kfd.sighup.io/v1alpha2
 kind: Immutable
 metadata:
-  name: missing-network-config
+  name: missing-node-groups
 spec:
   distributionVersion: v1.32.1
 
   infrastructure:
     nodes:
       - hostname: node01.k8s.example.com
+        arch: x86-64
         macAddress: 52:54:00:10:00:01
         storage:
           installDisk: /dev/sda
-        # ERROR: Missing required 'network' field
+        network:
+          ethernets:
+            eth0:
+              addresses:
+                - "192.168.1.10/24"
+              gateway: "192.168.1.1"
+              nameservers:
+                addresses:
+                  - 8.8.8.8
 
     ssh:
       username: core
       privateKeyPath: ~/.ssh/id_rsa
 
   kubernetes:
+    pkiPath: ./pki
     controlPlane:
       address: k8s-api.example.com:6443
       members:
         - hostname: node01.k8s.example.com
+          ip: 192.168.1.10
 
     etcd:
       members:
         - hostname: node01.k8s.example.com
+          ip: 192.168.1.10
 
-    nodeGroups: []
-
+    # ERROR: Missing required 'nodeGroups' field
     networking:
       podCIDR: 10.244.0.0/16
       serviceCIDR: 10.96.0.0/12

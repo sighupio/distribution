@@ -618,3 +618,16 @@ test_schema() {
 
     test_schema "public" "immutable-kfd-v1alpha2" "129-no" expect
 }
+
+@test "130 - no" {
+    info
+
+    expect() {
+        expect_no "${1}"
+
+        assert_error_contains "/spec/kubernetes" "missing property" || return $?
+        assert_error_contains "/spec/kubernetes" "'nodeGroups'" || return $?
+    }
+
+    test_schema "public" "immutable-kfd-v1alpha2" "130-no" expect
+}
