@@ -2,48 +2,97 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-# This playbook does not fail when the cluster does not exist. It fetches the admin.conf
-# file when a control plane node has one. furyctl then looks for the local file to know if
-# the cluster exists. An error from this playbook is therefore a true error, such as a host
-# that Ansible cannot reach.
+# This playbook does not fail when a host does not answer, or when the cluster does not exist.
+# It writes state.json, which says which hosts answer, which ones hold kubelet.conf and which
+# control plane hosts hold admin.conf. It also fetches admin.conf when a control plane host
+# has one. furyctl reads the two files to know the state of the cluster. An error from this
+# playbook is therefore a true error, and not an answer about the cluster.
+
+- name: Check which hosts answer and which ones joined a cluster
+  hosts: all
+  gather_facts: false
+  become: true
+  ignore_unreachable: true
+  tasks:
+    - name: Check that the host answers
+      ansible.builtin.ping:
+      register: host_ping
+
+    # kubeadm writes this file when a host joins a cluster, and the kube-worker role of the
+    # installer reads it to know that a host joined. The file shows a cluster on a host that
+    # is not a control plane host.
+    - name: Check that the /etc/kubernetes/kubelet.conf exists
+      when: not (host_ping.unreachable | default(false))
+      ansible.builtin.stat:
+        path: /etc/kubernetes/kubelet.conf
+      register: kubelet_conf_stat
+
+    - name: Record the answer of the host
+      ansible.builtin.set_fact:
+        host_reachable: "{{ not (host_ping.unreachable | default(false)) }}"
+        kubelet_conf_exists: "{{ kubelet_conf_stat.stat.exists | default(false) }}"
 
 - name: Check for admin.conf on the control plane nodes
   hosts: control_plane
+  gather_facts: false
   become: true
+  ignore_unreachable: true
   tasks:
     - name: Check that the /etc/kubernetes/admin.conf exists
-      stat:
+      when: hostvars[inventory_hostname].host_reachable
+      ansible.builtin.stat:
         path: /etc/kubernetes/admin.conf
       register: admin_conf_stat
 
     - name: Set fact if admin.conf exists on node
-      set_fact:
-        admin_conf_exists: "{{ admin_conf_stat.stat.exists }}"
-      when: admin_conf_stat.stat.exists
+      ansible.builtin.set_fact:
+        admin_conf_exists: "{{ admin_conf_stat.stat.exists | default(false) }}"
 
 - name: Fetch admin.conf from a control plane node that has it
   hosts: control_plane
+  gather_facts: false
+  ignore_unreachable: true
   tasks:
     # A loop over the group finds a node that has the file. The first node of the group can
     # be reachable and still have no admin.conf, and a fetch with run_once alone would then
     # skip the file that the other nodes hold.
     - name: Pick a control plane node that has admin.conf
-      set_fact:
+      ansible.builtin.set_fact:
         admin_conf_host: "{{ item }}"
       loop: "{{ groups['control_plane'] }}"
       when:
         - admin_conf_host is not defined
-        - hostvars[item].admin_conf_exists is defined
+        - hostvars[item].admin_conf_exists | default(false)
 
     # furyctl needs the admin.conf to check for the cluster version.
     - name: Getting admin.conf kubeconfig
-      become: yes
-      fetch:
+      become: true
+      ansible.builtin.fetch:
         src: /etc/kubernetes/admin.conf
         dest: "{{ kubernetes_kubeconfig_path }}/admin.conf"
-        flat: yes
+        flat: true
       delegate_to: "{{ admin_conf_host | default(inventory_hostname) }}"
       # Without run_once, a fetch from more than one node to the same destination can give
       # a checksum error.
       run_once: true
       when: admin_conf_host is defined
+
+- name: Write the state of the cluster
+  hosts: localhost
+  gather_facts: false
+  connection: local
+  tasks:
+    - name: Write state.json
+      vars:
+        probed: "{{ groups['all'] | map('extract', hostvars) | list }}"
+      ansible.builtin.copy:
+        dest: "{{ playbook_dir }}/state.json"
+        mode: "0644"
+        content: >-
+          {{ {
+            'reachable': probed | selectattr('host_reachable', 'defined') | selectattr('host_reachable') | map(attribute='inventory_hostname') | list,
+            'unreachable': probed | rejectattr('host_reachable', 'defined') | map(attribute='inventory_hostname') | list
+              + (probed | selectattr('host_reachable', 'defined') | rejectattr('host_reachable') | map(attribute='inventory_hostname') | list),
+            'kubeletConfHosts': probed | selectattr('kubelet_conf_exists', 'defined') | selectattr('kubelet_conf_exists') | map(attribute='inventory_hostname') | list,
+            'adminConfHosts': probed | selectattr('admin_conf_exists', 'defined') | selectattr('admin_conf_exists') | map(attribute='inventory_hostname') | list
+          } | to_json }}
