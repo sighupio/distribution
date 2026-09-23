@@ -6919,7 +6919,7 @@ SSH username. Example: core
 | [controlPlane](#speckubernetescontrolplane) | `object` | Required |
 | [etcd](#speckubernetesetcd)                 | `object` | Optional |
 | [networking](#speckubernetesnetworking)     | `object` | Required |
-| [nodeGroups](#speckubernetesnodegroups)     | `array`  | Optional |
+| [nodeGroups](#speckubernetesnodegroups)     | `array`  | Required |
 | [pkiPath](#speckubernetespkipath)           | `string` | Required |
 | [version](#speckubernetesversion)           | `string` | Optional |
 
