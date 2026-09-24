@@ -17,6 +17,7 @@ Welcome to the latest release of SD maintained by SIGHUP by ReeVo team.
 - [[#605](https://github.com/sighupio/distribution/pull/605)] Immutable: the preflight check now reads every host, and not only the control plane hosts. It tells a cluster whose control plane does not answer from a cluster that does not exist, and furyctl stops the apply in the first case.
 - [[#577](https://github.com/sighupio/distribution/pull/577)] Makes the admin.conf fetch in fetch-admin-conf-playbook.yaml pick the right master, and stops the playbook from failing on purpose to signal "cluster doesn't exist".
 - [[#573](https://github.com/sighupio/distribution/issues/573)] Immutable: you can now apply the configuration file that `furyctl create config` generates without changes to it. Each node must now declare `arch`, and the generated file sets it on all the nodes. The schema declared a default of `x86-64` for `arch`, but nothing applied that default. A node without the field made `furyctl apply` stop with a template error.
+- [[#607](https://github.com/sighupio/distribution/pull/607)] DR module: fix velero triggering immediate backups after every `furyctl apply`.
 
 ## Breaking Changes 💔
 
