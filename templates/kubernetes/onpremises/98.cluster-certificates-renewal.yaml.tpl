@@ -45,14 +45,14 @@
 
     - name: Ensure Kubernetes backup directory exists
       file:
-        path: "{{ "{{ ansible_env.HOME }}" }}/certs-backup/{{ print "{{ backup_timestamp }}" }}/etc-kubernetes-pki"
+        path: "{{ "{{ ansible_facts['env']['HOME'] }}" }}/certs-backup/{{ print "{{ backup_timestamp }}" }}/etc-kubernetes-pki"
         state: directory
         mode: '0750'
       when: inventory_hostname in groups['master']
 
     - name: Ensure etcd backup directory exists
       file:
-        path: "{{ "{{ ansible_env.HOME }}" }}/certs-backup/{{ print "{{ backup_timestamp }}" }}/etc-etcd-pki"
+        path: "{{ "{{ ansible_facts['env']['HOME'] }}" }}/certs-backup/{{ print "{{ backup_timestamp }}" }}/etc-etcd-pki"
         state: directory
         mode: '0750'
       when: inventory_hostname in groups['etcd']
@@ -60,7 +60,7 @@
     - name: Backup Kubernetes certificates
       copy:
         src: /etc/kubernetes/pki/
-        dest: "{{ "{{ ansible_env.HOME }}" }}/certs-backup/{{ print "{{ backup_timestamp }}" }}/etc-kubernetes-pki"
+        dest: "{{ "{{ ansible_facts['env']['HOME'] }}" }}/certs-backup/{{ print "{{ backup_timestamp }}" }}/etc-kubernetes-pki"
         remote_src: yes
         mode: preserve
         directory_mode: '0750'
@@ -69,7 +69,7 @@
     - name: Backup etcd certificates
       copy:
         src: /etc/etcd/pki/
-        dest: "{{ "{{ ansible_env.HOME }}" }}/certs-backup/{{ print "{{ backup_timestamp }}" }}/etc-etcd-pki"
+        dest: "{{ "{{ ansible_facts['env']['HOME'] }}" }}/certs-backup/{{ print "{{ backup_timestamp }}" }}/etc-etcd-pki"
         remote_src: yes
         mode: preserve
         directory_mode: '0750'
