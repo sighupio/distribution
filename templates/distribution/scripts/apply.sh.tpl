@@ -12,7 +12,7 @@ vendorPath="{{ .paths.vendorPath }}"
 $kustomizebin build --load-restrictor LoadRestrictionsNone . > out.yaml
 
 {{- if and (index .spec.distribution.common "registry") (ne .spec.distribution.common.registry "") }}
-if echo "$OSTYPE" | grep '^darwin'; then
+if echo "$OSTYPE" | grep -q '^darwin'; then
   sed -i "" 's#registry.sighup.io/fury#{{.spec.distribution.common.registry}}#g' out.yaml
 else
   sed -i 's#registry.sighup.io/fury#{{.spec.distribution.common.registry}}#g' out.yaml
@@ -20,7 +20,7 @@ fi
 {{- end }}
 
 {{- if eq .spec.distribution.modules.monitoring.type "none" }}
-if ! $kubectlbin get apiservice v1.monitoring.coreos.com; then
+if ! $kubectlbin get apiservice v1.monitoring.coreos.com > /dev/null 2>&1; then
   cat out.yaml | $yqbin 'select(.apiVersion != "monitoring.coreos.com/v1")' > out-filtered.yaml
   cp out-filtered.yaml out.yaml
 fi
@@ -85,7 +85,7 @@ echo "Cleaning up Minio HA on tracing namespace..."
 $kustomizebin build $vendorPath/modules/tracing/katalog/minio-ha > delete-tracing-minio-ha.yaml
 
 {{- if eq .spec.distribution.modules.monitoring.type "none" }}
-if ! $kubectlbin get apiservice v1.monitoring.coreos.com; then
+if ! $kubectlbin get apiservice v1.monitoring.coreos.com > /dev/null 2>&1; then
   cat delete-tracing-minio-ha.yaml | $yqbin 'select(.apiVersion != "monitoring.coreos.com/v1")' > delete-tracing-minio-ha-filtered.yaml
   cp delete-tracing-minio-ha-filtered.yaml delete-tracing-minio-ha.yaml
 fi
@@ -103,7 +103,7 @@ echo "Cleaning up Minio HA on monitoring namespace..."
 $kustomizebin build $vendorPath/modules/monitoring/katalog/minio-ha > delete-monitoring-minio-ha.yaml
 
 {{- if eq .spec.distribution.modules.monitoring.type "none" }}
-if ! $kubectlbin get apiservice v1.monitoring.coreos.com; then
+if ! $kubectlbin get apiservice v1.monitoring.coreos.com > /dev/null 2>&1; then
   cat delete-monitoring-minio-ha.yaml | $yqbin 'select(.apiVersion != "monitoring.coreos.com/v1")' > delete-monitoring-minio-ha-filtered.yaml
   cp delete-monitoring-minio-ha-filtered.yaml delete-monitoring-minio-ha.yaml
 fi
@@ -121,7 +121,7 @@ echo "Cleaning up Minio on kube-system namespace..."
 $kustomizebin build $vendorPath/modules/dr/katalog/velero/velero-on-prem/minio > delete-dr-minio.yaml
 
 {{- if eq .spec.distribution.modules.monitoring.type "none" }}
-if ! $kubectlbin get apiservice v1.monitoring.coreos.com; then
+if ! $kubectlbin get apiservice v1.monitoring.coreos.com > /dev/null 2>&1; then
   cat delete-dr-minio.yaml | $yqbin 'select(.apiVersion != "monitoring.coreos.com/v1")' > delete-dr-minio-filtered.yaml
   cp delete-dr-minio-filtered.yaml delete-dr-minio.yaml
 fi

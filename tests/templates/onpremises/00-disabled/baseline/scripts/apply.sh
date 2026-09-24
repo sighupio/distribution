@@ -10,7 +10,7 @@ yqbin=""
 vendorPath=""
 
 $kustomizebin build --load-restrictor LoadRestrictionsNone . > out.yaml
-if ! $kubectlbin get apiservice v1.monitoring.coreos.com; then
+if ! $kubectlbin get apiservice v1.monitoring.coreos.com > /dev/null 2>&1; then
   cat out.yaml | $yqbin 'select(.apiVersion != "monitoring.coreos.com/v1")' > out-filtered.yaml
   cp out-filtered.yaml out.yaml
 fi
