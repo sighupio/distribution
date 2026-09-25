@@ -99,6 +99,12 @@
           "items": {
             "type": "object"
           }
+        },
+        "headlamp": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
         }
       }
     },

@@ -13,13 +13,14 @@ modules:
   opa: v1.18.0-rc.2
   networking: v4.1.0-rc.0
   tracing: v1.6.0-rc.0
+  utilities: v0.1.0
 kubernetes:
   eks:
     version: 1.36
     installer: v3.6.0-rc.0
   onpremises:
     version: 1.36.4
-    installer: v1.36.4-rc.0
+    installer: v1.36.4-rc.2
   immutable:
     version: 1.36.4
     installer: v1.36.4-rc.0

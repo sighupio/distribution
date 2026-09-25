@@ -159,6 +159,40 @@ routes:
       {{- end }}
   {{- end }}
 
+  {{- if and (eq .spec.distribution.common.provider.type "none" "immutable") (hasKeyAny .spec "kubernetes") (eq (.spec | digAny "distribution" "modules" "utilities" "headlamp" "type" "none") "sso") }}
+  {{- /* Mirrors the manual $host computation in utilities/resources/headlamp-ingress.yml.tpl: */}}
+  {{- /* headlamp has no ingress.overrides.ingresses entry (unlike the other modules above), so */}}
+  {{- /* the "ingressHost" helper (which reads that override) doesn't apply here. */}}
+  - from: https://headlamp.{{ .spec.distribution.modules.ingress.baseDomain }}
+    to: http://headlamp.headlamp.svc.cluster.local:80
+    allow_websockets: true
+    preserve_host_header: true
+    # Two distinct mechanisms are needed, both required (see headlamp/patches/proxy-auth.yml.tpl,
+    # which adds -proxy-auth=true to the Deployment - without it these headers are ignored):
+    # 1. Authorization: Headlamp's backend forwards this unchanged to the API server, which
+    #    validates it and applies plain Kubernetes RBAC per user/group (see the utilities
+    #    module's examples/oidc-rbac).
+    # 2. X-Forwarded-*: Headlamp's own frontend login gate (a separate concern from API auth)
+    #    only bypasses its "paste your token" screen when -proxy-auth sees these - see
+    #    https://headlamp.dev/docs/latest/installation/in-cluster/identity-aware-proxy/.
+    #    X-Forwarded-Id-Token must carry the RAW token, with no "Bearer " prefix.
+    set_request_headers:
+      Authorization: "Bearer ${pomerium.id_token}"
+      X-Forwarded-Id-Token: "${pomerium.id_token}"
+    jwt_claims_headers:
+      X-Forwarded-User: email
+      X-Forwarded-Email: email
+      X-Forwarded-Group: groups
+    policy:
+      {{- if and (index .spec.distribution.modules.auth.pomerium "defaultRoutesPolicy") (index .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy "headlamp") }}
+      {{- .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.headlamp | toYaml | nindent 6 }}
+      {{- else }}
+      - allow:
+          and:
+            - authenticated_user: true
+      {{- end }}
+  {{- end }}
+
   {{- if index .spec.distribution.modules.auth.pomerium "routes" }}
   {{- .spec.distribution.modules.auth.pomerium.routes | toYaml | nindent 2 }}
   {{- else if index .spec.distribution.modules.auth.pomerium "policy" }}

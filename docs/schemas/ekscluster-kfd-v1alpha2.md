@@ -870,6 +870,7 @@ Configuration for Pomerium, an identity-aware reverse proxy used for SSO.
 | Property                                                                                                          | Type    | Required |
 |:------------------------------------------------------------------------------------------------------------------|:--------|:---------|
 | [gatekeeperPolicyManager](#specdistributionmodulesauthpomeriumdefaultroutespolicygatekeeperpolicymanager)         | `array` | Optional |
+| [headlamp](#specdistributionmodulesauthpomeriumdefaultroutespolicyheadlamp)                                       | `array` | Optional |
 | [hubbleUi](#specdistributionmodulesauthpomeriumdefaultroutespolicyhubbleui)                                       | `array` | Optional |
 | [ingressForecastle](#specdistributionmodulesauthpomeriumdefaultroutespolicyingressforecastle)                     | `array` | Optional |
 | [loggingMinioConsole](#specdistributionmodulesauthpomeriumdefaultroutespolicyloggingminioconsole)                 | `array` | Optional |
@@ -886,6 +887,8 @@ Configuration for Pomerium, an identity-aware reverse proxy used for SSO.
 override default routes for SD components
 
 ## .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.gatekeeperPolicyManager
+
+## .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.headlamp
 
 ## .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.hubbleUi
 

@@ -1064,6 +1064,9 @@
         },
         "policy": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Policy"
+        },
+        "utilities": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Utilities"
         }
       },
       "required": [
@@ -1394,6 +1397,47 @@
             ]
           },
           "then": false
+        },
+        {
+          "if": {
+            "required": [
+              "utilities"
+            ],
+            "properties": {
+              "utilities": {
+                "required": [
+                  "headlamp"
+                ],
+                "properties": {
+                  "headlamp": {
+                    "required": [
+                      "type"
+                    ],
+                    "properties": {
+                      "type": {
+                        "const": "sso"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "auth": {
+                "properties": {
+                  "provider": {
+                    "properties": {
+                      "type": {
+                        "const": "sso"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
       ]
     },
@@ -2623,6 +2667,78 @@
       "required": [
         "validationFailureAction",
         "installDefaultPolicies"
+      ]
+    },
+    "Spec.Distribution.Modules.Utilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configuration for the Utilities module.",
+      "properties": {
+        "headlamp": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Utilities.Headlamp"
+        }
+      },
+      "required": [
+        "headlamp"
+      ]
+    },
+    "Spec.Distribution.Modules.Utilities.Headlamp": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configuration for Headlamp.",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "none",
+            "token-auth",
+            "sso"
+          ],
+          "description": "The Headlamp authentication mode. `none` disables Headlamp; `token-auth` exposes Headlamp using Kubernetes token authentication; `sso` fronts Headlamp with Pomerium SSO and binds an OIDC group to a read-only ClusterRole via plain Kubernetes RBAC (requires `auth.provider.type: sso`)."
+        },
+        "clusterRole": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The name of the ClusterRole to bind to the Headlamp ServiceAccount when using token authentication."
+        },
+        "oidcGroup": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The OIDC group (from the `groups` claim) granted read-only access to Headlamp when using SSO authentication."
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "token-auth"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "clusterRole"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "sso"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "oidcGroup"
+            ]
+          }
+        }
       ]
     },
     "Spec.Distribution.Modules.Dr": {

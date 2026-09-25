@@ -210,6 +210,16 @@ spec:
           type: none
         # The base domain used for all the auth ingresses, if in the HAProxy dual configuration, it should be the same as the .spec.distribution.modules.ingress.dns.public.name domain
         baseDomain: example.dev
+      # This section contains the configuration for the utilities module
+      utilities:
+        headlamp:
+          # type can be none, token-auth or sso. With none, Headlamp won't be installed
+          type: none
+          # Required when type is token-auth. Defines the ClusterRole bound to the Headlamp ServiceAccount
+          # clusterRole: view
+          # Required when type is sso (requires auth.provider.type: sso). The OIDC group (from the
+          # `groups` claim) granted read-only access to Headlamp via Kubernetes RBAC
+          # oidcGroup: sd-ui-viewers
     # Custom Patches to add or override fields in the generated manifests
     #customPatches: {}
   # Plugins to be installed

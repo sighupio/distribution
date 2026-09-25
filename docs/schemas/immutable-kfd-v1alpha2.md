@@ -551,6 +551,7 @@ Add custom resources to the distribution phase. This field is a list of strings.
 | [networking](#specdistributionmodulesnetworking) | `object` | Optional |
 | [policy](#specdistributionmodulespolicy)         | `object` | Required |
 | [tracing](#specdistributionmodulestracing)       | `object` | Optional |
+| [utilities](#specdistributionmodulesutilities)   | `object` | Optional |
 
 ## .spec.distribution.modules.auth
 
@@ -924,6 +925,7 @@ Configuration for Pomerium, an identity-aware reverse proxy used for SSO.
 | Property                                                                                                          | Type    | Required |
 |:------------------------------------------------------------------------------------------------------------------|:--------|:---------|
 | [gatekeeperPolicyManager](#specdistributionmodulesauthpomeriumdefaultroutespolicygatekeeperpolicymanager)         | `array` | Optional |
+| [headlamp](#specdistributionmodulesauthpomeriumdefaultroutespolicyheadlamp)                                       | `array` | Optional |
 | [hubbleUi](#specdistributionmodulesauthpomeriumdefaultroutespolicyhubbleui)                                       | `array` | Optional |
 | [ingressForecastle](#specdistributionmodulesauthpomeriumdefaultroutespolicyingressforecastle)                     | `array` | Optional |
 | [loggingMinioConsole](#specdistributionmodulesauthpomeriumdefaultroutespolicyloggingminioconsole)                 | `array` | Optional |
@@ -940,6 +942,8 @@ Configuration for Pomerium, an identity-aware reverse proxy used for SSO.
 override default routes for SD components
 
 ## .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.gatekeeperPolicyManager
+
+## .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.headlamp
 
 ## .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.hubbleUi
 
@@ -5412,6 +5416,68 @@ Default is `tempo`.
 |:--------|
 |`"none"` |
 |`"tempo"`|
+
+## .spec.distribution.modules.utilities
+
+### Properties
+
+| Property                                              | Type     | Required |
+|:------------------------------------------------------|:---------|:---------|
+| [headlamp](#specdistributionmodulesutilitiesheadlamp) | `object` | Required |
+
+### Description
+
+Configuration for the Utilities module.
+
+## .spec.distribution.modules.utilities.headlamp
+
+### Properties
+
+| Property                                                            | Type     | Required |
+|:--------------------------------------------------------------------|:---------|:---------|
+| [clusterRole](#specdistributionmodulesutilitiesheadlampclusterrole) | `string` | Optional |
+| [oidcGroup](#specdistributionmodulesutilitiesheadlampoidcgroup)     | `string` | Optional |
+| [type](#specdistributionmodulesutilitiesheadlamptype)               | `string` | Required |
+
+### Description
+
+Configuration for Headlamp.
+
+## .spec.distribution.modules.utilities.headlamp.clusterRole
+
+### Description
+
+The name of the ClusterRole to bind to the Headlamp ServiceAccount when using token authentication.
+
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
+
+## .spec.distribution.modules.utilities.headlamp.oidcGroup
+
+### Description
+
+The OIDC group (from the `groups` claim) granted read-only access to Headlamp when using SSO authentication.
+
+### Constraints
+
+**minimum length**: the minimum number of characters for this string is: `1`
+
+## .spec.distribution.modules.utilities.headlamp.type
+
+### Description
+
+The Headlamp authentication mode. `none` disables Headlamp; `token-auth` exposes Headlamp using Kubernetes token authentication; `sso` fronts Headlamp with Pomerium SSO and binds an OIDC group to a read-only ClusterRole via plain Kubernetes RBAC (requires `auth.provider.type: sso`).
+
+### Constraints
+
+**enum**: the value of this property must be equal to one of the following string values:
+
+| Value        |
+|:-------------|
+|`"none"`      |
+|`"token-auth"`|
+|`"sso"`       |
 
 ## .spec.distributionVersion
 

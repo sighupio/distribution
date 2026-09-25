@@ -348,5 +348,7 @@ templates:
   includes:
     - ".*\\.yaml"
     - ".*\\.yml"
+  excludes:
+    - "manifests/utilities/"
   suffix: ".tpl"
   processFilename: true

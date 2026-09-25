@@ -330,3 +330,13 @@ spec:
       auth:
         provider:
           type: none
+
+      utilities:
+        headlamp:
+          # type can be none, token-auth or sso. With none, Headlamp won't be installed
+          type: none
+          # Required when type is token-auth. Defines the ClusterRole bound to the Headlamp ServiceAccount
+          # clusterRole: view
+          # Required when type is sso (requires auth.provider.type: sso). The OIDC group (from the
+          # `groups` claim) granted read-only access to Headlamp via Kubernetes RBAC
+          # oidcGroup: sd-ui-viewers

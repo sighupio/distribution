@@ -35,6 +35,9 @@ resources:
 {{- if and (eq .spec.distribution.modules.tracing.type "tempo") (.checks.storageClassAvailable) }}
   - tracing
 {{- end }}
+{{- if and (eq .spec.distribution.common.provider.type "none" "immutable") (hasKeyAny .spec "kubernetes") (has (.spec | digAny "distribution" "modules" "utilities" "headlamp" "type" "none") (list "token-auth" "sso")) }}
+  - utilities
+{{- end }}
 
 {{- if .spec.distribution.customResources }}
   {{ .spec.distribution.customResources | toYaml | indent 2 | trim -}}
