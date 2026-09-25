@@ -1,0 +1,37 @@
+
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+
+
+
+  
+
+
+
+
+
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: headlamp
+  namespace: headlamp
+spec:
+  ingressClassName: internal
+  rules:
+    - host: headlamp.internal.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: headlamp
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - headlamp.internal.example.com

@@ -1,0 +1,301 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+---
+apiVersion: monitoring.coreos.com/v1
+kind: Alertmanager
+metadata:
+  name: main
+  namespace: monitoring
+spec:
+  nodeSelector:
+    node.kubernetes.io/role: infra
+  tolerations:
+    - effect: NoSchedule
+      key: node.kubernetes.io/role
+      value: infra
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: monitoring
+spec:
+  template:
+    spec:
+      nodeSelector:
+        node.kubernetes.io/role: infra
+      tolerations:
+        - effect: NoSchedule
+          key: node.kubernetes.io/role
+          value: infra
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus-adapter
+  namespace: monitoring
+spec:
+  template:
+    spec:
+      nodeSelector:
+        node.kubernetes.io/role: infra
+      tolerations:
+        - effect: NoSchedule
+          key: node.kubernetes.io/role
+          value: infra
+---
+apiVersion: monitoring.coreos.com/v1
+kind: Prometheus
+metadata:
+  name: k8s
+  namespace: monitoring
+spec:
+  nodeSelector:
+    node.kubernetes.io/role: infra
+  tolerations:
+    - effect: NoSchedule
+      key: node.kubernetes.io/role
+      value: infra
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blackbox-exporter
+  namespace: monitoring
+spec:
+  template:
+    spec:
+      nodeSelector:
+        node.kubernetes.io/role: infra
+      tolerations:
+        - effect: NoSchedule
+          key: node.kubernetes.io/role
+          value: infra
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kube-state-metrics
+  namespace: monitoring
+spec:
+  template:
+    spec:
+      nodeSelector:
+        node.kubernetes.io/role: infra
+      tolerations:
+        - effect: NoSchedule
+          key: node.kubernetes.io/role
+          value: infra
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus-operator
+  namespace: monitoring
+spec:
+  template:
+    spec:
+      nodeSelector:
+        node.kubernetes.io/role: infra
+      tolerations:
+        - effect: NoSchedule
+          key: node.kubernetes.io/role
+          value: infra
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: x509-certificate-exporter
+  namespace: monitoring
+spec:
+  template:
+    spec:
+      nodeSelector:
+        node.kubernetes.io/role: infra
+      tolerations:
+        - effect: NoSchedule
+          key: node.kubernetes.io/role
+          value: infra
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: x509-certificate-exporter-data-plane
+  namespace: monitoring
+spec:
+  template:
+    spec:
+      tolerations:
+        - effect: NoSchedule
+          key: node.kubernetes.io/role
+          value: infra
+
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mimir-distributed-compactor
+  namespace: monitoring
+spec:
+  template:
+    spec:
+      nodeSelector:
+        node.kubernetes.io/role: infra
+      tolerations:
+        - effect: NoSchedule
+          key: node.kubernetes.io/role
+          value: infra
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mimir-distributed-ingester
+  namespace: monitoring
+spec:
+  template:
+    spec:
+      nodeSelector:
+        node.kubernetes.io/role: infra
+      tolerations:
+        - effect: NoSchedule
+          key: node.kubernetes.io/role
+          value: infra
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mimir-distributed-store-gateway
+  namespace: monitoring
+spec:
+  template:
+    spec:
+      nodeSelector:
+        node.kubernetes.io/role: infra
+      tolerations:
+        - effect: NoSchedule
+          key: node.kubernetes.io/role
+          value: infra
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: minio-monitoring
+  namespace: monitoring
+spec:
+  template:
+    spec:
+      nodeSelector:
+        node.kubernetes.io/role: infra
+      tolerations:
+        - effect: NoSchedule
+          key: node.kubernetes.io/role
+          value: infra
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: minio-monitoring-buckets-setup
+  namespace: monitoring
+spec:
+  template:
+    spec:
+      nodeSelector:
+        node.kubernetes.io/role: infra
+      tolerations:
+        - effect: NoSchedule
+          key: node.kubernetes.io/role
+          value: infra
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mimir-distributed-continuous-test
+  namespace: monitoring
+spec:
+  template:
+    spec:
+      nodeSelector:
+        node.kubernetes.io/role: infra
+      tolerations:
+        - effect: NoSchedule
+          key: node.kubernetes.io/role
+          value: infra
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mimir-distributed-distributor
+  namespace: monitoring
+spec:
+  template:
+    spec:
+      nodeSelector:
+        node.kubernetes.io/role: infra
+      tolerations:
+        - effect: NoSchedule
+          key: node.kubernetes.io/role
+          value: infra
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mimir-distributed-gateway
+  namespace: monitoring
+spec:
+  template:
+    spec:
+      nodeSelector:
+        node.kubernetes.io/role: infra
+      tolerations:
+        - effect: NoSchedule
+          key: node.kubernetes.io/role
+          value: infra
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mimir-distributed-querier
+  namespace: monitoring
+spec:
+  template:
+    spec:
+      nodeSelector:
+        node.kubernetes.io/role: infra
+      tolerations:
+        - effect: NoSchedule
+          key: node.kubernetes.io/role
+          value: infra
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mimir-distributed-query-frontend
+  namespace: monitoring
+spec:
+  template:
+    spec:
+      nodeSelector:
+        node.kubernetes.io/role: infra
+      tolerations:
+        - effect: NoSchedule
+          key: node.kubernetes.io/role
+          value: infra
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mimir-distributed-query-scheduler
+  namespace: monitoring
+spec:
+  template:
+    spec:
+      nodeSelector:
+        node.kubernetes.io/role: infra
+      tolerations:
+        - effect: NoSchedule
+          key: node.kubernetes.io/role
+          value: infra
+---
+

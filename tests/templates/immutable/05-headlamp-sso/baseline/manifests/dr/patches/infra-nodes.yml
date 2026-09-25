@@ -1,0 +1,61 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: velero
+  namespace: kube-system
+spec:
+  template:
+    spec:
+      nodeSelector:
+        node.kubernetes.io/role: infra
+      tolerations:
+        - effect: NoSchedule
+          key: node.kubernetes.io/role
+          value: infra
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: node-agent
+  namespace: kube-system
+spec:
+  template:
+    spec:
+      tolerations:
+        - effect: NoSchedule
+          key: node.kubernetes.io/role
+          value: infra
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: minio
+  namespace: kube-system
+spec:
+  template:
+    spec:
+      nodeSelector:
+        node.kubernetes.io/role: infra
+      tolerations:
+        - effect: NoSchedule
+          key: node.kubernetes.io/role
+          value: infra
+
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: minio-setup
+  namespace: kube-system
+spec:
+  template:
+    spec:
+      nodeSelector:
+        node.kubernetes.io/role: infra
+      tolerations:
+        - effect: NoSchedule
+          key: node.kubernetes.io/role
+          value: infra
