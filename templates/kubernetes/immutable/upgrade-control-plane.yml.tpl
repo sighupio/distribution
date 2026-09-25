@@ -2,6 +2,25 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 ---
+# Collect the facts of every control plane before the upgrade starts.
+#
+# The upgrade play uses `serial: 1`, which gathers only the host of the batch. The keepalived.conf
+# template builds its peer list from the facts of every host of the group.
+- name: Gather facts from every control plane
+  hosts: control_plane
+  become: false
+  gather_facts: true
+  post_tasks:
+    # Stop before any work unless every control plane answered: the keepalived.conf render needs
+    # their facts, and the upgrade needs every etcd member and API server anyway.
+    - name: Fail when a control plane does not answer
+      run_once: true
+      ansible.builtin.assert:
+        that:
+          - ansible_play_hosts_all | difference(ansible_play_hosts) | length == 0
+        fail_msg: "{{ "These control planes did not answer: {{ ansible_play_hosts_all | difference(ansible_play_hosts) | join(', ') }}. Every control plane must answer before the upgrade starts." }}"
+        success_msg: "{{ "All {{ ansible_play_hosts_all | length }} control planes answered." }}"
+
 # Control-plane upgrade (serial:1): sysext refresh, cert renewal, kubeadm upgrade apply (in-band static-pod restart), then reboot to activate the staged OS.
 - name: Upgrade the control plane
   hosts: control_plane
@@ -35,6 +54,9 @@
   roles:
     - containerd
     - kube-control-plane
+    # Aligns the VIP extension and rewrites its configuration, also when the VIP is disabled:
+    # butane installs the extension on every control plane. The reboot below activates it.
+    - keepalived
   post_tasks:
     # Wait on the async OS stage and reboot into the target version (after the kubeadm upgrade has run).
     - name: Reboot into the staged operating system
