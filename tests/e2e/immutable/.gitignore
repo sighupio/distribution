@@ -1,0 +1,7 @@
+# generated, ephemeral test artifacts — never commit
+config/
+# tofu working files:
+.terraform/
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.backup
