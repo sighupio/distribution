@@ -55,6 +55,18 @@ steps: # qa
       - eval "$(mise activate bash --shims)"
       - mise run license-check
 
+  - name: lint-e2e
+    image: quay.io/sighup/mise:v2026.6.14
+    pull: always
+    depends_on:
+      - install-tools
+    volumes:
+      - name: mise-cache
+        path: /mise-data
+    commands:
+      - eval "$(mise activate bash --shims)"
+      - mise run lint:e2e
+
   - &test-schema
     name: test-schema-kfddistribution
     image: quay.io/sighup/mise:v2026.6.14
