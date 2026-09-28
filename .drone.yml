@@ -1455,10 +1455,6 @@ trigger:
     include:
       - refs/tags/e2e-immutable-**
       - refs/tags/e2e-all-**
-  # Run also when the on-premises pipelines fail.
-  status:
-    - success
-    - failure
 
 environment:
   MISE_DATA_DIR: /mise-data
