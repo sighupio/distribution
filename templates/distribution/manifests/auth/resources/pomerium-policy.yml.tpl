@@ -167,15 +167,10 @@ routes:
     to: http://headlamp.headlamp.svc.cluster.local:80
     allow_websockets: true
     preserve_host_header: true
-    # Two distinct mechanisms are needed, both required (see headlamp/patches/proxy-auth.yml.tpl,
-    # which adds -proxy-auth=true to the Deployment - without it these headers are ignored):
-    # 1. Authorization: Headlamp's backend forwards this unchanged to the API server, which
-    #    validates it and applies plain Kubernetes RBAC per user/group (see the utilities
-    #    module's examples/oidc-rbac).
-    # 2. X-Forwarded-*: Headlamp's own frontend login gate (a separate concern from API auth)
-    #    only bypasses its "paste your token" screen when -proxy-auth sees these - see
-    #    https://headlamp.dev/docs/latest/installation/in-cluster/identity-aware-proxy/.
-    #    X-Forwarded-Id-Token must carry the RAW token, with no "Bearer " prefix.
+    # Authorization: Headlamp's backend forwards this unchanged to the API server, which
+    # validates it and applies plain Kubernetes RBAC per user/group (see the utilities
+    # module's examples/oidc-rbac). X-Forwarded-Id-Token must carry the RAW token, with no
+    # "Bearer " prefix.
     set_request_headers:
       Authorization: "Bearer ${pomerium.id_token}"
       X-Forwarded-Id-Token: "${pomerium.id_token}"
