@@ -1,8 +1,9 @@
-{{- $enabled := and (eq .spec.distribution.common.provider.type "none" "immutable") (hasKeyAny .spec "kubernetes") (eq (.spec | digAny "distribution" "modules" "utilities" "headlamp" "type" "none") "sso") }}
-{{- if $enabled }}
 # Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
+
+{{- $enabled := and (eq .spec.distribution.common.provider.type "none" "immutable") (hasKeyAny .spec "kubernetes") (eq (.spec | digAny "distribution" "modules" "utilities" "headlamp" "type" "none") "sso") }}
+{{- if $enabled }}
 
 {{- $group := .spec.distribution.modules.utilities.headlamp.oidcGroup }}
 {{- $hasServiceProxy := or (ne .spec.distribution.modules.monitoring.type "none") (and (ne .spec.distribution.modules.logging.type "none") (.checks.storageClassAvailable)) }}
