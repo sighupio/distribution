@@ -1441,10 +1441,12 @@ kind: pipeline
 type: docker
 # No node selector: lands on the single bare-metal worker with /dev/kvm + libvirt.
 
-# Only qa: a pipeline that depends on one its tag does not trigger is skipped. The
-# VM gate serializes it with the on-premises pipelines on e2e-all tags.
+# After the on-premises pipelines: they share the one libvirt worker, which fits one
+# cluster at a time. On an e2e-immutable tag the on-premises pipelines are skipped,
+# and Drone then waits for their own dependencies (qa) instead. The VM gate stays as
+# the safety net for separate builds.
 depends_on:
-  - qa
+  - e2e-onpremises-upgrades-1.34.1-1.35.1
 clone:
   depth: 1
 
@@ -1453,6 +1455,10 @@ trigger:
     include:
       - refs/tags/e2e-immutable-**
       - refs/tags/e2e-all-**
+  # Run also when the on-premises pipelines fail.
+  status:
+    - success
+    - failure
 
 environment:
   MISE_DATA_DIR: /mise-data
