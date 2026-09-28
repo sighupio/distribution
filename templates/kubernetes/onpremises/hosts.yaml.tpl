@@ -129,6 +129,22 @@ all:
         {{- if index .spec.kubernetes.advanced.oidc "group_prefix" }}
         oidc_group_prefix: "{{ .spec.kubernetes.advanced.oidc.group_prefix }}"
         {{- end }}
+        {{- /* Two consumers can present a token whose audience differs from the primary client_id: Headlamp SSO always forwards the fixed pomerium Dex client token (see auth/secrets/dex.yml.tpl), and Gangplank uses its own configured client id (auth.oidcKubernetesAuth). Each is added to oidc_extra_audiences only when it differs, so clusters that don't hit either case see no change. */}}
+        {{- /* pomeriumDexClientID must match the static client id in auth/secrets/dex.yml.tpl; update both if that ever changes. */}}
+        {{- $pomeriumDexClientID := "pomerium" }}
+        {{- $primaryClientID := index .spec.kubernetes.advanced.oidc "client_id" | default "" }}
+        {{- $extraAudiences := list }}
+        {{- if and (eq (.spec | digAny "distribution" "modules" "utilities" "headlamp" "type" "none") "sso") (ne $pomeriumDexClientID $primaryClientID) }}
+        {{- $extraAudiences = append $extraAudiences $pomeriumDexClientID }}
+        {{- end }}
+        {{- $gangplankClientID := .spec | digAny "distribution" "modules" "auth" "oidcKubernetesAuth" "clientID" "" }}
+        {{- if and (.spec | digAny "distribution" "modules" "auth" "oidcKubernetesAuth" "enabled" false) (ne $gangplankClientID "") (ne $gangplankClientID $primaryClientID) }}
+        {{- $extraAudiences = append $extraAudiences $gangplankClientID }}
+        {{- end }}
+        {{- if $extraAudiences }}
+        oidc_extra_audiences:
+{{ $extraAudiences | uniq | toYaml | indent 10 }}
+        {{- end }}
         {{- end }}
 
         {{- if index .spec.kubernetes "advanced" }}
