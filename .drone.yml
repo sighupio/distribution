@@ -1433,6 +1433,186 @@ steps: # e2e-onpremises-upgrades-1.34.1-1.35.1
         - failure
 
 ---
+# Immutable install pipeline: Flatcar VMs PXE boot from the furyctl iPXE server
+# on the same libvirt worker as the on-premises pipelines. libvirt's dnsmasq is
+# the DHCP server (fixed IP per MAC + boot.ipxe). See tests/e2e/immutable/README.md.
+name: e2e-immutable
+kind: pipeline
+type: docker
+# No node selector: lands on the single bare-metal worker with /dev/kvm + libvirt.
+
+# After the on-premises pipelines: they share the one libvirt worker, which fits one
+# cluster at a time. On an e2e-immutable tag the on-premises pipelines are skipped,
+# and Drone then waits for their own dependencies (qa) instead. The VM gate stays as
+# the safety net for separate builds.
+depends_on:
+  - e2e-onpremises-upgrades-1.34.1-1.35.1
+clone:
+  depth: 1
+
+trigger:
+  ref:
+    include:
+      - refs/tags/e2e-immutable-**
+      - refs/tags/e2e-all-**
+
+environment:
+  MISE_DATA_DIR: /mise-data
+  # v1.36.0 needs furyctl 0.36.0. Pinned here only, so the repo pin (and the other
+  # pipelines) keep working. Move to 0.36.0 when it is released.
+  MISE_FURYCTL_VERSION: 0.36.0-rc.0
+  TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
+  # the scripts reused from onpremises/scripts target this pipeline's dirs.
+  E2E_DIR: /drone/src/tests/e2e/immutable
+
+volumes:
+  - name: cache
+    temp: {}
+  - name: mise-cache
+    host:
+      path: /root/mise_data_dir
+  - name: libvirt-sock
+    host:
+      path: /var/run/libvirt
+  - name: e2e-diag
+    host:
+      path: /root/e2e-diag
+  # Flatcar image + sysext packages (~1GB): furyctl skips a file that is already
+  # there with the full size.
+  - name: immutable-assets
+    host:
+      path: /root/e2e-immutable-assets
+
+steps: # e2e-immutable
+  - name: install-tools
+    image: quay.io/sighup/mise:v2026.6.14
+    pull: always
+    environment:
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
+    volumes:
+      - name: mise-cache
+        path: /mise-data
+    commands:
+      - "(flock -w 1800 9 || exit 1; mise install) 9>/mise-data/.mise-install.lock"
+      - eval "$(mise activate bash --shims)"
+
+  - name: provision-vms
+    image: quay.io/sighup/mise:v2026.6.14
+    pull: always
+    network_mode: host
+    environment:
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
+      # an on-premises run on the same e2e-all tag can hold the worker for a while
+      MAX_WAIT_SECONDS: 14400
+    volumes:
+      - name: cache
+        path: /cache
+      - name: mise-cache
+        path: /mise-data
+      - name: libvirt-sock
+        path: /var/run/libvirt
+    commands:
+      - eval "$(mise activate bash --shims)"
+      - apt-get update && apt-get install -y --no-install-recommends libvirt-clients
+      - bash tests/e2e/onpremises/scripts/wait-for-free-worker.sh
+      # furyctl writes the public key (same path + .pub) into every node's ignition
+      - ssh-keygen -N '' -t ed25519 -C "sighup" -f /cache/ci-ssh-key
+      # empty-disk VMs, created powered off; then furyctl.yaml + ingress certs
+      - cd tests/e2e/immutable/tofu
+      - tofu init
+      - tofu apply -auto-approve
+      - mkdir -p ../config
+      - tofu output -raw furyctl_yaml > ../config/furyctl.yaml
+      - tofu output -raw req_dns > ../config/req-dns.cnf
+      - cd ../config && bash ../../onpremises/scripts/create_ingress_certs.sh
+
+  - name: install
+    image: quay.io/sighup/mise:v2026.6.14
+    pull: always
+    network_mode: host
+    environment:
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
+      DISTRO_LOCATION: /drone/src
+      DIAG_DIR: /diag
+    volumes:
+      - name: cache
+        path: /cache
+      - name: mise-cache
+        path: /mise-data
+      - name: libvirt-sock
+        path: /var/run/libvirt
+      - name: e2e-diag
+        path: /diag
+      - name: immutable-assets
+        path: /root/.furyctl/e2e-immutable/infrastructure/server/assets
+    commands:
+      - eval "$(mise activate bash --shims)"
+      - apt-get update && apt-get install -y --no-install-recommends libvirt-clients procps
+      # furyctl serves the iPXE assets on the network gateway; power-on.sh starts
+      # the VMs once it answers. Then the on-premises install sequence.
+      - bash tests/e2e/immutable/scripts/install.sh
+
+  - name: bats-test-distribution
+    image: quay.io/sighup/mise:v2026.6.14
+    pull: always
+    network_mode: host
+    environment:
+      DIAG_DIR: /diag
+      TESTS_DIR: /drone/src/tests/e2e/onpremises/tests
+    volumes:
+      - name: cache
+        path: /cache
+      - name: mise-cache
+        path: /mise-data
+      - name: e2e-diag
+        path: /diag
+    commands:
+      - eval "$(mise activate bash --shims)"
+      # same modules as on-premises, so the same suite
+      - bash tests/e2e/onpremises/scripts/bats-test.sh
+
+  - name: kube-bench
+    image: quay.io/sighup/mise:v2026.6.14
+    pull: always
+    network_mode: host
+    volumes:
+      - name: cache
+        path: /cache
+      - name: mise-cache
+        path: /mise-data
+    commands:
+      - eval "$(mise activate bash --shims)"
+      - bash tests/e2e/immutable/scripts/kube-bench.sh
+
+  - name: delete
+    image: quay.io/sighup/mise:v2026.6.14
+    pull: always
+    network_mode: host
+    volumes:
+      - name: mise-cache
+        path: /mise-data
+      - name: libvirt-sock
+        path: /var/run/libvirt
+    commands:
+      - eval "$(mise activate bash --shims)"
+      - cd tests/e2e/immutable/tofu
+      - tofu init
+      - tofu destroy -auto-approve
+    when:
+      status:
+        - success
+        - failure
+
+---
 kind: pipeline
 type: docker
 name: scheduled-aws-nuke
