@@ -21,8 +21,8 @@ kubernetes:
     version: 1.36.4
     installer: v1.36.4-rc.0
   immutable:
-    version: 1.36.4
-    installer: v1.36.5-rc.1
+    version: 1.36.5
+    installer: v1.36.5-rc.0
 furyctlSchemas:
   eks:
     - apiVersion: kfd.sighup.io/v1alpha2
@@ -39,7 +39,7 @@ furyctlSchemas:
 tools:
   common:
     kubectl:
-      version: 1.36.4
+      version: 1.36.5
     kustomize:
       version: 5.6.0
     yq:
