@@ -1457,8 +1457,8 @@ trigger:
 environment:
   MISE_DATA_DIR: /mise-data
   # v1.36.0 needs furyctl 0.36.0. Pinned here only, so the repo pin (and the other
-  # pipelines) keep working until it is released.
-  MISE_FURYCTL_VERSION: 0.36.0
+  # pipelines) keep working. Move to 0.36.0 when it is released.
+  MISE_FURYCTL_VERSION: 0.36.0-rc.0
   TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
   # the scripts reused from onpremises/scripts target this pipeline's dirs.
   E2E_DIR: /drone/src/tests/e2e/immutable
