@@ -40,12 +40,21 @@ done
 for vm in $VMS; do $VIRSH start "$vm"; done
 
 # The server stops once every node reports "booted", so an unreachable server
-# after this point means the boot is done.
+# after this point means the boot is done. A request can time out while the server
+# sends the Flatcar image, so only 3 failed requests in a row mean that it stopped.
 waited=0
-while s="$(status)"; do
+fails=0
+while [ "$fails" -lt 3 ]; do
   [ "$waited" -ge "$BOOT_TIMEOUT" ] && abort "nodes did not boot in ${waited}s"
-  echo "POWER-ON: $s"
-  sleep 30
-  waited=$((waited + 30))
+  if s="$(status)"; then
+    fails=0
+    echo "POWER-ON: $s"
+    pause=30
+  else
+    fails=$((fails + 1))
+    pause=10
+  fi
+  sleep "$pause"
+  waited=$((waited + pause))
 done
 echo "POWER-ON: every node booted"
