@@ -13,4 +13,3 @@ resources:
 
 patches:
   - path: patches/infra-nodes.yml
-  - path: patches/proxy-auth.yml
