@@ -19,7 +19,7 @@ if [ -n "${DIAG_DIR:-}" ] && mkdir -p "$DIAG_DIR" 2>/dev/null; then
   exec > >(tee -a "$DIAG_DIR/upgrade-${DRONE_BUILD_NUMBER:-local}.log") 2>&1
 fi
 
-cd "$E2E_DIR/config"
+cd "$E2E_DIR/config" || exit 1
 
 # Single attempt: an upgrade failure (e.g. a node drain blocked by a PDB) is
 # deterministic, not a transient blip -- retrying only burns the pipeline's clock.

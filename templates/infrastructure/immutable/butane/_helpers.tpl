@@ -48,12 +48,15 @@ curl reads only the lower case http_proxy, while Go reads either case. */}}
         inline: |
           {{- if $http }}
           export HTTP_PROXY={{ $http }}
+          export http_proxy={{ $http }}
           {{- end }}
           {{- if $https }}
           export HTTPS_PROXY={{ $https }}
+          export https_proxy={{ $https }}
           {{- end }}
           {{- if $noProxy }}
           export NO_PROXY={{ $noProxy }}
+          export no_proxy={{ $noProxy }}
           {{- end }}
 {{- end }}
 {{- end }}
