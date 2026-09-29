@@ -102,6 +102,7 @@
         },
         "headlamp": {
           "type": "array",
+          "description": "Only used on OnPremises and Immutable clusters when `.spec.distribution.modules.utilities.headlamp.type` is `sso`.",
           "items": {
             "type": "object"
           }

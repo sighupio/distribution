@@ -898,6 +898,10 @@ override default routes for SD components
 
 ## .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.headlamp
 
+### Description
+
+Only used on OnPremises and Immutable clusters when `.spec.distribution.modules.utilities.headlamp.type` is `sso`.
+
 ## .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.hubbleUi
 
 ## .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.ingressForecastle
