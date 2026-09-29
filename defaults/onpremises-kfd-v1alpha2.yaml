@@ -354,8 +354,6 @@ data:
     utilities:
       headlamp:
         type: none
-        clusterRole: cluster-admin
-        oidcGroup: ""
 
 templates:
   includes:
