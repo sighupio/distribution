@@ -12,7 +12,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - {{ print $vendorPrefix "/modules/utilities/ui/katalog/headlamp" }}
+  - {{ print $vendorPrefix "/modules/utilities/katalog/headlamp" }}
 {{- if eq $headlampType "token-auth" }}
   - resources/headlamp-clusterrolebinding.yml
 {{- else if eq $headlampType "sso" }}

@@ -82,15 +82,9 @@ routes:
     preserve_host_header: true
     # Authorization: Headlamp's backend forwards this unchanged to the API server, which
     # validates it and applies plain Kubernetes RBAC per user/group (see the utilities
-    # module's examples/oidc-rbac). X-Forwarded-Id-Token must carry the RAW token, with no
-    # "Bearer " prefix.
+    # module's examples/oidc-rbac).
     set_request_headers:
       Authorization: "Bearer ${pomerium.id_token}"
-      X-Forwarded-Id-Token: "${pomerium.id_token}"
-    jwt_claims_headers:
-      X-Forwarded-User: email
-      X-Forwarded-Email: email
-      X-Forwarded-Group: groups
     policy:
       - allow:
           and:

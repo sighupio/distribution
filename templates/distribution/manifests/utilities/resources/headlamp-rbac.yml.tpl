@@ -9,10 +9,6 @@
 {{- $hasServiceProxy := or (ne .spec.distribution.modules.monitoring.type "none") (and (ne .spec.distribution.modules.logging.type "none") (.checks.storageClassAvailable)) }}
 
 ---
-# Cluster-wide read for the plugins that do cluster-scoped list/watch calls (sd-core landing,
-# sd-events, sd-logs, sd-policy). Bound to a real OIDC group carried in the user's `groups`
-# claim: without Capsule Proxy there is no per-namespace filtering primitive in vanilla RBAC,
-# so every bound user sees the whole cluster (ops/SRE scope, not multi-tenant isolation).
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
