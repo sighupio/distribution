@@ -5268,7 +5268,7 @@ Configuration for Headlamp.
 
 ### Description
 
-The name of the ClusterRole to bind to the Headlamp ServiceAccount when using token authentication.
+The name of an existing ClusterRole to bind to the Headlamp ServiceAccount, used only when `type` is `token-auth`. Anyone with the ServiceAccount token will have the permissions of this ClusterRole. Example: `view`.
 
 ### Constraints
 
@@ -5278,7 +5278,7 @@ The name of the ClusterRole to bind to the Headlamp ServiceAccount when using to
 
 ### Description
 
-The OIDC group (from the `groups` claim) granted read-only access to Headlamp when using SSO authentication.
+The OIDC group to bind to the roles that Headlamp needs, used only when `type` is `sso`. The group will be able to read the main cluster resources and the `furyctl-config` Secret, and to query the installed Prometheus, Loki and OpenSearch, with any Kubernetes client. The OIDC groups prefix of the API server (default `oidc:`) will be added automatically. Example: `authors`.
 
 ### Constraints
 
@@ -5288,7 +5288,12 @@ The OIDC group (from the `groups` claim) granted read-only access to Headlamp wh
 
 ### Description
 
-The Headlamp authentication mode. `none` disables Headlamp; `token-auth` exposes Headlamp using Kubernetes token authentication; `sso` fronts Headlamp with Pomerium SSO and binds an OIDC group to a read-only ClusterRole via plain Kubernetes RBAC (requires `auth.provider.type: sso`).
+The type of authentication for Headlamp, options are:
+- `none`: will disable Headlamp.
+- `token-auth`: will expose Headlamp at `dashboard.<baseDomain>`, users log in with a Kubernetes token.
+- `sso`: will expose Headlamp at `dashboard.<baseDomain>` protected by Pomerium, users log in with SSO. Requires `.spec.distribution.modules.auth.provider.type` to be `sso`.
+
+Default is `none`.
 
 ### Constraints
 
