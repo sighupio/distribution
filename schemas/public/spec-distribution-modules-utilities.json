@@ -1,0 +1,61 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "Configuration for the Utilities module.",
+  "properties": {
+    "headlamp": {
+      "$ref": "#/$defs/Spec.Distribution.Modules.Utilities.Headlamp"
+    }
+  },
+  "required": [
+    "headlamp"
+  ],
+  "$defs": {
+    "Spec.Distribution.Modules.Utilities.Headlamp": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configuration for Headlamp.",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "none",
+            "token-auth",
+            "sso"
+          ],
+          "description": "The type of authentication for Headlamp, options are:\n- `none`: will disable Headlamp.\n- `token-auth`: will expose Headlamp at `dashboard.<baseDomain>`, users log in with a Kubernetes token.\n- `sso`: will expose Headlamp at `dashboard.<baseDomain>` protected by Pomerium, users log in with SSO. Requires `.spec.distribution.modules.auth.provider.type` to be `sso`.\n\nDefault is `none`."
+        },
+        "clusterRole": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The name of an existing ClusterRole to bind to the Headlamp ServiceAccount, used only when `type` is `token-auth`. Anyone with the ServiceAccount token will have the permissions of this ClusterRole. Example: `view`."
+        },
+        "oidcGroup": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The OIDC group to bind to the roles that Headlamp needs, used only when `type` is `sso`. The group will be able to read the main cluster resources and the `furyctl-config` Secret, and to query the installed Prometheus, Loki and OpenSearch, with any Kubernetes client. The OIDC groups prefix of the API server (default `oidc:`) will be added automatically. Example: `authors`."
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "sso"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "oidcGroup"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

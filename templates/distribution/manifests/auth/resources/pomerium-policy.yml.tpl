@@ -159,6 +159,29 @@ routes:
       {{- end }}
   {{- end }}
 
+  {{- if and (eq .spec.distribution.common.provider.type "none" "immutable") (hasKeyAny .spec "kubernetes") (eq (.spec | digAny "distribution" "modules" "utilities" "headlamp" "type" "none") "sso") }}
+  {{- /* Mirrors the manual $host computation in utilities/resources/headlamp-ingress.yml.tpl: */}}
+  {{- /* headlamp has no ingress.overrides.ingresses entry (unlike the other modules above), so */}}
+  {{- /* the "ingressHost" helper (which reads that override) doesn't apply here. */}}
+  - from: https://dashboard.{{ .spec.distribution.modules.ingress.baseDomain }}
+    to: http://headlamp.headlamp.svc.cluster.local:80
+    allow_websockets: true
+    preserve_host_header: true
+    # Authorization: Headlamp's backend forwards this unchanged to the API server, which
+    # validates it and applies plain Kubernetes RBAC per user/group (see the utilities
+    # module's examples/oidc-rbac).
+    set_request_headers:
+      Authorization: "Bearer ${pomerium.id_token}"
+    policy:
+      {{- if and (index .spec.distribution.modules.auth.pomerium "defaultRoutesPolicy") (index .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy "headlamp") }}
+      {{- .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.headlamp | toYaml | nindent 6 }}
+      {{- else }}
+      - allow:
+          and:
+            - authenticated_user: true
+      {{- end }}
+  {{- end }}
+
   {{- if index .spec.distribution.modules.auth.pomerium "routes" }}
   {{- .spec.distribution.modules.auth.pomerium.routes | toYaml | nindent 2 }}
   {{- else if index .spec.distribution.modules.auth.pomerium "policy" }}

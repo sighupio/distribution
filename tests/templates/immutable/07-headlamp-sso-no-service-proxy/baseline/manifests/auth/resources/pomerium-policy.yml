@@ -1,0 +1,62 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+
+address: ":8080"
+metrics_address: ":9090"
+
+insecure_server: true
+autocert: false
+
+routes:
+
+  
+  - from: https://directory.internal.example.com
+    to: http://forecastle.forecastle.svc.cluster.local
+    policy:
+      - allow:
+          and:
+            - authenticated_user: true
+  - from: https://minio-logging.internal.example.com
+    to: http://minio-logging-console.logging.svc.cluster.local:9001
+    allow_websockets: true
+    preserve_host_header: true
+    policy:
+      - allow:
+          and:
+            - authenticated_user: true
+  - from: https://minio-tracing.internal.example.com
+    to: http://minio-tracing-console.tracing.svc.cluster.local:9001
+    allow_websockets: true
+    preserve_host_header: true
+    policy:
+      - allow:
+          and:
+            - authenticated_user: true
+  - from: https://gpm.internal.example.com
+    to: http://gatekeeper-policy-manager.gatekeeper-system.svc.cluster.local
+    policy:
+      - allow:
+          and:
+            - authenticated_user: true
+  - from: https://whisker.internal.example.com
+    to: http://whisker.calico-system.svc.cluster.local:8081
+    policy:
+      - allow:
+          and:
+            - authenticated_user: true
+  - from: https://dashboard.internal.example.com
+    to: http://headlamp.headlamp.svc.cluster.local:80
+    allow_websockets: true
+    preserve_host_header: true
+    # Authorization: Headlamp's backend forwards this unchanged to the API server, which
+    # validates it and applies plain Kubernetes RBAC per user/group (see the utilities
+    # module's examples/oidc-rbac).
+    set_request_headers:
+      Authorization: "Bearer ${pomerium.id_token}"
+    policy:
+      - allow:
+          and:
+            - authenticated_user: true
+

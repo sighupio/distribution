@@ -1829,6 +1829,9 @@
         },
         "policy": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Policy"
+        },
+        "utilities": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Utilities"
         }
       },
       "required": [
@@ -2171,6 +2174,47 @@
             ]
           },
           "then": false
+        },
+        {
+          "if": {
+            "required": [
+              "utilities"
+            ],
+            "properties": {
+              "utilities": {
+                "required": [
+                  "headlamp"
+                ],
+                "properties": {
+                  "headlamp": {
+                    "required": [
+                      "type"
+                    ],
+                    "properties": {
+                      "type": {
+                        "const": "sso"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "auth": {
+                "properties": {
+                  "provider": {
+                    "properties": {
+                      "type": {
+                        "const": "sso"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
       ]
     },
@@ -3391,6 +3435,9 @@
         "validationFailureAction",
         "installDefaultPolicies"
       ]
+    },
+    "Spec.Distribution.Modules.Utilities": {
+      "$ref": "./spec-distribution-modules-utilities.json"
     },
     "Spec.Distribution.Modules.Dr": {
       "type": "object",
