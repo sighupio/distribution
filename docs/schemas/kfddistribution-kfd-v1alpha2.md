@@ -2645,7 +2645,17 @@ The username for the default MinIO root user.
 
 ### Description
 
-The PVC size for each MinIO disk, 6 disks total.
+Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+```
+
+[try pattern](https://regexr.com/?expression=^\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\(\([KMGTPE]i\)|[numkMGTPE]|\([eE]\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\)\)?$)
 
 ## .spec.distribution.modules.logging.opensearch
 
@@ -2778,7 +2788,17 @@ The memory request for the Pod. Example: `500M`.
 
 ### Description
 
-The storage size for the OpenSearch volumes. Follows Kubernetes resources storage requests. Default is `150Gi`.
+Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+```
+
+[try pattern](https://regexr.com/?expression=^\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\(\([KMGTPE]i\)|[numkMGTPE]|\([eE]\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\)\)?$)
 
 ## .spec.distribution.modules.logging.opensearch.type
 
@@ -3510,7 +3530,17 @@ The username for the default MinIO root user.
 
 ### Description
 
-The PVC size for each MinIO disk, 6 disks total.
+Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+```
+
+[try pattern](https://regexr.com/?expression=^\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\(\([KMGTPE]i\)|[numkMGTPE]|\([eE]\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\)\)?$)
 
 ## .spec.distribution.modules.monitoring.overrides
 
@@ -3671,7 +3701,17 @@ The retention time for the `k8s` Prometheus instance.
 
 ### Description
 
-The storage size for the `k8s` Prometheus instance.
+Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+```
+
+[try pattern](https://regexr.com/?expression=^\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\(\([KMGTPE]i\)|[numkMGTPE]|\([eE]\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\)\)?$)
 
 ## .spec.distribution.modules.monitoring.prometheusAdapter
 
@@ -4646,7 +4686,17 @@ The username for the default MinIO root user.
 
 ### Description
 
-The PVC size for each MinIO disk, 6 disks total.
+Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+```
+
+[try pattern](https://regexr.com/?expression=^\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\(\([KMGTPE]i\)|[numkMGTPE]|\([eE]\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\)\)?$)
 
 ## .spec.distribution.modules.tracing.overrides
 
