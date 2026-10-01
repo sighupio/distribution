@@ -21,7 +21,7 @@ metadata:
 spec:
   ingressClassName: internal
   rules:
-    - host: headlamp.internal.example.com
+    - host: dashboard.internal.example.com
       http:
         paths:
           - path: /
@@ -35,4 +35,4 @@ spec:
                   number: 80
   tls:
     - hosts:
-        - headlamp.internal.example.com
+        - dashboard.internal.example.com

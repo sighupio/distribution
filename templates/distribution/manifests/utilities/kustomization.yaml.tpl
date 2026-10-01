@@ -13,7 +13,7 @@ kind: Kustomization
 
 resources:
   - {{ print $vendorPrefix "/modules/utilities/katalog/headlamp" }}
-{{- if eq $headlampType "token-auth" }}
+{{- if and (eq $headlampType "token-auth") (.spec | digAny "distribution" "modules" "utilities" "headlamp" "clusterRole" "") }}
   - resources/headlamp-clusterrolebinding.yml
 {{- else if eq $headlampType "sso" }}
   - resources/headlamp-rbac.yml

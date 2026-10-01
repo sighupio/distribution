@@ -76,7 +76,7 @@ routes:
       - allow:
           and:
             - authenticated_user: true
-  - from: https://headlamp.internal.example.com
+  - from: https://dashboard.internal.example.com
     to: http://headlamp.headlamp.svc.cluster.local:80
     allow_websockets: true
     preserve_host_header: true

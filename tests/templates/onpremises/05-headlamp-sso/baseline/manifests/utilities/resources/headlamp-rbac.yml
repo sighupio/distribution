@@ -48,7 +48,7 @@ metadata:
   name: sd-ui-reader
 subjects:
   - kind: Group
-    name: sd-ui-viewers
+    name: oidc:sd-ui-viewers
     apiGroup: rbac.authorization.k8s.io
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -78,7 +78,7 @@ metadata:
   name: sd-ui-service-proxy
 subjects:
   - kind: Group
-    name: sd-ui-viewers
+    name: oidc:sd-ui-viewers
     apiGroup: rbac.authorization.k8s.io
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -105,7 +105,7 @@ metadata:
   namespace: kube-system
 subjects:
   - kind: Group
-    name: sd-ui-viewers
+    name: oidc:sd-ui-viewers
     apiGroup: rbac.authorization.k8s.io
 roleRef:
   apiGroup: rbac.authorization.k8s.io

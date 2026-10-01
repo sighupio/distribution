@@ -163,7 +163,7 @@ routes:
   {{- /* Mirrors the manual $host computation in utilities/resources/headlamp-ingress.yml.tpl: */}}
   {{- /* headlamp has no ingress.overrides.ingresses entry (unlike the other modules above), so */}}
   {{- /* the "ingressHost" helper (which reads that override) doesn't apply here. */}}
-  - from: https://headlamp.{{ .spec.distribution.modules.ingress.baseDomain }}
+  - from: https://dashboard.{{ .spec.distribution.modules.ingress.baseDomain }}
     to: http://headlamp.headlamp.svc.cluster.local:80
     allow_websockets: true
     preserve_host_header: true

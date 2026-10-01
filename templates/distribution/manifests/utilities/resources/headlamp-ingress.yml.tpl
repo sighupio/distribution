@@ -19,7 +19,7 @@
 {{ if $isHaproxy }}
   {{ $tlsProvider = .spec.distribution.modules.ingress.haproxy.tls.provider }}
 {{ end }}
-{{ $host := print "headlamp." .spec.distribution.modules.ingress.baseDomain }}
+{{ $host := print "dashboard." .spec.distribution.modules.ingress.baseDomain }}
 {{ $isSSO := eq $headlampType "sso" }}
 
 ---
