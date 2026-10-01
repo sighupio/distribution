@@ -196,7 +196,7 @@
           "items": {
             "$ref": "#/$defs/Spec.Kubernetes.Member"
           },
-          "description": "Load balancer member nodes. These nodes will run HAProxy and keepalived. If no members are specified it will be assumed some other solution for load balancing is in place.",
+          "description": "Load balancer member nodes. These nodes will run HAProxy and keepalived. If no members are specified it will be assumed some other solution for load balancing is in place. Each entry refers to an infrastructure node by hostname, with an optional IP override.",
           "minItems": 1
         },
         "keepalived": {
@@ -283,7 +283,7 @@
         },
         "kernelArguments": {
           "$ref": "#/$defs/Spec.Infrastructure.Node.KernelArguments",
-          "description": "Node-specific kernel arguments. When omitted, furyctl derives the initramfs network arguments (ip=/nameserver=) from the node's static interfaces so it can boot on a segment without DHCP. When set, these replace that derivation, so include the network arguments yourself if the node has no DHCP."
+          "description": "Node-specific kernel arguments, with the same format as Butane's `kernel_arguments` (both lists are optional). Ignition writes them to the bootloader on the first boot of the node. When omitted, furyctl derives the initramfs network arguments (ip=/nameserver=) from the node's static interfaces so it can boot on a segment without DHCP. When set, these replace that derivation, so include the network arguments yourself if the node has no DHCP."
         },
         "kernelParameters": {
           "type": "array",
@@ -360,7 +360,7 @@
       "properties": {
         "installDisk": {
           "$ref": "#/$defs/Types.DevicePath",
-          "description": "The disk device where the OS will be installed. Example: /dev/sda"
+          "description": "The disk device where the OS will be installed. The path must be absolute and clean: it must not contain empty, `.` or `..` path segments. Examples: `/dev/sda`, `/dev/nvme0n1`, `/dev/disk/by-id/wwn-0x5000c500a1b2c3d4`"
         },
         "disks": {
           "type": "array",
@@ -1153,7 +1153,7 @@
           "items": {
             "$ref": "#/$defs/Spec.Kubernetes.NodeGroup"
           },
-          "description": "Worker node groups with labels, taints, and annotations."
+          "description": "Worker node groups with labels, taints, and annotations. Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/"
         },
         "networking": {
           "$ref": "#/$defs/Spec.Kubernetes.Networking"
@@ -1187,7 +1187,7 @@
           "items": {
             "$ref": "#/$defs/Spec.Kubernetes.Member"
           },
-          "description": "Control plane member nodes.",
+          "description": "Control plane member nodes. Each entry refers to an infrastructure node by hostname, with an optional IP override.",
           "minItems": 1
         },
         "keepalived": {
@@ -1257,7 +1257,7 @@
           "items": {
             "$ref": "#/$defs/Spec.Kubernetes.Member"
           },
-          "description": "etcd member nodes.",
+          "description": "etcd member nodes. Each entry refers to an infrastructure node by hostname, with an optional IP override.",
           "minItems": 1
         }
       },
@@ -1299,7 +1299,7 @@
           "items": {
             "$ref": "#/$defs/Spec.Kubernetes.Member"
           },
-          "description": "Nodes in this group.",
+          "description": "Nodes in this group. Each entry refers to an infrastructure node by hostname, with an optional IP override.",
           "minItems": 1
         },
         "labels": {
@@ -2239,7 +2239,7 @@
         },
         "byoic": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.BYOIC",
-          "description": "Configuration for Bring Your Own Ingress Controller mode. Can coexist with nginx and haproxy. The ingressClass is used when both controllers are disabled."
+          "description": "Configuration for Bring Your Own Ingress Controller mode. Can coexist with nginx and haproxy. The ingressClass is used for infrastructure ingresses when both controllers are disabled."
         },
         "certManager": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.CertManager",
