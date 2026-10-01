@@ -1552,9 +1552,13 @@
           "type": "string",
           "description": "JWT claim to use as the user's group."
         },
+        "groups_prefix": {
+          "type": "string",
+          "description": "Prefix prepended to group claims to prevent clashes with existing names (such as system: groups). Sets `claimMappings.groups.prefix` in the API server AuthenticationConfiguration. Replaces the deprecated `group_prefix` field. Defaults to `oidc:`."
+        },
         "group_prefix": {
           "type": "string",
-          "description": "Prefix prepended to group claims to prevent clashes with existing names (such as system: groups)."
+          "description": "DEPRECATED, use `groups_prefix`. Ignored when `groups_prefix` is set."
         }
       }
     },

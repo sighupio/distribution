@@ -126,8 +126,10 @@ all:
         {{- if index .spec.kubernetes.advanced.oidc "groups_claim" }}
         oidc_groups_claim: "{{ .spec.kubernetes.advanced.oidc.groups_claim }}"
         {{- end }}
-        {{- if index .spec.kubernetes.advanced.oidc "group_prefix" }}
-        oidc_group_prefix: "{{ .spec.kubernetes.advanced.oidc.group_prefix }}"
+        {{- if index .spec.kubernetes.advanced.oidc "groups_prefix" }}
+        oidc_groups_prefix: "{{ .spec.kubernetes.advanced.oidc.groups_prefix }}"
+        {{- else if index .spec.kubernetes.advanced.oidc "group_prefix" }}
+        oidc_groups_prefix: "{{ .spec.kubernetes.advanced.oidc.group_prefix }}"
         {{- end }}
         {{- end }}
 

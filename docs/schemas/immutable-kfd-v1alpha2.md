@@ -7426,6 +7426,7 @@ Process IDs reserved for system daemons. Example: `1000`
 | [client_id](#speckubernetesadvancedoidcclient_id)             | `string` | Optional |
 | [group_prefix](#speckubernetesadvancedoidcgroup_prefix)       | `string` | Optional |
 | [groups_claim](#speckubernetesadvancedoidcgroups_claim)       | `string` | Optional |
+| [groups_prefix](#speckubernetesadvancedoidcgroups_prefix)     | `string` | Optional |
 | [issuer_url](#speckubernetesadvancedoidcissuer_url)           | `string` | Optional |
 | [username_claim](#speckubernetesadvancedoidcusername_claim)   | `string` | Optional |
 | [username_prefix](#speckubernetesadvancedoidcusername_prefix) | `string` | Optional |
@@ -7450,13 +7451,19 @@ The client ID the API server will use to authenticate to the OIDC provider.
 
 ### Description
 
-Prefix prepended to group claims to prevent clashes with existing names (such as system: groups).
+DEPRECATED, use `groups_prefix`. Ignored when `groups_prefix` is set.
 
 ## .spec.kubernetes.advanced.oidc.groups_claim
 
 ### Description
 
 JWT claim to use as the user's group.
+
+## .spec.kubernetes.advanced.oidc.groups_prefix
+
+### Description
+
+Prefix prepended to group claims to prevent clashes with existing names (such as system: groups). Sets `claimMappings.groups.prefix` in the API server AuthenticationConfiguration. Replaces the deprecated `group_prefix` field. Defaults to `oidc:`.
 
 ## .spec.kubernetes.advanced.oidc.issuer_url
 
