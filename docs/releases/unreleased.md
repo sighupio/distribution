@@ -10,7 +10,7 @@ Welcome to the latest release of SD maintained by SIGHUP by ReeVo team.
 
 - [[#601](https://github.com/sighupio/distribution/pull/601)] Immutable: the infrastructure phase now upgrades the load balancers. The new `upgrade-load-balancers.yml` playbook updates the operating system, the system extensions and the configuration. It upgrades one load balancer at a time, so the virtual IP address stays available. The playbook stops before it changes anything when a load balancer does not answer.
 
-- [[#612](https://github.com/sighupio/distribution/pull/612)] Adds `module-utilities` with Headlamp as its first package, for OnPremises and Immutable.
+- [[#612](https://github.com/sighupio/distribution/pull/612)] Adds `module-utilities` with Headlamp as its first package, for OnPremises and Immutable. Headlamp is exposed at `dashboard.<baseDomain>`. Set `spec.distribution.modules.utilities.headlamp.type` to `token-auth` or `sso` to install it. With `token-auth`, the users log in with their own Kubernetes token and get the permissions of that token. Set the optional `clusterRole` field to also bind a ClusterRole to the `headlamp` ServiceAccount, so that its token can be used to log in. With `sso`, Headlamp is behind Pomerium, and the group in `oidcGroup` gets read-only access to the cluster.
 
 ## Bug fixes 🐞
 
