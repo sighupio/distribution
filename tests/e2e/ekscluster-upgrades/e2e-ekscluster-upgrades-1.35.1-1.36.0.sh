@@ -20,6 +20,36 @@ wait_for_eks_active() {
   done
 }
 
+# Dumps what EKS reports as in progress on the cluster, its node groups and addons.
+# The upgrade has failed with "cluster currently has an update in progress"
+# (HTTP 409) while the cluster was ACTIVE, without a known cause.
+dump_eks_state() {
+  cluster_name="$1"
+  region="$2"
+  echo "--- EKS cluster ${cluster_name} ($(date -u +%Y-%m-%dT%H:%M:%SZ)) ---"
+  aws eks describe-cluster --name "$cluster_name" --region "$region" \
+    --query 'cluster.{status:status,version:version,platformVersion:platformVersion,health:health}' --output json || true
+  echo "--- Cluster updates ---"
+  for update_id in $(aws eks list-updates --name "$cluster_name" --region "$region" --query 'updateIds[]' --output text || true); do
+    aws eks describe-update --name "$cluster_name" --region "$region" --update-id "$update_id" \
+      --query 'update.{id:id,type:type,status:status,createdAt:createdAt,params:params,errors:errors}' --output json || true
+  done
+  echo "--- Node groups ---"
+  for nodegroup in $(aws eks list-nodegroups --cluster-name "$cluster_name" --region "$region" --query 'nodegroups[]' --output text || true); do
+    aws eks describe-nodegroup --cluster-name "$cluster_name" --region "$region" --nodegroup-name "$nodegroup" \
+      --query 'nodegroup.{name:nodegroupName,status:status,version:version,releaseVersion:releaseVersion,modifiedAt:modifiedAt,health:health}' --output json || true
+    for update_id in $(aws eks list-updates --name "$cluster_name" --region "$region" --nodegroup-name "$nodegroup" --query 'updateIds[]' --output text || true); do
+      aws eks describe-update --name "$cluster_name" --region "$region" --nodegroup-name "$nodegroup" --update-id "$update_id" \
+        --query 'update.{id:id,type:type,status:status,createdAt:createdAt,errors:errors}' --output json || true
+    done
+  done
+  echo "--- Addons ---"
+  for addon in $(aws eks list-addons --cluster-name "$cluster_name" --region "$region" --query 'addons[]' --output text || true); do
+    aws eks describe-addon --cluster-name "$cluster_name" --region "$region" --addon-name "$addon" \
+      --query 'addon.{name:addonName,status:status,version:addonVersion,modifiedAt:modifiedAt,health:health}' --output json || true
+  done
+}
+
 echo "----------------------------------------------------------------------------"
 echo "Executing furyctl for the initial setup 1.35.1 with alinux2023"
 FURYCTL_YAML=tests/e2e/ekscluster-upgrades/manifests/furyctl-upgrade-version-1.35.1.yaml
@@ -71,17 +101,24 @@ fi
 # when an update is still in progress from the initial cluster creation.
 EKS_REGION=$(yq '.spec.region' "$FURYCTL_YAML")
 wait_for_eks_active "$CLUSTER_NAME" "$EKS_REGION"
+dump_eks_state "$CLUSTER_NAME" "$EKS_REGION"
 
 echo "----------------------------------------------------------------------------"
 echo "Executing version upgrade to 1.36.0 (with alinux2023)"
 FURYCTL_YAML=tests/e2e/ekscluster-upgrades/manifests/furyctl-upgrade-version-1.36.0.yaml
 tests/e2e/ekscluster/replace_variables.sh --cluster-name "$CLUSTER_NAME" --furyctl-yaml "$FURYCTL_YAML"
-furyctl apply --upgrade \
+if ! furyctl apply --upgrade \
   --outdir /furyctl-outdir \
   --config "$FURYCTL_YAML" \
   --disable-analytics \
   --distro-location ./ \
   --force upgrades \
   --skip-vpn-confirmation \
-  --no-tty
+  --no-tty; then
+  echo "============================================================================"
+  echo "Upgrade to 1.36.0 failed, gathering EKS state..."
+  echo "============================================================================"
+  dump_eks_state "$CLUSTER_NAME" "$EKS_REGION"
+  exit 1
+fi
 echo "$FURYCTL_YAML" > last_furyctl_yaml.txt
