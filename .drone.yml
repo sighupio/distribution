@@ -836,6 +836,8 @@ trigger:
     include:
       - refs/tags/e2e-eks-**
       - refs/tags/e2e-all-**
+      # TEMPORARY
+      - refs/tags/e2e-eksupgrades-**
 
 environment:
   MISE_DATA_DIR: /mise-data
@@ -1241,6 +1243,8 @@ trigger:
     include:
       - refs/tags/e2e-onpremises-**
       - refs/tags/e2e-all-**
+      # TEMPORARY
+      - refs/tags/e2e-onpremisesupgrades-**
 
 environment:
   MISE_DATA_DIR: /mise-data
