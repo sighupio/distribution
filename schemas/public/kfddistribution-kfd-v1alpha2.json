@@ -566,7 +566,7 @@
         },
         "byoic": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.BYOIC",
-          "description": "Configuration for Bring Your Own Ingress Controller mode. Can coexist with nginx and haproxy. The ingressClass is used when both controllers are disabled."
+          "description": "Configuration for Bring Your Own Ingress Controller mode. Can coexist with nginx and haproxy. The ingressClass is used for infrastructure ingresses when both controllers are disabled."
         },
         "certManager": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.CertManager",

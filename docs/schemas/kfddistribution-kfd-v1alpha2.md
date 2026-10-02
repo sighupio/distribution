@@ -1573,7 +1573,7 @@ The base domain used for all the SD infrastructural ingresses. If using the ngin
 
 ### Description
 
-Configuration for Bring Your Own Ingress Controller mode. The ingressClass is used for infrastructure ingresses when both controllers are disabled.
+Configuration for Bring Your Own Ingress Controller mode. Can coexist with nginx and haproxy. The ingressClass is used for infrastructure ingresses when both controllers are disabled.
 
 ## .spec.distribution.modules.ingress.byoic.commonAnnotations
 
@@ -1803,7 +1803,7 @@ The value of the toleration
 
 ### Description
 
-Configuration for HAProxy Kubernetes Ingress Controller.
+Configurations for the HAProxy Kubernetes Ingress Controller package.
 
 ## .spec.distribution.modules.ingress.haproxy.overrides
 
@@ -2645,7 +2645,9 @@ The username for the default MinIO root user.
 
 ### Description
 
-Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
+The PVC size for each MinIO disk, 6 disks total.
+
+Follows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
@@ -2788,7 +2790,9 @@ The memory request for the Pod. Example: `500M`.
 
 ### Description
 
-Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
+The storage size for the OpenSearch volumes. Default is `150Gi`.
+
+Follows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
@@ -3530,7 +3534,9 @@ The username for the default MinIO root user.
 
 ### Description
 
-Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
+The PVC size for each MinIO disk, 6 disks total.
+
+Follows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
@@ -3701,7 +3707,9 @@ The retention time for the `k8s` Prometheus instance.
 
 ### Description
 
-Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
+The storage size for the `k8s` Prometheus instance.
+
+Follows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
@@ -4686,7 +4694,9 @@ The username for the default MinIO root user.
 
 ### Description
 
-Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
+The PVC size for each MinIO disk, 6 disks total.
+
+Follows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 

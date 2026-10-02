@@ -324,7 +324,7 @@
           "$ref": "#/$defs/Types.KubeAnnotations"
         },
         "kubeletConfiguration": {
-          "description": "Optional Kubelet configuration specific to control-plane nodes. If set, this will override the global `advanced.kubeletConfiguration`. See `advanced.KubeletConfiguration` for more details.",
+          "description": "Optional Kubelet configuration specific to control-plane nodes. If set, this will override the global `advanced.kubeletConfiguration`. See `advanced.KubeletConfiguration` for more details.\n\nNOTE: Content will **not** be validated by furyctl. To customize the TLS cipher suites of the Kubelet, set only the `Spec.Kubernetes.Advanced.Encryption.tlsCipherSuitesKubelet` field - do not configure them under this field.",
           "$ref": "#/$defs/Spec.Kubernetes.Advanced.KubeletConfiguration"
         },
         "kernelParameters": {
@@ -448,7 +448,7 @@
           "$ref": "#/$defs/Types.KubeAnnotations"
         },
         "kubeletConfiguration": {
-          "description": "Optional Kubelet configuration specific to worker nodes. If set, this will override the global `advanced.kubeletConfiguration`. See `advanced.KubeletConfiguration` for more details.",
+          "description": "Optional Kubelet configuration specific to worker nodes. If set, this will override the global `advanced.kubeletConfiguration`. See `advanced.KubeletConfiguration` for more details.\n\nNOTE: Content will **not** be validated by furyctl. To customize the TLS cipher suites of the Kubelet, set only the `Spec.Kubernetes.Advanced.Encryption.tlsCipherSuitesKubelet` field - do not configure them under this field.",
           "$ref": "#/$defs/Spec.Kubernetes.Advanced.KubeletConfiguration"
         },
         "kernelParameters": {
@@ -1466,7 +1466,7 @@
         },
         "byoic": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.BYOIC",
-          "description": "Configuration for Bring Your Own Ingress Controller mode. Can coexist with nginx and haproxy. The ingressClass is used when both controllers are disabled."
+          "description": "Configuration for Bring Your Own Ingress Controller mode. Can coexist with nginx and haproxy. The ingressClass is used for infrastructure ingresses when both controllers are disabled."
         },
         "certManager": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.CertManager",

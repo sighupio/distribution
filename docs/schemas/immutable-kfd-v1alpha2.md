@@ -1780,7 +1780,7 @@ The base domain used for all the SD's infrastructural ingresses. If using the ng
 
 ### Description
 
-Configuration for Bring Your Own Ingress Controller mode. The ingressClass is used for infrastructure ingresses when both controllers are disabled.
+Configuration for Bring Your Own Ingress Controller mode. Can coexist with nginx and haproxy. The ingressClass is used for infrastructure ingresses when both controllers are disabled.
 
 ## .spec.distribution.modules.ingress.byoic.commonAnnotations
 
@@ -2010,7 +2010,7 @@ The value of the toleration
 
 ### Description
 
-Configuration for HAProxy Kubernetes Ingress Controller.
+Configurations for the HAProxy Kubernetes Ingress Controller package.
 
 ## .spec.distribution.modules.ingress.haproxy.overrides
 
@@ -2639,7 +2639,9 @@ The CPU limit for the Pod, in cores or millicores. Examples: 1000m, 2, 1.5
 
 ### Description
 
-Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
+The memory limit for the Pod. Example: 1Gi, 2Gi
+
+Follows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
@@ -2680,7 +2682,9 @@ The CPU request for the Pod, in cores or millicores. Examples: 500m, 1, 0.5
 
 ### Description
 
-Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
+The memory request for the Pod. Example: 500Mi, 1Gi
+
+Follows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
@@ -2814,7 +2818,9 @@ The username for the default MinIO root user.
 
 ### Description
 
-Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
+The PVC size for each MinIO disk, 6 disks total.
+
+Follows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
@@ -2940,7 +2946,9 @@ The CPU limit for the Pod, in cores or millicores. Examples: 1000m, 2, 1.5
 
 ### Description
 
-Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
+The memory limit for the Pod. Example: 1Gi, 2Gi
+
+Follows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
@@ -2981,7 +2989,9 @@ The CPU request for the Pod, in cores or millicores. Examples: 500m, 1, 0.5
 
 ### Description
 
-Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
+The memory request for the Pod. Example: 500Mi, 1Gi
+
+Follows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
@@ -2997,7 +3007,9 @@ Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The 
 
 ### Description
 
-Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
+The storage size for the OpenSearch volumes. Default is `150Gi`.
+
+Follows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
@@ -3088,7 +3100,9 @@ The CPU limit for the Pod, in cores or millicores. Examples: 1000m, 2, 1.5
 
 ### Description
 
-Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
+The memory limit for the Pod. Example: 1Gi, 2Gi
+
+Follows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
@@ -3129,7 +3143,9 @@ The CPU request for the Pod, in cores or millicores. Examples: 500m, 1, 0.5
 
 ### Description
 
-Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
+The memory request for the Pod. Example: 500Mi, 1Gi
+
+Follows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
@@ -3198,7 +3214,9 @@ The CPU limit for the Pod, in cores or millicores. Examples: 1000m, 2, 1.5
 
 ### Description
 
-Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
+The memory limit for the Pod. Example: 1Gi, 2Gi
+
+Follows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
@@ -3239,7 +3257,9 @@ The CPU request for the Pod, in cores or millicores. Examples: 500m, 1, 0.5
 
 ### Description
 
-Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
+The memory request for the Pod. Example: 500Mi, 1Gi
+
+Follows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
@@ -3954,7 +3974,9 @@ The username for the default MinIO root user.
 
 ### Description
 
-Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
+The PVC size for each MinIO disk, 6 disks total.
+
+Follows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
@@ -4096,7 +4118,9 @@ The CPU limit for the Pod, in cores or millicores. Examples: 1000m, 2, 1.5
 
 ### Description
 
-Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
+The memory limit for the Pod. Example: 1Gi, 2Gi
+
+Follows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
@@ -4137,7 +4161,9 @@ The CPU request for the Pod, in cores or millicores. Examples: 500m, 1, 0.5
 
 ### Description
 
-Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
+The memory request for the Pod. Example: 500Mi, 1Gi
+
+Follows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
@@ -4165,7 +4191,9 @@ The retention time for the `k8s` Prometheus instance.
 
 ### Description
 
-Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
+The storage size for the `k8s` Prometheus instance.
+
+Follows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
@@ -4230,7 +4258,9 @@ The CPU limit for the Pod, in cores or millicores. Examples: 1000m, 2, 1.5
 
 ### Description
 
-Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
+The memory limit for the Pod. Example: 1Gi, 2Gi
+
+Follows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
@@ -4271,7 +4301,9 @@ The CPU request for the Pod, in cores or millicores. Examples: 500m, 1, 0.5
 
 ### Description
 
-Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
+The memory request for the Pod. Example: 500Mi, 1Gi
+
+Follows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
@@ -4338,7 +4370,9 @@ The CPU limit for the Pod, in cores or millicores. Examples: 1000m, 2, 1.5
 
 ### Description
 
-Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
+The memory limit for the Pod. Example: 1Gi, 2Gi
+
+Follows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
@@ -4379,7 +4413,9 @@ The CPU request for the Pod, in cores or millicores. Examples: 500m, 1, 0.5
 
 ### Description
 
-Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
+The memory request for the Pod. Example: 500Mi, 1Gi
+
+Follows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
@@ -5223,7 +5259,9 @@ The username for the default MinIO root user.
 
 ### Description
 
-Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
+The PVC size for each MinIO disk, 6 disks total.
+
+Follows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
@@ -5872,7 +5910,7 @@ The virtual router ID of Keepalived, an arbitrary unique number from 1 to 255 us
 
 ### Description
 
-A member node reference with optional IP override.
+Load balancer member nodes. These nodes will run HAProxy and keepalived. If no members are specified it will be assumed some other solution for load balancing is in place. Each entry refers to an infrastructure node by hostname, with an optional IP override.
 
 ### Constraints
 
@@ -5922,7 +5960,7 @@ Optional IP address. If not specified, it is inferred from the node's network co
 
 ### Description
 
-Definition of a bare metal node with storage, network, and hardware configuration.
+List of bare metal nodes to provision.
 
 ### Constraints
 
@@ -5972,7 +6010,7 @@ Fully qualified domain name for the node. Example: node01.k8s.example.com
 
 ### Description
 
-Kernel arguments for this node, mirroring Butane's kernel_arguments (both lists optional). They are written to the bootloader and applied by Ignition on the node's first boot.
+Node-specific kernel arguments, with the same format as Butane's `kernel_arguments` (both lists are optional). Ignition writes them to the bootloader on the first boot of the node. When omitted, furyctl derives the initramfs network arguments (ip=/nameserver=) from the node's static interfaces so it can boot on a segment without DHCP. When set, these replace that derivation, so include the network arguments yourself if the node has no DHCP.
 
 ## .spec.infrastructure.nodes.kernelArguments.shouldExist
 
@@ -6262,7 +6300,7 @@ Storage configuration for the node, including the install disk and the Butane st
 
 ### Description
 
-Represents a directory to be created on the filesystem. See Butane Flatcar v1.1.0 spec.
+The list of directories to be created. Every directory must have a unique path. See https://coreos.github.io/butane/config-flatcar-v1_1/#objects-storage-directories
 
 ## .spec.infrastructure.nodes.storage.directories.group
 
@@ -6825,7 +6863,7 @@ Whether to additionally generate a generic mount unit for this filesystem, or a 
 
 ### Description
 
-Absolute, clean Unix device path, validated like Butane/Ignition does for device fields: it must be absolute and must not contain empty, '.' or '..' path segments. Example: /dev/sda, /dev/nvme0n1, /dev/disk/by-id/wwn-0x5000c500a1b2c3d4
+The disk device where the OS will be installed. The path must be absolute and clean: it must not contain empty, `.` or `..` path segments. Examples: `/dev/sda`, `/dev/nvme0n1`, `/dev/disk/by-id/wwn-0x5000c500a1b2c3d4`
 
 ### Constraints
 
@@ -7497,7 +7535,9 @@ CPU reserved for system daemons, in cores or millicores. Examples: `500m`, `1`, 
 
 ### Description
 
-Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
+Ephemeral storage reserved for system daemons. Example: `2Gi`
+
+Follows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
@@ -7513,7 +7553,9 @@ Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The 
 
 ### Description
 
-Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
+Memory reserved for system daemons. Example: `1Gi`, `500Mi`
+
+Follows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
@@ -7689,7 +7731,7 @@ Optional additional Kubernetes annotations that will be added to the control-pla
 
 ### Description
 
-This section allows to configure a floating Virtual IP between the nodes via Keepalived. This can be used to provide high availability between 2 or more nodes.
+This section allows to configure a floating Virtual IP between the Control Plane nodes via Keepalived. This can be used to provide high availability for the Kubernetes API server instead of a load balancer.
 
 ## .spec.kubernetes.controlPlane.keepalived.enabled
 
@@ -7789,7 +7831,9 @@ CPU reserved for system daemons, in cores or millicores. Examples: `500m`, `1`, 
 
 ### Description
 
-Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
+Ephemeral storage reserved for system daemons. Example: `2Gi`
+
+Follows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
@@ -7805,7 +7849,9 @@ Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The 
 
 ### Description
 
-Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
+Memory reserved for system daemons. Example: `1Gi`, `500Mi`
+
+Follows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
@@ -7852,7 +7898,7 @@ Note: **Existing labels with the same key will be overwritten** and the label se
 
 ### Description
 
-A member node reference with optional IP override.
+Control plane member nodes. Each entry refers to an infrastructure node by hostname, with an optional IP override.
 
 ### Constraints
 
@@ -7949,7 +7995,7 @@ etcd cluster configuration. Ref: https://kubernetes.io/docs/tasks/administer-clu
 
 ### Description
 
-A member node reference with optional IP override.
+etcd member nodes. Each entry refers to an infrastructure node by hostname, with an optional IP override.
 
 ### Constraints
 
@@ -8041,7 +8087,7 @@ Service network CIDR. Example: 10.96.0.0/12
 
 ### Description
 
-A group of worker nodes with common labels, taints, and annotations. Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+Worker node groups with labels, taints, and annotations. Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
 
 ## .spec.kubernetes.nodeGroups.annotations
 
@@ -8113,7 +8159,9 @@ CPU reserved for system daemons, in cores or millicores. Examples: `500m`, `1`, 
 
 ### Description
 
-Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
+Ephemeral storage reserved for system daemons. Example: `2Gi`
+
+Follows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
@@ -8129,7 +8177,9 @@ Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The 
 
 ### Description
 
-Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
+Memory reserved for system daemons. Example: `1Gi`, `500Mi`
+
+Follows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
@@ -8184,7 +8234,7 @@ Node group name identifier. Example: infra_workers
 
 ### Description
 
-A member node reference with optional IP override.
+Nodes in this group. Each entry refers to an infrastructure node by hostname, with an optional IP override.
 
 ### Constraints
 
