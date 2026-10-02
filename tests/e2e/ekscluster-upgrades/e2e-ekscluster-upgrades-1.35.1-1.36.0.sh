@@ -137,13 +137,34 @@ if ! furyctl apply --upgrade \
   echo "Upgrade to 1.36.0 failed, gathering EKS state..."
   echo "============================================================================"
   dump_eks_state "$CLUSTER_NAME" "$EKS_REGION"
-  # CloudTrail delivers events with a delay of a few minutes: dump them now and
-  # again after waiting, so the events right before the failure are included.
   dump_cloudtrail_events "$CLUSTER_NAME" "$EKS_REGION"
-  echo "Waiting 10m for CloudTrail to deliver the latest events..."
-  sleep 600
+  # The node group reported "ClusterUnreachable: ... your cluster is going through
+  # a config update" a few minutes after the 409, with no update visible from the
+  # API. Watch it to measure how long that internal update lasts.
+  watch_eks_internal_update "$CLUSTER_NAME" "$EKS_REGION"
   dump_eks_state "$CLUSTER_NAME" "$EKS_REGION"
   dump_cloudtrail_events "$CLUSTER_NAME" "$EKS_REGION"
-  exit 1
+
+  echo "============================================================================"
+  echo "Retrying the upgrade to 1.36.0 (furyctl resumes from the failed phase)..."
+  echo "============================================================================"
+  if ! furyctl apply --upgrade \
+    --outdir /furyctl-outdir \
+    --config "$FURYCTL_YAML" \
+    --disable-analytics \
+    --distro-location ./ \
+    --force upgrades \
+    --skip-vpn-confirmation \
+    --no-tty; then
+    echo "============================================================================"
+    echo "Retry of the upgrade to 1.36.0 failed too, gathering EKS state..."
+    echo "============================================================================"
+    dump_eks_state "$CLUSTER_NAME" "$EKS_REGION"
+    dump_cloudtrail_events "$CLUSTER_NAME" "$EKS_REGION"
+    exit 1
+  fi
+  echo "============================================================================"
+  echo "WARNING: the upgrade to 1.36.0 passed only on the retry."
+  echo "============================================================================"
 fi
 echo "$FURYCTL_YAML" > last_furyctl_yaml.txt
