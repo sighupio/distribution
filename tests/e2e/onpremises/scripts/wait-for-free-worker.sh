@@ -7,8 +7,9 @@
 # until no other e2e VMs (install, upgrade or immutable) are defined, then proceed.
 # The worker fits roughly one full run, so runs go one at a time. State-based (no lock files to
 # leak) -- it keys off the e2e VM naming. It counts running VMs, and the immutable VMs
-# (-e2eimm-) also when they are shut off: that pipeline defines its VMs powered off and
-# starts them later. Other shut-off VMs do not count, because they use no memory. A
+# (-e2eimm-, -e2eimmup-) also when they are shut off: those pipelines define their
+# VMs powered off and start them later. Other shut-off VMs do not count, because they
+# use no memory. A
 # hard-killed build whose delete step never ran leaves orphan VMs that block until
 # MAX_WAIT, then this fails loudly.
 set -uo pipefail
@@ -21,7 +22,7 @@ PAT='^(haproxy|lb|controlplane|infra|worker)-'
 busy_vms() {
   {
     $VIRSH list --state-running --name
-    $VIRSH list --all --name | grep -- '-e2eimm-'
+    $VIRSH list --all --name | grep -E -- '-e2eimm(up)?-'
   } 2>/dev/null | grep -E "$PAT" | sort -u
 }
 

@@ -32,8 +32,8 @@ output "worker_0" {
 # worker-0 uses DHCP after install and every other node a static address, so both
 # network configurations are covered. The Kubernetes nodes enable iscsid, which
 # longhorn needs to attach volumes (Flatcar ships it disabled).
-output "furyctl_yaml" {
-  value = <<EOT
+locals {
+  furyctl_yaml = <<EOT
 ---
 apiVersion: kfd.sighup.io/v1alpha2
 kind: Immutable
@@ -41,7 +41,7 @@ metadata:
   # fixed, so the furyctl assets dir has a stable path for the pipeline cache
   name: e2e-immutable
 spec:
-  distributionVersion: v1.36.0
+  distributionVersion: ${var.distribution_version}
   infrastructure:
     ssh:
       username: core
@@ -232,6 +232,16 @@ spec:
         provider:
           type: none
 EOT
+}
+
+output "furyctl_yaml" {
+  value = local.furyctl_yaml
+}
+
+# The upgrade pipeline installs distribution_version, then upgrades to
+# upgrade_version with the same configuration.
+output "furyctl_upgrade_yaml" {
+  value = replace(local.furyctl_yaml, "distributionVersion: ${var.distribution_version}", "distributionVersion: ${var.upgrade_version}")
 }
 
 output "req_dns" {

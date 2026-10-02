@@ -41,8 +41,7 @@ addresses. Thus the e2e tests both network configurations.
 
 ## Flow
 
-1. **install-tools**: `mise install`. The pipeline sets `MISE_FURYCTL_VERSION`
-   to the furyctl version that supports this distribution version.
+1. **install-tools**: `mise install`.
 2. **provision-vms**: the step waits until no other e2e VMs are on the worker.
    Then `tofu apply` creates the VMs powered off. The step writes `furyctl.yaml`
    from `tofu output` and creates the ingress certificates.
@@ -59,10 +58,11 @@ addresses. Thus the e2e tests both network configurations.
 ```
 immutable/
   tofu/       libvirt network (DHCP + boot file), empty disks, VMs; output.tf
-              writes furyctl.yaml and req-dns.cnf
+              writes furyctl.yaml, furyctl_upgrade.yaml and req-dns.cnf
   scripts/    install.sh, power-on.sh, kube-bench.sh
   longhorn/   kustomize base for spec.distribution.customResources: upstream
-              longhorn.yaml with replica 1 and over-provisioning
+              longhorn.yaml with replica 1, over-provisioning and always-allow
+              node drain
   config/     generated at run time: furyctl.yaml, pki/, kubeconfig, tls.*
   schema.sh   schema tests (qa pipeline), with helper.bash
 ```
@@ -89,3 +89,21 @@ suite, the kube-bench playbook and the encryption configuration.
   `/root/e2e-immutable-assets` on the worker. furyctl does not download a file
   again when the full file is already there. The cluster name is fixed
   (`e2e-immutable`), so the path of the assets does not change between runs.
+  The upgrade pipeline uses the same cache.
+
+## Upgrade pipeline
+
+The `e2e-immutable-upgrades-1.35.1-1.36.0` pipeline uses the same tofu and
+scripts. It runs after `e2e-immutable` and starts on the same tags.
+
+- The pipeline sets `TF_VAR_name_prefix=e2eimmup` and the octet range 250..254,
+  so its VMs and network never collide with the install pipeline.
+- `TF_VAR_distribution_version` (v1.35.1) is the version in `furyctl.yaml`, and
+  `TF_VAR_upgrade_version` (v1.36.0) is the version in `furyctl_upgrade.yaml`.
+  The rest of the two files is the same.
+- **install-1.35.1** sets `DISTRO_LOCATION` to the v1.35.1 tag on GitHub, so the
+  base cluster is the released v1.35.1 and not this checkout.
+- **upgrade-1.36.0** runs `../onpremises/scripts/upgrade.sh`: `furyctl apply
+  --upgrade` with this checkout. The nodes already run, so furyctl does not serve
+  iPXE: it upgrades the nodes over SSH, one at a time, with drain and reboot.
+- The on-premises bats suite runs after the install and after the upgrade.

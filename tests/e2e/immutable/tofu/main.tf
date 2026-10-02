@@ -21,7 +21,8 @@ provider "libvirt" {
 }
 
 locals {
-  # Disjoint per-run /24, outside the on-premises ranges (10..99, 110..199).
+  # Disjoint per-run /24, outside the on-premises ranges (10..99, 110..199). The
+  # install pipeline uses 200..249 (defaults), the upgrade pipeline 250..254.
   octet   = (tonumber(var.ci_number) % var.octet_span) + var.octet_base
   subnet  = "10.10.${local.octet}"
   gateway = "${local.subnet}.1"

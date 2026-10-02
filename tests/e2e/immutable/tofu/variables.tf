@@ -10,7 +10,7 @@ variable "ci_number" {
 variable "name_prefix" {
   type        = string
   default     = "e2eimm"
-  description = "Prefix for every libvirt resource name, distinct from the on-premises pipelines (e2e, e2eup)."
+  description = "Prefix for every libvirt resource name, distinct from the on-premises pipelines (e2e, e2eup). The upgrade pipeline uses e2eimmup."
 }
 
 # octet_base + (ci_number % octet_span) is the third octet of the /24.
@@ -22,6 +22,18 @@ variable "octet_base" {
 variable "octet_span" {
   type    = number
   default = 50
+}
+
+variable "distribution_version" {
+  type        = string
+  default     = "v1.36.0"
+  description = "distributionVersion of furyctl.yaml, the version that the install step applies."
+}
+
+variable "upgrade_version" {
+  type        = string
+  default     = "v1.36.0"
+  description = "distributionVersion of furyctl_upgrade.yaml, the target of the upgrade pipeline."
 }
 
 variable "private_key_path" {

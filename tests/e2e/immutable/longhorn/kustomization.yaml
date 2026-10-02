@@ -26,6 +26,10 @@ patches:
           disable-revision-counter: true
           storage-over-provisioning-percentage: 1000
           storage-minimal-available-percentage: 5
+          # the upgrade drains each node; with replica 1 longhorn's PDB would block
+          # evicting the instance-manager that holds the only replica. e2e data is
+          # disposable, so always allow the drain.
+          node-drain-policy: always-allow
   - patch: |
       apiVersion: v1
       kind: ConfigMap

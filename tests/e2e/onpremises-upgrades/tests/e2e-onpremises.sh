@@ -54,7 +54,7 @@ load ./helper
 
 @test "HAProxy Ingress Controller is Running" {
     info
-    # haproxy ingress is added by the upgrade; not present in the v1.34.1 base.
+    # haproxy ingress is added by the upgrade; not present in the v1.35.1 base.
     [ "${EXPECT_HAPROXY_INGRESS:-0}" = "1" ] || skip "haproxy ingress only after upgrade"
     test() {
         kubectl get pods -l app.kubernetes.io/name=kubernetes-ingress -o json -n ingress-haproxy |jq '.items[].status.containerStatuses[].ready' | uniq | grep -q true

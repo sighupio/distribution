@@ -26,7 +26,7 @@ volumes:
 
 steps: # qa
   - name: install-tools
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     environment:
       MISE_GITHUB_TOKEN:
@@ -44,7 +44,7 @@ steps: # qa
       - eval "$(mise activate bash --shims)"
 
   - name: license-check
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     depends_on:
       - install-tools
@@ -56,7 +56,7 @@ steps: # qa
       - mise run license-check
 
   - name: lint-e2e
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     depends_on:
       - install-tools
@@ -69,7 +69,7 @@ steps: # qa
 
   - &test-schema
     name: test-schema-kfddistribution
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     depends_on:
       - license-check
@@ -94,7 +94,7 @@ steps: # qa
 
   - &test-create-config
     name: test-create-config-kfddistribution
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     depends_on:
       - install-tools
@@ -109,31 +109,31 @@ steps: # qa
     commands:
       - eval "$(mise activate bash --shims)"
       - mkdir -p /tmp/test-kfddistribution /tmp/test-ekscluster /tmp/test-onpremises /tmp/test-immutable
-      - furyctl create config --kind KFDDistribution --version v1.35.1 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-kfddistribution
+      - furyctl create config --kind KFDDistribution --version v1.36.0 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-kfddistribution
 
   - <<: *test-create-config
     name: test-create-config-ekscluster
     commands:
       - eval "$(mise activate bash --shims)"
       - mkdir -p /tmp/test-kfddistribution /tmp/test-ekscluster /tmp/test-onpremises /tmp/test-immutable
-      - furyctl create config --kind EKSCluster --version v1.35.1 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-ekscluster
+      - furyctl create config --kind EKSCluster --version v1.36.0 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-ekscluster
 
   - <<: *test-create-config
     name: test-create-config-onpremises
     commands:
       - eval "$(mise activate bash --shims)"
       - mkdir -p /tmp/test-kfddistribution /tmp/test-ekscluster /tmp/test-onpremises /tmp/test-immutable
-      - furyctl create config --kind OnPremises --version v1.35.1 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-onpremises
+      - furyctl create config --kind OnPremises --version v1.36.0 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-onpremises
 
   - <<: *test-create-config
     name: test-create-config-immutable
     commands:
       - eval "$(mise activate bash --shims)"
       - mkdir -p /tmp/test-kfddistribution /tmp/test-ekscluster /tmp/test-onpremises /tmp/test-immutable
-      - furyctl create config --kind Immutable --version v1.35.1 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-immutable
+      - furyctl create config --kind Immutable --version v1.36.0 --name test --distro-location /drone/src --disable-analytics --no-tty --workdir /tmp/test-immutable
 
   - name: test-templates-regressions
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     depends_on:
       - install-tools
@@ -150,7 +150,7 @@ steps: # qa
       - mise run "test:templates:regressions"
 
   - name: render
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     depends_on:
       - license-check
@@ -162,7 +162,7 @@ steps: # qa
       FURYCTL_OUTDIR: ./
       FURYCTL_DISABLE_ANALYTICS: "true"
       KUBECONFIG: ./dummy
-      KUBECTL_VERSION: "1.35.1"
+      KUBECTL_VERSION: "1.36.4"
       MISE_GITHUB_TOKEN:
         from_secret: github_token
       GITHUB_TOKEN:
@@ -186,10 +186,10 @@ steps: # qa
       - render
     commands:
       # we use --ignore-deprecations because we don't want the CI to fail when the API has not been removed yet.
-      - /pluto detect distribution.yml --ignore-deprecations --target-versions=k8s=v1.35.0
+      - /pluto detect distribution.yml --ignore-deprecations --target-versions=k8s=v1.36.0
 
 ---
-name: e2e-kfddistribution-1.35
+name: e2e-kfddistribution-1.36
 kind: pipeline
 type: docker
 
@@ -215,7 +215,7 @@ environment:
   MISE_DATA_DIR: /mise-data
   CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}
   KUBECONFIG: /drone/src/kubeconfig
-  CLUSTER_VERSION: v1.35.0
+  CLUSTER_VERSION: v1.36.4
 
 volumes:
   - name: dockersock
@@ -225,9 +225,9 @@ volumes:
     host:
       path: /root/mise_data_dir
 
-steps: # e2e-kfddistribution-1.34
+steps: # e2e-kfddistribution-1.36
   - name: install-tools
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     environment:
       MISE_GITHUB_TOKEN:
@@ -245,7 +245,7 @@ steps: # e2e-kfddistribution-1.34
       - eval "$(mise activate bash --shims)"
 
   - name: create Kind cluster
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     depends_on:
       - install-tools
@@ -271,7 +271,7 @@ steps: # e2e-kfddistribution-1.34
       - kind get kubeconfig --name $${CLUSTER_NAME} > $${KUBECONFIG}
 
   - name: e2e-kfddistribution
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     network_mode: host
     environment:
@@ -290,7 +290,7 @@ steps: # e2e-kfddistribution-1.34
       - tests/e2e/kfddistribution/e2e-kfddistribution.sh
 
   - name: delete-kind-cluster
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     volumes:
       - name: dockersock
@@ -308,8 +308,8 @@ steps: # e2e-kfddistribution-1.34
         - failure
 
 ---
-# We test 1.34.1 -> 1.35.0 upgrade pipeline
-name: e2e-kfddistribution-1.34.1-to-1.35.1
+# We test 1.35.1 -> 1.36.0 upgrade pipeline
+name: e2e-kfddistribution-1.35.1-to-1.36.0
 kind: pipeline
 type: docker
 
@@ -335,8 +335,8 @@ environment:
   MISE_DATA_DIR: /mise-data
   CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-upgrades
   KUBECONFIG: /drone/src/kubeconfig-upgrades
-  KUBECTL_VERSION: "1.34.0"
-  CLUSTER_VERSION: v1.34.0
+  KUBECTL_VERSION: "1.35.0"
+  CLUSTER_VERSION: v1.35.0
 
 volumes:
   - name: dockersock
@@ -346,9 +346,9 @@ volumes:
     host:
       path: /root/mise_data_dir
 
-steps: # e2e-kfddistribution-1.34.1-to-1.35.0
+steps: # e2e-kfddistribution-1.35.1-to-1.36.0
   - name: install-tools
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     environment:
       MISE_GITHUB_TOKEN:
@@ -366,7 +366,7 @@ steps: # e2e-kfddistribution-1.34.1-to-1.35.0
       - eval "$(mise activate bash --shims)"
 
   - name: create Kind cluster
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     depends_on:
       - install-tools
@@ -394,7 +394,7 @@ steps: # e2e-kfddistribution-1.34.1-to-1.35.0
       - kind get kubeconfig --name $${CLUSTER_NAME} > $${KUBECONFIG}
 
   - name: e2e-kfddistribution
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     network_mode: host
     environment:
@@ -415,7 +415,7 @@ steps: # e2e-kfddistribution-1.34.1-to-1.35.0
       - tests/e2e/kfddistribution/e2e-kfddistribution-upgrades.sh
 
   - name: delete-kind-cluster
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     volumes:
       - name: dockersock
@@ -433,7 +433,7 @@ steps: # e2e-kfddistribution-1.34.1-to-1.35.0
         - failure
 
 ---
-name: e2e-ekscluster-1.35.1
+name: e2e-ekscluster-1.36.0
 kind: pipeline
 type: docker
 
@@ -451,7 +451,7 @@ trigger:
 
 environment:
   MISE_DATA_DIR: /mise-data
-  DISTRIBUTION_VERSION: "v1.35.1"
+  DISTRIBUTION_VERSION: "v1.36.0"
   CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}
 
 volumes:
@@ -461,9 +461,9 @@ volumes:
   - name: furyctl-outdir-eks
     temp: {}
 
-steps: # e2e-ekscluster-1.34.1
+steps: # e2e-ekscluster-1.36.0
   - name: install-tools
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     environment:
       MISE_GITHUB_TOKEN:
@@ -481,7 +481,7 @@ steps: # e2e-ekscluster-1.34.1
       - eval "$(mise activate bash --shims)"
 
   - name: run-tests
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     environment:
       AWS_ACCESS_KEY_ID:
@@ -507,7 +507,7 @@ steps: # e2e-ekscluster-1.34.1
       - ./tests/e2e/ekscluster/e2e-ekscluster.sh
 
   - name: furyctl-delete
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     environment:
       AWS_ACCESS_KEY_ID:
@@ -546,7 +546,7 @@ steps: # e2e-ekscluster-1.34.1
         - failure
 
   - name: furyctl-delete-force
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     environment:
       AWS_ACCESS_KEY_ID:
@@ -597,7 +597,7 @@ steps: # e2e-ekscluster-1.34.1
         - failure
 
   - name: delete-aws-bucket
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     environment:
       AWS_ACCESS_KEY_ID:
@@ -627,7 +627,7 @@ steps: # e2e-ekscluster-1.34.1
         - failure
 
 ---
-name: e2e-ekscluster-selfmanaged-alinux2023-1.35.1
+name: e2e-ekscluster-selfmanaged-alinux2023-1.36.0
 kind: pipeline
 type: docker
 
@@ -645,7 +645,7 @@ trigger:
 
 environment:
   MISE_DATA_DIR: /mise-data
-  DISTRIBUTION_VERSION: "v1.35.1"
+  DISTRIBUTION_VERSION: "v1.36.0"
   CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-selfmanaged
 
 volumes:
@@ -655,9 +655,9 @@ volumes:
   - name: furyctl-outdir-eks-selfmanaged
     temp: {}
 
-steps: # e2e-ekscluster-selfmanaged-alinux2023-1.34.1
+steps: # e2e-ekscluster-selfmanaged-alinux2023-1.36.0
   - name: install-tools
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     environment:
       MISE_GITHUB_TOKEN:
@@ -675,7 +675,7 @@ steps: # e2e-ekscluster-selfmanaged-alinux2023-1.34.1
       - eval "$(mise activate bash --shims)"
 
   - name: run-tests
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     environment:
       AWS_ACCESS_KEY_ID:
@@ -701,7 +701,7 @@ steps: # e2e-ekscluster-selfmanaged-alinux2023-1.34.1
       - ./tests/e2e/ekscluster/e2e-ekscluster-selfmanaged-alinux2023.sh
 
   - name: furyctl-delete
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     environment:
       AWS_ACCESS_KEY_ID:
@@ -740,7 +740,7 @@ steps: # e2e-ekscluster-selfmanaged-alinux2023-1.34.1
         - failure
 
   - name: furyctl-delete-force
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     environment:
       AWS_ACCESS_KEY_ID:
@@ -791,7 +791,7 @@ steps: # e2e-ekscluster-selfmanaged-alinux2023-1.34.1
         - failure
 
   - name: delete-aws-bucket
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     environment:
       AWS_ACCESS_KEY_ID:
@@ -821,7 +821,7 @@ steps: # e2e-ekscluster-selfmanaged-alinux2023-1.34.1
         - failure
 
 ---
-name: e2e-ekscluster-upgrades-1.34.1-1.35.1
+name: e2e-ekscluster-upgrades-1.35.1-1.36.0
 kind: pipeline
 type: docker
 
@@ -839,7 +839,7 @@ trigger:
 
 environment:
   MISE_DATA_DIR: /mise-data
-  DISTRIBUTION_VERSION: "v1.35.1"
+  DISTRIBUTION_VERSION: "v1.36.0"
   CLUSTER_NAME: e2e-eks-${DRONE_BUILD_NUMBER}-upgrades
 
 volumes:
@@ -851,7 +851,7 @@ volumes:
 
 steps: #e2e-eks-upgrades
   - name: install-tools
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     environment:
       MISE_GITHUB_TOKEN:
@@ -869,7 +869,7 @@ steps: #e2e-eks-upgrades
       - eval "$(mise activate bash --shims)"
 
   - name: run-tests
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     environment:
       AWS_ACCESS_KEY_ID:
@@ -892,10 +892,10 @@ steps: #e2e-eks-upgrades
         path: /furyctl-outdir
     commands:
       - eval "$(mise activate bash --shims)"
-      - ./tests/e2e/ekscluster-upgrades/e2e-ekscluster-upgrades-1.34.1-1.35.1.sh
+      - ./tests/e2e/ekscluster-upgrades/e2e-ekscluster-upgrades-1.35.1-1.36.0.sh
 
   - name: furyctl-delete
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     environment:
       AWS_ACCESS_KEY_ID:
@@ -934,7 +934,7 @@ steps: #e2e-eks-upgrades
         - failure
 
   - name: furyctl-delete-force
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     environment:
       AWS_ACCESS_KEY_ID:
@@ -957,13 +957,13 @@ steps: #e2e-eks-upgrades
         path: /furyctl-outdir
     commands:
       - eval "$(mise activate bash --shims)"
-      - tests/e2e/ekscluster/replace_variables.sh --cluster-name "$CLUSTER_NAME" --furyctl-yaml tests/e2e/ekscluster-upgrades/manifests/furyctl-upgrade-version-1.34.1.yaml
+      - tests/e2e/ekscluster/replace_variables.sh --cluster-name "$CLUSTER_NAME" --furyctl-yaml tests/e2e/ekscluster-upgrades/manifests/furyctl-upgrade-version-1.35.1.yaml
       - |
         furyctl delete cluster \
           --outdir /furyctl-outdir \
           --debug \
           --disable-analytics \
-          --config tests/e2e/ekscluster-upgrades/manifests/furyctl-upgrade-version-1.34.1.yaml \
+          --config tests/e2e/ekscluster-upgrades/manifests/furyctl-upgrade-version-1.35.1.yaml \
           --distro-location ./ \
           --phase kubernetes \
           --force \
@@ -973,7 +973,7 @@ steps: #e2e-eks-upgrades
           --outdir /furyctl-outdir \
           --debug \
           --disable-analytics \
-          --config tests/e2e/ekscluster-upgrades/manifests/furyctl-upgrade-version-1.34.1.yaml \
+          --config tests/e2e/ekscluster-upgrades/manifests/furyctl-upgrade-version-1.35.1.yaml \
           --distro-location ./ \
           --phase infrastructure \
           --force \
@@ -985,7 +985,7 @@ steps: #e2e-eks-upgrades
         - failure
 
   - name: delete-aws-bucket
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     environment:
       AWS_ACCESS_KEY_ID:
@@ -1058,7 +1058,7 @@ volumes:
 
 steps: # e2e-onpremises
   - name: install-tools
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     environment:
       MISE_GITHUB_TOKEN:
@@ -1076,7 +1076,7 @@ steps: # e2e-onpremises
       - eval "$(mise activate bash --shims)"
 
   - name: provision-vms
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     network_mode: host
     environment:
@@ -1122,7 +1122,7 @@ steps: # e2e-onpremises
       - cd ../config && bash ../scripts/create_ingress_certs.sh
 
   - name: prepare-nodes
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     network_mode: host
     environment:
@@ -1141,7 +1141,7 @@ steps: # e2e-onpremises
       - bash tests/e2e/onpremises/scripts/prepare-nodes.sh
 
   - name: install
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     network_mode: host
     environment:
@@ -1165,7 +1165,7 @@ steps: # e2e-onpremises
       - bash tests/e2e/onpremises/scripts/install.sh
 
   - name: bats-test-distribution
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     network_mode: host
     environment:
@@ -1183,7 +1183,7 @@ steps: # e2e-onpremises
       - bash tests/e2e/onpremises/scripts/bats-test.sh
 
   - name: kube-bench
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     network_mode: host
     volumes:
@@ -1196,7 +1196,7 @@ steps: # e2e-onpremises
       - bash tests/e2e/onpremises/scripts/kube-bench.sh
 
   - name: delete
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     network_mode: host
     volumes:
@@ -1218,10 +1218,10 @@ steps: # e2e-onpremises
         - failure
 
 ---
-# On-premises upgrade pipeline: install v1.34.1, then upgrade to v1.35.0, on the
+# On-premises upgrade pipeline: install v1.35.1, then upgrade to v1.36.0, on the
 # same local libvirt VMs as e2e-onpremises (calico + gatekeeper path). Disjoint
 # subnet range (e2eup / 110..199) so it never collides with the install pipeline.
-name: e2e-onpremises-upgrades-1.34.1-1.35.1
+name: e2e-onpremises-upgrades-1.35.1-1.36.0
 kind: pipeline
 type: docker
 # No node selector: like e2e-onpremises, lands on the single bare-metal worker --
@@ -1265,9 +1265,9 @@ volumes:
     host:
       path: /root/e2e-diag
 
-steps: # e2e-onpremises-upgrades-1.34.1-1.35.1
+steps: # e2e-onpremises-upgrades-1.35.1-1.36.0
   - name: install-tools
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     environment:
       MISE_GITHUB_TOKEN:
@@ -1282,7 +1282,7 @@ steps: # e2e-onpremises-upgrades-1.34.1-1.35.1
       - eval "$(mise activate bash --shims)"
 
   - name: provision-vms
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     network_mode: host
     environment:
@@ -1323,7 +1323,7 @@ steps: # e2e-onpremises-upgrades-1.34.1-1.35.1
       - cd ../config && bash /drone/src/tests/e2e/onpremises/scripts/create_ingress_certs.sh
 
   - name: prepare-nodes
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     network_mode: host
     environment:
@@ -1340,8 +1340,8 @@ steps: # e2e-onpremises-upgrades-1.34.1-1.35.1
       - eval "$(mise activate bash --shims)"
       - bash tests/e2e/onpremises/scripts/prepare-nodes.sh
 
-  - name: install-1.34.1
-    image: quay.io/sighup/mise:v2026.6.14
+  - name: install-1.35.1
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     network_mode: host
     environment:
@@ -1349,7 +1349,8 @@ steps: # e2e-onpremises-upgrades-1.34.1-1.35.1
         from_secret: github_token
       GITHUB_TOKEN:
         from_secret: github_token
-      DISTRO_LOCATION: /drone/src
+      # the released base version, not this checkout: only the upgrade uses /drone/src
+      DISTRO_LOCATION: git::https://github.com/sighupio/fury-distribution?ref=v1.35.1&depth=1
       DIAG_DIR: /diag
     volumes:
       - name: cache
@@ -1360,11 +1361,11 @@ steps: # e2e-onpremises-upgrades-1.34.1-1.35.1
         path: /diag
     commands:
       - eval "$(mise activate bash --shims)"
-      # pki + apply v1.34.1, StorageClass-wait, distribution re-apply (see install.sh)
+      # pki + apply v1.35.1, StorageClass-wait, distribution re-apply (see install.sh)
       - bash tests/e2e/onpremises/scripts/install.sh
 
-  - name: bats-test-1.34.1
-    image: quay.io/sighup/mise:v2026.6.14
+  - name: bats-test-1.35.1
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     network_mode: host
     environment:
@@ -1381,8 +1382,8 @@ steps: # e2e-onpremises-upgrades-1.34.1-1.35.1
       # post-install checks (haproxy ingress not yet present -> its check skips)
       - bash tests/e2e/onpremises/scripts/bats-test.sh
 
-  - name: upgrade-1.35.1
-    image: quay.io/sighup/mise:v2026.6.14
+  - name: upgrade-1.36.0
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     network_mode: host
     environment:
@@ -1403,8 +1404,8 @@ steps: # e2e-onpremises-upgrades-1.34.1-1.35.1
       - eval "$(mise activate bash --shims)"
       - bash tests/e2e/onpremises/scripts/upgrade.sh
 
-  - name: bats-test-1.35.1
-    image: quay.io/sighup/mise:v2026.6.14
+  - name: bats-test-1.36.0
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     network_mode: host
     environment:
@@ -1423,7 +1424,7 @@ steps: # e2e-onpremises-upgrades-1.34.1-1.35.1
       - bash tests/e2e/onpremises/scripts/bats-test.sh
 
   - name: delete
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     network_mode: host
     volumes:
@@ -1458,7 +1459,7 @@ type: docker
 # and Drone then waits for their own dependencies (qa) instead. The VM gate stays as
 # the safety net for separate builds.
 depends_on:
-  - e2e-onpremises-upgrades-1.34.1-1.35.1
+  - e2e-onpremises-upgrades-1.35.1-1.36.0
 clone:
   depth: 1
 
@@ -1470,9 +1471,6 @@ trigger:
 
 environment:
   MISE_DATA_DIR: /mise-data
-  # v1.36.0 needs furyctl 0.36.0. Pinned here only, so the repo pin (and the other
-  # pipelines) keep working. Move to 0.36.0 when it is released.
-  MISE_FURYCTL_VERSION: 0.36.0-rc.0
   TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
   # the scripts reused from onpremises/scripts target this pipeline's dirs.
   E2E_DIR: /drone/src/tests/e2e/immutable
@@ -1497,7 +1495,7 @@ volumes:
 
 steps: # e2e-immutable
   - name: install-tools
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     environment:
       MISE_GITHUB_TOKEN:
@@ -1512,7 +1510,7 @@ steps: # e2e-immutable
       - eval "$(mise activate bash --shims)"
 
   - name: provision-vms
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     network_mode: host
     environment:
@@ -1545,7 +1543,7 @@ steps: # e2e-immutable
       - cd ../config && bash ../../onpremises/scripts/create_ingress_certs.sh
 
   - name: install
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     network_mode: host
     environment:
@@ -1574,7 +1572,7 @@ steps: # e2e-immutable
       - bash tests/e2e/immutable/scripts/install.sh
 
   - name: bats-test-distribution
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     network_mode: host
     environment:
@@ -1593,7 +1591,7 @@ steps: # e2e-immutable
       - bash tests/e2e/onpremises/scripts/bats-test.sh
 
   - name: kube-bench
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     network_mode: host
     volumes:
@@ -1606,7 +1604,217 @@ steps: # e2e-immutable
       - bash tests/e2e/immutable/scripts/kube-bench.sh
 
   - name: delete
-    image: quay.io/sighup/mise:v2026.6.14
+    image: quay.io/sighup/mise:v2026.8.6
+    pull: always
+    network_mode: host
+    volumes:
+      - name: mise-cache
+        path: /mise-data
+      - name: libvirt-sock
+        path: /var/run/libvirt
+    commands:
+      - eval "$(mise activate bash --shims)"
+      - cd tests/e2e/immutable/tofu
+      - tofu init
+      - tofu destroy -auto-approve
+    when:
+      status:
+        - success
+        - failure
+
+---
+# Immutable upgrade pipeline: install v1.35.1, then upgrade to v1.36.0, on the same
+# Flatcar VMs as e2e-immutable. Same tofu, with its own name prefix (e2eimmup) and
+# subnet range (250..254) so it never collides with the install pipeline.
+name: e2e-immutable-upgrades-1.35.1-1.36.0
+kind: pipeline
+type: docker
+# No node selector: lands on the single bare-metal worker with /dev/kvm + libvirt.
+
+# After the install pipeline: they share the one libvirt worker, which fits one
+# cluster at a time. The VM gate stays as the safety net for separate builds.
+depends_on:
+  - e2e-immutable
+clone:
+  depth: 1
+
+trigger:
+  ref:
+    include:
+      - refs/tags/e2e-immutable-**
+      - refs/tags/e2e-all-**
+
+environment:
+  MISE_DATA_DIR: /mise-data
+  TF_VAR_ci_number: ${DRONE_BUILD_NUMBER}
+  TF_VAR_name_prefix: e2eimmup
+  TF_VAR_octet_base: "250"
+  TF_VAR_octet_span: "5"
+  TF_VAR_distribution_version: v1.35.1
+  TF_VAR_upgrade_version: v1.36.0
+  # the scripts reused from onpremises/scripts target this pipeline's dirs.
+  E2E_DIR: /drone/src/tests/e2e/immutable
+
+volumes:
+  - name: cache
+    temp: {}
+  - name: mise-cache
+    host:
+      path: /root/mise_data_dir
+  - name: libvirt-sock
+    host:
+      path: /var/run/libvirt
+  - name: e2e-diag
+    host:
+      path: /root/e2e-diag
+  # shared with e2e-immutable: same cluster name, so the same furyctl assets dir.
+  - name: immutable-assets
+    host:
+      path: /root/e2e-immutable-assets
+
+steps: # e2e-immutable-upgrades-1.35.1-1.36.0
+  - name: install-tools
+    image: quay.io/sighup/mise:v2026.8.6
+    pull: always
+    environment:
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
+    volumes:
+      - name: mise-cache
+        path: /mise-data
+    commands:
+      - "(flock -w 1800 9 || exit 1; mise install) 9>/mise-data/.mise-install.lock"
+      - eval "$(mise activate bash --shims)"
+
+  - name: provision-vms
+    image: quay.io/sighup/mise:v2026.8.6
+    pull: always
+    network_mode: host
+    environment:
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
+      # an on-premises or immutable run on the same e2e-all tag can hold the worker for a while
+      MAX_WAIT_SECONDS: 14400
+    volumes:
+      - name: cache
+        path: /cache
+      - name: mise-cache
+        path: /mise-data
+      - name: libvirt-sock
+        path: /var/run/libvirt
+    commands:
+      - eval "$(mise activate bash --shims)"
+      - apt-get update && apt-get install -y --no-install-recommends libvirt-clients
+      - bash tests/e2e/onpremises/scripts/wait-for-free-worker.sh
+      # furyctl writes the public key (same path + .pub) into every node's ignition
+      - ssh-keygen -N '' -t ed25519 -C "sighup" -f /cache/ci-ssh-key
+      # empty-disk VMs, created powered off; then both furyctl configs + ingress certs
+      - cd tests/e2e/immutable/tofu
+      - tofu init
+      - tofu apply -auto-approve
+      - mkdir -p ../config
+      - tofu output -raw furyctl_yaml > ../config/furyctl.yaml
+      - tofu output -raw furyctl_upgrade_yaml > ../config/furyctl_upgrade.yaml
+      - tofu output -raw req_dns > ../config/req-dns.cnf
+      - cd ../config && bash ../../onpremises/scripts/create_ingress_certs.sh
+
+  - name: install-1.35.1
+    image: quay.io/sighup/mise:v2026.8.6
+    pull: always
+    network_mode: host
+    environment:
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
+      # the released base version, not this checkout: only the upgrade uses /drone/src
+      DISTRO_LOCATION: git::https://github.com/sighupio/fury-distribution?ref=v1.35.1&depth=1
+      DIAG_DIR: /diag
+    volumes:
+      - name: cache
+        path: /cache
+      - name: mise-cache
+        path: /mise-data
+      - name: libvirt-sock
+        path: /var/run/libvirt
+      - name: e2e-diag
+        path: /diag
+      - name: immutable-assets
+        path: /root/.furyctl/e2e-immutable/infrastructure/server/assets
+    commands:
+      - eval "$(mise activate bash --shims)"
+      - apt-get update && apt-get install -y --no-install-recommends libvirt-clients procps
+      # iPXE boot + the on-premises install sequence, as in e2e-immutable
+      - bash tests/e2e/immutable/scripts/install.sh
+
+  - name: bats-test-1.35.1
+    image: quay.io/sighup/mise:v2026.8.6
+    pull: always
+    network_mode: host
+    environment:
+      DIAG_DIR: /diag
+      TESTS_DIR: /drone/src/tests/e2e/onpremises/tests
+    volumes:
+      - name: cache
+        path: /cache
+      - name: mise-cache
+        path: /mise-data
+      - name: e2e-diag
+        path: /diag
+    commands:
+      - eval "$(mise activate bash --shims)"
+      - bash tests/e2e/onpremises/scripts/bats-test.sh
+
+  # The nodes are already running, so the upgrade does not serve iPXE: furyctl
+  # stages the new sysext images over SSH and reboots the nodes one at a time.
+  - name: upgrade-1.36.0
+    image: quay.io/sighup/mise:v2026.8.6
+    pull: always
+    network_mode: host
+    environment:
+      MISE_GITHUB_TOKEN:
+        from_secret: github_token
+      GITHUB_TOKEN:
+        from_secret: github_token
+      DISTRO_LOCATION: /drone/src
+      DIAG_DIR: /diag
+    volumes:
+      - name: cache
+        path: /cache
+      - name: mise-cache
+        path: /mise-data
+      - name: e2e-diag
+        path: /diag
+      - name: immutable-assets
+        path: /root/.furyctl/e2e-immutable/infrastructure/server/assets
+    commands:
+      - eval "$(mise activate bash --shims)"
+      - bash tests/e2e/onpremises/scripts/upgrade.sh
+
+  - name: bats-test-1.36.0
+    image: quay.io/sighup/mise:v2026.8.6
+    pull: always
+    network_mode: host
+    environment:
+      DIAG_DIR: /diag
+      TESTS_DIR: /drone/src/tests/e2e/onpremises/tests
+    volumes:
+      - name: cache
+        path: /cache
+      - name: mise-cache
+        path: /mise-data
+      - name: e2e-diag
+        path: /diag
+    commands:
+      - eval "$(mise activate bash --shims)"
+      - bash tests/e2e/onpremises/scripts/bats-test.sh
+
+  - name: delete
+    image: quay.io/sighup/mise:v2026.8.6
     pull: always
     network_mode: host
     volumes:
