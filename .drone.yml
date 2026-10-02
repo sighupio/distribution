@@ -896,95 +896,96 @@ steps: #e2e-eks-upgrades
       - eval "$(mise activate bash --shims)"
       - ./tests/e2e/ekscluster-upgrades/e2e-ekscluster-upgrades-1.35.1-1.36.0.sh
 
-  - name: furyctl-delete
-    image: quay.io/sighup/mise:v2026.8.6
-    pull: always
-    environment:
-      AWS_ACCESS_KEY_ID:
-        from_secret: aws_access_key_id
-      AWS_SECRET_ACCESS_KEY:
-        from_secret: aws_secret_access_key
-      AWS_REGION:
-        from_secret: aws_region
-      MISE_GITHUB_TOKEN:
-        from_secret: github_token
-      GITHUB_TOKEN:
-        from_secret: github_token
-      # furyctl runs `aws` from --outdir; point mise at the project config and trust it so the shim resolves aws-cli.
-      MISE_GLOBAL_CONFIG_FILE: /drone/src/mise.toml
-      MISE_TRUSTED_CONFIG_PATHS: /drone/src
-    volumes:
-      - name: mise-cache
-        path: /mise-data
-      - name: furyctl-outdir-eks-upgrades
-        path: /furyctl-outdir
-    commands:
-      - eval "$(mise activate bash --shims)"
-      - |
-        furyctl delete cluster \
-          --outdir /furyctl-outdir \
-          --debug \
-          --disable-analytics \
-          --config "$(cat ./last_furyctl_yaml.txt)" \
-          --distro-location ./ \
-          --force \
-          --skip-vpn-confirmation \
-          --no-tty || true
-    when:
-      status:
-        - success
-        - failure
+  # TEMPORARY: delete steps disabled to keep the cluster for the 409 analysis
+#   - name: furyctl-delete
+#     image: quay.io/sighup/mise:v2026.8.6
+#     pull: always
+#     environment:
+#       AWS_ACCESS_KEY_ID:
+#         from_secret: aws_access_key_id
+#       AWS_SECRET_ACCESS_KEY:
+#         from_secret: aws_secret_access_key
+#       AWS_REGION:
+#         from_secret: aws_region
+#       MISE_GITHUB_TOKEN:
+#         from_secret: github_token
+#       GITHUB_TOKEN:
+#         from_secret: github_token
+#       # furyctl runs `aws` from --outdir; point mise at the project config and trust it so the shim resolves aws-cli.
+#       MISE_GLOBAL_CONFIG_FILE: /drone/src/mise.toml
+#       MISE_TRUSTED_CONFIG_PATHS: /drone/src
+#     volumes:
+#       - name: mise-cache
+#         path: /mise-data
+#       - name: furyctl-outdir-eks-upgrades
+#         path: /furyctl-outdir
+#     commands:
+#       - eval "$(mise activate bash --shims)"
+#       - |
+#         furyctl delete cluster \
+#           --outdir /furyctl-outdir \
+#           --debug \
+#           --disable-analytics \
+#           --config "$(cat ./last_furyctl_yaml.txt)" \
+#           --distro-location ./ \
+#           --force \
+#           --skip-vpn-confirmation \
+#           --no-tty || true
+#     when:
+#       status:
+#         - success
+#         - failure
 
-  - name: furyctl-delete-force
-    image: quay.io/sighup/mise:v2026.8.6
-    pull: always
-    environment:
-      AWS_ACCESS_KEY_ID:
-        from_secret: aws_access_key_id
-      AWS_SECRET_ACCESS_KEY:
-        from_secret: aws_secret_access_key
-      AWS_REGION:
-        from_secret: aws_region
-      MISE_GITHUB_TOKEN:
-        from_secret: github_token
-      GITHUB_TOKEN:
-        from_secret: github_token
-      # furyctl runs `aws` from --outdir; point mise at the project config and trust it so the shim resolves aws-cli.
-      MISE_GLOBAL_CONFIG_FILE: /drone/src/mise.toml
-      MISE_TRUSTED_CONFIG_PATHS: /drone/src
-    volumes:
-      - name: mise-cache
-        path: /mise-data
-      - name: furyctl-outdir-eks-upgrades
-        path: /furyctl-outdir
-    commands:
-      - eval "$(mise activate bash --shims)"
-      - tests/e2e/ekscluster/replace_variables.sh --cluster-name "$CLUSTER_NAME" --furyctl-yaml tests/e2e/ekscluster-upgrades/manifests/furyctl-upgrade-version-1.35.1.yaml
-      - |
-        furyctl delete cluster \
-          --outdir /furyctl-outdir \
-          --debug \
-          --disable-analytics \
-          --config tests/e2e/ekscluster-upgrades/manifests/furyctl-upgrade-version-1.35.1.yaml \
-          --distro-location ./ \
-          --phase kubernetes \
-          --force \
-          --skip-vpn-confirmation \
-          --no-tty || true
-        furyctl delete cluster \
-          --outdir /furyctl-outdir \
-          --debug \
-          --disable-analytics \
-          --config tests/e2e/ekscluster-upgrades/manifests/furyctl-upgrade-version-1.35.1.yaml \
-          --distro-location ./ \
-          --phase infrastructure \
-          --force \
-          --skip-vpn-confirmation \
-          --no-tty || true
-    when:
-      status:
-        - success
-        - failure
+#   - name: furyctl-delete-force
+#     image: quay.io/sighup/mise:v2026.8.6
+#     pull: always
+#     environment:
+#       AWS_ACCESS_KEY_ID:
+#         from_secret: aws_access_key_id
+#       AWS_SECRET_ACCESS_KEY:
+#         from_secret: aws_secret_access_key
+#       AWS_REGION:
+#         from_secret: aws_region
+#       MISE_GITHUB_TOKEN:
+#         from_secret: github_token
+#       GITHUB_TOKEN:
+#         from_secret: github_token
+#       # furyctl runs `aws` from --outdir; point mise at the project config and trust it so the shim resolves aws-cli.
+#       MISE_GLOBAL_CONFIG_FILE: /drone/src/mise.toml
+#       MISE_TRUSTED_CONFIG_PATHS: /drone/src
+#     volumes:
+#       - name: mise-cache
+#         path: /mise-data
+#       - name: furyctl-outdir-eks-upgrades
+#         path: /furyctl-outdir
+#     commands:
+#       - eval "$(mise activate bash --shims)"
+#       - tests/e2e/ekscluster/replace_variables.sh --cluster-name "$CLUSTER_NAME" --furyctl-yaml tests/e2e/ekscluster-upgrades/manifests/furyctl-upgrade-version-1.35.1.yaml
+#       - |
+#         furyctl delete cluster \
+#           --outdir /furyctl-outdir \
+#           --debug \
+#           --disable-analytics \
+#           --config tests/e2e/ekscluster-upgrades/manifests/furyctl-upgrade-version-1.35.1.yaml \
+#           --distro-location ./ \
+#           --phase kubernetes \
+#           --force \
+#           --skip-vpn-confirmation \
+#           --no-tty || true
+#         furyctl delete cluster \
+#           --outdir /furyctl-outdir \
+#           --debug \
+#           --disable-analytics \
+#           --config tests/e2e/ekscluster-upgrades/manifests/furyctl-upgrade-version-1.35.1.yaml \
+#           --distro-location ./ \
+#           --phase infrastructure \
+#           --force \
+#           --skip-vpn-confirmation \
+#           --no-tty || true
+#     when:
+#       status:
+#         - success
+#         - failure
 
   - name: delete-aws-bucket
     image: quay.io/sighup/mise:v2026.8.6
