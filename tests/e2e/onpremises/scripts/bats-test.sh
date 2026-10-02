@@ -14,6 +14,8 @@ ONPREM="$(dirname "$SCRIPTS")"
 # run a specific suite (post-install vs post-upgrade). Defaults to this pipeline.
 E2E_DIR="${E2E_DIR:-$ONPREM}"
 BATS_SUITE="${BATS_SUITE:-e2e-onpremises.sh}"
+# TESTS_DIR lets the immutable pipeline run this suite against its own cluster.
+TESTS_DIR="${TESTS_DIR:-$E2E_DIR/tests}"
 export KUBECONFIG="$E2E_DIR/config/kubeconfig"
 
 TIMEOUT="${BATS_TIMEOUT:-3600}" # 60m
@@ -21,5 +23,5 @@ LOG="${DIAG_DIR:+${DIAG_DIR}/bats-${DRONE_BUILD_NUMBER:-local}.log}"
 LOG="${LOG:-/tmp/bats.log}"
 mkdir -p "$(dirname "$LOG")" 2>/dev/null || true
 
-timeout "$TIMEOUT" bats -t "$E2E_DIR/tests/$BATS_SUITE" 2>&1 | tee "$LOG"
+timeout "$TIMEOUT" bats -t "$TESTS_DIR/$BATS_SUITE" 2>&1 | tee "$LOG"
 exit "${PIPESTATUS[0]}"

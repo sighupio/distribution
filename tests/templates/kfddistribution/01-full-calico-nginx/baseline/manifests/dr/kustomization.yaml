@@ -10,6 +10,7 @@ resources:
   - ../../../vendor/modules/dr/katalog/velero/velero-node-agent
   - ../../../vendor/modules/dr/katalog/velero/velero-on-prem
   - ../../../vendor/modules/dr/katalog/velero/velero-schedules
+  - kapp-configs/velero-schedules.yaml
 
 patches:
   - path: patches/infra-nodes.yml

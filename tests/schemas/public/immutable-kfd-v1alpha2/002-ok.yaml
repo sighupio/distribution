@@ -451,7 +451,7 @@ spec:
         username_claim: email
         groups_claim: groups
         username_prefix: "oidc:"
-        group_prefix: "oidc:"
+        groups_prefix: "oidc:"
 
       # User certificate generation
       users:

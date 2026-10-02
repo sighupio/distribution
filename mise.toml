@@ -9,15 +9,16 @@ golangci-lint = "1.62.0"
 bats = "1.9.0"
 jq = "1.6"
 yq = "4.34.1"
-kind = "0.30.0"
-kubectl = "1.35.5"
+kind = "0.33.0"
+kubectl = "1.36.4"
 kustomize = "5.6.0"
 opentofu = "1.10.0"
 python = "3.12"
 pipx = "latest"
 ansible = "latest"
 aws-cli = "2.24.17"
-furyctl = "0.35.1-rc.3"
+shellcheck = "0.11.0"
+furyctl = "0.36.0-rc.2"
 
 # Go-based CLI tools to work with the JSON schemas and docs (this repo has no Go code).
 "go:github.com/santhosh-tekuri/jsonschema/cmd/jv" = "v0.7.0"
@@ -52,6 +53,22 @@ addlicense -c "SIGHUP s.r.l" -y 2017-present -v -l bsd \
   -ignore 'target/**' \
   -ignore 'vendor/**' \
   .
+"""
+
+[tasks."lint:e2e"]
+description = "lint the e2e scripts and tofu code"
+run = """
+#!/usr/bin/env bash
+set -euo pipefail
+# Only scripts/: the other .sh files under tests/e2e are bats suites.
+shellcheck tests/e2e/*/scripts/*.sh
+for dir in tests/e2e/*/tofu; do
+  echo "Checking $dir..."
+  tofu -chdir="$dir" fmt -check -recursive
+  tofu -chdir="$dir" init -backend=false -input=false >/dev/null
+  tofu -chdir="$dir" validate
+  rm -rf "$dir/.terraform" "$dir/.terraform.lock.hcl"
+done
 """
 
 [tasks.generate-docs]

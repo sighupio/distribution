@@ -74,20 +74,24 @@ At this point, you'll need to switch to pushing some changes in furyctl
     3. `docs/relases/unreleased.md`.
 12. Update the compatibility unit tests with the new versions (`internal/distribution/compatibility_test.go`)
 13. If the distribution schemas changed in fields that furyctl reads or injects, update furyctl's hand-maintained config types accordingly in `internal/apis/kfd/v1alpha2/<kind>/{public,private}/schema.go`, keeping the `yaml` **and** `json` struct tags in sync (the `json` tags drive the runtime Terraform/OpenTofu data injection). The distribution no longer ships generated Go types and furyctl no longer imports it as a Go module (see furyctl#674), so this is now a manual step instead of a `go get` of the `fury-distribution` library.
-14. Tag a release candidate with the changes. This will be used in the e2e tests of the distribution.
+14. Align the mise release that furyctl bundles to the `quay.io/sighup/mise` image used in this repo's `.drone.yml`. furyctl downloads its own mise binary to install the distribution tools (the `Downloading mise-vX.Y.Z-...` line in the logs), so bumping the CI image here does not change it:
+    1. Set `Version` in furyctl's `internal/tool/mise/mise.go`.
+    2. Update `binChecksums` in the same file with the `linux-{x64,arm64}-musl` and `macos-{x64,arm64}` lines of that release's `SHASUMS256.txt` (`https://github.com/jdx/mise/releases/download/<version>/SHASUMS256.txt`).
+    3. Bump the `quay.io/sighup/mise` image in furyctl's `.drone.yml` to the same version.
+15. Tag a release candidate with the changes. This will be used in the e2e tests of the distribution.
 
 ### Back to fury-distribution
 
-15. Update the CI's `.drone.yaml` file to use the release candidate for furyctl that you released in step `14`.
-16. Update the e2e tests with the new upgrade paths.
-17. Tag with the `e2e-all-*` pattern to run the e2e tests using the new upgrade paths and furyctl's RC, then tag a release candidate.
-18. After the CI passes and the PR has been approved, merge into `main`
-19. Tag the final release and let the CI run again and do the release.
-20. **Repeat all the process for the other 2 "minor" versions that need to be updated**, but targeting `release-vx.y` branches instead of `main`.
+16. Update the CI's `.drone.yaml` file to use the release candidate for furyctl that you released in step `15`.
+17. Update the e2e tests with the new upgrade paths.
+18. Tag with the `e2e-all-*` pattern to run the e2e tests using the new upgrade paths and furyctl's RC, then tag a release candidate.
+19. After the CI passes and the PR has been approved, merge into `main`
+20. Tag the final release and let the CI run again and do the release.
+21. **Repeat all the process for the other 2 "minor" versions that need to be updated**, but targeting `release-vx.y` branches instead of `main`.
 
 ### Back to furyctl
 
-21. Once SD new releases are live and the PR with the update to furyctl has been approved, merge and tag the final release.
+22. Once SD new releases are live and the PR with the update to furyctl has been approved, merge and tag the final release.
 
 ### Other changes
 

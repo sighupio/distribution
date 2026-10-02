@@ -1,0 +1,61 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    
+
+  name: dex
+  namespace: kube-system
+spec:
+  # Needs to be externally available in order to act as callback from GitHub.
+  ingressClassName: external
+  rules:
+    - host: login.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: dex
+                port:
+                  name: http
+  tls:
+    - hosts:
+      - login.example.com
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    cluster.kfd.sighup.io/useful-link.enable: "true"
+  annotations:
+    cluster.kfd.sighup.io/useful-link.url: https://gangplank.example.com
+    cluster.kfd.sighup.io/useful-link.name: "Gangplank"
+    forecastle.stakater.com/expose: "true"
+    forecastle.stakater.com/appName: "Gangplank - SSO Kubeconfig"
+    forecastle.stakater.com/icon: "https://raw.githubusercontent.com/sighupio/distribution/refs/heads/main/docs/assets/black-logo.png"
+    
+
+  name: gangplank
+  namespace: kube-system
+spec:
+  # Needs to be externally available in order to act as callback from GitHub.
+  ingressClassName: external
+  rules:
+    - host: gangplank.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: gangplank-svc
+                port:
+                  name: http
+  tls:
+    - hosts:
+      - gangplank.example.com

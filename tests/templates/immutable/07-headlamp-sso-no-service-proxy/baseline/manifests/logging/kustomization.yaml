@@ -1,0 +1,121 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../../vendor/modules/logging/katalog/logging-operator
+  - ../../../vendor/modules/logging/katalog/logging-operated
+  - kapp-configs/logging-operator-crd.yaml
+  - ../../../vendor/modules/logging/katalog/configs/audit
+  - ../../../vendor/modules/logging/katalog/configs/events
+  - ../../../vendor/modules/logging/katalog/configs/infra
+  - ../../../vendor/modules/logging/katalog/configs/ingress-nginx
+  - ../../../vendor/modules/logging/katalog/configs/kubernetes
+  - ../../../vendor/modules/logging/katalog/configs/systemd
+
+patches:
+  - path: patches/infra-nodes.yml
+  - target:
+      kind: Output
+      group: logging.banzaicloud.io
+      version: v1beta1
+      name: audit
+    patch: |-
+      - op: replace
+        path: /spec
+        value:
+          stdout {}
+  - target:
+      kind: Output
+      group: logging.banzaicloud.io
+      version: v1beta1
+      name: events
+    patch: |-
+      - op: replace
+        path: /spec
+        value:
+          stdout {}
+  - target:
+      kind: ClusterOutput
+      group: logging.banzaicloud.io
+      version: v1beta1
+      name: infra
+    patch: |-
+      - op: replace
+        path: /spec
+        value:
+          stdout {}
+  - target:
+      kind: Output
+      group: logging.banzaicloud.io
+      version: v1beta1
+      name: ingress-nginx
+    patch: |-
+      - op: replace
+        path: /spec
+        value:
+          stdout {}
+  - target:
+      kind: Output
+      group: logging.banzaicloud.io
+      version: v1beta1
+      name: ingress-haproxy
+    patch: |-
+      - op: replace
+        path: /spec
+        value:
+          stdout {}
+  - target:
+      kind: ClusterOutput
+      group: logging.banzaicloud.io
+      version: v1beta1
+      name: kubernetes
+    patch: |-
+      - op: replace
+        path: /spec
+        value:
+          stdout {}
+  - target:
+      kind: Output
+      group: logging.banzaicloud.io
+      version: v1beta1
+      name: systemd-common
+    patch: |-
+      - op: replace
+        path: /spec
+        value:
+          stdout {}
+  - target:
+      kind: Output
+      group: logging.banzaicloud.io
+      version: v1beta1
+      name: systemd-etcd
+    patch: |-
+      - op: replace
+        path: /spec
+        value:
+          stdout {}
+  - target:
+      kind: ClusterOutput
+      group: logging.banzaicloud.io
+      version: v1beta1
+      name: errors
+    patch: |-
+      - op: replace
+        path: /spec
+        value:
+          stdout {}
+  - patch: |-
+      apiVersion: logging.banzaicloud.io/v1beta1
+      kind: Logging
+      metadata:
+        name: infra
+      spec:
+        fluentd:
+          metrics:
+            serviceMonitor: false
+            prometheusRules: false
