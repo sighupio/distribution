@@ -27,8 +27,12 @@ dump_eks_state() {
   cluster_name="$1"
   region="$2"
   echo "--- EKS cluster ${cluster_name} ($(date -u +%Y-%m-%dT%H:%M:%SZ)) ---"
-  aws eks describe-cluster --name "$cluster_name" --region "$region" \
-    --query 'cluster.{status:status,version:version,platformVersion:platformVersion,health:health}' --output json || true
+  aws eks describe-cluster --name "$cluster_name" --region "$region" --output json || true
+  echo "--- Upgrade insights ---"
+  for insight_id in $(aws eks list-insights --cluster-name "$cluster_name" --region "$region" --query 'insights[].id' --output text || true); do
+    aws eks describe-insight --cluster-name "$cluster_name" --region "$region" --id "$insight_id" \
+      --query 'insight.{name:name,category:category,kubernetesVersion:kubernetesVersion,status:insightStatus,lastRefreshTime:lastRefreshTime}' --output json || true
+  done
   echo "--- Cluster updates ---"
   for update_id in $(aws eks list-updates --name "$cluster_name" --region "$region" --query 'updateIds[]' --output text || true); do
     aws eks describe-update --name "$cluster_name" --region "$region" --update-id "$update_id" \
@@ -48,6 +52,19 @@ dump_eks_state() {
     aws eks describe-addon --cluster-name "$cluster_name" --region "$region" --addon-name "$addon" \
       --query 'addon.{name:addonName,status:status,version:addonVersion,modifiedAt:modifiedAt,health:health}' --output json || true
   done
+}
+
+# Dumps the CloudTrail events on the cluster since its creation, including the ones
+# made by AWS services, to find the operation EKS considers in progress.
+dump_cloudtrail_events() {
+  cluster_name="$1"
+  region="$2"
+  created_at=$(aws eks describe-cluster --name "$cluster_name" --region "$region" --query 'cluster.createdAt' --output text || true)
+  echo "--- CloudTrail events on ${cluster_name} since ${created_at} ($(date -u +%Y-%m-%dT%H:%M:%SZ)) ---"
+  aws cloudtrail lookup-events --region "$region" \
+    --lookup-attributes AttributeKey=ResourceName,AttributeValue="$cluster_name" \
+    --start-time "$created_at" \
+    --query 'reverse(sort_by(Events,&EventTime))[].[EventTime,EventSource,EventName,Username]' --output text || true
 }
 
 echo "----------------------------------------------------------------------------"
@@ -102,6 +119,7 @@ fi
 EKS_REGION=$(yq '.spec.region' "$FURYCTL_YAML")
 wait_for_eks_active "$CLUSTER_NAME" "$EKS_REGION"
 dump_eks_state "$CLUSTER_NAME" "$EKS_REGION"
+dump_cloudtrail_events "$CLUSTER_NAME" "$EKS_REGION"
 
 echo "----------------------------------------------------------------------------"
 echo "Executing version upgrade to 1.36.0 (with alinux2023)"
@@ -119,6 +137,13 @@ if ! furyctl apply --upgrade \
   echo "Upgrade to 1.36.0 failed, gathering EKS state..."
   echo "============================================================================"
   dump_eks_state "$CLUSTER_NAME" "$EKS_REGION"
+  # CloudTrail delivers events with a delay of a few minutes: dump them now and
+  # again after waiting, so the events right before the failure are included.
+  dump_cloudtrail_events "$CLUSTER_NAME" "$EKS_REGION"
+  echo "Waiting 10m for CloudTrail to deliver the latest events..."
+  sleep 600
+  dump_eks_state "$CLUSTER_NAME" "$EKS_REGION"
+  dump_cloudtrail_events "$CLUSTER_NAME" "$EKS_REGION"
   exit 1
 fi
 echo "$FURYCTL_YAML" > last_furyctl_yaml.txt
