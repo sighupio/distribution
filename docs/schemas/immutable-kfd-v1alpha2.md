@@ -2639,17 +2639,17 @@ The CPU limit for the Pod, in cores or millicores. Examples: 1000m, 2, 1.5
 
 ### Description
 
-Kubernetes resource quantity format. Examples: 50Gi, 100Mi, 1Ti
+Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
 **pattern**: the string must match the following regular expression:
 
 ```regexp
-^[0-9]+(\.[0-9]+)?(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk])$
+^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
 ```
 
-[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk]\)$)
+[try pattern](https://regexr.com/?expression=^\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\(\([KMGTPE]i\)|[numkMGTPE]|\([eE]\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\)\)?$)
 
 ## .spec.distribution.modules.logging.loki.resources.requests
 
@@ -2680,17 +2680,17 @@ The CPU request for the Pod, in cores or millicores. Examples: 500m, 1, 0.5
 
 ### Description
 
-Kubernetes resource quantity format. Examples: 50Gi, 100Mi, 1Ti
+Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
 **pattern**: the string must match the following regular expression:
 
 ```regexp
-^[0-9]+(\.[0-9]+)?(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk])$
+^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
 ```
 
-[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk]\)$)
+[try pattern](https://regexr.com/?expression=^\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\(\([KMGTPE]i\)|[numkMGTPE]|\([eE]\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\)\)?$)
 
 ## .spec.distribution.modules.logging.loki.retentionTime
 
@@ -2814,7 +2814,17 @@ The username for the default MinIO root user.
 
 ### Description
 
-The PVC size for each MinIO disk, 6 disks total.
+Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+```
+
+[try pattern](https://regexr.com/?expression=^\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\(\([KMGTPE]i\)|[numkMGTPE]|\([eE]\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\)\)?$)
 
 ## .spec.distribution.modules.logging.opensearch
 
@@ -2930,17 +2940,17 @@ The CPU limit for the Pod, in cores or millicores. Examples: 1000m, 2, 1.5
 
 ### Description
 
-Kubernetes resource quantity format. Examples: 50Gi, 100Mi, 1Ti
+Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
 **pattern**: the string must match the following regular expression:
 
 ```regexp
-^[0-9]+(\.[0-9]+)?(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk])$
+^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
 ```
 
-[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk]\)$)
+[try pattern](https://regexr.com/?expression=^\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\(\([KMGTPE]i\)|[numkMGTPE]|\([eE]\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\)\)?$)
 
 ## .spec.distribution.modules.logging.opensearch.resources.requests
 
@@ -2971,23 +2981,33 @@ The CPU request for the Pod, in cores or millicores. Examples: 500m, 1, 0.5
 
 ### Description
 
-Kubernetes resource quantity format. Examples: 50Gi, 100Mi, 1Ti
+Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
 **pattern**: the string must match the following regular expression:
 
 ```regexp
-^[0-9]+(\.[0-9]+)?(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk])$
+^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
 ```
 
-[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk]\)$)
+[try pattern](https://regexr.com/?expression=^\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\(\([KMGTPE]i\)|[numkMGTPE]|\([eE]\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\)\)?$)
 
 ## .spec.distribution.modules.logging.opensearch.storageSize
 
 ### Description
 
-The storage size for the OpenSearch volumes. Follows Kubernetes resources storage requests. Default is `150Gi`.
+Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+```
+
+[try pattern](https://regexr.com/?expression=^\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\(\([KMGTPE]i\)|[numkMGTPE]|\([eE]\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\)\)?$)
 
 ## .spec.distribution.modules.logging.opensearch.type
 
@@ -3068,17 +3088,17 @@ The CPU limit for the Pod, in cores or millicores. Examples: 1000m, 2, 1.5
 
 ### Description
 
-Kubernetes resource quantity format. Examples: 50Gi, 100Mi, 1Ti
+Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
 **pattern**: the string must match the following regular expression:
 
 ```regexp
-^[0-9]+(\.[0-9]+)?(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk])$
+^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
 ```
 
-[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk]\)$)
+[try pattern](https://regexr.com/?expression=^\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\(\([KMGTPE]i\)|[numkMGTPE]|\([eE]\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\)\)?$)
 
 ## .spec.distribution.modules.logging.operator.fluentbit.resources.requests
 
@@ -3109,17 +3129,17 @@ The CPU request for the Pod, in cores or millicores. Examples: 500m, 1, 0.5
 
 ### Description
 
-Kubernetes resource quantity format. Examples: 50Gi, 100Mi, 1Ti
+Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
 **pattern**: the string must match the following regular expression:
 
 ```regexp
-^[0-9]+(\.[0-9]+)?(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk])$
+^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
 ```
 
-[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk]\)$)
+[try pattern](https://regexr.com/?expression=^\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\(\([KMGTPE]i\)|[numkMGTPE]|\([eE]\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\)\)?$)
 
 ## .spec.distribution.modules.logging.operator.fluentd
 
@@ -3178,17 +3198,17 @@ The CPU limit for the Pod, in cores or millicores. Examples: 1000m, 2, 1.5
 
 ### Description
 
-Kubernetes resource quantity format. Examples: 50Gi, 100Mi, 1Ti
+Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
 **pattern**: the string must match the following regular expression:
 
 ```regexp
-^[0-9]+(\.[0-9]+)?(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk])$
+^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
 ```
 
-[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk]\)$)
+[try pattern](https://regexr.com/?expression=^\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\(\([KMGTPE]i\)|[numkMGTPE]|\([eE]\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\)\)?$)
 
 ## .spec.distribution.modules.logging.operator.fluentd.resources.requests
 
@@ -3219,17 +3239,17 @@ The CPU request for the Pod, in cores or millicores. Examples: 500m, 1, 0.5
 
 ### Description
 
-Kubernetes resource quantity format. Examples: 50Gi, 100Mi, 1Ti
+Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
 **pattern**: the string must match the following regular expression:
 
 ```regexp
-^[0-9]+(\.[0-9]+)?(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk])$
+^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
 ```
 
-[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk]\)$)
+[try pattern](https://regexr.com/?expression=^\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\(\([KMGTPE]i\)|[numkMGTPE]|\([eE]\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\)\)?$)
 
 ## .spec.distribution.modules.logging.operator.overrides
 
@@ -3934,7 +3954,17 @@ The username for the default MinIO root user.
 
 ### Description
 
-The PVC size for each MinIO disk, 6 disks total.
+Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+```
+
+[try pattern](https://regexr.com/?expression=^\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\(\([KMGTPE]i\)|[numkMGTPE]|\([eE]\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\)\)?$)
 
 ## .spec.distribution.modules.monitoring.overrides
 
@@ -4066,17 +4096,17 @@ The CPU limit for the Pod, in cores or millicores. Examples: 1000m, 2, 1.5
 
 ### Description
 
-Kubernetes resource quantity format. Examples: 50Gi, 100Mi, 1Ti
+Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
 **pattern**: the string must match the following regular expression:
 
 ```regexp
-^[0-9]+(\.[0-9]+)?(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk])$
+^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
 ```
 
-[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk]\)$)
+[try pattern](https://regexr.com/?expression=^\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\(\([KMGTPE]i\)|[numkMGTPE]|\([eE]\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\)\)?$)
 
 ## .spec.distribution.modules.monitoring.prometheus.resources.requests
 
@@ -4107,17 +4137,17 @@ The CPU request for the Pod, in cores or millicores. Examples: 500m, 1, 0.5
 
 ### Description
 
-Kubernetes resource quantity format. Examples: 50Gi, 100Mi, 1Ti
+Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
 **pattern**: the string must match the following regular expression:
 
 ```regexp
-^[0-9]+(\.[0-9]+)?(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk])$
+^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
 ```
 
-[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk]\)$)
+[try pattern](https://regexr.com/?expression=^\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\(\([KMGTPE]i\)|[numkMGTPE]|\([eE]\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\)\)?$)
 
 ## .spec.distribution.modules.monitoring.prometheus.retentionSize
 
@@ -4135,7 +4165,17 @@ The retention time for the `k8s` Prometheus instance.
 
 ### Description
 
-The storage size for the `k8s` Prometheus instance.
+Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+```
+
+[try pattern](https://regexr.com/?expression=^\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\(\([KMGTPE]i\)|[numkMGTPE]|\([eE]\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\)\)?$)
 
 ## .spec.distribution.modules.monitoring.prometheusAdapter
 
@@ -4190,17 +4230,17 @@ The CPU limit for the Pod, in cores or millicores. Examples: 1000m, 2, 1.5
 
 ### Description
 
-Kubernetes resource quantity format. Examples: 50Gi, 100Mi, 1Ti
+Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
 **pattern**: the string must match the following regular expression:
 
 ```regexp
-^[0-9]+(\.[0-9]+)?(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk])$
+^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
 ```
 
-[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk]\)$)
+[try pattern](https://regexr.com/?expression=^\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\(\([KMGTPE]i\)|[numkMGTPE]|\([eE]\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\)\)?$)
 
 ## .spec.distribution.modules.monitoring.prometheusAdapter.resources.requests
 
@@ -4231,17 +4271,17 @@ The CPU request for the Pod, in cores or millicores. Examples: 500m, 1, 0.5
 
 ### Description
 
-Kubernetes resource quantity format. Examples: 50Gi, 100Mi, 1Ti
+Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
 **pattern**: the string must match the following regular expression:
 
 ```regexp
-^[0-9]+(\.[0-9]+)?(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk])$
+^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
 ```
 
-[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk]\)$)
+[try pattern](https://regexr.com/?expression=^\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\(\([KMGTPE]i\)|[numkMGTPE]|\([eE]\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\)\)?$)
 
 ## .spec.distribution.modules.monitoring.prometheusAgent
 
@@ -4298,17 +4338,17 @@ The CPU limit for the Pod, in cores or millicores. Examples: 1000m, 2, 1.5
 
 ### Description
 
-Kubernetes resource quantity format. Examples: 50Gi, 100Mi, 1Ti
+Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
 **pattern**: the string must match the following regular expression:
 
 ```regexp
-^[0-9]+(\.[0-9]+)?(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk])$
+^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
 ```
 
-[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk]\)$)
+[try pattern](https://regexr.com/?expression=^\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\(\([KMGTPE]i\)|[numkMGTPE]|\([eE]\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\)\)?$)
 
 ## .spec.distribution.modules.monitoring.prometheusAgent.resources.requests
 
@@ -4339,17 +4379,17 @@ The CPU request for the Pod, in cores or millicores. Examples: 500m, 1, 0.5
 
 ### Description
 
-Kubernetes resource quantity format. Examples: 50Gi, 100Mi, 1Ti
+Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
 **pattern**: the string must match the following regular expression:
 
 ```regexp
-^[0-9]+(\.[0-9]+)?(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk])$
+^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
 ```
 
-[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk]\)$)
+[try pattern](https://regexr.com/?expression=^\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\(\([KMGTPE]i\)|[numkMGTPE]|\([eE]\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\)\)?$)
 
 ## .spec.distribution.modules.monitoring.type
 
@@ -5183,7 +5223,17 @@ The username for the default MinIO root user.
 
 ### Description
 
-The PVC size for each MinIO disk, 6 disks total.
+Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+```
+
+[try pattern](https://regexr.com/?expression=^\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\(\([KMGTPE]i\)|[numkMGTPE]|\([eE]\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\)\)?$)
 
 ## .spec.distribution.modules.tracing.overrides
 
@@ -7447,33 +7497,33 @@ CPU reserved for system daemons, in cores or millicores. Examples: `500m`, `1`, 
 
 ### Description
 
-Kubernetes resource quantity format. Examples: 50Gi, 100Mi, 1Ti
+Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
 **pattern**: the string must match the following regular expression:
 
 ```regexp
-^[0-9]+(\.[0-9]+)?(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk])$
+^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
 ```
 
-[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk]\)$)
+[try pattern](https://regexr.com/?expression=^\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\(\([KMGTPE]i\)|[numkMGTPE]|\([eE]\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\)\)?$)
 
 ## .spec.kubernetes.advanced.kubeletConfiguration.systemReserved.memory
 
 ### Description
 
-Kubernetes resource quantity format. Examples: 50Gi, 100Mi, 1Ti
+Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
 **pattern**: the string must match the following regular expression:
 
 ```regexp
-^[0-9]+(\.[0-9]+)?(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk])$
+^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
 ```
 
-[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk]\)$)
+[try pattern](https://regexr.com/?expression=^\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\(\([KMGTPE]i\)|[numkMGTPE]|\([eE]\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\)\)?$)
 
 ## .spec.kubernetes.advanced.kubeletConfiguration.systemReserved.pid
 
@@ -7739,33 +7789,33 @@ CPU reserved for system daemons, in cores or millicores. Examples: `500m`, `1`, 
 
 ### Description
 
-Kubernetes resource quantity format. Examples: 50Gi, 100Mi, 1Ti
+Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
 **pattern**: the string must match the following regular expression:
 
 ```regexp
-^[0-9]+(\.[0-9]+)?(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk])$
+^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
 ```
 
-[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk]\)$)
+[try pattern](https://regexr.com/?expression=^\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\(\([KMGTPE]i\)|[numkMGTPE]|\([eE]\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\)\)?$)
 
 ## .spec.kubernetes.controlPlane.kubeletConfiguration.systemReserved.memory
 
 ### Description
 
-Kubernetes resource quantity format. Examples: 50Gi, 100Mi, 1Ti
+Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
 **pattern**: the string must match the following regular expression:
 
 ```regexp
-^[0-9]+(\.[0-9]+)?(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk])$
+^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
 ```
 
-[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk]\)$)
+[try pattern](https://regexr.com/?expression=^\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\(\([KMGTPE]i\)|[numkMGTPE]|\([eE]\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\)\)?$)
 
 ## .spec.kubernetes.controlPlane.kubeletConfiguration.systemReserved.pid
 
@@ -8063,33 +8113,33 @@ CPU reserved for system daemons, in cores or millicores. Examples: `500m`, `1`, 
 
 ### Description
 
-Kubernetes resource quantity format. Examples: 50Gi, 100Mi, 1Ti
+Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
 **pattern**: the string must match the following regular expression:
 
 ```regexp
-^[0-9]+(\.[0-9]+)?(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk])$
+^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
 ```
 
-[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk]\)$)
+[try pattern](https://regexr.com/?expression=^\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\(\([KMGTPE]i\)|[numkMGTPE]|\([eE]\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\)\)?$)
 
 ## .spec.kubernetes.nodeGroups.kubeletConfiguration.systemReserved.memory
 
 ### Description
 
-Kubernetes resource quantity format. Examples: 50Gi, 100Mi, 1Ti
+Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid.
 
 ### Constraints
 
 **pattern**: the string must match the following regular expression:
 
 ```regexp
-^[0-9]+(\.[0-9]+)?(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk])$
+^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
 ```
 
-[try pattern](https://regexr.com/?expression=^[0-9]%2B\(\.[0-9]%2B\)?\(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk]\)$)
+[try pattern](https://regexr.com/?expression=^\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\(\([KMGTPE]i\)|[numkMGTPE]|\([eE]\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\)\)?$)
 
 ## .spec.kubernetes.nodeGroups.kubeletConfiguration.systemReserved.pid
 

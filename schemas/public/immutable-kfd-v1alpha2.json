@@ -1350,12 +1350,12 @@
               "description": "CPU reserved for system daemons, in cores or millicores. Examples: `500m`, `1`, `0.5`"
             },
             "memory": {
-              "$ref": "#/$defs/Types.KubernetesQuantity",
-              "description": "Memory reserved for system daemons. Example: `1Gi`, `500Mi`"
+              "$ref": "./shared-types.json#/$defs/Types.KubernetesQuantity",
+              "description": "Memory reserved for system daemons. Example: `1Gi`, `500Mi`\n\nFollows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid."
             },
             "ephemeral-storage": {
-              "$ref": "#/$defs/Types.KubernetesQuantity",
-              "description": "Ephemeral storage reserved for system daemons. Example: `2Gi`"
+              "$ref": "./shared-types.json#/$defs/Types.KubernetesQuantity",
+              "description": "Ephemeral storage reserved for system daemons. Example: `2Gi`\n\nFollows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid."
             },
             "pid": {
               "type": "string",
@@ -2714,8 +2714,8 @@
           "$ref": "#/$defs/Types.KubeResources"
         },
         "storageSize": {
-          "type": "string",
-          "description": "The storage size for the OpenSearch volumes. Follows Kubernetes resources storage requests. Default is `150Gi`."
+          "$ref": "./shared-types.json#/$defs/Types.KubernetesQuantity",
+          "description": "The storage size for the OpenSearch volumes. Default is `150Gi`.\n\nFollows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid."
         },
         "overrides": {
           "$ref": "#/$defs/Types.FuryModuleComponentOverrides"
@@ -2731,8 +2731,8 @@
       "description": "Configuration for Logging's MinIO deployment.",
       "properties": {
         "storageSize": {
-          "type": "string",
-          "description": "The PVC size for each MinIO disk, 6 disks total."
+          "$ref": "./shared-types.json#/$defs/Types.KubernetesQuantity",
+          "description": "The PVC size for each MinIO disk, 6 disks total.\n\nFollows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid."
         },
         "rootUser": {
           "type": "object",
@@ -2964,8 +2964,8 @@
           "description": "The retention size for the `k8s` Prometheus instance."
         },
         "storageSize": {
-          "type": "string",
-          "description": "The storage size for the `k8s` Prometheus instance."
+          "$ref": "./shared-types.json#/$defs/Types.KubernetesQuantity",
+          "description": "The storage size for the `k8s` Prometheus instance.\n\nFollows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid."
         },
         "remoteWrite": {
           "description": "Set this option to ship the collected metrics to a remote Prometheus receiver.\n\n`remoteWrite` is an array of objects that allows configuring the [remoteWrite](https://prometheus.io/docs/specs/remote_write_spec/) options for Prometheus. The objects in the array follow [the same schema as in the prometheus operator](https://prometheus-operator.dev/docs/api-reference/api/#monitoring.coreos.com/v1.RemoteWriteSpec).",
@@ -3122,8 +3122,8 @@
       "additionalProperties": false,
       "properties": {
         "storageSize": {
-          "type": "string",
-          "description": "The PVC size for each MinIO disk, 6 disks total."
+          "$ref": "./shared-types.json#/$defs/Types.KubernetesQuantity",
+          "description": "The PVC size for each MinIO disk, 6 disks total.\n\nFollows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid."
         },
         "rootUser": {
           "type": "object",
@@ -3226,8 +3226,8 @@
       "additionalProperties": false,
       "properties": {
         "storageSize": {
-          "type": "string",
-          "description": "The PVC size for each MinIO disk, 6 disks total."
+          "$ref": "./shared-types.json#/$defs/Types.KubernetesQuantity",
+          "description": "The PVC size for each MinIO disk, 6 disks total.\n\nFollows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid."
         },
         "rootUser": {
           "type": "object",
@@ -4220,8 +4220,8 @@
               "description": "The CPU request for the Pod, in cores or millicores. Examples: 500m, 1, 0.5"
             },
             "memory": {
-              "$ref": "#/$defs/Types.KubernetesQuantity",
-              "description": "The memory request for the Pod. Example: 500Mi, 1Gi"
+              "$ref": "./shared-types.json#/$defs/Types.KubernetesQuantity",
+              "description": "The memory request for the Pod. Example: 500Mi, 1Gi\n\nFollows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid."
             }
           }
         },
@@ -4235,17 +4235,12 @@
               "description": "The CPU limit for the Pod, in cores or millicores. Examples: 1000m, 2, 1.5"
             },
             "memory": {
-              "$ref": "#/$defs/Types.KubernetesQuantity",
-              "description": "The memory limit for the Pod. Example: 1Gi, 2Gi"
+              "$ref": "./shared-types.json#/$defs/Types.KubernetesQuantity",
+              "description": "The memory limit for the Pod. Example: 1Gi, 2Gi\n\nFollows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid."
             }
           }
         }
       }
-    },
-    "Types.KubernetesQuantity": {
-      "type": "string",
-      "pattern": "^[0-9]+(\\.[0-9]+)?(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?|[EPTGMk])$",
-      "description": "Kubernetes resource quantity format. Examples: 50Gi, 100Mi, 1Ti"
     },
     "Types.FuryModuleOverrides": {
       "type": "object",
