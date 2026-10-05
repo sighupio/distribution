@@ -289,23 +289,23 @@ steps: # e2e-kfddistribution-1.36
       - until kubectl get serviceaccount default > /dev/null 2>&1; do echo "waiting for control-plane" && sleep 1; done
       - tests/e2e/kfddistribution/e2e-kfddistribution.sh
 
-  # - name: delete-kind-cluster
-  #   image: quay.io/sighup/mise:v2026.8.6
-  #   pull: always
-  #   volumes:
-  #     - name: dockersock
-  #       path: /var/run/docker.sock
-  #     - name: mise-cache
-  #       path: /mise-data
-  #   commands:
-  #     - eval "$(mise activate bash --shims)"
-  #     - kind delete cluster --name $${CLUSTER_NAME} || true
-  #   depends_on:
-  #     - e2e-kfddistribution
-  #   when:
-  #     status:
-  #       - success
-  #       - failure
+  - name: delete-kind-cluster
+    image: quay.io/sighup/mise:v2026.8.6
+    pull: always
+    volumes:
+      - name: dockersock
+        path: /var/run/docker.sock
+      - name: mise-cache
+        path: /mise-data
+    commands:
+      - eval "$(mise activate bash --shims)"
+      - kind delete cluster --name $${CLUSTER_NAME} || true
+    depends_on:
+      - e2e-kfddistribution
+    when:
+      status:
+        - success
+        - failure
 
 ---
 # We test 1.35.1 -> 1.36.0 upgrade pipeline
@@ -414,23 +414,23 @@ steps: # e2e-kfddistribution-1.35.1-to-1.36.0
       - until kubectl get serviceaccount default > /dev/null 2>&1; do echo "waiting for control-plane" && sleep 1; done
       - tests/e2e/kfddistribution/e2e-kfddistribution-upgrades.sh
 
-  # - name: delete-kind-cluster
-  #   image: quay.io/sighup/mise:v2026.8.6
-  #   pull: always
-  #   volumes:
-  #     - name: dockersock
-  #       path: /var/run/docker.sock
-  #     - name: mise-cache
-  #       path: /mise-data
-  #   commands:
-  #     - eval "$(mise activate bash --shims)"
-  #     - kind delete cluster --name $${CLUSTER_NAME} || true
-  #   depends_on:
-  #     - e2e-kfddistribution
-  #   when:
-  #     status:
-  #       - success
-  #       - failure
+  - name: delete-kind-cluster
+    image: quay.io/sighup/mise:v2026.8.6
+    pull: always
+    volumes:
+      - name: dockersock
+        path: /var/run/docker.sock
+      - name: mise-cache
+        path: /mise-data
+    commands:
+      - eval "$(mise activate bash --shims)"
+      - kind delete cluster --name $${CLUSTER_NAME} || true
+    depends_on:
+      - e2e-kfddistribution
+    when:
+      status:
+        - success
+        - failure
 
 ---
 name: e2e-ekscluster-1.36.0
