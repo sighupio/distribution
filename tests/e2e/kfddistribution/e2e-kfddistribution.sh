@@ -5,6 +5,14 @@
 
 set -e
 
+# The Kind cluster is created without a CNI, so nodes stay NotReady until Calico is up.
+# Installing the full stack in one shot makes every pod wait for the CNI, eating into the
+# Deployments' progressDeadlineSeconds and making kapp fail. Temp
+echo "----------------------------------------------------------------------------"
+echo "Bootstrapping the CNI with a minimal setup"
+furyctl create cluster --config tests/e2e/kfddistribution/manifests/furyctl-cleanup-all.yaml --outdir "$PWD" --distro-location ./ --force all --disable-analytics
+kubectl wait --for=condition=Ready nodes --all --timeout=10m
+
 echo "----------------------------------------------------------------------------"
 echo "Executing furyctl for the initial setup"
 furyctl create cluster --config tests/e2e/kfddistribution/manifests/furyctl-init-cluster.yaml --outdir "$PWD" --distro-location ./ --force all --disable-analytics -D
