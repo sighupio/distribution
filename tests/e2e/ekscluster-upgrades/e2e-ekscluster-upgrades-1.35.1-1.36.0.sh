@@ -20,53 +20,6 @@ wait_for_eks_active() {
   done
 }
 
-# Dumps what EKS reports as in progress on the cluster, its node groups and addons.
-# The upgrade has failed with "cluster currently has an update in progress"
-# (HTTP 409) while the cluster was ACTIVE, without a known cause.
-dump_eks_state() {
-  cluster_name="$1"
-  region="$2"
-  echo "--- EKS cluster ${cluster_name} ($(date -u +%Y-%m-%dT%H:%M:%SZ)) ---"
-  aws eks describe-cluster --name "$cluster_name" --region "$region" --output json || true
-  echo "--- Upgrade insights ---"
-  for insight_id in $(aws eks list-insights --cluster-name "$cluster_name" --region "$region" --query 'insights[].id' --output text || true); do
-    aws eks describe-insight --cluster-name "$cluster_name" --region "$region" --id "$insight_id" \
-      --query 'insight.{name:name,category:category,kubernetesVersion:kubernetesVersion,status:insightStatus,lastRefreshTime:lastRefreshTime}' --output json || true
-  done
-  echo "--- Cluster updates ---"
-  for update_id in $(aws eks list-updates --name "$cluster_name" --region "$region" --query 'updateIds[]' --output text || true); do
-    aws eks describe-update --name "$cluster_name" --region "$region" --update-id "$update_id" \
-      --query 'update.{id:id,type:type,status:status,createdAt:createdAt,params:params,errors:errors}' --output json || true
-  done
-  echo "--- Node groups ---"
-  for nodegroup in $(aws eks list-nodegroups --cluster-name "$cluster_name" --region "$region" --query 'nodegroups[]' --output text || true); do
-    aws eks describe-nodegroup --cluster-name "$cluster_name" --region "$region" --nodegroup-name "$nodegroup" \
-      --query 'nodegroup.{name:nodegroupName,status:status,version:version,releaseVersion:releaseVersion,modifiedAt:modifiedAt,health:health}' --output json || true
-    for update_id in $(aws eks list-updates --name "$cluster_name" --region "$region" --nodegroup-name "$nodegroup" --query 'updateIds[]' --output text || true); do
-      aws eks describe-update --name "$cluster_name" --region "$region" --nodegroup-name "$nodegroup" --update-id "$update_id" \
-        --query 'update.{id:id,type:type,status:status,createdAt:createdAt,errors:errors}' --output json || true
-    done
-  done
-  echo "--- Addons ---"
-  for addon in $(aws eks list-addons --cluster-name "$cluster_name" --region "$region" --query 'addons[]' --output text || true); do
-    aws eks describe-addon --cluster-name "$cluster_name" --region "$region" --addon-name "$addon" \
-      --query 'addon.{name:addonName,status:status,version:addonVersion,modifiedAt:modifiedAt,health:health}' --output json || true
-  done
-}
-
-# Dumps the CloudTrail events on the cluster since its creation, including the ones
-# made by AWS services, to find the operation EKS considers in progress.
-dump_cloudtrail_events() {
-  cluster_name="$1"
-  region="$2"
-  created_at=$(aws eks describe-cluster --name "$cluster_name" --region "$region" --query 'cluster.createdAt' --output text || true)
-  echo "--- CloudTrail events on ${cluster_name} since ${created_at} ($(date -u +%Y-%m-%dT%H:%M:%SZ)) ---"
-  aws cloudtrail lookup-events --region "$region" \
-    --lookup-attributes AttributeKey=ResourceName,AttributeValue="$cluster_name" \
-    --start-time "$created_at" \
-    --query 'reverse(sort_by(Events,&EventTime))[].[EventTime,EventSource,EventName,Username]' --output text || true
-}
-
 echo "----------------------------------------------------------------------------"
 echo "Executing furyctl for the initial setup 1.35.1 with alinux2023"
 FURYCTL_YAML=tests/e2e/ekscluster-upgrades/manifests/furyctl-upgrade-version-1.35.1.yaml
@@ -113,58 +66,52 @@ if ! furyctl apply \
     --no-tty
 fi
 
-# Wait for the cluster to be ACTIVE with no pending updates before upgrading.
-# Without this, UpdateClusterVersion fails with ResourceInUseException (HTTP 409)
-# when an update is still in progress from the initial cluster creation.
 EKS_REGION=$(yq '.spec.region' "$FURYCTL_YAML")
 wait_for_eks_active "$CLUSTER_NAME" "$EKS_REGION"
-dump_eks_state "$CLUSTER_NAME" "$EKS_REGION"
-dump_cloudtrail_events "$CLUSTER_NAME" "$EKS_REGION"
 
 echo "----------------------------------------------------------------------------"
 echo "Executing version upgrade to 1.36.0 (with alinux2023)"
 FURYCTL_YAML=tests/e2e/ekscluster-upgrades/manifests/furyctl-upgrade-version-1.36.0.yaml
 tests/e2e/ekscluster/replace_variables.sh --cluster-name "$CLUSTER_NAME" --furyctl-yaml "$FURYCTL_YAML"
-if ! furyctl apply --upgrade \
-  --outdir /furyctl-outdir \
-  --config "$FURYCTL_YAML" \
-  --disable-analytics \
-  --distro-location ./ \
-  --force upgrades \
-  --skip-vpn-confirmation \
-  --no-tty; then
-  echo "============================================================================"
-  echo "Upgrade to 1.36.0 failed, gathering EKS state..."
-  echo "============================================================================"
-  dump_eks_state "$CLUSTER_NAME" "$EKS_REGION"
-  dump_cloudtrail_events "$CLUSTER_NAME" "$EKS_REGION"
-  # The node group reported "ClusterUnreachable: ... your cluster is going through
-  # a config update" a few minutes after the 409, with no update visible from the
-  # API. Watch it to measure how long that internal update lasts.
-  watch_eks_internal_update "$CLUSTER_NAME" "$EKS_REGION"
-  dump_eks_state "$CLUSTER_NAME" "$EKS_REGION"
-  dump_cloudtrail_events "$CLUSTER_NAME" "$EKS_REGION"
 
-  echo "============================================================================"
-  echo "Retrying the upgrade to 1.36.0 (furyctl resumes from the failed phase)..."
-  echo "============================================================================"
-  if ! furyctl apply --upgrade \
-    --outdir /furyctl-outdir \
-    --config "$FURYCTL_YAML" \
-    --disable-analytics \
-    --distro-location ./ \
-    --force upgrades \
-    --skip-vpn-confirmation \
-    --no-tty; then
-    echo "============================================================================"
-    echo "Retry of the upgrade to 1.36.0 failed too, gathering EKS state..."
-    echo "============================================================================"
-    dump_eks_state "$CLUSTER_NAME" "$EKS_REGION"
-    dump_cloudtrail_events "$CLUSTER_NAME" "$EKS_REGION"
+# About 18 minutes after its creation EKS replaces the control plane instances of
+# the cluster, for about 10 minutes. Meanwhile the cluster stays ACTIVE with no
+# update listed, but UpdateClusterVersion fails with ResourceInUseException
+# (HTTP 409, "currently has an update in progress"), and the upgrade of the e2e
+# falls in that window. Retry on that error only: furyctl resumes the upgrade
+# from the failed phase.
+UPGRADE_MAX_ATTEMPTS=10
+UPGRADE_RETRY_DELAY=120
+attempt=1
+while true; do
+  echo "Upgrade attempt ${attempt}/${UPGRADE_MAX_ATTEMPTS} ($(date -u +%Y-%m-%dT%H:%M:%SZ))"
+  # The exit code goes through a file: the one of the pipeline is tee's.
+  rm -f upgrade_exit_code.txt
+  {
+    exit_code=0
+    furyctl apply --upgrade \
+      --outdir /furyctl-outdir \
+      --config "$FURYCTL_YAML" \
+      --disable-analytics \
+      --distro-location ./ \
+      --force upgrades \
+      --skip-vpn-confirmation \
+      --no-tty || exit_code=$?
+    echo "$exit_code" > upgrade_exit_code.txt
+  } 2>&1 | tee upgrade_output.txt
+  if [ "$(cat upgrade_exit_code.txt)" = "0" ]; then
+    break
+  fi
+  if ! grep -q "Cannot VersionUpdate because cluster ${CLUSTER_NAME} currently has an update in progress" upgrade_output.txt; then
+    echo "Upgrade to 1.36.0 failed."
     exit 1
   fi
-  echo "============================================================================"
-  echo "WARNING: the upgrade to 1.36.0 passed only on the retry."
-  echo "============================================================================"
-fi
+  if [ "$attempt" -ge "$UPGRADE_MAX_ATTEMPTS" ]; then
+    echo "Upgrade to 1.36.0 still blocked by the EKS update in progress after ${attempt} attempts."
+    exit 1
+  fi
+  echo "EKS has an update in progress on the cluster, retrying the upgrade in ${UPGRADE_RETRY_DELAY}s..."
+  sleep "$UPGRADE_RETRY_DELAY"
+  attempt=$((attempt + 1))
+done
 echo "$FURYCTL_YAML" > last_furyctl_yaml.txt
