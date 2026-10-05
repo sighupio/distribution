@@ -1172,6 +1172,8 @@ steps: # e2e-onpremises
     network_mode: host
     environment:
       DIAG_DIR: /diag
+      # the utilities module (headlamp) is installed only in the clean install
+      EXPECT_HEADLAMP: "1"
     volumes:
       - name: cache
         path: /cache
@@ -1582,6 +1584,8 @@ steps: # e2e-immutable
     environment:
       DIAG_DIR: /diag
       TESTS_DIR: /drone/src/tests/e2e/onpremises/tests
+      # the utilities module (headlamp) is installed only in the clean install
+      EXPECT_HEADLAMP: "1"
     volumes:
       - name: cache
         path: /cache

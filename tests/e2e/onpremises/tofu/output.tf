@@ -168,6 +168,10 @@ spec:
       auth:
         provider:
           type: none
+      utilities:
+        headlamp:
+          type: token-auth
+          clusterRole: view
   plugins:
     helm:
       repositories:

@@ -10,6 +10,9 @@ locals {
   infras    = [for k in ["infra-0", "infra-1", "infra-2"] : local.nodes[k]]
   worker    = local.nodes["worker-0"]
   k8s_nodes = concat(local.cps, local.infras, [local.worker])
+  # The utilities module (Headlamp) is tested only in the clean install pipeline:
+  # the upgrades pipeline installs v1.35.1 first, whose schema has no utilities.
+  headlamp = var.distribution_version == var.upgrade_version
 }
 
 output "vms" {
@@ -231,6 +234,12 @@ spec:
       auth:
         provider:
           type: none
+%{~if local.headlamp}
+      utilities:
+        headlamp:
+          type: token-auth
+          clusterRole: view
+%{~endif}
 EOT
 }
 
