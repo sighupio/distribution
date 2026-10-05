@@ -41,6 +41,8 @@ addlicense -c "SIGHUP s.r.l" -y 2017-present -v -l bsd \
   -ignore 'templates/distribution/**' \
   -ignore 'target/**' \
   -ignore 'vendor/**' \
+  -ignore '**/.terraform/**' \
+  -ignore '**/.terraform.lock.hcl' \
   -ignore 'tests/templates/**' \
   --check .
 """
@@ -52,6 +54,8 @@ addlicense -c "SIGHUP s.r.l" -y 2017-present -v -l bsd \
   -ignore 'templates/distribution/**' \
   -ignore 'target/**' \
   -ignore 'vendor/**' \
+  -ignore '**/.terraform/**' \
+  -ignore '**/.terraform.lock.hcl' \
   .
 """
 
