@@ -19,6 +19,10 @@ spec:
     modules:
       networking:
         type: calico
+        # Kind's pod CIDR, set explicitly: without it the rendered Installation has no ipPools and,
+        # when kapp re-applies it, the Tigera operator deletes the default IPPool and cannot recreate it.
+        tigeraOperator:
+          podCidr: 10.244.0.0/16
       # This section contains all the configurations for the ingress module
       ingress:
         baseDomain: fury.sighup.cc
