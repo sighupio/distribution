@@ -83,6 +83,15 @@ spec:
             password: testpassword
     # patches for kind compatibility and resource setting
     customPatches:
+      # The Kind cluster has no CNI until Calico is installed by this same apply, so pods stay
+      # Unschedulable for several minutes. Give Deployments more time before ProgressDeadlineExceeded.
+      patches:
+        - target:
+            kind: Deployment
+          patch: |
+            - op: add
+              path: /spec/progressDeadlineSeconds
+              value: 1800
       patchesStrategicMerge:
         - |
           apiVersion: apps/v1
