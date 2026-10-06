@@ -4,7 +4,7 @@
 
 version: v1.36.0
 modules:
-  auth: v0.8.0-rc.3
+  auth: v0.8.0-rc.5
   aws: v5.4.0-rc.0
   dr: v3.5.0-rc.0
   ingress: v5.2.0-rc.0
