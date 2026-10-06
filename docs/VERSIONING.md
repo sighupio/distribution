@@ -20,4 +20,4 @@ For example:
 
 Each SD version will come with comprehensive documentation on all supported upgrade paths (es. tutorials to upgrade minor to minor, including patches if present).
 
-See the [upgrade path](upgrades/UPGRADE_PATH.md) document for more details.
+See the [upgrade path](upgrades/README.md) document for more details.

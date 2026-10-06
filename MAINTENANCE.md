@@ -71,7 +71,7 @@ At this point, you'll need to switch to pushing some changes in furyctl
 11. Update the documentation:
     1. `README.md`.
     2. `docs/COMPATIBILITY_MATRIX.md`.
-    3. `docs/relases/unreleased.md`.
+    3. `docs/releases/unreleased.md`.
 12. Update the compatibility unit tests with the new versions (`internal/distribution/compatibility_test.go`)
 13. If the distribution schemas changed in fields that furyctl reads or injects, update furyctl's hand-maintained config types accordingly in `internal/apis/kfd/v1alpha2/<kind>/{public,private}/schema.go`, keeping the `yaml` **and** `json` struct tags in sync (the `json` tags drive the runtime Terraform/OpenTofu data injection). The distribution no longer ships generated Go types and furyctl no longer imports it as a Go module (see furyctl#674), so this is now a manual step instead of a `go get` of the `fury-distribution` library.
 14. Align the mise release that furyctl bundles to the `quay.io/sighup/mise` image used in this repo's `.drone.yml`. furyctl downloads its own mise binary to install the distribution tools (the `Downloading mise-vX.Y.Z-...` line in the logs), so bumping the CI image here does not change it:
