@@ -9,4 +9,4 @@ metadata:
   name: kyverno
   namespace: kyverno
 data:
-  webhooks: "{\"namespaceSelector\":{\"matchExpressions\":[{\"key\":\"kubernetes.io/metadata.name\",\"operator\":\"NotIn\",\"values\":[\"kube-system\",\"kyverno\",\"logging\",\"monitoring\",\"ingress-nginx\",\"ingress-haproxy\",\"cert-manager\",\"tigera-operator\",\"calico-system\",\"calico-api\",\"vmware-system-csi\",\"pomerium\",\"tracing\",\"forecastle\",\"external-dns\"]}]}}"
+  webhooks: "{\"namespaceSelector\":{\"matchExpressions\":[{\"key\":\"kubernetes.io/metadata.name\",\"operator\":\"NotIn\",\"values\":[\"kube-system\",\"kyverno\",\"logging\",\"monitoring\",\"ingress-nginx\",\"ingress-haproxy\",\"cert-manager\",\"tigera-operator\",\"calico-system\",\"calico-api\",\"vmware-system-csi\",\"pomerium\",\"tracing\",\"forecastle\",\"external-dns\",\"headlamp\"]}]}}"
