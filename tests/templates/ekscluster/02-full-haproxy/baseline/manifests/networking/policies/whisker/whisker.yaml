@@ -2,28 +2,26 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 ---
-apiVersion: networking.k8s.io/v1
+apiVersion: crd.projectcalico.org/v1
 kind: NetworkPolicy
 metadata:
-  name: whisker-ingress-haproxy
+  name: calico-system.whisker-ingress-haproxy
   namespace: calico-system
   labels:
     cluster.kfd.sighup.io/module: networking
+    projectcalico.org/tier: calico-system
 spec:
-  podSelector:
-    matchLabels:
-      app.kubernetes.io/name: whisker
-  policyTypes:
+  tier: calico-system
+  order: 0
+  selector: k8s-app == 'whisker'
+  types:
     - Ingress
   ingress:
-    - from:
-      - namespaceSelector:
-          matchLabels:
-            kubernetes.io/metadata.name: ingress-haproxy
-        podSelector:
-          matchLabels:
-            app.kubernetes.io/name: kubernetes-ingress
-            app.kubernetes.io/instance: haproxy-ingress
-      ports:
-        - port: 8081
-          protocol: TCP
+    - action: Allow
+      protocol: TCP
+      source:
+        namespaceSelector: projectcalico.org/name == 'ingress-haproxy'
+        selector: app.kubernetes.io/name == 'kubernetes-ingress' && app.kubernetes.io/instance == 'haproxy-ingress'
+      destination:
+        ports:
+          - 8081
