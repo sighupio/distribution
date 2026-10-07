@@ -212,6 +212,13 @@ all:
     coredns_image_prefix: {{ .versions.coredns_image_prefix }}
     kubelet_csr_approver_tag: {{ .versions.kubelet_csr_approver_tag }}
     os_update_target_version: {{ .versions.os_update_target_version }}
+    # The pinned Flatcar update payload of each arch, which os-upgrade stages with flatcar-update.
+    os_update_payload_pins:
+    {{- range $arch, $p := .versions.os_update_payload_pins }}
+      {{ $arch }}:
+        url: {{ $p.url }}
+        sha256: "{{ $p.sha256 }}"
+    {{- end }}
     {{- if .versions.kubectl_bin }}
     kubectl_bin: {{ .versions.kubectl_bin }}
     {{- end }}
