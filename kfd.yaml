@@ -11,7 +11,7 @@ modules:
   logging: v5.5.0-rc.2
   monitoring: v4.3.0-rc.2
   opa: v1.18.0-rc.2
-  networking: v4.1.0-rc.0
+  networking: v4.1.0-rc.1
   tracing: v1.6.0-rc.0
   utilities: v0.1.1
 kubernetes:
