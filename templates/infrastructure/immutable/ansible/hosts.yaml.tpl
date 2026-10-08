@@ -150,4 +150,13 @@ all:
     http_proxy: "{{ .spec.infrastructure.proxy | digAny "http" "" }}"
     https_proxy: "{{ .spec.infrastructure.proxy | digAny "https" "" }}"
     no_proxy: "{{ .spec.infrastructure.proxy | digAny "noProxy" "" }}"
+    # The environment of the Ansible tasks that connect from the node: they get no systemd DefaultEnvironment.
+    # Both cases, because Go reads either form and curl reads only the lower case.
+    proxy_env:
+      http_proxy: "{{ .spec.infrastructure.proxy | digAny "http" "" }}"
+      https_proxy: "{{ .spec.infrastructure.proxy | digAny "https" "" }}"
+      no_proxy: "{{ .spec.infrastructure.proxy | digAny "noProxy" "" }}"
+      HTTP_PROXY: "{{ .spec.infrastructure.proxy | digAny "http" "" }}"
+      HTTPS_PROXY: "{{ .spec.infrastructure.proxy | digAny "https" "" }}"
+      NO_PROXY: "{{ .spec.infrastructure.proxy | digAny "noProxy" "" }}"
     {{- end }}
