@@ -36,8 +36,8 @@
       ansible.builtin.include_role:
         name: upgrade-gates
         tasks_from: infra_preflight.yml
-    # Launch the OS stage async so the Flatcar download overlaps the sysext staging and the kubeadm apply.
-    - name: Stage the operating system update (async)
+    # Stage the OS before the drain, so a missing or bad payload stops the run while the node still serves.
+    - name: Stage the operating system update
       ansible.builtin.include_role:
         name: os-upgrade
         tasks_from: os_stage.yml
@@ -58,7 +58,7 @@
     # butane installs the extension on every control plane. The reboot below activates it.
     - keepalived
   post_tasks:
-    # Wait on the async OS stage and reboot into the target version (after the kubeadm upgrade has run).
+    # Reboot into the staged target version (after the kubeadm upgrade has run).
     - name: Reboot into the staged operating system
       ansible.builtin.include_role:
         name: os-upgrade

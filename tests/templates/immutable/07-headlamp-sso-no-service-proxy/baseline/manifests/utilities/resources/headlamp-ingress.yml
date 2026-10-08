@@ -18,6 +18,11 @@ kind: Ingress
 metadata:
   name: headlamp
   namespace: pomerium
+  annotations:
+    forecastle.stakater.com/expose: "true"
+    forecastle.stakater.com/appName: "Headlamp"
+    forecastle.stakater.com/icon: "https://headlamp.dev/img/logo.svg"
+    forecastle.stakater.com/group: "headlamp"
 spec:
   ingressClassName: internal
   rules:

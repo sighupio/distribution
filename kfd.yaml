@@ -8,9 +8,9 @@ modules:
   aws: v5.4.0-rc.0
   dr: v3.5.0-rc.0
   ingress: v5.2.0-rc.0
-  logging: v5.5.0-rc.2
+  logging: v5.5.0-rc.3
   monitoring: v4.3.0-rc.3
-  opa: v1.18.0-rc.2
+  opa: v1.18.0-rc.4
   networking: v4.1.0-rc.1
   tracing: v1.6.0-rc.0
   utilities: v0.1.1
@@ -23,7 +23,7 @@ kubernetes:
     installer: v1.36.5-rc.0
   immutable:
     version: 1.36.5
-    installer: v1.36.5-rc.2
+    installer: v1.36.5-rc.4
 furyctlSchemas:
   eks:
     - apiVersion: kfd.sighup.io/v1alpha2
