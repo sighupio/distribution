@@ -58,6 +58,13 @@ curl reads only the lower case http_proxy, while Go reads either case. */}}
           export NO_PROXY={{ $noProxy }}
           export no_proxy={{ $noProxy }}
           {{- end }}
+    # flatcar-update serves the OS update to update-engine on localhost: keep that request away from the proxy.
+    - path: /etc/systemd/system/update-engine.service.d/10-no-proxy.conf
+      mode: 0644
+      contents:
+        inline: |
+          [Service]
+          UnsetEnvironment=http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
 {{- end }}
 {{- end }}
 
@@ -76,21 +83,15 @@ curl reads only the lower case http_proxy, while Go reads either case. */}}
 {{- end }}
 
 {{- define "update-server-config" }}
-    # Point Flatcar update-engine to a custom Nebraska/Omaha update server.
-    # OS updates are NOT applied automatically: update-engine.service and
-    # locksmithd.service are masked (see "disable-os-updates" and the locksmithd
-    # mask in each node config) and REBOOT_STRATEGY=off disables auto-reboot.
-    # To run an update manually on a node:
-    #   sudo systemctl unmask update-engine.service
-    #   sudo systemctl start update-engine.service
-    #   sudo update_engine_client -check_for_update
+    # OS updates are manual-only: SERVER=disabled makes every update check of update-engine fail, as the
+    # Flatcar documentation recommends, and each node configuration masks locksmithd.service. During an
+    # upgrade, the os-upgrade role stages the pinned version with flatcar-update, which serves it on localhost.
     - path: /etc/flatcar/update.conf
       overwrite: true
       mode: 0644
       contents:
         inline: |
-          SERVER=https://public.update.sighup-prod.sighup.io/v1/update/
-          GROUP=stable
+          SERVER=disabled
           REBOOT_STRATEGY=off
 {{- end }}
 
@@ -372,13 +373,6 @@ kernel_arguments:
       mask: true
 {{- end }}
 
-{{- define "disable-os-updates" }}
-    # Disable Flatcar OS automatic update checks and downloads - updates are manual-only
-    - name: update-engine.service
-      enabled: false
-      mask: true
-{{- end }}
-
 {{- define "disable-flatcar-containerd-docker" }}
     # Disable Docker from Flatcar base OS
     - path: /etc/extensions/docker-flatcar.raw
@@ -388,12 +382,6 @@ kernel_arguments:
     - path: /etc/extensions/containerd-flatcar.raw
       target: /dev/null
       overwrite: true
-{{- end }}
-
-{{- define "locksmith-disable" }}
-    - name: locksmithd.service
-      # Disable Flatcar native reboot coordination as KureD will handle OS updates, too
-      mask: true
 {{- end }}
 
 {{- define "statusReporterBooted" }}
