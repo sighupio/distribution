@@ -32,11 +32,15 @@ metadata:
 {{- else }}
   namespace: headlamp
 {{- end }}
-{{- if or (eq $tlsProvider "certManager") .spec.distribution.modules.ingress.byoic.enabled }}
   annotations:
+    forecastle.stakater.com/expose: "true"
+    forecastle.stakater.com/appName: "Headlamp"
+    forecastle.stakater.com/icon: "https://headlamp.dev/img/logo.svg"
+    {{ if and $isSSO (not .spec.distribution.modules.ingress.overrides.ingresses.forecastle.disableAuth) }}
+    forecastle.stakater.com/group: "headlamp"
+    {{ end }}
     {{ template "certManagerClusterIssuer" . }}
     {{ template "byoicAnnotations" . }}
-{{- end }}
 spec:
   ingressClassName: {{ template "globalIngressClass" (dict "spec" .spec "type" "internal") }}
   rules:
