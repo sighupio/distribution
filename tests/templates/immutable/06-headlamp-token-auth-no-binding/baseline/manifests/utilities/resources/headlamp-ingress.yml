@@ -18,6 +18,10 @@ kind: Ingress
 metadata:
   name: headlamp
   namespace: headlamp
+  annotations:
+    forecastle.stakater.com/expose: "true"
+    forecastle.stakater.com/appName: "Headlamp"
+    forecastle.stakater.com/icon: "https://headlamp.dev/img/logo.svg"
 spec:
   ingressClassName: internal
   rules:
