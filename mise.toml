@@ -25,7 +25,7 @@ furyctl = "0.36.0-rc.3"
 "go:github.com/sighupio/md-gen" = "latest"
 
 # GitHub releases (using ubi: backend)
-"ubi:google/addlicense" = "v1.1.1"
+"github:google/addlicense" = "v1.1.1"
 
 [env]
 CGO_ENABLED = 0
