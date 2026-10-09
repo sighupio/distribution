@@ -1,0 +1,30 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+apiVersion: operator.tigera.io/v1
+kind: Installation
+metadata:
+  name: default
+spec:
+  calicoNetwork:
+    linuxDataplane: "BPF"
+  # We need to patch the dnsPolicy of calico-node because it inherits it from 
+  # the Operator DaemonSet and calico-node needs to resolve cluster DNS names.
+  calicoNodeDaemonSet:
+    spec:
+      template:
+        spec:
+          dnsPolicy: "ClusterFirst"
+---
+# This patch is needed otherwise the Tigera Operator will not be able to start
+# because it will not be able to resolve the Kubernetes API server address.
+# See: https://github.com/projectcalico/calico/issues/10683
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tigera-operator
+  namespace: tigera-operator
+spec:
+  template:
+    spec:
+      dnsPolicy: "Default"

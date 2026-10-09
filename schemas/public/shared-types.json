@@ -1,0 +1,11 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "Types shared by all the kinds.",
+  "$defs": {
+    "Types.KubernetesQuantity": {
+      "type": "string",
+      "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+      "description": "Kubernetes resource quantity, for example `50Gi`, `100Mi`, `1Ti` or `500M`. The pattern is the one that controller-gen sets for `resource.Quantity` fields in CRDs. Suffixes like `GB` or `MB` are not valid."
+    }
+  }
+}

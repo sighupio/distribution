@@ -330,3 +330,7 @@ spec:
       auth:
         provider:
           type: none
+
+      utilities:
+        headlamp:
+          type: none

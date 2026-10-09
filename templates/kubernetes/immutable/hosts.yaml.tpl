@@ -109,8 +109,16 @@ all:
           {{- if index .spec.kubernetes.advanced.oidc "groups_claim" }}
         oidc_groups_claim: "{{ .spec.kubernetes.advanced.oidc.groups_claim }}"
           {{- end }}
-          {{- if index .spec.kubernetes.advanced.oidc "group_prefix" }}
-        oidc_group_prefix: "{{ .spec.kubernetes.advanced.oidc.group_prefix }}"
+          {{- if index .spec.kubernetes.advanced.oidc "groups_prefix" }}
+        oidc_groups_prefix: "{{ .spec.kubernetes.advanced.oidc.groups_prefix }}"
+          {{- else if index .spec.kubernetes.advanced.oidc "group_prefix" }}
+        oidc_groups_prefix: "{{ .spec.kubernetes.advanced.oidc.group_prefix }}"
+          {{- end }}
+          {{- /* Headlamp SSO forwards the token of the static pomerium Dex client (see auth/secrets/dex.yml.tpl; keep the two in sync), so the API server must also accept that audience. */}}
+          {{- $primaryClientID := index .spec.kubernetes.advanced.oidc "client_id" | default "" }}
+          {{- if and (eq (.spec | digAny "distribution" "modules" "utilities" "headlamp" "type" "none") "sso") (ne "pomerium" $primaryClientID) }}
+        oidc_extra_audiences:
+          - pomerium
           {{- end }}
         {{- end }}
 
@@ -204,6 +212,13 @@ all:
     coredns_image_prefix: {{ .versions.coredns_image_prefix }}
     kubelet_csr_approver_tag: {{ .versions.kubelet_csr_approver_tag }}
     os_update_target_version: {{ .versions.os_update_target_version }}
+    # The pinned Flatcar update payload of each arch, which os-upgrade stages with flatcar-update.
+    os_update_payload_pins:
+    {{- range $arch, $p := .versions.os_update_payload_pins }}
+      {{ $arch }}:
+        url: {{ $p.url }}
+        sha256: "{{ $p.sha256 }}"
+    {{- end }}
     {{- if .versions.kubectl_bin }}
     kubectl_bin: {{ .versions.kubectl_bin }}
     {{- end }}
@@ -232,6 +247,15 @@ all:
     http_proxy: "{{ .spec.infrastructure.proxy | digAny "http" "" }}"
     https_proxy: "{{ .spec.infrastructure.proxy | digAny "https" "" }}"
     no_proxy: "{{ .spec.infrastructure.proxy | digAny "noProxy" "" }}"
+    # The environment of the Ansible tasks that connect from the node: they get no systemd DefaultEnvironment.
+    # Both cases, because Go reads either form and curl reads only the lower case.
+    proxy_env:
+      http_proxy: "{{ .spec.infrastructure.proxy | digAny "http" "" }}"
+      https_proxy: "{{ .spec.infrastructure.proxy | digAny "https" "" }}"
+      no_proxy: "{{ .spec.infrastructure.proxy | digAny "noProxy" "" }}"
+      HTTP_PROXY: "{{ .spec.infrastructure.proxy | digAny "http" "" }}"
+      HTTPS_PROXY: "{{ .spec.infrastructure.proxy | digAny "https" "" }}"
+      NO_PROXY: "{{ .spec.infrastructure.proxy | digAny "noProxy" "" }}"
     {{- end }}
 
     {{- if (index .spec.kubernetes "advanced") }}

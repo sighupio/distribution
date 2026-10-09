@@ -126,6 +126,13 @@ all:
     # The load balancer upgrade stages the Flatcar update and aligns its extensions, so it needs the
     # same pins the kubernetes phase uses. The create path never reads them.
     os_update_target_version: {{ .versions.os_update_target_version }}
+    # The pinned Flatcar update payload of each arch, which os-upgrade stages with flatcar-update.
+    os_update_payload_pins:
+    {{- range $arch, $p := .versions.os_update_payload_pins }}
+      {{ $arch }}:
+        url: {{ $p.url }}
+        sha256: "{{ $p.sha256 }}"
+    {{- end }}
     sysext_targets:
     {{- range $name, $t := .versions.sysext_targets }}
       {{ $name }}:
@@ -143,4 +150,13 @@ all:
     http_proxy: "{{ .spec.infrastructure.proxy | digAny "http" "" }}"
     https_proxy: "{{ .spec.infrastructure.proxy | digAny "https" "" }}"
     no_proxy: "{{ .spec.infrastructure.proxy | digAny "noProxy" "" }}"
+    # The environment of the Ansible tasks that connect from the node: they get no systemd DefaultEnvironment.
+    # Both cases, because Go reads either form and curl reads only the lower case.
+    proxy_env:
+      http_proxy: "{{ .spec.infrastructure.proxy | digAny "http" "" }}"
+      https_proxy: "{{ .spec.infrastructure.proxy | digAny "https" "" }}"
+      no_proxy: "{{ .spec.infrastructure.proxy | digAny "noProxy" "" }}"
+      HTTP_PROXY: "{{ .spec.infrastructure.proxy | digAny "http" "" }}"
+      HTTPS_PROXY: "{{ .spec.infrastructure.proxy | digAny "https" "" }}"
+      NO_PROXY: "{{ .spec.infrastructure.proxy | digAny "noProxy" "" }}"
     {{- end }}

@@ -26,8 +26,6 @@ distributor:
                     endpoint: 0.0.0.0:6831
                 thrift_http:
                     endpoint: 0.0.0.0:14268
-        opencensus:
-            endpoint: 0.0.0.0:55678
         otlp:
             protocols:
                 grpc:

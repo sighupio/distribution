@@ -1,0 +1,40 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+
+
+
+  
+
+
+
+
+
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: headlamp
+  namespace: headlamp
+  annotations:
+    forecastle.stakater.com/expose: "true"
+    forecastle.stakater.com/appName: "Headlamp"
+    forecastle.stakater.com/icon: "https://headlamp.dev/img/logo.svg"
+spec:
+  ingressClassName: internal
+  rules:
+    - host: dashboard.internal.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: headlamp
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - dashboard.internal.example.com
