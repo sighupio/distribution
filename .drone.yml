@@ -148,6 +148,8 @@ steps: # qa
     commands:
       - eval "$(mise activate bash --shims)"
       - mise run "test:templates:regressions"
+      - mise run "test:templates:diff-safety"
+      - mise run "test:templates:plugins-diff-sync"
 
   - name: render
     image: quay.io/sighup/mise:v2026.8.6

@@ -18,12 +18,13 @@ fi
 
 # list generated with: kustomize build . | yq 'select(.kind == "CustomResourceDefinition") | .spec.group' | sort | uniq
 {{- if eq .spec.distribution.common.provider.type "eks" }}
+{{- /* The DNS zone names go into double-quoted shell words: escape \, $, ` and ". */}}
 < out.yaml $yqbin 'select(.kind == "Ingress")' | $kubectlbin delete --ignore-not-found --wait --timeout=180s -f -
 echo "Ingresses deleted"
 
 {{- if eq .spec.distribution.modules.ingress.dns.public.create true }}
 publicHostedZones="$(aws route53 list-hosted-zones-by-name \
-  --dns-name "{{.spec.distribution.modules.ingress.dns.public.name}}." \
+  --dns-name "{{ .spec.distribution.modules.ingress.dns.public.name | replace "\\" "\\\\" | replace "$" "\\$" | replace "`" "\\`" | replace "\"" "\\\"" }}." \
   --max-items 1 \
   --query "HostedZones[0].Id" \
   --output text 2>/dev/null | cut -d'/' -f3)"
@@ -33,7 +34,7 @@ publicHostedZones=""
 
 {{- if eq .spec.distribution.modules.ingress.dns.private.create true }}
 privateHostedZones="$(aws route53 list-hosted-zones-by-name \
-  --dns-name "{{.spec.distribution.modules.ingress.dns.private.name}}." \
+  --dns-name "{{ .spec.distribution.modules.ingress.dns.private.name | replace "\\" "\\\\" | replace "$" "\\$" | replace "`" "\\`" | replace "\"" "\\\"" }}." \
   --max-items 1 \
   --query "HostedZones[0].Id" \
   --output text 2>/dev/null | cut -d'/' -f3)"

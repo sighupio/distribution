@@ -9,30 +9,7 @@ kubectlbin="{{ .paths.kubectl }}"
 yqbin="{{ .paths.yq }}"
 vendorPath="{{ .paths.vendorPath }}"
 
-$kustomizebin build --load-restrictor LoadRestrictionsNone . > out.yaml
-
-{{- if and (index .spec.distribution.common "registry") (ne .spec.distribution.common.registry "") }}
-if echo "$OSTYPE" | grep -q '^darwin'; then
-  sed -i "" 's#registry.sighup.io/fury#{{.spec.distribution.common.registry}}#g' out.yaml
-else
-  sed -i 's#registry.sighup.io/fury#{{.spec.distribution.common.registry}}#g' out.yaml
-fi
-{{- end }}
-
-{{- if eq .spec.distribution.modules.monitoring.type "none" }}
-if ! $kubectlbin get apiservice v1.monitoring.coreos.com > /dev/null 2>&1; then
-  cat out.yaml | $yqbin 'select(.apiVersion != "monitoring.coreos.com/v1")' > out-filtered.yaml
-  cp out-filtered.yaml out.yaml
-fi
-{{- end }}
-
-{{- if and (ne .spec.distribution.modules.monitoring.type "prometheusAgent") (not .spec.distribution.modules.monitoring.alertmanager.installDefaultRules) }}
-if $kubectlbin get apiservice v1alpha1.monitoring.coreos.com > /dev/null 2>&1; then
-  # filter out the Alertmanger Configuration custom resources from the build.
-  cat out.yaml | $yqbin 'select(.kind != "AlertmanagerConfig")' > out-filtered.yaml
-  cp out-filtered.yaml out.yaml
-fi
-{{- end }}
+{{ template "kfdBuildOutYaml" . }}
 
 if [ "$dryrun" != "" ]; then
   exit 0
@@ -45,19 +22,12 @@ $kubectlbin delete --ignore-not-found --wait --timeout=180s job minio-logging-bu
 $kubectlbin delete --ignore-not-found --wait --timeout=180s job minio-monitoring-buckets-setup -n monitoring
 $kubectlbin delete --ignore-not-found --wait --timeout=180s job minio-tracing-buckets-setup -n tracing
 
-additionalKappArgs=""
-
-{{- if eq .spec.distribution.modules.policy.type "gatekeeper" }}
-    {{- if .spec.distribution.modules.policy.gatekeeper.installDefaultPolicies }}
-# We need this to tell Kapp that the CRDs will be created later by Gatekeeper
-additionalKappArgs="-f ../../vendor/modules/opa/katalog/tests/kapp/exists.yaml"
-    {{- end }}
-{{- end }}
+{{ template "kfdAdditionalKappArgs" . }}
 
 # Retry kapp deploy once on failure
-if ! "$kappbin" deploy -a kfd -n kube-system -f out.yaml $additionalKappArgs --allow-all-ns -y --default-label-scoping-rules=false --apply-default-update-strategy=fallback-on-replace --wait-timeout 120m0s --apply-timeout 120m0s --apply-concurrency 20 2>&1 ; then
+if ! "$kappbin" deploy {{ template "kfdKappApp" . }} -y {{ template "kfdKappStrategy" . }} --wait-timeout 120m0s --apply-timeout 120m0s --apply-concurrency 20 2>&1 ; then
   echo "kapp deploy failed at first attempt retrying a second time..."
-  "$kappbin" deploy -a kfd -n kube-system -f out.yaml $additionalKappArgs --allow-all-ns -y --default-label-scoping-rules=false --apply-default-update-strategy=fallback-on-replace --wait-timeout 120m0s --apply-timeout 120m0s --apply-concurrency 20 2>&1
+  "$kappbin" deploy {{ template "kfdKappApp" . }} -y {{ template "kfdKappStrategy" . }} --wait-timeout 120m0s --apply-timeout 120m0s --apply-concurrency 20 2>&1
 fi
 
 echo "Executing cleanup migrations on values that can be nil..."

@@ -10,6 +10,16 @@ yqbin=""
 vendorPath=""
 
 $kustomizebin build --load-restrictor LoadRestrictionsNone . > out.yaml
+if echo "$OSTYPE" | grep -q '^darwin'; then
+  sed -i "" 's#registry.sighup.io/fury#registry.example.com/fury#g' out.yaml
+else
+  sed -i 's#registry.sighup.io/fury#registry.example.com/fury#g' out.yaml
+fi
+if $kubectlbin get apiservice v1alpha1.monitoring.coreos.com > /dev/null 2>&1; then
+  # filter out the Alertmanger Configuration custom resources from the build.
+  cat out.yaml | $yqbin 'select(.kind != "AlertmanagerConfig")' > out-filtered.yaml
+  cp out-filtered.yaml out.yaml
+fi
 
 if [ "$dryrun" != "" ]; then
   exit 0
@@ -31,5 +41,14 @@ if ! "$kappbin" deploy -a kfd -n kube-system -f out.yaml $additionalKappArgs --a
 fi
 
 echo "Executing cleanup migrations on values that can be nil..."
+
+echo "Cleaning up alertmanagerconfigs..."
+
+$kubectlbin delete --ignore-not-found --wait --timeout=180s -n monitoring alertmanagerconfigs.monitoring.coreos.com deadmanswitch
+$kubectlbin delete --ignore-not-found --wait --timeout=180s -n monitoring alertmanagerconfigs.monitoring.coreos.com infra
+$kubectlbin delete --ignore-not-found --wait --timeout=180s -n monitoring alertmanagerconfigs.monitoring.coreos.com k8s
+$kubectlbin delete --ignore-not-found --wait --timeout=180s -n monitoring secret infra-slack-webhook
+$kubectlbin delete --ignore-not-found --wait --timeout=180s -n monitoring secret k8s-slack-webhook
+$kubectlbin delete --ignore-not-found --wait --timeout=180s -n monitoring secret healthchecks-webhook
 
 echo "Apply script completed."
