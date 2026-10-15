@@ -1,0 +1,27 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+---
+apiVersion: crd.projectcalico.org/v1
+kind: NetworkPolicy
+metadata:
+  name: calico-system.whisker-ingress-pomerium
+  namespace: calico-system
+  labels:
+    cluster.kfd.sighup.io/module: networking
+    projectcalico.org/tier: calico-system
+spec:
+  tier: calico-system
+  order: 0
+  selector: k8s-app == 'whisker'
+  types:
+    - Ingress
+  ingress:
+    - action: Allow
+      protocol: TCP
+      source:
+        namespaceSelector: projectcalico.org/name == 'pomerium'
+        selector: app == 'pomerium'
+      destination:
+        ports:
+          - 8081

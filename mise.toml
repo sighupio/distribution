@@ -159,3 +159,11 @@ for dir in ${usage_kind}*/; do
 done
 popd
 """
+
+[tasks."test:templates:diff-safety"]
+description = "Check that the rendered diff.sh scripts never write to the cluster"
+run = "sh tests/templates/diff-safety.sh"
+
+[tasks."test:templates:plugins-diff-sync"]
+description = "Check that the plugins diff.sh template stays in sync with the plugins apply.sh template"
+run = "sh tests/templates/plugins-diff-sync.sh"
