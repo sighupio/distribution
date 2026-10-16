@@ -1,0 +1,79 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+
+address: ":8080"
+metrics_address: ":9090"
+
+insecure_server: true
+autocert: false
+
+routes:
+  - from: https://prometheus.internal.example.com
+    to: http://prometheus-k8s.monitoring.svc.cluster.local:9090
+    policy:
+      - allow:
+          and:
+            - authenticated_user: true
+  - from: https://alertmanager.internal.example.com
+    to: http://alertmanager-main.monitoring.svc.cluster.local:9093
+    policy:
+      - allow:
+          and:
+            - authenticated_user: true
+  - from: https://grafana.internal.example.com
+    to: http://grafana.monitoring.svc.cluster.local:3000
+    allow_websockets: true
+    host_rewrite_header: true
+    preserve_host_header: true
+    pass_identity_headers: true
+    policy:
+      - allow:
+          and:
+            - authenticated_user: true
+  - from: https://minio-monitoring.internal.example.com
+    to: http://minio-monitoring-console.monitoring.svc.cluster.local:9001
+    allow_websockets: true
+    preserve_host_header: true
+    policy:
+      - allow:
+          and:
+            - authenticated_user: true
+
+  
+  - from: https://directory.internal.example.com
+    to: http://forecastle.forecastle.svc.cluster.local
+    policy:
+      - allow:
+          and:
+            - authenticated_user: true
+  - from: https://minio-logging.internal.example.com
+    to: http://minio-logging-console.logging.svc.cluster.local:9001
+    allow_websockets: true
+    preserve_host_header: true
+    policy:
+      - allow:
+          and:
+            - authenticated_user: true
+  - from: https://minio-tracing.internal.example.com
+    to: http://minio-tracing-console.tracing.svc.cluster.local:9001
+    allow_websockets: true
+    preserve_host_header: true
+    policy:
+      - allow:
+          and:
+            - authenticated_user: true
+  - from: https://gpm.internal.example.com
+    to: http://gatekeeper-policy-manager.gatekeeper-system.svc.cluster.local
+    policy:
+      - allow:
+          and:
+            - authenticated_user: true
+  - from: https://whisker.internal.example.com
+    to: http://whisker.calico-system.svc.cluster.local:8081
+    policy:
+      - allow:
+          and:
+            - authenticated_user: true
+
