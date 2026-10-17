@@ -210,6 +210,9 @@ spec:
           type: none
         # The base domain used for all the auth ingresses, if in the HAProxy dual configuration, it should be the same as the .spec.distribution.modules.ingress.dns.public.name domain
         baseDomain: example.dev
+      utilities:
+        headlamp:
+          type: none
     # Custom Patches to add or override fields in the generated manifests
     #customPatches: {}
   # Plugins to be installed

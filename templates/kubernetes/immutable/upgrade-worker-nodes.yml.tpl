@@ -25,8 +25,8 @@
       ansible.builtin.include_role:
         name: upgrade-gates
         tasks_from: infra_preflight.yml
-    # Stage the OS update async so the Flatcar download overlaps the sysext staging + drain.
-    - name: Stage the operating system update (async)
+    # Stage the OS before the drain, so a missing or bad payload stops the run while the node still serves.
+    - name: Stage the operating system update
       ansible.builtin.include_role:
         name: os-upgrade
         tasks_from: os_stage.yml

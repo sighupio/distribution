@@ -48,7 +48,7 @@ deleteOpensearch() {
   $kustomizebin build $vendorPath/modules/logging/katalog/opensearch-triple > delete-opensearch.yaml
 
 {{- if eq .spec.distribution.modules.monitoring.type "none" }}
-  if ! $kubectlbin get apiservice v1.monitoring.coreos.com; then
+  if ! $kubectlbin get apiservice v1.monitoring.coreos.com > /dev/null 2>&1; then
     $yqbin -i 'select(.apiVersion != "monitoring.coreos.com/v1")' delete-opensearch.yaml
     $yqbin -i 'select(.apiVersion != "monitoring.coreos.com/v1")' delete-opensearch-dashboards.yaml
   fi
@@ -66,7 +66,7 @@ deleteLoki() {
   $kustomizebin build $vendorPath/modules/logging/katalog/loki-distributed > delete-loki.yaml
 
 {{- if eq .spec.distribution.modules.monitoring.type "none" }}
-  if ! $kubectlbin get apiservice v1.monitoring.coreos.com; then
+  if ! $kubectlbin get apiservice v1.monitoring.coreos.com > /dev/null 2>&1; then
      $yqbin -i 'select(.apiVersion != "monitoring.coreos.com/v1")' delete-loki.yaml
   fi
 {{- end }}
@@ -82,7 +82,7 @@ deleteLoggingOperator() {
   $kustomizebin build $vendorPath/modules/logging/katalog/logging-operated > delete-logging-operated.yaml
   $kustomizebin build $vendorPath/modules/logging/katalog/logging-operator > delete-logging-operator.yaml
 {{- if eq .spec.distribution.modules.monitoring.type "none" }}
-  if ! $kubectlbin get apiservice v1.monitoring.coreos.com; then
+  if ! $kubectlbin get apiservice v1.monitoring.coreos.com > /dev/null 2>&1; then
     $yqbin -i 'select(.apiVersion != "monitoring.coreos.com/v1")' delete-logging-operated.yaml
     $yqbin -i 'select(.apiVersion != "monitoring.coreos.com/v1")' delete-logging-operator.yaml
   fi
@@ -99,7 +99,7 @@ deleteMinioLogging() {
 $kustomizebin build $vendorPath/modules/logging/katalog/minio-ha > delete-logging-minio-ha.yaml
 
 {{- if eq .spec.distribution.modules.monitoring.type "none" }}
-  if ! $kubectlbin get apiservice v1.monitoring.coreos.com; then
+  if ! $kubectlbin get apiservice v1.monitoring.coreos.com > /dev/null 2>&1; then
     $yqbin -i 'select(.apiVersion != "monitoring.coreos.com/v1")' delete-logging-minio-ha.yaml
   fi
 {{- end }}
@@ -283,7 +283,7 @@ deleteTempo() {
   $kustomizebin build $vendorPath/modules/tracing/katalog/tempo-distributed > delete-tracing-tempo-distributed.yaml
 
 {{- if eq .spec.distribution.modules.monitoring.type "none" }}
-  if ! $kubectlbin get apiservice v1.monitoring.coreos.com; then
+  if ! $kubectlbin get apiservice v1.monitoring.coreos.com > /dev/null 2>&1; then
     cat delete-tracing-minio-ha.yaml | $yqbin 'select(.apiVersion != "monitoring.coreos.com/v1")' > delete-tracing-minio-ha-filtered.yaml
     cp delete-tracing-minio-ha-filtered.yaml delete-tracing-minio-ha.yaml
     cat delete-tracing-tempo-distributed.yaml | $yqbin 'select(.apiVersion != "monitoring.coreos.com/v1")' > delete-tracing-tempo-distributed-filtered.yaml
@@ -319,7 +319,7 @@ deleteTracingMinioHA() {
   $kustomizebin build $vendorPath/modules/tracing/katalog/minio-ha > delete-tracing-minio-ha.yaml
 
 {{- if eq .spec.distribution.modules.monitoring.type "none" }}
-  if ! $kubectlbin get apiservice v1.monitoring.coreos.com; then
+  if ! $kubectlbin get apiservice v1.monitoring.coreos.com > /dev/null 2>&1; then
     cat delete-tracing-minio-ha.yaml | $yqbin 'select(.apiVersion != "monitoring.coreos.com/v1")' > delete-tracing-minio-ha-filtered.yaml
     cp delete-tracing-minio-ha-filtered.yaml delete-tracing-minio-ha.yaml
   fi
@@ -353,7 +353,7 @@ deleteVelero() {
   $kustomizebin build $vendorPath/modules/dr/katalog/velero/velero-on-prem > delete-velero.yaml
 
 {{- if eq .spec.distribution.modules.dr.type "none" }}
-  if ! $kubectlbin get apiservice v1.monitoring.coreos.com; then
+  if ! $kubectlbin get apiservice v1.monitoring.coreos.com > /dev/null 2>&1; then
     cat delete-velero.yaml | $yqbin 'select(.apiVersion != "monitoring.coreos.com/v1")' > delete-velero-filtered.yaml
     cp delete-velero-filtered.yaml delete-velero.yaml
   fi
@@ -393,7 +393,7 @@ deleteVeleroMinio() {
   $kustomizebin build $vendorPath/modules/dr/katalog/velero/velero-on-prem/minio > delete-dr-minio.yaml
 
 {{- if eq .spec.distribution.modules.monitoring.type "none" }}
-  if ! $kubectlbin get apiservice v1.monitoring.coreos.com; then
+  if ! $kubectlbin get apiservice v1.monitoring.coreos.com > /dev/null 2>&1; then
     cat delete-dr-minio.yaml | $yqbin 'select(.apiVersion != "monitoring.coreos.com/v1")' > delete-dr-minio-filtered.yaml
     cp delete-dr-minio-filtered.yaml delete-dr-minio.yaml
   fi
@@ -556,7 +556,7 @@ deleteMimirMinioHA() {
   $kustomizebin build $vendorPath/modules/monitoring/katalog/minio-ha > delete-monitoring-minio-ha.yaml
 
 {{- if or (eq .spec.distribution.modules.monitoring.type "none") (eq .storedCfg.spec.distribution.modules.monitoring.type "none") }}
-  if ! $kubectlbin get apiservice v1.monitoring.coreos.com; then
+  if ! $kubectlbin get apiservice v1.monitoring.coreos.com > /dev/null 2>&1; then
     cat delete-monitoring-minio-ha.yaml | $yqbin 'select(.apiVersion != "monitoring.coreos.com/v1")' > delete-monitoring-minio-ha-filtered.yaml
     cp delete-monitoring-minio-ha-filtered.yaml delete-monitoring-minio-ha.yaml
   fi
@@ -590,7 +590,7 @@ deleteNginx() {
   $kustomizebin build $vendorPath/modules/ingress/katalog/forecastle > delete-forecastle.yaml
 
 {{- if eq .spec.distribution.modules.monitoring.type "none" }}
-  if ! $kubectlbin get apiservice v1.monitoring.coreos.com; then
+  if ! $kubectlbin get apiservice v1.monitoring.coreos.com > /dev/null 2>&1; then
     cat delete-nginx.yaml | $yqbin 'select(.apiVersion != "monitoring.coreos.com/v1")' > delete-nginx-filtered.yaml
     cp delete-nginx-filtered.yaml delete-nginx.yaml
     cat delete-dual-nginx.yaml | $yqbin 'select(.apiVersion != "monitoring.coreos.com/v1")' > delete-dual-nginx-filtered.yaml
@@ -651,7 +651,7 @@ deleteDex() {
   $kustomizebin build $vendorPath/modules/auth/katalog/dex > delete-dex.yaml
 
 {{- if eq .spec.distribution.modules.monitoring.type "none" }}
-  if ! $kubectlbin get apiservice v1.monitoring.coreos.com; then
+  if ! $kubectlbin get apiservice v1.monitoring.coreos.com > /dev/null 2>&1; then
     cat delete-dex.yaml | $yqbin 'select(.apiVersion != "monitoring.coreos.com/v1")' > delete-dex-filtered.yaml
     cp delete-dex-filtered.yaml delete-dex.yaml
 
@@ -668,7 +668,7 @@ deleteGangplank() {
   $kustomizebin build $vendorPath/modules/auth/katalog/gangplank > delete-gangplank.yaml
 
 {{- if eq .spec.distribution.modules.monitoring.type "none" }}
-  if ! $kubectlbin get apiservice v1.monitoring.coreos.com; then
+  if ! $kubectlbin get apiservice v1.monitoring.coreos.com > /dev/null 2>&1; then
     cat delete-gangplank.yaml | $yqbin 'select(.apiVersion != "monitoring.coreos.com/v1")' > delete-gangplank-filtered.yaml
     cp delete-gangplank-filtered.yaml delete-pomerium.yaml
 
@@ -684,7 +684,7 @@ deletePomerium() {
   $kustomizebin build $vendorPath/modules/auth/katalog/pomerium > delete-pomerium.yaml
 
 {{- if eq .spec.distribution.modules.monitoring.type "none" }}
-  if ! $kubectlbin get apiservice v1.monitoring.coreos.com; then
+  if ! $kubectlbin get apiservice v1.monitoring.coreos.com > /dev/null 2>&1; then
     cat delete-pomerium.yaml | $yqbin 'select(.apiVersion != "monitoring.coreos.com/v1")' > delete-pomerium-filtered.yaml
     cp delete-pomerium-filtered.yaml delete-pomerium.yaml
 

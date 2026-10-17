@@ -45,6 +45,7 @@ resources:
 {{- end }}
 {{- if .spec.distribution.modules.dr.velero.schedules.install }}
   - {{ print $vendorPrefix "/modules/dr/katalog/velero/velero-schedules" }}
+  - kapp-configs/velero-schedules.yaml
 {{- end }}
 {{- if eq .spec.distribution.common.provider.type "eks" }}
   - resources/eks-velero-backupstoragelocation.yml

@@ -324,7 +324,7 @@
           "$ref": "#/$defs/Types.KubeAnnotations"
         },
         "kubeletConfiguration": {
-          "description": "Optional Kubelet configuration specific to control-plane nodes. If set, this will override the global `advanced.kubeletConfiguration`. See `advanced.KubeletConfiguration` for more details.",
+          "description": "Optional Kubelet configuration specific to control-plane nodes. If set, this will override the global `advanced.kubeletConfiguration`. See `advanced.KubeletConfiguration` for more details.\n\nNOTE: Content will **not** be validated by furyctl. To customize the TLS cipher suites of the Kubelet, set only the `Spec.Kubernetes.Advanced.Encryption.tlsCipherSuitesKubelet` field - do not configure them under this field.",
           "$ref": "#/$defs/Spec.Kubernetes.Advanced.KubeletConfiguration"
         },
         "kernelParameters": {
@@ -448,7 +448,7 @@
           "$ref": "#/$defs/Types.KubeAnnotations"
         },
         "kubeletConfiguration": {
-          "description": "Optional Kubelet configuration specific to worker nodes. If set, this will override the global `advanced.kubeletConfiguration`. See `advanced.KubeletConfiguration` for more details.",
+          "description": "Optional Kubelet configuration specific to worker nodes. If set, this will override the global `advanced.kubeletConfiguration`. See `advanced.KubeletConfiguration` for more details.\n\nNOTE: Content will **not** be validated by furyctl. To customize the TLS cipher suites of the Kubelet, set only the `Spec.Kubernetes.Advanced.Encryption.tlsCipherSuitesKubelet` field - do not configure them under this field.",
           "$ref": "#/$defs/Spec.Kubernetes.Advanced.KubeletConfiguration"
         },
         "kernelParameters": {
@@ -653,9 +653,13 @@
           "type": "string",
           "description": "JWT claim to use as the user's group."
         },
+        "groups_prefix": {
+          "type": "string",
+          "description": "Prefix prepended to group claims to prevent clashes with existing names (such as system: groups). Sets `claimMappings.groups.prefix` in the API server AuthenticationConfiguration. Replaces the deprecated `group_prefix` field. Defaults to `oidc:`."
+        },
         "group_prefix": {
           "type": "string",
-          "description": "Prefix prepended to group claims to prevent clashes with existing names (such as system: groups)."
+          "description": "DEPRECATED, use `groups_prefix`. Ignored when `groups_prefix` is set."
         }
       }
     },
@@ -1064,6 +1068,9 @@
         },
         "policy": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Policy"
+        },
+        "utilities": {
+          "$ref": "#/$defs/Spec.Distribution.Modules.Utilities"
         }
       },
       "required": [
@@ -1394,6 +1401,47 @@
             ]
           },
           "then": false
+        },
+        {
+          "if": {
+            "required": [
+              "utilities"
+            ],
+            "properties": {
+              "utilities": {
+                "required": [
+                  "headlamp"
+                ],
+                "properties": {
+                  "headlamp": {
+                    "required": [
+                      "type"
+                    ],
+                    "properties": {
+                      "type": {
+                        "const": "sso"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "auth": {
+                "properties": {
+                  "provider": {
+                    "properties": {
+                      "type": {
+                        "const": "sso"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
       ]
     },
@@ -1418,7 +1466,7 @@
         },
         "byoic": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.BYOIC",
-          "description": "Configuration for Bring Your Own Ingress Controller mode. Can coexist with nginx and haproxy. The ingressClass is used when both controllers are disabled."
+          "description": "Configuration for Bring Your Own Ingress Controller mode. Can coexist with nginx and haproxy. The ingressClass is used for infrastructure ingresses when both controllers are disabled."
         },
         "certManager": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Ingress.CertManager",
@@ -1893,8 +1941,8 @@
           "$ref": "#/$defs/Types.KubeResources"
         },
         "storageSize": {
-          "type": "string",
-          "description": "The storage size for the OpenSearch volumes. Follows Kubernetes resources storage requests. Default is `150Gi`."
+          "$ref": "./shared-types.json#/$defs/Types.KubernetesQuantity",
+          "description": "The storage size for the OpenSearch volumes. Default is `150Gi`.\n\nFollows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid."
         },
         "overrides": {
           "$ref": "#/$defs/Types.FuryModuleComponentOverrides"
@@ -1920,8 +1968,8 @@
       "description": "Configuration for Logging's MinIO deployment.",
       "properties": {
         "storageSize": {
-          "type": "string",
-          "description": "The PVC size for each MinIO disk, 6 disks total."
+          "$ref": "./shared-types.json#/$defs/Types.KubernetesQuantity",
+          "description": "The PVC size for each MinIO disk, 6 disks total.\n\nFollows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid."
         },
         "rootUser": {
           "type": "object",
@@ -2153,8 +2201,8 @@
           "description": "The retention size for the `k8s` Prometheus instance."
         },
         "storageSize": {
-          "type": "string",
-          "description": "The storage size for the `k8s` Prometheus instance."
+          "$ref": "./shared-types.json#/$defs/Types.KubernetesQuantity",
+          "description": "The storage size for the `k8s` Prometheus instance.\n\nFollows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid."
         },
         "remoteWrite": {
           "description": "Set this option to ship the collected metrics to a remote Prometheus receiver.\n\n`remoteWrite` is an array of objects that allows configuring the [remoteWrite](https://prometheus.io/docs/specs/remote_write_spec/) options for Prometheus. The objects in the array follow [the same schema as in the prometheus operator](https://prometheus-operator.dev/docs/api-reference/api/#monitoring.coreos.com/v1.RemoteWriteSpec).",
@@ -2311,8 +2359,8 @@
       "additionalProperties": false,
       "properties": {
         "storageSize": {
-          "type": "string",
-          "description": "The PVC size for each MinIO disk, 6 disks total."
+          "$ref": "./shared-types.json#/$defs/Types.KubernetesQuantity",
+          "description": "The PVC size for each MinIO disk, 6 disks total.\n\nFollows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid."
         },
         "rootUser": {
           "type": "object",
@@ -2415,8 +2463,8 @@
       "additionalProperties": false,
       "properties": {
         "storageSize": {
-          "type": "string",
-          "description": "The PVC size for each MinIO disk, 6 disks total."
+          "$ref": "./shared-types.json#/$defs/Types.KubernetesQuantity",
+          "description": "The PVC size for each MinIO disk, 6 disks total.\n\nFollows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid."
         },
         "rootUser": {
           "type": "object",
@@ -2624,6 +2672,9 @@
         "validationFailureAction",
         "installDefaultPolicies"
       ]
+    },
+    "Spec.Distribution.Modules.Utilities": {
+      "$ref": "./spec-distribution-modules-utilities.json"
     },
     "Spec.Distribution.Modules.Dr": {
       "type": "object",

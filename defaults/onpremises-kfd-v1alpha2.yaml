@@ -350,6 +350,10 @@ data:
       oidcKubernetesAuth:
         enabled: false
       baseDomain: ""
+    # utilities module configuration
+    utilities:
+      headlamp:
+        type: none
 
 templates:
   includes:

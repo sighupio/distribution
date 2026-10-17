@@ -214,3 +214,11 @@ distribution:
     reducers:
       - key: distributionModulesMonitoringGrafanaBasicAuthIngress
         lifecycle: pre-apply
+  - path: .spec.distribution.modules.utilities.headlamp.type
+    immutable: false
+    description: "changes to the Headlamp type have been detected. Setting it to none will remove Headlamp from the cluster, switching between token-auth and sso will replace its Ingress and RBAC resources."
+    safe:
+      - from: none
+    reducers:
+      - key: distributionModulesUtilitiesHeadlampType
+        lifecycle: pre-apply

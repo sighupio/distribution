@@ -32,4 +32,14 @@ IDP_PROVIDER=oidc
 # IDP_PROVIDER_URL is the url of dex ingress
 IDP_PROVIDER_URL={{ template "dexHost" . }}
 IDP_SCOPES=openid profile email groups
+{{- /* Since Pomerium v0.33 the sign-out handler ignores pomerium_redirect_uri unless the */}}
+{{- /* allow_any_sign_out_redirect_uri runtime flag is set, so send every sign-out back to */}}
+{{- /* Headlamp: with no session left, Pomerium restarts the OIDC flow (login page). */}}
+{{- /* The predicate mirrors utilities/resources/headlamp-ingress.yml.tpl (SSO mode only). */}}
+{{- $headlampType := .spec | digAny "distribution" "modules" "utilities" "headlamp" "type" "none" }}
+{{- if and (eq .spec.distribution.common.provider.type "none" "immutable") (hasKeyAny .spec "kubernetes") (eq $headlampType "sso") }}
+
+# Send every sign-out back to Headlamp
+SIGNOUT_REDIRECT_URL=https://dashboard.{{ .spec.distribution.modules.ingress.baseDomain }}/
+{{- end }}
 {{ end }}

@@ -1,0 +1,69 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sd-spec
+  namespace: headlamp
+data:
+  info.json: |
+    {
+      "cluster": {
+        "kind": "OnPremises",
+        "name": "headlamp-sso"
+      },
+      "distributionVersion": "v1.36.0",
+      "moduleVersions": {
+        "auth": "v0.8.0",
+        "aws": "v5.4.0",
+        "dr": "v3.5.0",
+        "ingress": "v5.2.0",
+        "logging": "v5.5.0",
+        "monitoring": "v4.3.0",
+        "networking": "v4.1.0",
+        "opa": "v1.18.0",
+        "tracing": "v1.6.0",
+        "utilities": "v1.0.0"
+      },
+      "modules": {
+        "auth": {
+          "provider": {
+            "type": "sso"
+          }
+        },
+        "dr": {
+          "type": "on-premises"
+        },
+        "ingress": {
+          "haproxy": {
+            "type": "none"
+          },
+          "nginx": {
+            "type": "dual"
+          }
+        },
+        "logging": {
+          "type": "loki"
+        },
+        "monitoring": {
+          "type": "mimir"
+        },
+        "networking": {
+          "type": "calico"
+        },
+        "policy": {
+          "type": "gatekeeper"
+        },
+        "tracing": {
+          "type": "tempo"
+        },
+        "utilities": {
+          "headlamp": {
+            "type": "sso"
+          }
+        }
+      }
+    }

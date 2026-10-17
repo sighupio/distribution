@@ -31,7 +31,7 @@
         name: upgrade-gates
         tasks_from: cluster_health_gate.yml
 {{- if not $etcdOnControlPlane }}
-    # Stage the OS on the dedicated etcd node (async, no kubectl drain — etcd is not a Kubernetes node); the reboot below activates it.
+    # Stage the OS on the dedicated etcd node (no kubectl drain — etcd is not a Kubernetes node); the reboot below activates it.
     - name: Stage the operating system update on the etcd node
       ansible.builtin.include_role:
         name: os-upgrade

@@ -1,0 +1,59 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# Longhorn for spec.distribution.customResources: the distribution phase applies
+# it, so the StorageClass exists before the plugins phase. Same settings as the
+# helm values of the on-premises pipeline.
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - https://raw.githubusercontent.com/longhorn/longhorn/v1.8.1/deploy/longhorn.yaml
+
+patches:
+  - patch: |
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: longhorn-default-setting
+        namespace: longhorn-system
+      data:
+        # e2e volumes are mostly empty; let longhorn over-provision the thin disks.
+        default-setting.yaml: |-
+          priority-class: longhorn-critical
+          disable-revision-counter: true
+          storage-over-provisioning-percentage: 1000
+          storage-minimal-available-percentage: 5
+          # the upgrade drains each node; with replica 1 longhorn's PDB would block
+          # evicting the instance-manager that holds the only replica. e2e data is
+          # disposable, so always allow the drain.
+          node-drain-policy: always-allow
+  - patch: |
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: longhorn-storageclass
+        namespace: longhorn-system
+      data:
+        storageclass.yaml: |
+          kind: StorageClass
+          apiVersion: storage.k8s.io/v1
+          metadata:
+            name: longhorn
+            annotations:
+              storageclass.kubernetes.io/is-default-class: "true"
+          provisioner: driver.longhorn.io
+          allowVolumeExpansion: true
+          reclaimPolicy: "Delete"
+          volumeBindingMode: Immediate
+          parameters:
+            numberOfReplicas: "1"
+            staleReplicaTimeout: "30"
+            fromBackup: ""
+            fsType: "ext4"
+            dataLocality: "disabled"
+            unmapMarkSnapChainRemoved: "ignored"
+            disableRevisionCounter: "true"
+            dataEngine: "v1"

@@ -8,7 +8,7 @@ kind: KFDDistribution
 metadata:
   name: sighup
 spec:
-  distributionVersion: v1.35.1
+  distributionVersion: v1.36.0
   # This section describes how the KFD distribution will be installed
   distribution:
     kubeconfig: "{env://KUBECONFIG}"
@@ -19,6 +19,10 @@ spec:
     modules:
       networking:
         type: calico
+        # Kind's pod CIDR, set explicitly: without it the rendered Installation has no ipPools and,
+        # when kapp re-applies it, the Tigera operator deletes the default IPPool and cannot recreate it.
+        tigeraOperator:
+          podCidr: 10.244.0.0/16
       # This section contains all the configurations for the ingress module
       ingress:
         baseDomain: fury.sighup.cc
@@ -83,6 +87,15 @@ spec:
             password: testpassword
     # patches for kind compatibility and resource setting
     customPatches:
+      # The Kind cluster has no CNI until Calico is installed by this same apply, so pods stay
+      # Unschedulable for several minutes. Give Deployments more time before ProgressDeadlineExceeded.
+      patches:
+        - target:
+            kind: Deployment
+          patch: |
+            - op: add
+              path: /spec/progressDeadlineSeconds
+              value: 1800
       patchesStrategicMerge:
         - |
           apiVersion: apps/v1

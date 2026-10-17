@@ -870,6 +870,7 @@ Configuration for Pomerium, an identity-aware reverse proxy used for SSO.
 | Property                                                                                                          | Type    | Required |
 |:------------------------------------------------------------------------------------------------------------------|:--------|:---------|
 | [gatekeeperPolicyManager](#specdistributionmodulesauthpomeriumdefaultroutespolicygatekeeperpolicymanager)         | `array` | Optional |
+| [headlamp](#specdistributionmodulesauthpomeriumdefaultroutespolicyheadlamp)                                       | `array` | Optional |
 | [hubbleUi](#specdistributionmodulesauthpomeriumdefaultroutespolicyhubbleui)                                       | `array` | Optional |
 | [ingressForecastle](#specdistributionmodulesauthpomeriumdefaultroutespolicyingressforecastle)                     | `array` | Optional |
 | [loggingMinioConsole](#specdistributionmodulesauthpomeriumdefaultroutespolicyloggingminioconsole)                 | `array` | Optional |
@@ -886,6 +887,12 @@ Configuration for Pomerium, an identity-aware reverse proxy used for SSO.
 override default routes for SD components
 
 ## .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.gatekeeperPolicyManager
+
+## .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.headlamp
+
+### Description
+
+Only used on OnPremises and Immutable clusters when `.spec.distribution.modules.utilities.headlamp.type` is `sso`.
 
 ## .spec.distribution.modules.auth.pomerium.defaultRoutesPolicy.hubbleUi
 
@@ -1889,7 +1896,7 @@ The base domain used for all the SD infrastructural ingresses. If in the nginx `
 
 ### Description
 
-Configuration for Bring Your Own Ingress Controller mode. The ingressClass is used for infrastructure ingresses when both controllers are disabled.
+Configuration for Bring Your Own Ingress Controller mode. Can coexist with nginx and haproxy. The ingressClass is used for infrastructure ingresses when both controllers are disabled.
 
 ## .spec.distribution.modules.ingress.byoic.commonAnnotations
 
@@ -2245,7 +2252,7 @@ The value of the toleration
 
 ### Description
 
-Configuration for HAProxy ingress controller.
+Configurations for the HAProxy ingress controller package.
 
 ## .spec.distribution.modules.ingress.haproxy.overrides
 
@@ -3089,6 +3096,18 @@ The username for the default MinIO root user.
 
 The PVC size for each MinIO disk, 6 disks total.
 
+Follows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid.
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+```
+
+[try pattern](https://regexr.com/?expression=^\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\(\([KMGTPE]i\)|[numkMGTPE]|\([eE]\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\)\)?$)
+
 ## .spec.distribution.modules.logging.opensearch
 
 ### Properties
@@ -3220,7 +3239,19 @@ The memory request for the Pod. Example: `500M`.
 
 ### Description
 
-The storage size for the OpenSearch volumes. Follows Kubernetes resources storage requests. Default is `150Gi`.
+The storage size for the OpenSearch volumes. Default is `150Gi`.
+
+Follows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid.
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+```
+
+[try pattern](https://regexr.com/?expression=^\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\(\([KMGTPE]i\)|[numkMGTPE]|\([eE]\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\)\)?$)
 
 ## .spec.distribution.modules.logging.opensearch.type
 
@@ -3954,6 +3985,18 @@ The username for the default MinIO root user.
 
 The PVC size for each MinIO disk, 6 disks total.
 
+Follows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid.
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+```
+
+[try pattern](https://regexr.com/?expression=^\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\(\([KMGTPE]i\)|[numkMGTPE]|\([eE]\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\)\)?$)
+
 ## .spec.distribution.modules.monitoring.overrides
 
 ### Properties
@@ -4114,6 +4157,18 @@ The retention time for the `k8s` Prometheus instance.
 ### Description
 
 The storage size for the `k8s` Prometheus instance.
+
+Follows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid.
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+```
+
+[try pattern](https://regexr.com/?expression=^\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\(\([KMGTPE]i\)|[numkMGTPE]|\([eE]\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\)\)?$)
 
 ## .spec.distribution.modules.monitoring.prometheusAdapter
 
@@ -4944,6 +4999,18 @@ The username for the default MinIO root user.
 ### Description
 
 The PVC size for each MinIO disk, 6 disks total.
+
+Follows the Kubernetes resource quantity format, for example `10Gi`. Suffixes like `GB` or `MB` are not valid.
+
+### Constraints
+
+**pattern**: the string must match the following regular expression:
+
+```regexp
+^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+```
+
+[try pattern](https://regexr.com/?expression=^\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\(\([KMGTPE]i\)|[numkMGTPE]|\([eE]\(\%2B|-\)?\(\([0-9]%2B\(\.[0-9]*\)?\)|\(\.[0-9]%2B\)\)\)\)?$)
 
 ## .spec.distribution.modules.tracing.overrides
 

@@ -110,6 +110,10 @@ spec:
                 clientID: client-id
                 clientSecret: client-secret
                 issuer: https://dex.example.com
+      utilities:
+        headlamp:
+          type: token-auth
+          clusterRole: view
     customPatches:
       patches:
         - path: dummy/folder

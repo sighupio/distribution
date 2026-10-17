@@ -67,6 +67,19 @@ load ./helper
     [ "$status" -eq 0 ]
 }
 
+@test "Headlamp is Running" {
+    info
+    # the utilities module is installed only by the clean install pipelines; the
+    # immutable upgrades pipeline reuses this suite without it.
+    [ "${EXPECT_HEADLAMP:-0}" = "1" ] || skip "headlamp only in the clean install pipelines"
+    test() {
+        kubectl get pods -l app.kubernetes.io/name=headlamp -o json -n headlamp |jq '.items[].status.containerStatuses[].ready' | uniq | grep -q true
+    }
+    loop_it test 60 10
+    status=${loop_it_result}
+    [ "$status" -eq 0 ]
+}
+
 @test "Fluentd is Running" {
     info
     test() {

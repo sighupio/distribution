@@ -15,5 +15,6 @@ resources:
   - networking
   - opa
   - tracing
+  - utilities
 patches:
   - path: dummy/folder

@@ -15,6 +15,8 @@
           - curl
         state: present
         update_cache: yes
+      # Flatcar (Immutable) has no package manager; git and curl ship with it.
+      when: kube_bench_install_packages | default(true) | bool
 
     - name: Clone installer-on-premises repository for kube-bench config
       ansible.builtin.git:

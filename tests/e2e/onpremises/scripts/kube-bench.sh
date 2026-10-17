@@ -6,7 +6,7 @@
 # Run the CIS kube-bench benchmark (ansible) on one representative node per role
 # -- controlplane-0 + worker-0 -- as the original e2e. Builds the inventory from
 # tofu output and runs playbooks/kube-bench.yaml (SIGHUP installer-on-premises config).
-set -uo pipefail
+set -euo pipefail
 
 SCRIPTS="$(cd "$(dirname "$0")" && pwd)"
 ONPREM="$(dirname "$SCRIPTS")"
@@ -19,6 +19,10 @@ cp -f "$E2E_DIR/config/kubeconfig" /cache/kubeconfig
 
 CP0="$(cd "$TF" && tofu output -raw controlplane_0_ip)"
 WK0="$(cd "$TF" && tofu output -raw worker_0_ip)"
+if [ -z "$CP0" ] || [ -z "$WK0" ]; then
+  echo "kube-bench: tofu output has no controlplane_0_ip or worker_0_ip" >&2
+  exit 1
+fi
 
 INV="$E2E_DIR/config/kube-bench-hosts.yaml"
 cat > "$INV" <<EOF

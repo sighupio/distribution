@@ -11,12 +11,6 @@ spec:
   template:
     spec:
       initContainers:
-        - name: config
-          env:
-            - name: KUBERNETES_SERVICE_HOST
-              value: "cp1.example.com"
-            - name: KUBERNETES_SERVICE_PORT
-              value: "6443"
         - name: clean-cilium-state
           env:
             - name: KUBERNETES_SERVICE_HOST

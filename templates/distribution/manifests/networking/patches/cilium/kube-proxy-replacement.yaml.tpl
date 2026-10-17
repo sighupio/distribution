@@ -14,12 +14,6 @@ spec:
   template:
     spec:
       initContainers:
-        - name: config
-          env:
-            - name: KUBERNETES_SERVICE_HOST
-              value: "{{- template "controlPlaneAddress" (dict "config" . "args" "host") -}}"
-            - name: KUBERNETES_SERVICE_PORT
-              value: "{{- template "controlPlaneAddress" (dict "config" . "args" "port") -}}"
         - name: clean-cilium-state
           env:
             - name: KUBERNETES_SERVICE_HOST

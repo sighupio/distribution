@@ -26,7 +26,7 @@ additionalKappArgs=""
 
 # Retry kapp deploy once on failure
 if ! "$kappbin" deploy -a kfd -n kube-system -f out.yaml $additionalKappArgs --allow-all-ns -y --default-label-scoping-rules=false --apply-default-update-strategy=fallback-on-replace --wait-timeout 120m0s --apply-timeout 120m0s --apply-concurrency 20 2>&1 ; then
-  echo "kapp failed, showing last 100 lines and retrying..."
+  echo "kapp deploy failed at first attempt retrying a second time..."
   "$kappbin" deploy -a kfd -n kube-system -f out.yaml $additionalKappArgs --allow-all-ns -y --default-label-scoping-rules=false --apply-default-update-strategy=fallback-on-replace --wait-timeout 120m0s --apply-timeout 120m0s --apply-concurrency 20 2>&1
 fi
 
