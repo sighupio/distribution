@@ -62,7 +62,6 @@ systemd:
     - name: locksmithd.service
       mask: true
     # Other needed units
-{{ template "keepalived-unit-fix-binary-path" . }}
 {{ template "containerd-unit-generate-config" . }}
 {{ template "statusReporterBooted" . }}
 {{- if (.node | digAny "systemd" "units" false) }}

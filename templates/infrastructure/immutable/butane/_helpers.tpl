@@ -255,21 +255,6 @@ kernel_arguments:
       hard: false
 {{- end }}
 
-{{- define "keepalived-unit-fix-binary-path"}}
-    # =========================================================================
-    # Keepalived service - Fix binary path
-    # This issue is present only on LTS, on stable /usr/sbin is linked to /usr/bin
-    # =========================================================================
-    - name: keepalived.service
-      enabled: true
-      dropins:
-        - name: 20-fix-binary-path.conf
-          contents: |
-            [Service]
-            ExecStart=
-            ExecStart=/usr/bin/keepalived --use-file /etc/keepalived/keepalived.conf $KEEPALIVED_OPTIONS
-{{- end }}
-
 {{- define "kubernetes-sysext-files" }}
     # kubernetes sysext download and sysupdate configuration
     - path: /opt/extensions/kubernetes/kubernetes-{{ .sysext.kubernetes.version }}-{{ .node.arch }}.raw
