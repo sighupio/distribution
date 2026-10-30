@@ -193,6 +193,9 @@ name: e2e-kfddistribution-1.36
 kind: pipeline
 type: docker
 
+node:
+  performance: low
+
 depends_on:
   - qa
 
@@ -312,6 +315,9 @@ steps: # e2e-kfddistribution-1.36
 name: e2e-kfddistribution-1.35.1-to-1.36.0
 kind: pipeline
 type: docker
+
+node:
+  performance: low
 
 depends_on:
   - qa
@@ -436,6 +442,9 @@ steps: # e2e-kfddistribution-1.35.1-to-1.36.0
 name: e2e-ekscluster-1.36.0
 kind: pipeline
 type: docker
+
+node:
+  performance: low
 
 depends_on:
   - qa
@@ -631,6 +640,9 @@ name: e2e-ekscluster-selfmanaged-alinux2023-1.36.0
 kind: pipeline
 type: docker
 
+node:
+  performance: low
+
 depends_on:
   - qa
 
@@ -825,6 +837,9 @@ name: e2e-ekscluster-upgrades-1.35.1-1.36.0
 kind: pipeline
 type: docker
 
+node:
+  performance: low
+
 depends_on:
   - qa
 
@@ -1018,9 +1033,8 @@ steps: #e2e-eks-upgrades
 name: e2e-onpremises
 kind: pipeline
 type: docker
-# No node selector: like the e2e-kfddistribution pipeline, this lands on the
-# single bare-metal worker — the only one with /dev/kvm + libvirt (set up by the
-# infra `libvirt` ansible role).
+# No node selector: this lands on the single bare-metal worker — the only one
+# with /dev/kvm + libvirt (set up by the infra `libvirt` ansible role).
 
 depends_on:
   - qa
@@ -1845,6 +1859,9 @@ kind: pipeline
 type: docker
 name: scheduled-aws-nuke
 
+node:
+  performance: low
+
 trigger:
   cron:
     - "scheduled-aws-nuke"
@@ -1884,6 +1901,9 @@ steps: # scheduled-aws-nuke
 name: release
 kind: pipeline
 type: docker
+
+node:
+  performance: low
 
 depends_on:
   - qa
