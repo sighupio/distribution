@@ -379,3 +379,53 @@ cert-manager.io/cluster-issuer: {{ .spec.distribution.modules.ingress.certManage
     {{- $controlPlaneAddress -}}
   {{- end }}
 {{- end }}
+
+{{- /* Shared by scripts/apply.sh and scripts/diff.sh: the kustomize build of out.yaml and its
+filters, which only read the cluster. */ -}}
+{{- define "kfdBuildOutYaml" -}}
+$kustomizebin build --load-restrictor LoadRestrictionsNone . > out.yaml
+
+{{- if and (index .spec.distribution.common "registry") (ne .spec.distribution.common.registry "") }}
+{{- /* The registry goes into a sed replacement inside a single-quoted shell word: escape \, &, the # delimiter
+and newlines for sed, then ' for the shell. A plain registry URL renders unchanged. */ -}}
+{{- $registry := .spec.distribution.common.registry | replace "\\" "\\\\" | replace "&" "\\&" | replace "#" "\\#" | replace "\n" "\\\n" | replace "'" "'\\''" }}
+if echo "$OSTYPE" | grep -q '^darwin'; then
+  sed -i "" 's#registry.sighup.io/fury#{{ $registry }}#g' out.yaml
+else
+  sed -i 's#registry.sighup.io/fury#{{ $registry }}#g' out.yaml
+fi
+{{- end }}
+
+{{- if eq .spec.distribution.modules.monitoring.type "none" }}
+if ! $kubectlbin get apiservice v1.monitoring.coreos.com > /dev/null 2>&1; then
+  cat out.yaml | $yqbin 'select(.apiVersion != "monitoring.coreos.com/v1")' > out-filtered.yaml
+  cp out-filtered.yaml out.yaml
+fi
+{{- end }}
+
+{{- if and (ne .spec.distribution.modules.monitoring.type "prometheusAgent") (not .spec.distribution.modules.monitoring.alertmanager.installDefaultRules) }}
+if $kubectlbin get apiservice v1alpha1.monitoring.coreos.com > /dev/null 2>&1; then
+  # filter out the Alertmanger Configuration custom resources from the build.
+  cat out.yaml | $yqbin 'select(.kind != "AlertmanagerConfig")' > out-filtered.yaml
+  cp out-filtered.yaml out.yaml
+fi
+{{- end }}
+{{- end -}}
+
+{{- /* Shared by scripts/apply.sh and scripts/diff.sh: the extra manifest files of the kapp app. */ -}}
+{{- define "kfdAdditionalKappArgs" -}}
+additionalKappArgs=""
+
+{{- if eq .spec.distribution.modules.policy.type "gatekeeper" }}
+    {{- if .spec.distribution.modules.policy.gatekeeper.installDefaultPolicies }}
+# We need this to tell Kapp that the CRDs will be created later by Gatekeeper
+additionalKappArgs="-f ../../vendor/modules/opa/katalog/tests/kapp/exists.yaml"
+    {{- end }}
+{{- end }}
+{{- end -}}
+
+{{- /* Shared by scripts/apply.sh and scripts/diff.sh: the kapp app and the files it deploys. */ -}}
+{{- define "kfdKappApp" -}}-a kfd -n kube-system -f out.yaml $additionalKappArgs --allow-all-ns{{- end -}}
+
+{{- /* Shared by scripts/apply.sh and scripts/diff.sh: how kapp labels and updates the resources. */ -}}
+{{- define "kfdKappStrategy" -}}--default-label-scoping-rules=false --apply-default-update-strategy=fallback-on-replace{{- end -}}

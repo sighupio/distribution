@@ -32,6 +32,8 @@ spec:
           - name: node
             ip: 10.0.0.2
   distribution:
+    common:
+      registry: registry.example.com/fury
     modules:
       networking:
         type: cilium
@@ -57,6 +59,8 @@ spec:
           storageSize: "20Gi"
       monitoring:
         type: prometheus
+        alertmanager:
+          installDefaultRules: false
       tracing:
         type: none
         minio:
