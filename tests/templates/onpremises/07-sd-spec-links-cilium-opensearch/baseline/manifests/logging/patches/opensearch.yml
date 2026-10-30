@@ -1,0 +1,23 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: opensearch-cluster-master
+  namespace: logging
+spec:
+  template:
+    spec:
+      containers:
+      - name: opensearch
+  volumeClaimTemplates:
+  - metadata:
+      name: opensearch-cluster-master
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 150Gi

@@ -1,0 +1,48 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: headlamp-egress-kube-apiserver
+  namespace: headlamp
+  labels:
+    cluster.kfd.sighup.io/module: utilities
+spec:
+  policyTypes:
+    - Egress
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: headlamp
+  egress:
+    - ports:
+        - port: 6443
+          protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: headlamp-ingress-haproxy
+  namespace: headlamp
+  labels:
+    cluster.kfd.sighup.io/module: utilities
+spec:
+  policyTypes:
+    - Ingress
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: headlamp
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-haproxy
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: kubernetes-ingress
+              app.kubernetes.io/instance: haproxy-ingress
+      ports:
+        - port: 4466
+          protocol: TCP

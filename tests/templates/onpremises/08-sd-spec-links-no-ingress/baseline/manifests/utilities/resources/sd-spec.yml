@@ -1,0 +1,70 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sd-spec
+  namespace: headlamp
+data:
+  info.json: |
+    {
+      "cluster": {
+        "kind": "OnPremises",
+        "name": "sd-spec-links-no-ingress"
+      },
+      "distributionVersion": "v1.36.1",
+      "links": [],
+      "moduleVersions": {
+        "auth": "v0.9.0",
+        "aws": "v5.4.0",
+        "dr": "v3.5.0",
+        "ingress": "v5.3.0",
+        "logging": "v5.5.1",
+        "monitoring": "v4.3.0",
+        "networking": "v4.1.0",
+        "opa": "v1.19.0",
+        "tracing": "v1.6.0",
+        "utilities": "v1.0.0"
+      },
+      "modules": {
+        "auth": {
+          "provider": {
+            "type": "none"
+          }
+        },
+        "dr": {
+          "type": "on-premises"
+        },
+        "ingress": {
+          "haproxy": {
+            "type": "none"
+          },
+          "nginx": {
+            "type": "none"
+          }
+        },
+        "logging": {
+          "type": "loki"
+        },
+        "monitoring": {
+          "type": "prometheus"
+        },
+        "networking": {
+          "type": "calico"
+        },
+        "policy": {
+          "type": "gatekeeper"
+        },
+        "tracing": {
+          "type": "tempo"
+        },
+        "utilities": {
+          "headlamp": {
+            "type": "token-auth"
+          }
+        }
+      }
+    }

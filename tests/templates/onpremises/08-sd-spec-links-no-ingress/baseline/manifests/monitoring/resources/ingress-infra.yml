@@ -1,0 +1,124 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    cluster.kfd.sighup.io/useful-link.enable: "true"
+  annotations:
+    cluster.kfd.sighup.io/useful-link.url: https://alertmanager.internal.example.com
+    cluster.kfd.sighup.io/useful-link.name: "Alertmanager"
+    forecastle.stakater.com/expose: "true"
+    forecastle.stakater.com/appName: "Alertmanager"
+    
+    forecastle.stakater.com/icon: "https://github.com/stakater/ForecastleIcons/raw/master/alert-manager.png"
+    
+    cert-manager.io/cluster-issuer: letsencrypt-fury
+    
+
+  name: alertmanager
+  
+  namespace: monitoring
+  
+spec:
+  ingressClassName: 
+  rules:
+    - host: alertmanager.internal.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+            
+              service:
+                name: alertmanager-main
+                port:
+                  name: web
+            
+  tls:
+    - hosts:
+      - alertmanager.internal.example.com
+      secretName: alertmanager-tls
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    cluster.kfd.sighup.io/useful-link.enable: "true"
+  annotations:
+    cluster.kfd.sighup.io/useful-link.url: https://grafana.internal.example.com
+    cluster.kfd.sighup.io/useful-link.name: "Grafana"
+    forecastle.stakater.com/expose: "true"
+    forecastle.stakater.com/appName: "Grafana"
+    
+    forecastle.stakater.com/icon: "https://github.com/stakater/ForecastleIcons/raw/master/grafana.png"
+    
+    cert-manager.io/cluster-issuer: letsencrypt-fury
+    
+
+  name: grafana
+  
+  namespace: monitoring
+  
+spec:
+  ingressClassName: 
+  rules:
+    - host: grafana.internal.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+            
+              service:
+                name: grafana
+                port:
+                  name: http
+            
+  tls:
+    - hosts:
+      - grafana.internal.example.com
+      secretName: grafana-tls
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    cluster.kfd.sighup.io/useful-link.enable: "true"
+  annotations:
+    cluster.kfd.sighup.io/useful-link.url: https://prometheus.internal.example.com
+    cluster.kfd.sighup.io/useful-link.name: "Prometheus"
+    forecastle.stakater.com/expose: "true"
+    forecastle.stakater.com/appName: "Prometheus"
+    
+    forecastle.stakater.com/icon: "https://github.com/stakater/ForecastleIcons/raw/master/prometheus.png"
+    
+    cert-manager.io/cluster-issuer: letsencrypt-fury
+    
+
+  name: prometheus
+  
+  namespace: monitoring
+  
+spec:
+  ingressClassName: 
+  rules:
+    - host: prometheus.internal.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+            
+              service:
+                name: prometheus-k8s
+                port:
+                  name: web
+            
+  tls:
+    - hosts:
+      - prometheus.internal.example.com
+      secretName: prometheus-tls
