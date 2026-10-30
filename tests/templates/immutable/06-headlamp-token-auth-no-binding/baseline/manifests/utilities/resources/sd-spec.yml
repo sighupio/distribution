@@ -16,6 +16,58 @@ data:
         "name": "no-modules-enabled"
       },
       "distributionVersion": "v1.36.0",
+      "links": [
+        {
+          "module": "auth",
+          "name": "Gangplank",
+          "url": "https://gangplank.example.com"
+        },
+        {
+          "module": "ingress",
+          "name": "Forecastle",
+          "url": "https://directory.internal.example.com"
+        },
+        {
+          "module": "logging",
+          "name": "MinIO",
+          "url": "https://minio-logging.internal.example.com"
+        },
+        {
+          "module": "monitoring",
+          "name": "Grafana",
+          "url": "https://grafana.internal.example.com"
+        },
+        {
+          "module": "monitoring",
+          "name": "Prometheus",
+          "url": "https://prometheus.internal.example.com"
+        },
+        {
+          "module": "monitoring",
+          "name": "Alertmanager",
+          "url": "https://alertmanager.internal.example.com"
+        },
+        {
+          "module": "monitoring",
+          "name": "MinIO",
+          "url": "https://minio-monitoring.internal.example.com"
+        },
+        {
+          "module": "networking",
+          "name": "Whisker",
+          "url": "https://whisker.internal.example.com"
+        },
+        {
+          "module": "policy",
+          "name": "Gatekeeper Policy Manager",
+          "url": "https://gpm.internal.example.com"
+        },
+        {
+          "module": "tracing",
+          "name": "MinIO",
+          "url": "https://minio-tracing.internal.example.com"
+        }
+      ],
       "moduleVersions": {
         "auth": "v0.8.0",
         "aws": "v5.4.0",

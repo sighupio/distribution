@@ -45,11 +45,68 @@
 ) }}
 {{- $_ := set $moduleTypes "utilities" (dict "headlamp" (dict "type" (toString $headlampType))) }}
 
+{{- /* Links to the infrastructure UIs, shown by the SD UI next to their module. Each link is */}}
+{{- /* listed under the same conditions that make the module kustomization and its */}}
+{{- /* ingress-infra template render the ingress. `module` is the module name in .spec */}}
+{{- /* (e.g. `policy`, not `opa`). When adding an ingress with the useful-link annotations, */}}
+{{- /* add its link here too. */}}
+{{- $hasAnyIngress := or (ne $modules.ingress.nginx.type "none") (ne $modules.ingress.haproxy.type "none") $modules.ingress.byoic.enabled }}
+{{- $linkDefs := list }}
+{{- if $modules.auth.oidcKubernetesAuth.enabled }}
+{{- $linkDefs = append $linkDefs (dict "module" "auth" "package" "gangplank" "prefix" "gangplank." "name" "Gangplank") }}
+{{- end }}
+{{- if $hasAnyIngress }}
+{{- $linkDefs = append $linkDefs (dict "module" "ingress" "package" "forecastle" "prefix" "directory." "name" "Forecastle") }}
+{{- if eq $modules.logging.type "loki" "opensearch" }}
+{{- if .checks.storageClassAvailable }}
+{{- if eq $modules.logging.type "opensearch" }}
+{{- $linkDefs = append $linkDefs (dict "module" "logging" "package" "opensearchDashboards" "prefix" "opensearch-dashboards." "name" "OpenSearch Dashboards") }}
+{{- end }}
+{{- $linkDefs = append $linkDefs (dict "module" "logging" "package" "minio" "prefix" "minio-logging." "name" "MinIO") }}
+{{- end }}
+{{- end }}
+{{- if eq $modules.monitoring.type "prometheus" "mimir" }}
+{{- $linkDefs = append $linkDefs (dict "module" "monitoring" "package" "grafana" "prefix" "grafana." "name" "Grafana") }}
+{{- $linkDefs = append $linkDefs (dict "module" "monitoring" "package" "prometheus" "prefix" "prometheus." "name" "Prometheus") }}
+{{- $linkDefs = append $linkDefs (dict "module" "monitoring" "package" "alertmanager" "prefix" "alertmanager." "name" "Alertmanager") }}
+{{- if and (eq $modules.monitoring.type "mimir") (eq $modules.monitoring.mimir.backend "minio") }}
+{{- $linkDefs = append $linkDefs (dict "module" "monitoring" "package" "minio" "prefix" "minio-monitoring." "name" "MinIO") }}
+{{- end }}
+{{- end }}
+{{- if eq $modules.networking.type "calico" }}
+{{- $linkDefs = append $linkDefs (dict "module" "networking" "package" "whisker" "prefix" "whisker." "name" "Whisker") }}
+{{- else if eq $modules.networking.type "cilium" }}
+{{- $linkDefs = append $linkDefs (dict "module" "networking" "package" "hubble" "prefix" "hubble." "name" "Hubble UI") }}
+{{- end }}
+{{- if eq $modules.policy.type "gatekeeper" }}
+{{- $linkDefs = append $linkDefs (dict "module" "policy" "package" "gpm" "prefix" "gpm." "name" "Gatekeeper Policy Manager") }}
+{{- end }}
+{{- if and (eq $modules.tracing.type "tempo") .checks.storageClassAvailable (eq $modules.tracing.tempo.backend "minio") }}
+{{- $linkDefs = append $linkDefs (dict "module" "tracing" "package" "minio" "prefix" "minio-tracing." "name" "MinIO") }}
+{{- end }}
+{{- end }}
+
+{{- /* Same host as the "ingressHost" and "ingressHostAuth" helpers, which cannot be captured */}}
+{{- /* into a variable: the override when set, otherwise the prefix plus the base domain. */}}
+{{- $links := list }}
+{{- range $linkDefs }}
+{{- $baseDomain := $modules.ingress.baseDomain }}
+{{- if eq .module "auth" }}
+{{- $baseDomain = $modules.auth.baseDomain }}
+{{- end }}
+{{- $host := toString ($modules | digAny .module "overrides" "ingresses" .package "host" "") }}
+{{- if not $host }}
+{{- $host = print .prefix $baseDomain }}
+{{- end }}
+{{- $links = append $links (dict "module" .module "name" .name "url" (print "https://" $host)) }}
+{{- end }}
+
 {{- $info := dict
   "distributionVersion" (toString ($kfd | digAny "version" .spec.distributionVersion))
   "cluster" (dict "name" .metadata.name "kind" $kind)
   "moduleVersions" $moduleVersions
   "modules" $moduleTypes
+  "links" $links
 }}
 
 ---
