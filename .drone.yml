@@ -1473,7 +1473,9 @@ steps: # e2e-onpremises-upgrades-1.35.1-1.36.0
 name: e2e-immutable
 kind: pipeline
 type: docker
-# No node selector: lands on the single bare-metal worker with /dev/kvm + libvirt.
+# Runs on the internal worker with /dev/kvm + libvirt (set up by the `libvirt` ansible role).
+node:
+  performance: low
 
 # After the on-premises pipelines: they share the one libvirt worker, which fits one
 # cluster at a time. On an e2e-immutable tag the on-premises pipelines are skipped,
@@ -1601,6 +1603,9 @@ steps: # e2e-immutable
       TESTS_DIR: /drone/src/tests/e2e/onpremises/tests
       # the utilities module (headlamp) is installed only in the clean install
       EXPECT_HEADLAMP: "1"
+      # minimal cluster: logging and policy modules are not installed
+      EXPECT_LOGGING: "0"
+      EXPECT_POLICY: "0"
     volumes:
       - name: cache
         path: /cache
@@ -1652,7 +1657,9 @@ steps: # e2e-immutable
 name: e2e-immutable-upgrades-1.35.1-1.36.0
 kind: pipeline
 type: docker
-# No node selector: lands on the single bare-metal worker with /dev/kvm + libvirt.
+# Runs on the internal worker with /dev/kvm + libvirt (set up by the `libvirt` ansible role).
+node:
+  performance: low
 
 # After the install pipeline: they share the one libvirt worker, which fits one
 # cluster at a time. The VM gate stays as the safety net for separate builds.
@@ -1781,6 +1788,9 @@ steps: # e2e-immutable-upgrades-1.35.1-1.36.0
     environment:
       DIAG_DIR: /diag
       TESTS_DIR: /drone/src/tests/e2e/onpremises/tests
+      # minimal cluster: logging and policy modules are not installed
+      EXPECT_LOGGING: "0"
+      EXPECT_POLICY: "0"
     volumes:
       - name: cache
         path: /cache
@@ -1829,6 +1839,9 @@ steps: # e2e-immutable-upgrades-1.35.1-1.36.0
     environment:
       DIAG_DIR: /diag
       TESTS_DIR: /drone/src/tests/e2e/onpremises/tests
+      # minimal cluster: logging and policy modules are not installed
+      EXPECT_LOGGING: "0"
+      EXPECT_POLICY: "0"
     volumes:
       - name: cache
         path: /cache

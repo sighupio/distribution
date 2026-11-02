@@ -82,8 +82,7 @@ load ./helper
 
 @test "Fluentd is Running" {
     info
-    # the on-prem install pipeline runs without the logging module (minimal cluster);
-    # the immutable pipelines reusing this suite still install it.
+    # the minimal e2e clusters (on-premises, immutable) run without the logging module.
     [ "${EXPECT_LOGGING:-1}" = "1" ] || skip "logging module not installed"
     test() {
         kubectl get pods -l app.kubernetes.io/name=fluentd -o json -n logging |jq '.items[].status.containerStatuses[].ready' | uniq | grep -q true

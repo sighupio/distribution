@@ -6,8 +6,8 @@ locals {
   vip_fqdn  = "10-10-${local.octet}-20.nip.io"
   ingress   = "ingress.${local.vip_fqdn}"
   lbs       = [for k in ["lb-0", "lb-1"] : local.nodes[k]]
-  cps       = [for k in ["controlplane-0", "controlplane-1", "controlplane-2"] : local.nodes[k]]
-  infras    = [for k in ["infra-0", "infra-1", "infra-2"] : local.nodes[k]]
+  cps       = [for k in ["controlplane-0"] : local.nodes[k]]
+  infras    = [for k in ["infra-0"] : local.nodes[k]]
   worker    = local.nodes["worker-0"]
   k8s_nodes = concat(local.cps, local.infras, [local.worker])
   # The utilities module (Headlamp) is tested only in the clean install pipeline:
@@ -197,11 +197,10 @@ spec:
             name: letsencrypt-fury
             email: samuele.chiocca@reevo.it
             type: http01
+      # none: loki + its minio + the logging operators are too heavy for the
+      # minimal e2e cluster, as in the on-premises pipeline.
       logging:
-        type: loki
-        loki:
-          backend: minio
-          tsdbStartDate: "2024-11-18"
+        type: none
       # prometheus and no tracing: mimir and tempo (distributed + minio) are too
       # heavy for a single-worker e2e, as in the on-premises pipeline.
       monitoring:
@@ -212,12 +211,10 @@ spec:
           storageSize: 20Gi
         alertmanager:
           installDefaultRules: false
+      # none: the policy engine (3 admission replicas) is too heavy for the
+      # minimal e2e cluster.
       policy:
-        type: kyverno
-        kyverno:
-          additionalExcludedNamespaces: ["longhorn-system"]
-          installDefaultPolicies: true
-          validationFailureAction: Audit
+        type: none
       dr:
         type: on-premises
         velero:
@@ -240,6 +237,20 @@ spec:
           type: token-auth
           clusterRole: view
 %{~endif}
+    customPatches:
+      patches:
+        # cilium-operator runs 2 hostNetwork replicas pinned to infra nodes: with
+        # the single infra node the second one stays Pending on its host port.
+        - target:
+            group: apps
+            version: v1
+            kind: Deployment
+            name: cilium-operator
+            namespace: kube-system
+          patch: |-
+            - op: replace
+              path: /spec/replicas
+              value: 1
 EOT
 }
 
