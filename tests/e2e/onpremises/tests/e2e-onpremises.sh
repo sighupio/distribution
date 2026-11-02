@@ -82,6 +82,9 @@ load ./helper
 
 @test "Fluentd is Running" {
     info
+    # the on-prem install pipeline runs without the logging module (minimal cluster);
+    # the immutable pipelines reusing this suite still install it.
+    [ "${EXPECT_LOGGING:-1}" = "1" ] || skip "logging module not installed"
     test() {
         kubectl get pods -l app.kubernetes.io/name=fluentd -o json -n logging |jq '.items[].status.containerStatuses[].ready' | uniq | grep -q true
     }
@@ -154,6 +157,7 @@ load ./helper
 
 @test "Kyverno Admission controller is Running" {
     info
+    [ "${EXPECT_POLICY:-1}" = "1" ] || skip "policy module not installed"
     test(){
         readyReplicas=$(kubectl get deploy kyverno-admission-controller -n kyverno -o jsonpath="{.status.readyReplicas}")
         if [ "${readyReplicas}" != "3" ]; then return 1; fi

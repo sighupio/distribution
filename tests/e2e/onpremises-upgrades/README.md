@@ -14,9 +14,9 @@ and the shell steps reuse `../onpremises/scripts/*` (via `E2E_DIR`). Only the tw
 furyctl configs and the bats suite live here.
 
 ## Differences from the install e2e
-- **calico + gatekeeper** (the install e2e uses cilium + kyverno) — a complementary
-  upgrade path. Everything else is lightened the same way for the single worker
-  (prometheus not mimir, tracing off, one worker, longhorn replica 1 + over-provisioning).
+- **calico** (the install e2e uses cilium) — a complementary upgrade path. Everything
+  else is lightened the same way (1 control plane + 1 infra + 1 worker, no logging/
+  policy, prometheus not mimir, tracing off, longhorn replica 1 + over-provisioning).
 - **Disjoint subnet range**: `10.10.110..199` and resources named `e2eup-<build>`, so
   it never collides with the install pipeline (`e2e-*`, `10.10.10..99`) on the worker.
 - **haproxy ingress** is added by the upgrade, so its bats check runs only in the

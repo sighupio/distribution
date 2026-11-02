@@ -23,17 +23,15 @@ locals {
   octet  = (tonumber(var.ci_number) % var.octet_span) + var.octet_base
   subnet = "10.10.${local.octet}"
 
-  # HA topology: haproxy + 3 control planes + 3 infra + 1 worker.
-  # Sizes tuned for the worker (62GB/16 threads); control planes need >=2 vCPU
-  # for the kubeadm preflight.
+  # Minimal topology: haproxy + 1 control plane + 1 infra + 1 worker (13 vCPU).
+  # Sized for the internal worker (24 vCPU / 62GB): the former 3+3 HA layout asked
+  # 27 vCPU and starved the host (apiserver crash-looping). Control planes need >=2
+  # vCPU for the kubeadm preflight. IPs keep their old slots (.3 cp, .6 infra, .9
+  # worker) so the rendered configs and haproxy backends stay stable.
   nodes = {
     haproxy        = { ip = "${local.subnet}.2", cpu = 1, mem = 1024 }
-    controlplane-0 = { ip = "${local.subnet}.3", cpu = 4, mem = 4096 }
-    controlplane-1 = { ip = "${local.subnet}.4", cpu = 4, mem = 4096 }
-    controlplane-2 = { ip = "${local.subnet}.5", cpu = 4, mem = 4096 }
-    infra-0        = { ip = "${local.subnet}.6", cpu = 4, mem = 12288 }
-    infra-1        = { ip = "${local.subnet}.7", cpu = 4, mem = 12288 }
-    infra-2        = { ip = "${local.subnet}.8", cpu = 4, mem = 12288 }
+    controlplane-0 = { ip = "${local.subnet}.3", cpu = 4, mem = 6144 }
+    infra-0        = { ip = "${local.subnet}.6", cpu = 6, mem = 16384 }
     worker-0       = { ip = "${local.subnet}.9", cpu = 2, mem = 4096 }
   }
 
