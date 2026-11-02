@@ -1033,8 +1033,9 @@ steps: #e2e-eks-upgrades
 name: e2e-onpremises
 kind: pipeline
 type: docker
-# No node selector: this lands on the single bare-metal worker — the only one
-# with /dev/kvm + libvirt (set up by the infra `libvirt` ansible role).
+# Runs on the internal worker with /dev/kvm + libvirt (set up by the `libvirt` ansible role).
+node:
+  performance: low
 
 depends_on:
   - qa
@@ -1240,8 +1241,9 @@ steps: # e2e-onpremises
 name: e2e-onpremises-upgrades-1.35.1-1.36.0
 kind: pipeline
 type: docker
-# No node selector: like e2e-onpremises, lands on the single bare-metal worker --
-# the only one with /dev/kvm + libvirt.
+# Like e2e-onpremises, runs on the internal worker with /dev/kvm (nested virt) + libvirt.
+node:
+  performance: low
 
 # Run AFTER the install pipeline (not just qa): the two share the one worker and
 # serialize via the VM gate, so starting them together would leave this one idling
