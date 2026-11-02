@@ -163,6 +163,8 @@ spec:
       patches:
         # cilium-operator runs 2 hostNetwork replicas pinned to infra nodes: with
         # the single infra node the second one stays Pending on its host port.
+        # Same reason for the rollout: a surge pod can't get the ports while the
+        # old one holds them, so stop the old pod first (maxSurge 0).
         - target:
             group: apps
             version: v1
@@ -173,6 +175,13 @@ spec:
             - op: replace
               path: /spec/replicas
               value: 1
+            - op: add
+              path: /spec/strategy
+              value:
+                type: RollingUpdate
+                rollingUpdate:
+                  maxSurge: 0
+                  maxUnavailable: 1
   plugins:
     helm:
       repositories:
