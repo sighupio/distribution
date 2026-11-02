@@ -22,11 +22,11 @@ output "all_ips" {
   value = module.vms.all_ips
 }
 
-# v1.35.1 base config: the cluster we install, then upgrade. calico + gatekeeper
-# (the real upgrade path, complementary to the install pipeline's cilium + kyverno).
-# Lightened for the single worker exactly like the install pipeline: monitoring is
-# prometheus (mimir-distributed won't fit), one worker, longhorn replica 1 with
-# over-provisioning. nginx-only ingress; haproxy ingress is added by the upgrade.
+# v1.35.1 base config: the cluster we install, then upgrade. calico (complementary
+# to the install pipeline's cilium). Lightened exactly like the install pipeline:
+# 1 control plane + 1 infra + 1 worker, no logging/policy modules, monitoring is
+# prometheus (mimir-distributed won't fit), longhorn replica 1 with over-provisioning.
+# nginx-only ingress; haproxy ingress is added by the upgrade.
 output "furyctl_yaml" {
   value = <<EOF
 ---
@@ -65,19 +65,11 @@ spec:
       hosts:
         - name: controlplane0-${module.vms.dash}-3
           ip: ${module.vms.subnet}.3
-        - name: controlplane1-${module.vms.dash}-4
-          ip: ${module.vms.subnet}.4
-        - name: controlplane2-${module.vms.dash}-5
-          ip: ${module.vms.subnet}.5
     nodes:
       - name: infra
         hosts:
           - name: infra0-${module.vms.dash}-6
             ip: ${module.vms.subnet}.6
-          - name: infra1-${module.vms.dash}-7
-            ip: ${module.vms.subnet}.7
-          - name: infra2-${module.vms.dash}-8
-            ip: ${module.vms.subnet}.8
         taints: []
       - name: worker
         hosts:
@@ -98,6 +90,13 @@ spec:
     modules:
       networking:
         type: calico
+        tigeraOperator:
+          overrides:
+            # calico-typha uses hostNetwork and the operator runs 2 replicas on 3
+            # nodes: pinned to the single infra node the second one stays Pending.
+            # Let it (and the calico control plane) use any linux node.
+            nodeSelector:
+              kubernetes.io/os: linux
       ingress:
         baseDomain: ingress.${module.vms.dash}-2.nip.io
         nginx:
@@ -114,12 +113,9 @@ spec:
             email: samuele.chiocca@reevo.it
             type: http01
       logging:
-        type: loki
-        opensearch:
-          type: triple
-        loki:
-          backend: minio
-          tsdbStartDate: "2024-11-18"
+        # none: loki + its minio + the logging operators are too heavy for the
+        # minimal single-infra e2e cluster.
+        type: none
       monitoring:
         type: prometheus
         mimir:
@@ -132,10 +128,9 @@ spec:
         alertmanager:
           installDefaultRules: false
       policy:
-        type: gatekeeper
-        gatekeeper:
-          enforcementAction: warn
-          installDefaultPolicies: true
+        # none: the policy engine (3 admission replicas) is too heavy for the
+        # minimal e2e cluster.
+        type: none
       dr:
         type: on-premises
         velero:
@@ -219,19 +214,11 @@ spec:
       hosts:
         - name: controlplane0-${module.vms.dash}-3
           ip: ${module.vms.subnet}.3
-        - name: controlplane1-${module.vms.dash}-4
-          ip: ${module.vms.subnet}.4
-        - name: controlplane2-${module.vms.dash}-5
-          ip: ${module.vms.subnet}.5
     nodes:
       - name: infra
         hosts:
           - name: infra0-${module.vms.dash}-6
             ip: ${module.vms.subnet}.6
-          - name: infra1-${module.vms.dash}-7
-            ip: ${module.vms.subnet}.7
-          - name: infra2-${module.vms.dash}-8
-            ip: ${module.vms.subnet}.8
         taints: []
       - name: worker
         hosts:
@@ -252,6 +239,13 @@ spec:
     modules:
       networking:
         type: calico
+        tigeraOperator:
+          overrides:
+            # calico-typha uses hostNetwork and the operator runs 2 replicas on 3
+            # nodes: pinned to the single infra node the second one stays Pending.
+            # Let it (and the calico control plane) use any linux node.
+            nodeSelector:
+              kubernetes.io/os: linux
       ingress:
         baseDomain: ingress.${module.vms.dash}-2.nip.io
         nginx:
@@ -276,12 +270,9 @@ spec:
             email: samuele.chiocca@reevo.it
             type: http01
       logging:
-        type: loki
-        opensearch:
-          type: triple
-        loki:
-          backend: minio
-          tsdbStartDate: "2024-11-18"
+        # none: loki + its minio + the logging operators are too heavy for the
+        # minimal single-infra e2e cluster.
+        type: none
       monitoring:
         type: prometheus
         mimir:
@@ -294,10 +285,9 @@ spec:
         alertmanager:
           installDefaultRules: false
       policy:
-        type: gatekeeper
-        gatekeeper:
-          enforcementAction: warn
-          installDefaultPolicies: true
+        # none: the policy engine (3 admission replicas) is too heavy for the
+        # minimal e2e cluster.
+        type: none
       dr:
         type: on-premises
         velero:

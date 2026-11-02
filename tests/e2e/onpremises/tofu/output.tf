@@ -66,19 +66,11 @@ spec:
       hosts:
         - name: controlplane0-${module.vms.dash}-3
           ip: ${module.vms.subnet}.3
-        - name: controlplane1-${module.vms.dash}-4
-          ip: ${module.vms.subnet}.4
-        - name: controlplane2-${module.vms.dash}-5
-          ip: ${module.vms.subnet}.5
     nodes:
       - name: infra
         hosts:
           - name: infra0-${module.vms.dash}-6
             ip: ${module.vms.subnet}.6
-          - name: infra1-${module.vms.dash}-7
-            ip: ${module.vms.subnet}.7
-          - name: infra2-${module.vms.dash}-8
-            ip: ${module.vms.subnet}.8
         taints: []
       - name: worker
         hosts:
@@ -123,12 +115,9 @@ spec:
             email: samuele.chiocca@reevo.it
             type: http01
       logging:
-        type: loki
-        opensearch:
-          type: triple
-        loki:
-          backend: minio
-          tsdbStartDate: "2024-11-18"
+        # none: loki + its minio + the logging operators are too heavy for the
+        # minimal single-infra e2e cluster.
+        type: none
       monitoring:
         # prometheus instead of mimir: mimir-distributed (+ its minio) is too heavy
         # for a single-worker e2e -- minio + the distributed consumers can't come up
@@ -144,11 +133,9 @@ spec:
         alertmanager:
           installDefaultRules: false
       policy:
-        type: kyverno
-        kyverno:
-          additionalExcludedNamespaces: ["longhorn-system"]
-          installDefaultPolicies: true
-          validationFailureAction: Audit
+        # none: the policy engine (3 admission replicas) is too heavy for the
+        # minimal e2e cluster.
+        type: none
       dr:
         type: on-premises
         velero:
@@ -172,6 +159,20 @@ spec:
         headlamp:
           type: token-auth
           clusterRole: view
+    customPatches:
+      patches:
+        # cilium-operator runs 2 hostNetwork replicas pinned to infra nodes: with
+        # the single infra node the second one stays Pending on its host port.
+        - target:
+            group: apps
+            version: v1
+            kind: Deployment
+            name: cilium-operator
+            namespace: kube-system
+          patch: |-
+            - op: replace
+              path: /spec/replicas
+              value: 1
   plugins:
     helm:
       repositories:
