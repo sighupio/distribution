@@ -26,6 +26,7 @@ graph TD
     monitoring -->|"53/UDP,TCP"| dns
     bucket -->|"9000/TCP"| minio
     prom -->|"6443,8405/TCP"| api
+    api -->|"9090/TCP (Headlamp proxy)"| prom
     prom -->|"9000/TCP"| minio
     prom -->|"9115,19115/TCP"| bb
     prom -->|"8443,9443/TCP"| ksm
