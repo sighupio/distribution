@@ -52,8 +52,8 @@ onpremises/
 ```
 
 ## Notes
-- **Config**: all modules, as in the original Hetzner e2e: cilium, kyverno, loki,
-  mimir, tempo, velero.
+- **Config**: cilium, kyverno, loki, prometheus, velero; tracing off — mimir/tempo
+  (distributed + minio) are too heavy for the single worker.
 - **Storage**: longhorn (replica 1). The install applies twice so storage-backed
   components come up once the StorageClass is ready.
 - **Concurrency**: each run gets its own libvirt network, subnet and pool, and runs

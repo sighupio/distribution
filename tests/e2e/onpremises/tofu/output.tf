@@ -132,7 +132,9 @@ spec:
           backend: minio
           tsdbStartDate: "2024-11-18"
       monitoring:
-        type: mimir
+        # prometheus instead of mimir: mimir-distributed (+ its minio) is too heavy
+        # for the nested-virt internal worker. prometheus keeps monitoring coverage.
+        type: prometheus
         mimir:
           retentionTime: 3d
           backend: minio
@@ -160,7 +162,9 @@ spec:
           snapshotController:
             install: true
       tracing:
-        type: tempo
+        # none: tempo-distributed (+ its minio) is too heavy for the nested-virt
+        # internal worker.
+        type: none
         tempo:
           backend: minio
       auth:
