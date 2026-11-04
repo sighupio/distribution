@@ -39,6 +39,7 @@
 - prometheus-k8s
 - prometheus-egress-minio
 - prometheus-egress-kube-apiserver
+- prometheus-ingress-kube-apiserver (when Headlamp is enabled)
 
 ### Mimir specific
 - mimir-distributed-discovery

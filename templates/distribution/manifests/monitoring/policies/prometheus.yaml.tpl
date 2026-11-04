@@ -47,6 +47,28 @@ spec:
   - Egress
   - Ingress
 ---
+{{- if and (eq .spec.distribution.common.provider.type "none" "immutable") (hasKeyAny .spec "kubernetes") (has (.spec | digAny "distribution" "modules" "utilities" "headlamp" "type" "none") (list "token-auth" "sso")) }}
+# The kube-apiserver runs in the host network, so its service proxy requests
+# (for example Headlamp's metrics) come from node addresses, not from pods.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: prometheus-ingress-kube-apiserver
+  namespace: monitoring
+  labels:
+    cluster.kfd.sighup.io/module: monitoring
+spec:
+  policyTypes:
+    - Ingress
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: prometheus
+  ingress:
+    - ports:
+        - port: 9090
+          protocol: TCP
+---
+{{- end }}
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
