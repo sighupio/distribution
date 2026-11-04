@@ -20,6 +20,9 @@ resources:
 {{- end }}
   - resources/headlamp-ingress.yml
   - resources/sd-spec.yml
+{{- if eq .spec.distribution.common.networkPoliciesEnabled true }}
+  - policies
+{{- end }}
 
 patches:
   - path: patches/infra-nodes.yml

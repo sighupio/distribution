@@ -9,6 +9,7 @@ graph TD
         log[Logging<br/>Opensearch/Loki]
         tracing[Tracing<br/>Tempo]
         opa[OPA<br/>Gatekeeper/Kyverno]
+        util[Utilities<br/>Headlamp]
     end
 
     %% K8s Core Components
@@ -20,7 +21,8 @@ graph TD
     kfd --->|"53/UDP"| dns
     kfd -->|"6443/TCP"| api
     ingress -->|"8080/TCP"| auth
-    auth -->|"auth proxy"| mon & log & tracing & opa
+    ingress -->|"4466/TCP"| util
+    auth -->|"auth proxy"| mon & log & tracing & opa & util
     auth -->|"443/TCP"| ext
     mon -->|"metrics"| all
     mon -->|"metrics"| auth
@@ -28,6 +30,7 @@ graph TD
     mon -->|"metrics"| log
     mon -->|"metrics"| tracing
     mon -->|"metrics"| opa
+    api -->|"API server proxy"| mon
     all[All Namespaces] -->|"logs"| log
     all -->|"traces"| tracing
 
