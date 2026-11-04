@@ -1187,9 +1187,6 @@ steps: # e2e-onpremises
       DIAG_DIR: /diag
       # the utilities module (headlamp) is installed only in the clean install
       EXPECT_HEADLAMP: "1"
-      # minimal on-prem cluster: logging and policy modules are not installed
-      EXPECT_LOGGING: "0"
-      EXPECT_POLICY: "0"
     volumes:
       - name: cache
         path: /cache

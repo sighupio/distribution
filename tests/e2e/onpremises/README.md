@@ -10,15 +10,15 @@ Runs in CI via the `e2e-onpremises` pipeline in `.drone.yml`. Needs a host with
 `/dev/kvm` and libvirt.
 
 ## Topology
-Minimal layout (13 vCPU, fits the 24-vCPU internal worker) on a per-run `/24` (`10.10.<octet>.0/24`, `octet` derived from the build
+HA layout on a per-run `/24` (`10.10.<octet>.0/24`, `octet` derived from the build
 number so concurrent runs don't collide):
 
 | role | hosts | IP |
 |------|-------|----|
 | haproxy (LB) | haproxy | `.2` |
-| control plane | controlplane-0 | `.3` |
-| infra | infra-0 | `.6` |
-| worker | worker-0 | `.9` |
+| control plane | controlplane-0/1/2 | `.3` `.4` `.5` |
+| infra | infra-0/1/2 | `.6` `.7` `.8` |
+| worker | worker-0/1 | `.9` `.10` |
 
 ## Flow
 1. **install-tools** — `mise install` (opentofu, furyctl, kubectl, ansible).
@@ -52,9 +52,8 @@ onpremises/
 ```
 
 ## Notes
-- **Config**: cilium, prometheus, velero; logging, policy and tracing off —
-  loki/kyverno/mimir/tempo are too heavy for the minimal cluster. The bats step
-  sets `EXPECT_LOGGING=0` / `EXPECT_POLICY=0` to skip their checks.
+- **Config**: all modules, as in the original Hetzner e2e: cilium, kyverno, loki,
+  mimir, tempo, velero.
 - **Storage**: longhorn (replica 1). The install applies twice so storage-backed
   components come up once the StorageClass is ready.
 - **Concurrency**: each run gets its own libvirt network, subnet and pool, and runs

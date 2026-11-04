@@ -5,7 +5,7 @@
 
 # shellcheck disable=SC2154
 
-# Distribution smoke checks for the upgrade pipeline (calico path; no logging/policy).
+# Distribution smoke checks for the upgrade pipeline (calico + gatekeeper path).
 # Reused for both phases: post-install and post-upgrade. The
 # haproxy ingress controller only exists after the upgrade adds it, so that single
 # check is skipped unless EXPECT_HAPROXY_INGRESS=1.
@@ -68,6 +68,16 @@ load ./helper
     info
     test() {
         kubectl get pods -l app=forecastle -o json -n forecastle |jq '.items[].status.containerStatuses[].ready' | uniq | grep -q true
+    }
+    loop_it test 60 10
+    status=${loop_it_result}
+    [ "$status" -eq 0 ]
+}
+
+@test "Fluentd is Running" {
+    info
+    test() {
+        kubectl get pods -l app.kubernetes.io/name=fluentd -o json -n logging |jq '.items[].status.containerStatuses[].ready' | uniq | grep -q true
     }
     loop_it test 60 10
     status=${loop_it_result}

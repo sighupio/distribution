@@ -66,16 +66,26 @@ spec:
       hosts:
         - name: controlplane0-${module.vms.dash}-3
           ip: ${module.vms.subnet}.3
+        - name: controlplane1-${module.vms.dash}-4
+          ip: ${module.vms.subnet}.4
+        - name: controlplane2-${module.vms.dash}-5
+          ip: ${module.vms.subnet}.5
     nodes:
       - name: infra
         hosts:
           - name: infra0-${module.vms.dash}-6
             ip: ${module.vms.subnet}.6
+          - name: infra1-${module.vms.dash}-7
+            ip: ${module.vms.subnet}.7
+          - name: infra2-${module.vms.dash}-8
+            ip: ${module.vms.subnet}.8
         taints: []
       - name: worker
         hosts:
           - name: worker0-${module.vms.dash}-9
             ip: ${module.vms.subnet}.9
+          - name: worker1-${module.vms.dash}-10
+            ip: ${module.vms.subnet}.10
         taints: []
     advanced:
       selfmanagedRepositories: false
@@ -115,14 +125,14 @@ spec:
             email: samuele.chiocca@reevo.it
             type: http01
       logging:
-        # none: loki + its minio + the logging operators are too heavy for the
-        # minimal single-infra e2e cluster.
-        type: none
+        type: loki
+        opensearch:
+          type: triple
+        loki:
+          backend: minio
+          tsdbStartDate: "2024-11-18"
       monitoring:
-        # prometheus instead of mimir: mimir-distributed (+ its minio) is too heavy
-        # for a single-worker e2e -- minio + the distributed consumers can't come up
-        # within kapp's deadlines. prometheus keeps monitoring coverage, far lighter.
-        type: prometheus
+        type: mimir
         mimir:
           retentionTime: 3d
           backend: minio
@@ -133,9 +143,11 @@ spec:
         alertmanager:
           installDefaultRules: false
       policy:
-        # none: the policy engine (3 admission replicas) is too heavy for the
-        # minimal e2e cluster.
-        type: none
+        type: kyverno
+        kyverno:
+          additionalExcludedNamespaces: ["longhorn-system"]
+          installDefaultPolicies: true
+          validationFailureAction: Audit
       dr:
         type: on-premises
         velero:
@@ -148,8 +160,7 @@ spec:
           snapshotController:
             install: true
       tracing:
-        # none: tempo-distributed (+ its minio) is too heavy for a single-worker e2e.
-        type: none
+        type: tempo
         tempo:
           backend: minio
       auth:
@@ -159,29 +170,6 @@ spec:
         headlamp:
           type: token-auth
           clusterRole: view
-    customPatches:
-      patches:
-        # cilium-operator runs 2 hostNetwork replicas pinned to infra nodes: with
-        # the single infra node the second one stays Pending on its host port.
-        # Same reason for the rollout: a surge pod can't get the ports while the
-        # old one holds them, so stop the old pod first (maxSurge 0).
-        - target:
-            group: apps
-            version: v1
-            kind: Deployment
-            name: cilium-operator
-            namespace: kube-system
-          patch: |-
-            - op: replace
-              path: /spec/replicas
-              value: 1
-            - op: add
-              path: /spec/strategy
-              value:
-                type: RollingUpdate
-                rollingUpdate:
-                  maxSurge: 0
-                  maxUnavailable: 1
   plugins:
     helm:
       repositories:
@@ -231,6 +219,7 @@ frontend ingress-http
 
 backend ingress-http
     server worker0 ${module.vms.subnet}.9:31080 maxconn 256 check
+    server worker1 ${module.vms.subnet}.10:31080 maxconn 256 check
 
 frontend ingress-https
     mode tcp
@@ -239,5 +228,6 @@ frontend ingress-https
 
 backend ingress-https
     server worker0 ${module.vms.subnet}.9:31443 maxconn 256 check
+    server worker1 ${module.vms.subnet}.10:31443 maxconn 256 check
 EOF
 }
