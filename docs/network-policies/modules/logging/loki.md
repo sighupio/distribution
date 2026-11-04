@@ -33,7 +33,8 @@ graph TD
     bucket -->|"6443/TCP"| api
     fb -->|"24240/TCP"| fd
     fd -->|"8080/TCP"| loki_gateway
-    prom -->|"3100/TCP"| loki_gateway
+    prom -->|"3100,4040/TCP"| loki_gateway
+    prom -->|"24231,9533/TCP"| fd
     graf -->|"8080/TCP"| loki_gateway
     prom -->|"2020/TCP"| fb
     fb -->|"6443/TCP"| api 
