@@ -36,6 +36,7 @@ graph TD
     prom -->|"3100,4040/TCP"| loki_gateway
     prom -->|"24231,9533/TCP"| fd
     graf -->|"8080/TCP"| loki_gateway
+    api -->|"8080/TCP (Headlamp proxy)"| loki_gateway
     prom -->|"2020/TCP"| fb
     fb -->|"6443/TCP"| api 
     loki_query_frontend -->|"loki-discovery<br/>9095,7946,3100/TCP"| loki_distributor

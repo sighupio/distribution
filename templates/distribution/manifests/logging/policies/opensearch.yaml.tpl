@@ -167,3 +167,26 @@ spec:
         - port: 9200
           protocol: TCP
 ---
+{{- if and (eq .spec.distribution.common.provider.type "none" "immutable") (hasKeyAny .spec "kubernetes") (has (.spec | digAny "distribution" "modules" "utilities" "headlamp" "type" "none") (list "token-auth" "sso")) }}
+# The kube-apiserver runs in the host network, so its service proxy requests
+# (for example Headlamp's logs and events) come from node addresses, not from pods.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: opensearch-ingress-kube-apiserver
+  namespace: logging
+  labels:
+    cluster.kfd.sighup.io/module: logging
+    cluster.kfd.sighup.io/logging-type: opensearch
+spec:
+  policyTypes:
+    - Ingress
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: opensearch
+  ingress:
+    - ports:
+        - port: 9200
+          protocol: TCP
+---
+{{- end }}
