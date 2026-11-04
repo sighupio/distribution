@@ -37,7 +37,7 @@ graph TD
     ispj -->|"5601/TCP"| osd
     ismj -->|"9200/TCP"| os
     prom -->|"2020/TCP"| fb
-    prom -->|"24231/TCP"| fd
+    prom -->|"24231,9533/TCP"| fd
     prom -->|"9108/TCP"| os
     prom -->|"9000/TCP"| minio
     bucket -->|"9000/TCP"| minio
