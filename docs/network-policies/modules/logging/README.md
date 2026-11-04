@@ -31,6 +31,7 @@
 - opensearch-ingress-fluentd
 - opensearch-ingress-prometheus-metrics
 - opensearch-ingress-jobs
+- opensearch-ingress-kube-apiserver (when Headlamp is enabled)
 - opensearch-dashboards-egress-opensearch
 - opensearch-dashboards-ingress-nginx
 - opensearch-dashboards-ingress-jobs
@@ -44,6 +45,7 @@
 - loki-distributed-ingress-prometheus-metrics
 - loki-distributed-discovery
 - loki-distributed-egress-all
+- loki-distributed-gateway-ingress-kube-apiserver (when Headlamp is enabled)
 
 ### MinIO
 

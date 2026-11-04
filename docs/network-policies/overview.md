@@ -30,7 +30,7 @@ graph TD
     mon -->|"metrics"| log
     mon -->|"metrics"| tracing
     mon -->|"metrics"| opa
-    api -->|"API server proxy"| mon
+    api -->|"API server proxy"| mon & log
     all[All Namespaces] -->|"logs"| log
     all -->|"traces"| tracing
 

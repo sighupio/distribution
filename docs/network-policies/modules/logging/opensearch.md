@@ -46,4 +46,5 @@ graph TD
     logging -->|"9000/TCP"| minio
     nginx -->|"9001/TCP"| minio
     nginx -->|"5601/TCP"| osd
+    api -->|"9200/TCP (Headlamp proxy)"| os
 ```

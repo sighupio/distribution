@@ -15,6 +15,10 @@ graph TD
         ing[Ingress Controller<br/>nginx/haproxy/BYOIC]
     end
 
+    subgraph logging
+        logs[Loki Gateway / OpenSearch]
+    end
+
     subgraph monitoring
         prom[Prometheus]
     end
@@ -29,4 +33,5 @@ graph TD
     pom -->|"4466/TCP (sso)"| hl
     ing -->|"4466/TCP (token-auth)"| hl
     api -->|"9090/TCP (API server proxy)"| prom
+    api -->|"8080/TCP, 9200/TCP (API server proxy)"| logs
 ```
