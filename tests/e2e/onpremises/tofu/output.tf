@@ -89,6 +89,11 @@ spec:
         taints: []
     advanced:
       selfmanagedRepositories: false
+      # Serialized pulls queued pods for 10+ minutes on a 12s pull, until kapp hit
+      # ProgressDeadlineExceeded. Bounded so the unpacking doesn't starve the node.
+      kubeletConfiguration:
+        serializeImagePulls: false
+        maxParallelImagePulls: 3
       containerd:
         selfmanagedRepositories: false
       encryption:
@@ -186,6 +191,18 @@ spec:
           version: '1.8.1'
           set:
             - name: persistence.defaultClassReplicaCount
+              value: "1"
+            # Default is 3 per CSI sidecar: 12 leader-electing pods hitting a starved
+            # API server. One each is enough for an e2e.
+            - name: csi.attacherReplicaCount
+              value: "1"
+            - name: csi.provisionerReplicaCount
+              value: "1"
+            - name: csi.resizerReplicaCount
+              value: "1"
+            - name: csi.snapshotterReplicaCount
+              value: "1"
+            - name: longhornUI.replicas
               value: "1"
             # e2e volumes are mostly empty; let longhorn over-provision so all the
             # storage-backed modules' volumes schedule on the (thin) node disks.
