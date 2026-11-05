@@ -18,7 +18,7 @@ number so concurrent runs don't collide):
 | haproxy (LB) | haproxy | `.2` |
 | control plane | controlplane-0/1/2 | `.3` `.4` `.5` |
 | infra | infra-0/1/2 | `.6` `.7` `.8` |
-| worker | worker-0/1 | `.9` `.10` |
+| worker | worker-0 | `.9` |
 
 ## Flow
 1. **install-tools** — `mise install` (opentofu, furyctl, kubectl, ansible).
