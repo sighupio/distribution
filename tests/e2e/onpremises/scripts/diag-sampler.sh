@@ -37,10 +37,10 @@ while :; do
     prev_idle="$idle"
 
     i=0
-    for ip in $(grep -oE 'ip: 10\.10\.[0-9]+\.[0-9]+' "$CONFIG" | awk '{print $2}'); do
+    while read -r ip; do
       i=$((i + 1))
-      { echo "--- $ip"; timeout 25 "${SSH[@]}" "root@$ip" "$REMOTE" 2>&1; } >"$TMP/$i" &
-    done
+      { echo "--- $ip"; timeout 25 "${SSH[@]}" "root@$ip" "$REMOTE" 2>&1 </dev/null; } >"$TMP/$i" &
+    done < <(grep -oE 'ip: 10\.10\.[0-9]+\.[0-9]+' "$CONFIG" | awk '{print $2}')
     wait
     cat "$TMP"/* 2>/dev/null
     rm -f "$TMP"/*
