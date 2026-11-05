@@ -28,7 +28,29 @@ fi
 
 cd "$E2E_DIR/config" || exit 1
 
+if [ -n "${DIAG_DIR:-}" ] && [ -d "$DIAG_DIR" ]; then
+  bash "$SCRIPTS/diag-sampler.sh" "$E2E_DIR/config/furyctl.yaml" \
+    "$DIAG_DIR/sampler-${DRONE_BUILD_NUMBER:-local}.log" >/dev/null 2>&1 &
+  SAMPLER_PID=$!
+  trap 'kill "$SAMPLER_PID" 2>/dev/null' EXIT
+fi
+
 furyctl create pki -p ./pki || true
+
+# A retry while image pulls and rollouts are still in progress only adds API load
+# and hits the same kapp deadlines: wait for the pods to settle first (bounded).
+wait_settled() {
+  local i pods
+  sleep 60
+  for i in $(seq 1 20); do
+    if pods="$(kubectl get pods -A --no-headers 2>/dev/null)" &&
+      ! grep -qE 'Pending|ContainerCreating|PodInitializing|Init:[0-9]' <<<"$pods"; then
+      return 0
+    fi
+    echo ">>> waiting for pods to settle before retrying ($i/20)"
+    sleep 30
+  done
+}
 
 apply_retry() {
   # $1 = human label, rest = furyctl apply args; retried until success
@@ -40,8 +62,8 @@ apply_retry() {
     if furyctl apply -D "$@" --distro-location "$DISTRO_LOCATION"; then
       return 0
     fi
-    echo ">>> ${label} attempt ${a} failed; retry in 60s"
-    sleep 60
+    echo ">>> ${label} attempt ${a} failed; waiting before the retry"
+    wait_settled
   done
   return 1
 }

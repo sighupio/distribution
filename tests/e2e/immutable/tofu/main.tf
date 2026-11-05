@@ -30,17 +30,16 @@ locals {
   ipxe    = "http://${local.gateway}:8080"
   tag     = "${var.name_prefix}-${var.ci_number}"
 
-  # Same HA topology as on-premises, with 2 LBs for keepalived. Flatcar PXE runs
-  # from RAM, so no node gets less than 3GB (the spike booted a 3GB node).
+  # Same minimal topology as on-premises (1 control plane + 1 infra + 1 worker),
+  # sized for the 24-vCPU internal worker (14 vCPU in all). 2 LBs stay because
+  # keepalived needs 2 members (schema), with 1 vCPU each like the on-premises
+  # haproxy. Flatcar PXE runs from RAM, so no node gets less than 3GB (the spike
+  # booted a 3GB node). Hosts keep their old slots.
   specs = {
-    lb-0           = { host = 2, cpu = 2, mem = 3072 }
-    lb-1           = { host = 3, cpu = 2, mem = 3072 }
-    controlplane-0 = { host = 4, cpu = 4, mem = 4096 }
-    controlplane-1 = { host = 5, cpu = 4, mem = 4096 }
-    controlplane-2 = { host = 6, cpu = 4, mem = 4096 }
-    infra-0        = { host = 7, cpu = 4, mem = 11264 }
-    infra-1        = { host = 8, cpu = 4, mem = 11264 }
-    infra-2        = { host = 9, cpu = 4, mem = 11264 }
+    lb-0           = { host = 2, cpu = 1, mem = 3072 }
+    lb-1           = { host = 3, cpu = 1, mem = 3072 }
+    controlplane-0 = { host = 4, cpu = 4, mem = 6144 }
+    infra-0        = { host = 7, cpu = 6, mem = 16384 }
     worker-0       = { host = 10, cpu = 2, mem = 4096 }
   }
 
