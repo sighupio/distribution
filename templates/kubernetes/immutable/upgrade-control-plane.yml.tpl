@@ -30,6 +30,7 @@
     upgrade: true
     os_update_apply: true
     os_update_reboot: true
+    skip_pods_running_check: {{ .options | digAny "skipPodsRunningCheck" false }}
   pre_tasks:
     # Infra preflight (disk, .raw reachability, A/B rollback) before any disruptive work.
     - name: Infrastructure preflight before the upgrade
@@ -68,8 +69,8 @@
       ansible.builtin.include_role:
         name: upgrade-gates
         tasks_from: sanity.yml
+    # Uncordon + pod wait on every node, drained or not: a run that failed after the drain leaves the node cordoned and the next run does not drain it.
     - name: Close the maintenance window (uncordon + wait for pods)
-      when: node_upgrade_drain_required
       ansible.builtin.include_role:
         name: node-maintenance
         tasks_from: uncordon.yml

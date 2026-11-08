@@ -49,9 +49,8 @@
       ansible.builtin.include_role:
         name: upgrade-gates
         tasks_from: sanity.yml
-    # Uncordon + baseline-relative pod-settle wait, only when the node was drained.
+    # Uncordon + pod wait on every node, drained or not: a run that failed after the drain leaves the node cordoned and the next run does not drain it.
     - name: Close the maintenance window (uncordon + wait for pods)
-      when: node_upgrade_drain_required
       ansible.builtin.include_role:
         name: node-maintenance
         tasks_from: uncordon.yml
