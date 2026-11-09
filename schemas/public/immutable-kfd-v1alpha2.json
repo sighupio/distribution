@@ -3853,30 +3853,23 @@
           }
         },
         {
-          "allOf": [
-            {
-              "if": {
+          "if": {
+            "required": [
+              "oidcKubernetesAuth"
+            ],
+            "properties": {
+              "oidcKubernetesAuth": {
+                "required": [
+                  "enabled"
+                ],
                 "properties": {
-                  "oidcKubernetesAuth": {
-                    "type": "object"
-                  }
-                }
-              }
-            },
-            {
-              "if": {
-                "properties": {
-                  "oidcKubernetesAuth": {
-                    "properties": {
-                      "enabled": {
-                        "const": true
-                      }
-                    }
+                  "enabled": {
+                    "const": true
                   }
                 }
               }
             }
-          ],
+          },
           "then": {
             "required": [
               "baseDomain",
