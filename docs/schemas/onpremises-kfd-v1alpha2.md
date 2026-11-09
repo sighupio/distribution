@@ -572,7 +572,7 @@ Configuration for the Auth module.
 
 ### Description
 
-The base domain for the ingresses created by the Auth module (Gangplank, Pomerium, Dex). Notice that when the ingress module type is `dual`, these will use the `external` ingress class.
+The base domain for the ingresses created by the Auth module (Gangplank, Pomerium, Dex). Notice that when the ingress module type is `dual`, these will use the `external` ingress class. Required when `provider.type` is `sso` or `oidcKubernetesAuth.enabled` is `true`.
 
 ## .spec.distribution.modules.auth.dex
 
@@ -587,7 +587,7 @@ The base domain for the ingresses created by the Auth module (Gangplank, Pomeriu
 
 ### Description
 
-Configuration for the Dex package.
+Configuration for the Dex package. Required when `provider.type` is `sso` or `oidcKubernetesAuth.enabled` is `true`.
 
 ## .spec.distribution.modules.auth.dex.additionalStaticClients
 
@@ -714,17 +714,21 @@ The value of the toleration
 | [sessionSecurityKey](#specdistributionmodulesauthoidckubernetesauthsessionsecuritykey)         | `string`  | Optional |
 | [usernameClaim](#specdistributionmodulesauthoidckubernetesauthusernameclaim)                   | `string`  | Optional |
 
+### Description
+
+Configuration for the Kubernetes API login with Gangplank and the Dex of the Auth module. To use an OIDC provider that is not this Dex, configure only `.spec.kubernetes.advanced.oidc` and keep this section disabled.
+
 ## .spec.distribution.modules.auth.oidcKubernetesAuth.clientID
 
 ### Description
 
-The client ID that the Kubernetes API will use to authenticate against the OIDC provider (Dex).
+The ID of the Dex client that Gangplank uses. The tokens that Gangplank gets from Dex have this value as audience. Set `.spec.kubernetes.advanced.oidc.client_id` to the same value, otherwise the API server does not accept these tokens.
 
 ## .spec.distribution.modules.auth.oidcKubernetesAuth.clientSecret
 
 ### Description
 
-The client secret that the Kubernetes API will use to authenticate against the OIDC provider (Dex).
+The secret of the Dex client that Gangplank uses.
 
 ## .spec.distribution.modules.auth.oidcKubernetesAuth.emailClaim
 
@@ -736,7 +740,7 @@ DEPRECATED. Defaults to `email`.
 
 ### Description
 
-If true, components needed for interacting with the Kubernetes API with OIDC authentication (Gangplank, Dex) be deployed and configued.
+If `true`, the Auth module deploys Gangplank and Dex, with all the provider types. Gangplank gives a kubeconfig file to the users that log in with Dex. Gangplank works only with this Dex, thus `dex` and `baseDomain` are required. This field does not configure the API server: also set `.spec.kubernetes.advanced.oidc`, with `issuer_url` set to the Dex URL and `client_id` set to `clientID`.
 
 ## .spec.distribution.modules.auth.oidcKubernetesAuth.namespace
 
@@ -766,7 +770,7 @@ The Key to use for the sessions in Gangplank. Must be different between differen
 
 ### Description
 
-The JWT claim to use as the username. This is used in Gangplank's UI. This is combined with the clusterName for the user portion of the kubeconfig. Defaults to `nickname`.
+The JWT claim that Gangplank uses as the user name. Gangplank shows it in its UI, and adds the cluster name to it for the user in the kubeconfig file. It does not change the user name that the API server uses: for that, refer to `.spec.kubernetes.advanced.oidc.username_claim`. Defaults to `email`.
 
 ## .spec.distribution.modules.auth.oidcTrustedCA
 
@@ -5992,7 +5996,7 @@ The path to the certificate for the CA that signed the identity provider's web c
 
 ### Description
 
-The client ID the API server will use to authenticate to the OIDC provider.
+The client ID of the Kubernetes API in the OIDC provider. The API server accepts only the tokens that have this value as audience. For the Dex of the Auth module, set it to the same value as `.spec.distribution.modules.auth.oidcKubernetesAuth.clientID`.
 
 ## .spec.kubernetes.advanced.oidc.group_prefix
 
@@ -6004,7 +6008,7 @@ DEPRECATED, use `groups_prefix`. Ignored when `groups_prefix` is set.
 
 ### Description
 
-JWT claim to use as the user's group.
+JWT claim to use as the user's group. Defaults to `groups`.
 
 ## .spec.kubernetes.advanced.oidc.groups_prefix
 
@@ -6016,19 +6020,19 @@ Prefix prepended to group claims to prevent clashes with existing names (such as
 
 ### Description
 
-The issuer URL of the OIDC provider.
+The issuer URL of the OIDC provider. For the Dex of the Auth module, the URL is `https://login.<baseDomain>`, or `https://<host>` when `.spec.distribution.modules.auth.overrides.ingresses.dex.host` is set.
 
 ## .spec.kubernetes.advanced.oidc.username_claim
 
 ### Description
 
-JWT claim to use as the user name. The default value is `sub`, which is expected to be a unique identifier of the end user.
+JWT claim that the API server uses as the user name. Defaults to `email`.
 
 ## .spec.kubernetes.advanced.oidc.username_prefix
 
 ### Description
 
-Prefix prepended to username claims to prevent clashes with existing names (such as system: users).
+Prefix prepended to username claims to prevent clashes with existing names (such as system: users). Defaults to `oidc:`.
 
 ## .spec.kubernetes.advanced.registry
 

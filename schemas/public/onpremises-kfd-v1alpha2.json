@@ -631,11 +631,11 @@
       "properties": {
         "issuer_url": {
           "type": "string",
-          "description": "The issuer URL of the OIDC provider."
+          "description": "The issuer URL of the OIDC provider. For the Dex of the Auth module, the URL is `https://login.<baseDomain>`, or `https://<host>` when `.spec.distribution.modules.auth.overrides.ingresses.dex.host` is set."
         },
         "client_id": {
           "type": "string",
-          "description": "The client ID the API server will use to authenticate to the OIDC provider."
+          "description": "The client ID of the Kubernetes API in the OIDC provider. The API server accepts only the tokens that have this value as audience. For the Dex of the Auth module, set it to the same value as `.spec.distribution.modules.auth.oidcKubernetesAuth.clientID`."
         },
         "ca_file": {
           "type": "string",
@@ -643,15 +643,15 @@
         },
         "username_claim": {
           "type": "string",
-          "description": "JWT claim to use as the user name. The default value is `sub`, which is expected to be a unique identifier of the end user."
+          "description": "JWT claim that the API server uses as the user name. Defaults to `email`."
         },
         "username_prefix": {
           "type": "string",
-          "description": "Prefix prepended to username claims to prevent clashes with existing names (such as system: users)."
+          "description": "Prefix prepended to username claims to prevent clashes with existing names (such as system: users). Defaults to `oidc:`."
         },
         "groups_claim": {
           "type": "string",
-          "description": "JWT claim to use as the user's group."
+          "description": "JWT claim to use as the user's group. Defaults to `groups`."
         },
         "groups_prefix": {
           "type": "string",
@@ -3027,7 +3027,7 @@
         },
         "baseDomain": {
           "type": "string",
-          "description": "The base domain for the ingresses created by the Auth module (Gangplank, Pomerium, Dex). Notice that when the ingress module type is `dual`, these will use the `external` ingress class."
+          "description": "The base domain for the ingresses created by the Auth module (Gangplank, Pomerium, Dex). Notice that when the ingress module type is `dual`, these will use the `external` ingress class. Required when `provider.type` is `sso` or `oidcKubernetesAuth.enabled` is `true`."
         },
         "pomerium": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Auth.Pomerium"
@@ -3217,7 +3217,7 @@
     "Spec.Distribution.Modules.Auth.Dex": {
       "type": "object",
       "additionalProperties": false,
-      "description": "Configuration for the Dex package.",
+      "description": "Configuration for the Dex package. Required when `provider.type` is `sso` or `oidcKubernetesAuth.enabled` is `true`.",
       "properties": {
         "connectors": {
           "type": "array",
@@ -3252,18 +3252,19 @@
     "Spec.Distribution.Modules.Auth.OIDCKubernetesAuth": {
       "type": "object",
       "additionalProperties": false,
+      "description": "Configuration for the Kubernetes API login with Gangplank and the Dex of the Auth module. To use an OIDC provider that is not this Dex, configure only `.spec.kubernetes.advanced.oidc` and keep this section disabled.",
       "properties": {
         "enabled": {
           "type": "boolean",
-          "description": "If true, components needed for interacting with the Kubernetes API with OIDC authentication (Gangplank, Dex) be deployed and configued."
+          "description": "If `true`, the Auth module deploys Gangplank and Dex, with all the provider types. Gangplank gives a kubeconfig file to the users that log in with Dex. Gangplank works only with this Dex, thus `dex` and `baseDomain` are required. This field does not configure the API server: also set `.spec.kubernetes.advanced.oidc`, with `issuer_url` set to the Dex URL and `client_id` set to `clientID`."
         },
         "clientID": {
           "type": "string",
-          "description": "The client ID that the Kubernetes API will use to authenticate against the OIDC provider (Dex)."
+          "description": "The ID of the Dex client that Gangplank uses. The tokens that Gangplank gets from Dex have this value as audience. Set `.spec.kubernetes.advanced.oidc.client_id` to the same value, otherwise the API server does not accept these tokens."
         },
         "clientSecret": {
           "type": "string",
-          "description": "The client secret that the Kubernetes API will use to authenticate against the OIDC provider (Dex)."
+          "description": "The secret of the Dex client that Gangplank uses."
         },
         "scopes": {
           "type": "array",
@@ -3274,7 +3275,7 @@
         },
         "usernameClaim": {
           "type": "string",
-          "description": "The JWT claim to use as the username. This is used in Gangplank's UI. This is combined with the clusterName for the user portion of the kubeconfig. Defaults to `nickname`."
+          "description": "The JWT claim that Gangplank uses as the user name. Gangplank shows it in its UI, and adds the cluster name to it for the user in the kubeconfig file. It does not change the user name that the API server uses: for that, refer to `.spec.kubernetes.advanced.oidc.username_claim`. Defaults to `email`."
         },
         "emailClaim": {
           "type": "string",
