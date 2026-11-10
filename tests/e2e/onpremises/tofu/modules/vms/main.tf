@@ -23,9 +23,11 @@ locals {
   octet  = (tonumber(var.ci_number) % var.octet_span) + var.octet_base
   subnet = "10.10.${local.octet}"
 
-  # HA topology: haproxy + 3 control planes + 3 infra + 1 worker.
-  # Sizes tuned for the worker (62GB/16 threads); control planes need >=2 vCPU
-  # for the kubeadm preflight.
+  # HA topology: haproxy + 3 control planes + 3 infra + 1 worker (27 vCPU, 53GB).
+  # Same nodes and sizes as the bare-metal worker of v1.36.0 (62GB/16 threads), to
+  # compare the internal nested worker (32 threads) on the same test. 53 vCPUs
+  # starved etcd there until the apiservers crash-looped. Control planes need
+  # >=2 vCPU for the kubeadm preflight.
   nodes = {
     haproxy        = { ip = "${local.subnet}.2", cpu = 1, mem = 1024 }
     controlplane-0 = { ip = "${local.subnet}.3", cpu = 4, mem = 4096 }
@@ -115,5 +117,10 @@ resource "libvirt_domain" "vm" {
   console {
     type        = "pty"
     target_port = "0"
+  }
+
+  # temp for testing
+  xml {
+    xslt = file("${path.module}/cache-unsafe.xsl")
   }
 }

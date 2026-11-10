@@ -26,8 +26,8 @@ pipelines.
 | role | hosts | IP |
 |------|-------|----|
 | load balancer (HAProxy + keepalived) | lb-0, lb-1 | `.2` `.3` |
-| control plane | controlplane-0/1/2 | `.4` `.5` `.6` |
-| infra | infra-0/1/2 | `.7` `.8` `.9` |
+| control plane | controlplane-0 | `.4` |
+| infra | infra-0 | `.7` |
 | worker | worker-0 | `.10` |
 | keepalived VIP (API and ingress) | | `.20` |
 
