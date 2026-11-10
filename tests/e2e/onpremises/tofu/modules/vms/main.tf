@@ -118,4 +118,9 @@ resource "libvirt_domain" "vm" {
     type        = "pty"
     target_port = "0"
   }
+
+  # temp for testing
+  xml {
+    xslt = file("${path.module}/cache-unsafe.xsl")
+  }
 }

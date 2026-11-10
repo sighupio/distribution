@@ -60,8 +60,12 @@ apply_retry() {
     echo ">>> ${label} (attempt ${a})"
     rm -rf /tmp/furyctl-* 2>/dev/null || true
     if furyctl apply -D "$@" --distro-location "$DISTRO_LOCATION"; then
+      # temp for testing
+      bash "$SCRIPTS/etcd-snapshot.sh" "$E2E_DIR/config/furyctl.yaml" "${label// /-}-attempt-${a}-ok"
       return 0
     fi
+    # temp for testing
+    bash "$SCRIPTS/etcd-snapshot.sh" "$E2E_DIR/config/furyctl.yaml" "${label// /-}-attempt-${a}-failed"
     echo ">>> ${label} attempt ${a} failed; waiting before the retry"
     wait_settled
   done
