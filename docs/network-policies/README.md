@@ -10,6 +10,7 @@ This documentation describes all Network Policies of the SD components for the O
 - [Networking](modules/networking/README.md) - Whisker
 - [OPA](modules/opa/README.md) - Gatekeeper/Kyverno
 - [Tracing](modules/tracing/README.md) - Tempo
+- [Utilities](modules/utilities/README.md) - Headlamp
 
 ## Common Patterns
 All namespaces include:

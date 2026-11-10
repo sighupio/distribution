@@ -97,7 +97,8 @@ run = [
   "docker run --rm -v $(PWD)/docs/network-policies/modules/monitoring:/workdir minlag/mermaid-cli:latest -i \"/workdir/prometheus.md\" -o \"/workdir/prometheus.png\" -w 2048 -H 1536 -b white",
   "docker run --rm -v $(PWD)/docs/network-policies/modules/opa:/workdir minlag/mermaid-cli:latest -i \"/workdir/gatekeeper.md\" -o \"/workdir/gatekeeper.png\" -w 2048 -H 1536 -b white",
   "docker run --rm -v $(PWD)/docs/network-policies/modules/opa:/workdir minlag/mermaid-cli:latest -i \"/workdir/kyverno.md\" -o \"/workdir/kyverno.png\" -w 2048 -H 1536 -b white",
-  "docker run --rm -v $(PWD)/docs/network-policies/modules/tracing:/workdir minlag/mermaid-cli:latest -i \"/workdir/tempo.md\" -o \"/workdir/tempo.png\" -w 2048 -H 1536 -b white"
+  "docker run --rm -v $(PWD)/docs/network-policies/modules/tracing:/workdir minlag/mermaid-cli:latest -i \"/workdir/tempo.md\" -o \"/workdir/tempo.png\" -w 2048 -H 1536 -b white",
+  "docker run --rm -v $(PWD)/docs/network-policies/modules/utilities:/workdir minlag/mermaid-cli:latest -i \"/workdir/headlamp.md\" -o \"/workdir/headlamp.png\" -w 2048 -H 1536 -b white"
 ]
 
 [tasks."test:templates:update-baseline"]

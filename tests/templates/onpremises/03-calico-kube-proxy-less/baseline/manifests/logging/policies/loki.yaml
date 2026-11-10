@@ -77,6 +77,8 @@ spec:
     - ports:
         - port: 3100
           protocol: TCP
+        - port: 4040
+          protocol: TCP
       from:
         - namespaceSelector:
             matchLabels:

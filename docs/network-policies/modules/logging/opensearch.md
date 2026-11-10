@@ -37,7 +37,7 @@ graph TD
     ispj -->|"5601/TCP"| osd
     ismj -->|"9200/TCP"| os
     prom -->|"2020/TCP"| fb
-    prom -->|"24231/TCP"| fd
+    prom -->|"24231,9533/TCP"| fd
     prom -->|"9108/TCP"| os
     prom -->|"9000/TCP"| minio
     bucket -->|"9000/TCP"| minio
@@ -46,4 +46,5 @@ graph TD
     logging -->|"9000/TCP"| minio
     nginx -->|"9001/TCP"| minio
     nginx -->|"5601/TCP"| osd
+    api -->|"9200/TCP (Headlamp proxy)"| os
 ```

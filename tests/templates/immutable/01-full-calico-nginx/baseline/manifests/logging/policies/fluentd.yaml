@@ -69,5 +69,7 @@ spec:
       ports:
           - port: 24231
             protocol: TCP
+          - port: 9533
+            protocol: TCP
 ---
 
