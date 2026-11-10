@@ -50,5 +50,12 @@ while :; do
     echo "--- top pods"
     timeout 20 kubectl top pods -A --sort-by=cpu 2>&1 | head -16
   } >>"$OUT" 2>&1
+
+  # temp for testing
+  n=$((${n:-0} + 1))
+  if [ $((n % 5)) = 0 ]; then
+    bash "$(dirname "$0")/etcd-snapshot.sh" "$CONFIG" latest >/dev/null 2>&1
+  fi
+
   sleep "$INTERVAL"
 done

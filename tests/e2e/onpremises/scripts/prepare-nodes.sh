@@ -24,4 +24,11 @@ INV="$E2E_DIR/config/prepare-hosts.ini"
   echo "ansible_ssh_common_args=-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
 } > "$INV"
 
+# temp for testing
+for ip in $(cd "$TF" && tofu output -raw all_ips); do
+  ssh -i /cache/ci-ssh-key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+    -o ConnectTimeout=5 -o LogLevel=ERROR "root@$ip" \
+    "nohup setsid vmstat -t 5 >/root/vmstat.log 2>&1 </dev/null &" </dev/null || true
+done
+
 ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i "$INV" "$ONPREM/playbooks/prepare-nodes.yaml"
