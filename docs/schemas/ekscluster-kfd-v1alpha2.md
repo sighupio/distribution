@@ -568,7 +568,7 @@ Configuration for the Auth module.
 
 ### Description
 
-The base domain for the ingresses created by the Auth module (Gangplank, Pomerium, Dex). Notice that when the ingress module type is `dual`, these will use the `external` ingress class.
+The base domain for the ingresses created by the Auth module (Gangplank, Pomerium, Dex). Notice that when the ingress module type is `dual`, these will use the `external` ingress class. Required when `provider.type` is `sso`.
 
 ## .spec.distribution.modules.auth.dex
 
@@ -583,13 +583,13 @@ The base domain for the ingresses created by the Auth module (Gangplank, Pomeriu
 
 ### Description
 
-Configuration for the Dex package.
+Configuration for the Dex package. Required when `provider.type` is `sso`.
 
 ## .spec.distribution.modules.auth.dex.additionalStaticClients
 
 ### Description
 
-Additional static clients defitions that will be added to the default clients included with the distribution in Dex's configuration. Example:
+Additional static clients definitions that will be added to the default clients included with the distribution in Dex's configuration. Example:
 
 ```yaml
 additionalStaticClients:

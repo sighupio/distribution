@@ -596,7 +596,7 @@ Configuration for the Dex package. Required when `provider.type` is `sso` or `oi
 
 ### Description
 
-Additional static clients defitions that will be added to the default clients included with the distribution in Dex's configuration. Example:
+Additional static clients definitions that will be added to the default clients included with the distribution in Dex's configuration. Example:
 
 ```yaml
 additionalStaticClients:

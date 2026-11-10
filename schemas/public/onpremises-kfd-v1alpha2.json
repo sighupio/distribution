@@ -3225,7 +3225,7 @@
         },
         "additionalStaticClients": {
           "type": "array",
-          "description": "Additional static clients defitions that will be added to the default clients included with the distribution in Dex's configuration. Example:\n\n```yaml\nadditionalStaticClients:\n  - id: my-custom-client\n    name: \"A custom additional static client\"\n    redirectURIs:\n      - \"https://myapp.tld/redirect\"\n      - \"https://alias.tld/oidc-callback\"\n    secret: supersecretpassword\n```\nReference: https://dexidp.io/docs/connectors/local/"
+          "description": "Additional static clients definitions that will be added to the default clients included with the distribution in Dex's configuration. Example:\n\n```yaml\nadditionalStaticClients:\n  - id: my-custom-client\n    name: \"A custom additional static client\"\n    redirectURIs:\n      - \"https://myapp.tld/redirect\"\n      - \"https://alias.tld/oidc-callback\"\n    secret: supersecretpassword\n```\nReference: https://dexidp.io/docs/connectors/local/"
         },
         "expiry": {
           "type": "object",
