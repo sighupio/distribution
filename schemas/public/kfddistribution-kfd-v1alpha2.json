@@ -460,88 +460,6 @@
             ]
           },
           "then": false
-        },
-        {
-          "if": {
-            "allOf": [
-              {
-                "properties": {
-                  "auth": {
-                    "required": ["oidcKubernetesAuth"],
-                    "properties": {
-                      "oidcKubernetesAuth": {
-                        "required": ["enabled"],
-                        "properties": {
-                          "enabled": {
-                            "const": true
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              },
-              {
-                "properties": {
-                  "ingress": {
-                    "properties": {
-                      "nginx": {
-                        "properties": {
-                          "type": {
-                            "const": "none"
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              },
-              {
-                "anyOf": [
-                  {
-                    "properties": {
-                      "ingress": {
-                        "properties": {
-                          "haproxy": {
-                            "properties": {
-                              "type": {
-                                "const": "none"
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  },
-                  {
-                    "properties": {
-                      "ingress": {
-                        "not": {
-                          "required": ["haproxy"]
-                        }
-                      }
-                    }
-                  }
-                ]
-              },
-              {
-                "properties": {
-                  "ingress": {
-                    "properties": {
-                      "byoic": {
-                        "properties": {
-                          "enabled": {
-                            "const": false
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            ]
-          },
-          "then": false
         }
       ]
     },
@@ -1997,7 +1915,7 @@
         },
         "baseDomain": {
           "type": "string",
-          "description": "The base domain for the ingresses created by the Auth module (Gangplank, Pomerium, Dex). Notice that when the ingress module type is `dual`, these will use the `external` ingress class."
+          "description": "The base domain for the ingresses created by the Auth module (Gangplank, Pomerium, Dex). Notice that when the ingress module type is `dual`, these will use the `external` ingress class. Required when `provider.type` is `sso`."
         },
         "pomerium": {
           "$ref": "#/$defs/Spec.Distribution.Modules.Auth.Pomerium"
@@ -2178,7 +2096,7 @@
     "Spec.Distribution.Modules.Auth.Dex": {
       "type": "object",
       "additionalProperties": false,
-      "description": "Configuration for the Dex package.",
+      "description": "Configuration for the Dex package. Required when `provider.type` is `sso`.",
       "properties": {
         "connectors": {
           "type": "array",
@@ -2186,7 +2104,7 @@
         },
         "additionalStaticClients": {
           "type": "array",
-          "description": "Additional static clients defitions that will be added to the default clients included with the distribution in Dex's configuration. Example:\n\n```yaml\nadditionalStaticClients:\n  - id: my-custom-client\n    name: \"A custom additional static client\"\n    redirectURIs:\n      - \"https://myapp.tld/redirect\"\n      - \"https://alias.tld/oidc-callback\"\n    secret: supersecretpassword\n```\nReference: https://dexidp.io/docs/connectors/local/"
+          "description": "Additional static clients definitions that will be added to the default clients included with the distribution in Dex's configuration. Example:\n\n```yaml\nadditionalStaticClients:\n  - id: my-custom-client\n    name: \"A custom additional static client\"\n    redirectURIs:\n      - \"https://myapp.tld/redirect\"\n      - \"https://alias.tld/oidc-callback\"\n    secret: supersecretpassword\n```\nReference: https://dexidp.io/docs/connectors/local/"
         },
         "expiry": {
           "type": "object",
