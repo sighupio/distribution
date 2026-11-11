@@ -2,6 +2,10 @@
 
 Welcome to the latest release of SD maintained by SIGHUP by ReeVo team.
 
+## New features 🌟
+
+- [[#644](https://github.com/sighupio/distribution/pull/644)] On the Immutable kind, the new playbook `templates/preflight/immutable/delete-playbook.yaml` lets `furyctl delete cluster` ([furyctl#819](https://github.com/sighupio/furyctl/pull/819)) erase every node. Before it changes anything, it checks that the inventory lists every node and that each node has the MAC address of the furyctl config, runs Flatcar and runs from the install disk of the furyctl config. Then it erases the partition table of the install disk and restarts the node: the node keeps nothing of the cluster, boots from the network and waits there until `furyctl apply` installs it again. Other disks are kept.
+
 ## Bug fixes 🐞
 
 - [[#637](https://github.com/sighupio/distribution/pull/637)] When `spec.distribution.common.networkPoliciesEnabled` is `true`, the Headlamp dashboard could not reach Prometheus to show the metrics in the UI because of a missing network policy.
