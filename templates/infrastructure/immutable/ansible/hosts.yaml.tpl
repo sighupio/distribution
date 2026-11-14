@@ -106,6 +106,14 @@ all:
         {{- end }}
         {{- end }}
         {{- end }}
+    # apply --reinstall-node accepts only a worker or a load balancer.
+    workers:
+      hosts:
+        {{- range $g := .spec.kubernetes | digAny "nodeGroups" list }}
+        {{- range $h := $g.nodes }}
+        {{ $h.hostname }}:
+        {{- end }}
+        {{- end }}
     nodes:
       hosts:
         {{- range $n := .spec.infrastructure.nodes }}
