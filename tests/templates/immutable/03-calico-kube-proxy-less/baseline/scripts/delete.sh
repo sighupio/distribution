@@ -2,41 +2,67 @@
 
 set -e
 
-kustomizebin=""
-kubectlbin=""
+kappbin=""
 yqbin=""
-vendorPath=""
 
-$kustomizebin build --load-restrictor LoadRestrictionsNone . > out.yaml
+# The objects of app kfd as one JSON array: kapp inspect --raw prints a header, then "---" before each object, then "Succeeded".
+# shellcheck disable=SC2016 # $o is a yq variable.
+appObjects() {
+  "$kappbin" inspect -a kfd -n kube-system --raw "$@" | awk 'f || /^---$/ { f = 1; print }' | grep -v '^Succeeded$' | "$yqbin" ea -o json -I0 '. as $o ireduce ([]; . + [$o])'
+}
 
-# list generated with: kustomize build . | yq 'select(.kind == "CustomResourceDefinition") | .spec.group' | sort | uniq
+stuckReport() {
+  printf '%s\n' "$1" | "$yqbin" '.[] | select(.metadata.deletionTimestamp != null) | "stuck: " + .kind + " " + ((.metadata.namespace // "") + "/" | sub("^/$", "")) + .metadata.name + " finalizers=" + ((.metadata.finalizers // []) | join(","))'
+}
 
-< out.yaml $yqbin 'select(.apiVersion == "acme.cert-manager.io/*" or .apiVersion == "cert-manager.io/*" or .apiVersion == "config.gatekeeper.sh/*" or .apiVersion == "expansion.gatekeeper.sh/*" or .apiVersion == "externaldata.gatekeeper.sh/*" or .apiVersion == "forecastle.stakater.com/*" or .apiVersion == "logging-extensions.banzaicloud.io/*" or .apiVersion == "logging.banzaicloud.io/*" or .apiVersion == "monitoring.coreos.com/*" or .apiVersion == "mutations.gatekeeper.sh/*" or .apiVersion == "status.gatekeeper.sh/*" or .apiVersion == "templates.gatekeeper.sh/*" or .apiVersion == "velero.io/*")' | $kubectlbin delete --ignore-not-found --wait --timeout=180s -f -
-echo "CRDs deleted"
+# A kapp filter that excludes the stuck objects and the CRDs that serve them: a CRD waits for its objects.
+# shellcheck disable=SC2016 # $objs and $s are yq variables.
+aroundStuck() {
+  printf '%s\n' "$1" | "$yqbin" -o json -I0 '
+    . as $objs
+    | [.[] | select(.metadata.deletionTimestamp != null) | . as $s
+      | ($s, ($objs[] | select(.kind == "CustomResourceDefinition" and .spec.names.kind == $s.kind and .spec.group == ($s.apiVersion | sub("/.*", "")))))]
+    | map({"resource": {"kinds": [.kind], "namespaces": [.metadata.namespace // ""], "names": [.metadata.name]}} | del(.resource.namespaces | select(.[0] == "")))
+    | {"not": {"or": .}}'
+}
 
-< out.yaml $yqbin 'select(.kind == "StatefulSet")' | $kubectlbin delete --ignore-not-found --wait --timeout=180s -f -
-echo "StatefulSets deleted"
+# kapp deletes in waves and a timeout stops the later ones: after a failure, objects stuck on a finalizer are
+# reported and one more pass deletes the rest around them.
+deleteWithGrace() {
+  if "$@"; then
+    return 0
+  fi
 
-$kubectlbin delete -n logging deployments -l app.kubernetes.io/instance=loki-distributed
-echo "Logging loki deployments deleted"
+  objects="$(appObjects)"
+  stuck="$(stuckReport "$objects")"
+  if [ -z "$stuck" ]; then
+    return 1
+  fi
+  echo "$stuck"
 
-$kubectlbin delete --ignore-not-found --wait --timeout=180s -n monitoring --all persistentvolumeclaims
-echo "Monitoring PVCs deleted"
+  filter="$(aroundStuck "$objects")"
+  # The last --filter wins in kapp, so the filter of the pass is kept inside the new one.
+  prev=""
+  for arg in "$@"; do
+    if [ "$prev" = "--filter" ]; then
+      filter="{\"and\":[$arg,$filter]}"
+    fi
+    prev="$arg"
+  done
 
-$kubectlbin delete --ignore-not-found --wait --timeout=180s -n logging --all persistentvolumeclaims
-echo "Logging PVCs deleted"
+  if "$@" --filter "$filter"; then
+    return 0
+  fi
 
-$kubectlbin delete --ignore-not-found --wait --timeout=180s -n tracing --all persistentvolumeclaims
-echo "Tracing PVCs deleted"
+  objects="$(appObjects --filter "$filter")"
+  if [ -n "$(printf '%s\n' "$objects" | "$yqbin" '.[] | select(.metadata.deletionTimestamp == null) | .kind')" ]; then
+    return 1
+  fi
+  stuckReport "$objects"
+}
 
-echo "Waiting 3 minutes"
-sleep 180
+# Calico goes last: pods that terminate after it cannot run CNI DEL and stay Terminating (tigera operator teardown).
+deleteWithGrace "$kappbin" delete -a kfd -n kube-system -y --apply-ignored --apply-concurrency 20 --apply-timeout 15m --wait-timeout 15m --filter '{"not":{"or":[{"resource":{"kinds":["Installation","APIServer","Goldmane","Whisker"]}},{"resource":{"namespaces":["tigera-operator","calico-system"]}},{"resource":{"names":["tigera-operator%","calico-system","%.operator.tigera.io","%.projectcalico.org","%.policy.networking.k8s.io"]}}]}}'
 
-< out.yaml $yqbin 'select(.kind == "Service" and .spec.type == "LoadBalancer")' | $kubectlbin delete --ignore-not-found --wait --timeout=180s -f - || true
-echo "LoadBalancer Services deleted"
-
-< out.yaml $yqbin 'select(.kind != "CustomResourceDefinition" and .apiVersion != "kapp.k14s.io/v1alpha1")' | $kubectlbin delete --ignore-not-found --wait --timeout=180s -f - || true
-echo "Resources deleted"
-
-< out.yaml $yqbin 'select(.kind == "CustomResourceDefinition")' | $kubectlbin delete --ignore-not-found --wait --timeout=180s -f - || true
-echo "CRDs deleted"
+# --apply-ignored deletes the objects kapp ignores by default, such as the PVCs of the StatefulSets.
+deleteWithGrace "$kappbin" delete -a kfd -n kube-system -y --apply-ignored --apply-concurrency 20 --apply-timeout 15m --wait-timeout 15m

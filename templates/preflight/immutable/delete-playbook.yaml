@@ -1,0 +1,61 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# furyctl delete cluster erases the install disk of every node and restarts it: --tags preflight, then wipe. Node tasks use raw: python3 can be missing.
+
+- name: Check that the inventory lists exactly the machines furyctl deletes
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  any_errors_fatal: true
+  tags:
+    - always
+    - guard
+  tasks:
+    # ansible-playbook skips unknown hosts with exit 0: a partial inventory would erase part of the cluster.
+    - name: Compare group nodes with furyctl_delete_hosts
+      vars:
+        delete_hosts: "{{ furyctl_delete_hosts | from_json if furyctl_delete_hosts is string else furyctl_delete_hosts }}"
+        listed_hosts: "{{ groups['nodes'] | default([]) }}"
+        missing_hosts: "{{ delete_hosts | difference(listed_hosts) | sort }}"
+        extra_hosts: "{{ listed_hosts | difference(delete_hosts) | sort }}"
+      ansible.builtin.assert:
+        that:
+          - missing_hosts | length == 0
+          - extra_hosts | length == 0
+        fail_msg: >-
+          The inventory group nodes does not list the hosts to delete.
+          Missing from the inventory: {{ missing_hosts | join(', ') }}.
+          Extra in the inventory: {{ extra_hosts | join(', ') }}.
+        quiet: true
+
+- name: Check every machine
+  hosts: nodes
+  gather_facts: false
+  become: true
+  any_errors_fatal: true
+  tags:
+    - preflight
+  tasks:
+    # The MAC address and install disk of the furyctl config, not the name: a stale DNS record or a wrong disk must not erase another machine or disk.
+    # A bond gives its interfaces another MAC address: perm_hwaddr keeps the address of each bonded interface.
+    - name: Check the MAC address, Flatcar and the install disk
+      ansible.builtin.raw: >-
+        cat /sys/class/net/*/address /sys/class/net/*/bonding_slave/perm_hwaddr 2>/dev/null | grep -qix '{{ delete_mac }}' || { echo "no interface has the MAC address {{ delete_mac }}" >&2; exit 1; };
+        sed 's/"//g' /etc/os-release | grep -qx 'ID=flatcar' || { echo "not Flatcar" >&2; exit 1; };
+        d=$(readlink -f '{{ delete_disk }}'); r=$(lsblk -ndo PKNAME "$(findmnt -nvo SOURCE /)");
+        [ -b "$d" ] && [ "/dev/$r" = "$d" ] || { echo "{{ delete_disk }} is not the disk of the root filesystem" >&2; exit 1; }
+
+# Best effort: one failing machine must not stop the others.
+- name: Erase the install disk and restart
+  hosts: nodes
+  gather_facts: false
+  become: true
+  tags:
+    - wipe
+  tasks:
+    # Without a partition table the machine boots from the network and waits there until furyctl apply installs it again. Not the reboot module: it waits for SSH.
+    - name: Erase the partition table of the install disk and restart
+      ansible.builtin.raw: >-
+        wipefs -af "$(readlink -f '{{ delete_disk }}')" && systemd-run --on-active=5 systemctl reboot

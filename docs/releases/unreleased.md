@@ -2,6 +2,10 @@
 
 Welcome to the latest release of SD maintained by SIGHUP by ReeVo team.
 
+## New features 🌟
+
+- [[#644](https://github.com/sighupio/distribution/pull/644)] On the Immutable kind, `furyctl delete cluster` ([furyctl#819](https://github.com/sighupio/furyctl/pull/819)) now deletes the cluster by phase. `templates/distribution/scripts/delete.sh` deletes the kapp app `kfd` (calico last), and the new `templates/plugins/scripts/delete.sh` deletes the plugins in reverse order: kustomize plugins with kapp, helm releases with their custom resources and CRDs first, and the plugins that own a StorageClass only with `--storage-class-providers`, never while a bound PVC outside their namespaces uses it. After the 15 minute timeout, an object stuck on a finalizer is reported (`stuck: <kind> <namespace>/<name> finalizers=<list>`) and the rest is deleted around it. Then the new playbook `templates/preflight/immutable/delete-playbook.yaml` checks that the inventory lists every node and that each node has the MAC address of the furyctl config, runs Flatcar and runs from the install disk of the furyctl config, and only then erases the partition table of the install disk and restarts the node: the node keeps nothing of the cluster, boots from the network and waits there until `furyctl apply` installs it again. Other disks are kept.
+
 ## Bug fixes 🐞
 
 - [[#637](https://github.com/sighupio/distribution/pull/637)] When `spec.distribution.common.networkPoliciesEnabled` is `true`, the Headlamp dashboard could not reach Prometheus to show the metrics in the UI because of a missing network policy.
