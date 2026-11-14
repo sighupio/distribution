@@ -1,0 +1,60 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+---
+# furyctl apply --reinstall-node: configure one reinstalled host again, as apply.yaml does for every host.
+# The host is furyctl_reinstall_target, not --limit: the keepalived.conf of a load balancer lists every
+# load balancer from their facts, and --limit also filters the play that gathers them.
+- name: Check the host to configure again
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  any_errors_fatal: true
+  tasks:
+    # An exact member, not a pattern: a group name or a wildcard in hosts would select more machines.
+    - name: Check that furyctl_reinstall_target is one host of the inventory
+      ansible.builtin.assert:
+        that:
+          - furyctl_reinstall_target is defined
+          - furyctl_reinstall_target in groups['nodes'] | default([])
+        fail_msg: "furyctl_reinstall_target must be one host of the inventory group nodes."
+        quiet: true
+
+- name: Gather facts from every load balancer
+  hosts: load_balancers
+  gather_facts: false
+  tasks:
+    - name: Gather the facts of the load balancer
+      when: furyctl_reinstall_target in groups['load_balancers']
+      ansible.builtin.setup:
+
+    # The keepalived.conf template needs the facts of every load balancer, and a peer must hold the virtual IP.
+    - name: Fail when a load balancer does not answer
+      when: furyctl_reinstall_target in groups['load_balancers']
+      run_once: true
+      ansible.builtin.assert:
+        that:
+          - ansible_play_hosts_all | difference(ansible_play_hosts) | length == 0
+        fail_msg: "These load balancers did not answer: {{ ansible_play_hosts_all | difference(ansible_play_hosts) | join(', ') }}."
+        quiet: true
+
+- name: Configure the host again
+  hosts: "{{ furyctl_reinstall_target | default([]) }}"
+  become: true
+  tasks:
+    - name: Set up the load balancer
+      when: inventory_hostname in groups['load_balancers']
+      block:
+        - name: Set up containerd
+          ansible.builtin.include_role:
+            name: containerd
+        - name: Set up haproxy
+          ansible.builtin.include_role:
+            name: haproxy
+        - name: Set up keepalived
+          ansible.builtin.include_role:
+            name: keepalived
+
+    - name: Set the kernel parameters
+      ansible.builtin.include_role:
+        name: sysctl
