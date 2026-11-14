@@ -3,6 +3,7 @@
 # license that can be found in the LICENSE file.
 
 # furyctl delete cluster erases the install disk of every node and restarts it: --tags preflight, then wipe. Node tasks use raw: python3 can be missing.
+# furyctl_delete_target selects one worker or load balancer (delete --delete-node, apply --reinstall-node): --tags preflight, drain for a worker, then wipe.
 
 - name: Check that the inventory lists exactly the machines furyctl deletes
   hosts: localhost
@@ -15,6 +16,7 @@
   tasks:
     # ansible-playbook skips unknown hosts with exit 0: a partial inventory would erase part of the cluster.
     - name: Compare group nodes with furyctl_delete_hosts
+      when: furyctl_delete_target is not defined
       vars:
         delete_hosts: "{{ furyctl_delete_hosts | from_json if furyctl_delete_hosts is string else furyctl_delete_hosts }}"
         listed_hosts: "{{ groups['nodes'] | default([]) }}"
@@ -30,8 +32,24 @@
           Extra in the inventory: {{ extra_hosts | join(', ') }}.
         quiet: true
 
+    # An exact member, not a pattern: a group name or a wildcard in hosts would select more machines.
+    - name: Check the single host to delete
+      when: furyctl_delete_target is defined
+      vars:
+        delete_hosts: "{{ furyctl_delete_hosts | from_json if furyctl_delete_hosts is string else furyctl_delete_hosts }}"
+      ansible.builtin.assert:
+        that:
+          - delete_hosts == [furyctl_delete_target]
+          - furyctl_delete_target in groups['nodes'] | default([])
+          - furyctl_delete_target in (groups['workers'] | default([])) + (groups['load_balancers'] | default([]))
+          - furyctl_delete_target not in groups['control_plane'] | default([])
+        fail_msg: >-
+          {{ furyctl_delete_target }} must be the only host of furyctl_delete_hosts, and a worker or a load balancer
+          of the inventory group nodes.
+        quiet: true
+
 - name: Check every machine
-  hosts: nodes
+  hosts: "{{ furyctl_delete_target | default('nodes') }}"
   gather_facts: false
   become: true
   any_errors_fatal: true
@@ -47,9 +65,57 @@
         d=$(readlink -f '{{ delete_disk }}'); r=$(lsblk -ndo PKNAME "$(findmnt -nvo SOURCE /)");
         [ -b "$d" ] && [ "/dev/$r" = "$d" ] || { echo "{{ delete_disk }} is not the disk of the root filesystem" >&2; exit 1; }
 
+# Only with --tags drain. A failed drain stops furyctl before the erase.
+- name: Remove the worker from Kubernetes
+  hosts: "{{ furyctl_delete_target | default('workers') }}"
+  gather_facts: true
+  become: true
+  any_errors_fatal: true
+  tags:
+    - never
+    - drain
+  tasks:
+    - name: Check that the host is the single worker to remove
+      ansible.builtin.assert:
+        that:
+          - furyctl_delete_target is defined
+          - inventory_hostname == furyctl_delete_target
+          - inventory_hostname in groups['workers'] | default([])
+        fail_msg: "Only furyctl_delete_target, when it is a worker, can be removed from Kubernetes."
+        quiet: true
+
+    - name: Drain the worker and delete its Node object
+      block:
+        - name: Fetch super-admin.conf for kubectl on the furyctl host
+          ansible.builtin.include_role:
+            name: upgrade-gates
+            tasks_from: fetch_admin_conf.yml
+
+        - name: Cordon and drain the worker
+          ansible.builtin.include_role:
+            name: node-maintenance
+            tasks_from: drain.yml
+
+        # The host joins again with the same name: a stale Node object would keep its old labels and taints.
+        - name: Delete the Node object
+          ansible.builtin.command:
+            cmd: >-
+              {{ kubectl_bin | default('kubectl') }} delete node {{ kubernetes_hostname | default(ansible_facts['fqdn']) }}
+              --ignore-not-found --kubeconfig {{ kubernetes_kubeconfig_path }}super-admin.conf
+          become: false
+          delegate_to: localhost
+          changed_when: true
+      always:
+        - name: Remove the fetched super-admin.conf from the furyctl host
+          ansible.builtin.file:
+            path: ./super-admin.conf
+            state: absent
+          become: false
+          delegate_to: localhost
+
 # Best effort: one failing machine must not stop the others.
 - name: Erase the install disk and restart
-  hosts: nodes
+  hosts: "{{ furyctl_delete_target | default('nodes') }}"
   gather_facts: false
   become: true
   tags:
