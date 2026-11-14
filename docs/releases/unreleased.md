@@ -2,6 +2,10 @@
 
 Welcome to the latest release of SD maintained by SIGHUP by ReeVo team.
 
+## New features 🌟
+
+- [[#640](https://github.com/sighupio/distribution/pull/640)] The distribution and the plugins have a new `scripts/diff.sh`, used by `furyctl diff` to list the resources an apply would create, update or delete in the cluster. It renders the manifests like `scripts/apply.sh` and runs kapp in diff mode, so it never writes to the cluster. When kapp fails, the script prints the error of kapp.
+
 ## Bug fixes 🐞
 
 - [[#637](https://github.com/sighupio/distribution/pull/637)] When `spec.distribution.common.networkPoliciesEnabled` is `true`, the Headlamp dashboard could not reach Prometheus to show the metrics in the UI because of a missing network policy.
