@@ -2,6 +2,10 @@
 
 Welcome to the latest release of SD maintained by SIGHUP by ReeVo team.
 
+## Breaking changes 💔
+
+- All kinds: removing an entry from `spec.plugins` and running `furyctl apply` left the plugin's resources in the cluster, unmanaged. With furyctl vTBD (the first release after v0.36.1) or later, `furyctl apply` now stops before changing anything when a plugin stored in the cluster configuration is missing from `spec.plugins`, and lists the plugins. To continue, run `furyctl apply --prune-plugins` to delete their resources with the new `templates/plugins/scripts/prune.sh` (kustomize plugins with `kapp delete`, Helm releases with their custom resources, PVCs and CRDs; the release namespace stays), add the entries back, or run `furyctl apply --force plugins-unmanage` to keep the resources outside of furyctl.
+
 ## Bug fixes 🐞
 
 - [[#637](https://github.com/sighupio/distribution/pull/637)] When `spec.distribution.common.networkPoliciesEnabled` is `true`, the Headlamp dashboard could not reach Prometheus to show the metrics in the UI because of a missing network policy.
