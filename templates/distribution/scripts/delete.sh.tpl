@@ -2,7 +2,8 @@
 
 set -e
 
-{{ if eq .spec.distribution.common.provider.type "immutable" -}}
+{{ if eq .spec.distribution.common.provider.type "none" "immutable" -}}
+# OnPremises and KFDDistribution (provider none) and Immutable: delete the kapp app kfd that apply.sh deploys.
 kappbin="{{ .paths.kapp }}"
 yqbin="{{ .paths.yq }}"
 
@@ -70,7 +71,7 @@ deleteWithGrace "$kappbin" delete -a kfd -n kube-system -y --apply-ignored --app
 
 # --apply-ignored deletes the objects kapp ignores by default, such as the PVCs of the StatefulSets.
 deleteWithGrace "$kappbin" delete -a kfd -n kube-system -y --apply-ignored --apply-concurrency 20 --apply-timeout 15m --wait-timeout 15m
-{{ else -}}
+{{ else if eq .spec.distribution.common.provider.type "eks" -}}
 kustomizebin="{{ .paths.kustomize }}"
 kubectlbin="{{ .paths.kubectl }}"
 yqbin="{{ .paths.yq }}"
@@ -196,4 +197,7 @@ if [ -f ./lb_arns.txt ]; then
   rm -f ./lb_arns.txt
 fi
 {{- end }}
+{{ else -}}
+echo "No delete for the provider {{ .spec.distribution.common.provider.type }}" >&2
+exit 1
 {{ end -}}

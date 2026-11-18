@@ -55,7 +55,7 @@
   tags:
     - wipe
   tasks:
-    # Without a partition table the machine boots from the network and waits there until furyctl apply installs it again. Not the reboot module: it waits for SSH.
+    # Without a partition table the machine no longer boots from this disk. Not the reboot module: it waits for SSH.
     - name: Erase the partition table of the install disk and restart
       ansible.builtin.raw: >-
         wipefs -af "$(readlink -f '{{ delete_disk }}')" && systemd-run --on-active=5 systemctl reboot
