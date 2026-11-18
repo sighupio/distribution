@@ -2,7 +2,6 @@
 
 set -e
 
-# OnPremises and KFDDistribution (provider none) and Immutable: delete the kapp app kfd that apply.sh deploys.
 kappbin=""
 yqbin=""
 
