@@ -9,7 +9,7 @@ Welcome to the latest release of SD maintained by SIGHUP by ReeVo team.
 ## Breaking changes 💔
 
 - [[#644](https://github.com/sighupio/distribution/pull/644)] OnPremises and KFDDistribution: `furyctl delete cluster` now deletes the distribution like Immutable, with `kapp delete` of what `furyctl apply` installed. It stops when an object cannot be deleted; objects stuck on a finalizer are only reported. On OnPremises the nodes are then not reset: run `--phase kubernetes` after fixing the cause.
-- [[#TBD](https://github.com/sighupio/distribution/pull/TBD)] Immutable: the schema no longer accepts `spec.kubernetes.version`. furyctl never read this field: the Kubernetes version always comes from the SD version in `spec.distributionVersion`. If your `furyctl.yaml` sets it, remove the line, or the validation fails.
+- [[#647](https://github.com/sighupio/distribution/pull/647)] Immutable: the schema no longer accepts `spec.kubernetes.version`. furyctl never read this field: the Kubernetes version always comes from the SD version in `spec.distributionVersion`. If your `furyctl.yaml` sets it, remove the line, or the validation fails.
 
 ## Bug fixes 🐞
 
