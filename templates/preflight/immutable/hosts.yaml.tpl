@@ -12,6 +12,8 @@ all:
       hosts:
         {{- range $n := .spec.infrastructure.nodes }}
         {{ $n.hostname }}:
+          delete_mac: "{{ $n.macAddress | lower | replace "-" ":" }}"
+          delete_disk: "{{ $n.storage.installDisk }}"
         {{- end }}
     load_balancers:
       hosts:

@@ -2,6 +2,14 @@
 
 Welcome to the latest release of SD maintained by SIGHUP by ReeVo team.
 
+## New features 🌟
+
+- [[#644](https://github.com/sighupio/distribution/pull/644)] Immutable: adds what `furyctl delete cluster` ([furyctl#819](https://github.com/sighupio/furyctl/pull/819)) needs to delete the cluster: delete scripts for the plugins and the distribution, and a playbook that erases the partition table of the install disk of every node.
+
+## Breaking changes 💔
+
+- [[#644](https://github.com/sighupio/distribution/pull/644)] OnPremises and KFDDistribution: `furyctl delete cluster` now deletes the distribution like Immutable, with `kapp delete` of what `furyctl apply` installed. It stops when an object cannot be deleted; objects stuck on a finalizer are only reported. On OnPremises the nodes are then not reset: run `--phase kubernetes` after fixing the cause.
+
 ## Bug fixes 🐞
 
 - [[#637](https://github.com/sighupio/distribution/pull/637)] When `spec.distribution.common.networkPoliciesEnabled` is `true`, the Headlamp dashboard could not reach Prometheus to show the metrics in the UI because of a missing network policy.
