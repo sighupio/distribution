@@ -1132,11 +1132,6 @@
       "additionalProperties": false,
       "description": "Kubernetes cluster configuration including control plane, etcd, and worker nodes.",
       "properties": {
-        "version": {
-          "type": "string",
-          "description": "Kubernetes version for sysext packages. Determines versions of containerd, kubernetes, and other components from installer defaults. Example: 1.33.4",
-          "pattern": "^\\d+\\.\\d+\\.\\d+$"
-        },
         "pkiPath": {
           "type": "string",
           "minLength": 1,
