@@ -4,7 +4,7 @@
   Use of this source code is governed by a BSD-style
   license that can be found in the LICENSE file.
 -->
-<!-- temp for testing -->
+<!-- Sets cache="unsafe" on every VM disk driver (see the xml block in main.tf). -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   <xsl:output omit-xml-declaration="yes" indent="yes"/>
 

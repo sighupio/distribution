@@ -1109,10 +1109,8 @@ steps: # e2e-onpremises
         path: /base
     commands:
       - eval "$(mise activate bash --shims)"
-      # host tools the libvirt provider (ISO build) + capacity gate need in the runner
-      - apt-get update && apt-get install -y --no-install-recommends genisoimage libvirt-clients qemu-utils
-      # temp for testing
-      - apt-get install -y --no-install-recommends xsltproc
+      # host tools the libvirt provider (ISO build, domain XSLT) + capacity gate need in the runner
+      - apt-get update && apt-get install -y --no-install-recommends genisoimage libvirt-clients qemu-utils xsltproc
       # serialize: wait until no other e2e VMs (install/upgrade) are running
       - bash tests/e2e/onpremises/scripts/wait-for-free-worker.sh
       # cache the Ubuntu 24.04 base image on the worker (downloaded once, then reused).
@@ -1319,9 +1317,7 @@ steps: # e2e-onpremises-upgrades-1.35.1-1.36.0
         path: /base
     commands:
       - eval "$(mise activate bash --shims)"
-      - apt-get update && apt-get install -y --no-install-recommends genisoimage libvirt-clients qemu-utils
-      # temp for testing
-      - apt-get install -y --no-install-recommends xsltproc
+      - apt-get update && apt-get install -y --no-install-recommends genisoimage libvirt-clients qemu-utils xsltproc
       # serialize: wait until no other e2e VMs (install/upgrade) are running
       - bash tests/e2e/onpremises/scripts/wait-for-free-worker.sh
       - |
