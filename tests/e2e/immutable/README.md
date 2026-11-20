@@ -79,9 +79,9 @@ suite, the kube-bench playbook and the encryption configuration.
 - **Memory**: the Flatcar PXE image runs from RAM, so every VM has 3 GB or more.
   The full run uses approximately 55 GB of the 62 GB on the worker.
 - **Storage**: longhorn (replica 1), from `spec.distribution.customResources`,
-  so it installs in the distribution phase. The install still applies the
-  distribution phase two times: furyctl skips the storage-backed modules until
-  a default StorageClass exists. Flatcar ships `iscsid` disabled, so
+  so it installs in the distribution phase. furyctl applies the distribution
+  phase again when the default StorageClass exists, for the storage-backed
+  modules. Flatcar ships `iscsid` disabled, so
   `furyctl.yaml` enables it and loads `iscsi_tcp` on the Kubernetes nodes.
 - **Concurrency**: only one e2e runs on the worker at a time. The VM gate also
   counts VMs that are shut off, because this pipeline creates its VMs powered off.
@@ -93,17 +93,17 @@ suite, the kube-bench playbook and the encryption configuration.
 
 ## Upgrade pipeline
 
-The `e2e-immutable-upgrades-1.35.1-1.36.0` pipeline uses the same tofu and
+The `e2e-immutable-upgrades-1.35.2-1.36.1` pipeline uses the same tofu and
 scripts. It runs after `e2e-immutable` and starts on the same tags.
 
 - The pipeline sets `TF_VAR_name_prefix=e2eimmup` and the octet range 250..254,
   so its VMs and network never collide with the install pipeline.
-- `TF_VAR_distribution_version` (v1.35.1) is the version in `furyctl.yaml`, and
-  `TF_VAR_upgrade_version` (v1.36.0) is the version in `furyctl_upgrade.yaml`.
+- `TF_VAR_distribution_version` (v1.35.2) is the version in `furyctl.yaml`, and
+  `TF_VAR_upgrade_version` (v1.36.1) is the version in `furyctl_upgrade.yaml`.
   The rest of the two files is the same.
-- **install-1.35.1** sets `DISTRO_LOCATION` to the v1.35.1 tag on GitHub, so the
-  base cluster is the released v1.35.1 and not this checkout.
-- **upgrade-1.36.0** runs `../onpremises/scripts/upgrade.sh`: `furyctl apply
+- **install-1.35.2** sets `DISTRO_LOCATION` to the v1.35.2 tag on GitHub, so the
+  base cluster is the released v1.35.2 and not this checkout.
+- **upgrade-1.36.1** runs `../onpremises/scripts/upgrade.sh`: `furyctl apply
   --upgrade` with this checkout. The nodes already run, so furyctl does not serve
   iPXE: it upgrades the nodes over SSH, one at a time, with drain and reboot.
 - The on-premises bats suite runs after the install and after the upgrade.

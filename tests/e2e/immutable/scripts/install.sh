@@ -3,10 +3,9 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-# The on-premises install sequence (pki, apply with retries, wait for the longhorn
-# StorageClass, distribution re-apply), with power-on.sh in the background to boot
-# the VMs while the first apply serves the iPXE assets. A retried apply finds the
-# nodes up and skips the boot wait.
+# The on-premises install sequence (pki, apply with retries), with power-on.sh in
+# the background to boot the VMs while the first apply serves the iPXE assets. A
+# retried apply finds the nodes up and skips the boot wait.
 set -uo pipefail
 
 SCRIPTS="$(cd "$(dirname "$0")" && pwd)"

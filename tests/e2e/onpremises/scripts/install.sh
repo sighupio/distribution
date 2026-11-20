@@ -3,13 +3,9 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-# Install the distribution with furyctl, mirroring the original Hetzner e2e
-# sequence (the known-good incantation):
-#   1. kubernetes phase
-#   2. full apply + distribution post-apply (retried until it succeeds) -- this is
-#      what actually rolls out the storage-backed modules (loki/tempo/velero/minio/
-#      prometheus); a plain single apply leaves them undeployed.
-#   3. a final distribution pass once the longhorn StorageClass is available.
+# Install the distribution with furyctl: create the pki, then one full apply,
+# retried until it succeeds. When the longhorn StorageClass appears, furyctl
+# applies the distribution phase again for the storage-backed modules.
 # (open-iscsi etc. is installed by the separate prepare-nodes step beforehand.)
 set -uo pipefail
 
@@ -46,26 +42,4 @@ apply_retry() {
   return 1
 }
 
-# 1. full apply: kubernetes + core distribution + plugins (longhorn). furyctl SKIPS
-#    the storage-backed modules (logging/tracing/dr/prometheus) here because no
-#    default StorageClass exists yet -- longhorn (a plugin) creates it only now.
 apply_retry "furyctl apply" --force migrations || { echo "furyctl apply failed"; exit 1; }
-
-# 2. wait for longhorn's default StorageClass before re-applying (a blind sleep is
-#    racy: longhorn-manager creates the SC a little after the plugin is installed).
-echo ">>> waiting for a default StorageClass"
-sc_ok=0
-for i in $(seq 1 60); do
-  if kubectl get storageclass 2>/dev/null | grep -qi '(default)'; then
-    echo ">>> default StorageClass present"
-    sc_ok=1
-    break
-  fi
-  echo ">>> no default StorageClass yet ($i/60); waiting 10s"
-  sleep 10
-done
-[ "$sc_ok" = 1 ] || { echo "no default StorageClass after waiting"; exit 1; }
-
-# 3. re-apply the distribution now that the StorageClass exists -> deploys the
-#    previously-skipped storage-backed modules.
-apply_retry "distribution re-apply" --phase distribution || { echo "distribution re-apply failed"; exit 1; }

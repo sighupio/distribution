@@ -11,7 +11,7 @@ locals {
   worker    = local.nodes["worker-0"]
   k8s_nodes = concat(local.cps, local.infras, [local.worker])
   # The utilities module (Headlamp) is tested only in the clean install pipeline:
-  # the upgrades pipeline installs v1.35.1 first, whose schema has no utilities.
+  # the upgrades pipeline installs v1.35.2 first, whose schema has no utilities.
   headlamp = var.distribution_version == var.upgrade_version
 }
 
@@ -163,8 +163,8 @@ spec:
       encryption:
         configuration: "{file://../../onpremises/config/encrypted-secret-config.yaml}"
   distribution:
-    # longhorn in the distribution phase: the StorageClass exists before the
-    # plugins phase, but furyctl skips the storage-backed modules until a re-apply.
+    # longhorn in the distribution phase: furyctl applies the phase again when
+    # the StorageClass appears, before the plugins phase.
     customResources:
       - ${abspath("${path.module}/../longhorn")}
     common:
