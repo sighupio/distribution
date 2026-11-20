@@ -7088,7 +7088,6 @@ SSH username. Example: core
 | [networking](#speckubernetesnetworking)     | `object` | Required |
 | [nodeGroups](#speckubernetesnodegroups)     | `array`  | Required |
 | [pkiPath](#speckubernetespkipath)           | `string` | Required |
-| [version](#speckubernetesversion)           | `string` | Optional |
 
 ### Description
 
@@ -8309,22 +8308,6 @@ Path to the PKI directory where to find the certificates and keys for Kubernetes
 ### Constraints
 
 **minimum length**: the minimum number of characters for this string is: `1`
-
-## .spec.kubernetes.version
-
-### Description
-
-Kubernetes version for sysext packages. Determines versions of containerd, kubernetes, and other components from installer defaults. Example: 1.33.4
-
-### Constraints
-
-**pattern**: the string must match the following regular expression:
-
-```regexp
-^\d+\.\d+\.\d+$
-```
-
-[try pattern](https://regexr.com/?expression=^\d%2B\.\d%2B\.\d%2B$)
 
 ## .spec.plugins
 

@@ -631,3 +631,34 @@ test_schema() {
 
     test_schema "public" "immutable-kfd-v1alpha2" "130-no" expect
 }
+
+@test "131 - ok" {
+    info
+
+    test_schema "public" "immutable-kfd-v1alpha2" "131-ok" expect_ok
+}
+
+@test "131 - no" {
+    info
+
+    expect() {
+        expect_no "${1}"
+
+        assert_error_contains "/spec/distribution/modules/monitoring/prometheus/storageSize" "does not match pattern" || return $?
+    }
+
+    test_schema "public" "immutable-kfd-v1alpha2" "131-no" expect
+}
+
+@test "132 - no" {
+    info
+
+    expect() {
+        expect_no "${1}"
+
+        assert_error_contains "/spec/kubernetes" "additional properties" || return $?
+        assert_error_contains "/spec/kubernetes" "'version'" || return $?
+    }
+
+    test_schema "public" "immutable-kfd-v1alpha2" "132-no" expect
+}
