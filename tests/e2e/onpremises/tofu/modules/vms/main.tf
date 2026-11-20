@@ -116,4 +116,11 @@ resource "libvirt_domain" "vm" {
     type        = "pty"
     target_port = "0"
   }
+
+  # We set the disk cache to unsafe so QEMU acknowledges the VM writes from the
+  # host RAM instead of waiting for the worker disk, since under the e2e load
+  # that disk got so slow that etcd in the VMs timed out.
+  xml {
+    xslt = file("${path.module}/cache-unsafe.xsl")
+  }
 }
