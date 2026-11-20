@@ -163,8 +163,8 @@ spec:
       encryption:
         configuration: "{file://../../onpremises/config/encrypted-secret-config.yaml}"
   distribution:
-    # longhorn in the distribution phase: the StorageClass exists before the
-    # plugins phase, but furyctl skips the storage-backed modules until a re-apply.
+    # longhorn in the distribution phase: furyctl applies the phase again when
+    # the StorageClass appears, before the plugins phase.
     customResources:
       - ${abspath("${path.module}/../longhorn")}
     common:

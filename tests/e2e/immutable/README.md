@@ -79,9 +79,9 @@ suite, the kube-bench playbook and the encryption configuration.
 - **Memory**: the Flatcar PXE image runs from RAM, so every VM has 3 GB or more.
   The full run uses approximately 55 GB of the 62 GB on the worker.
 - **Storage**: longhorn (replica 1), from `spec.distribution.customResources`,
-  so it installs in the distribution phase. The install still applies the
-  distribution phase two times: furyctl skips the storage-backed modules until
-  a default StorageClass exists. Flatcar ships `iscsid` disabled, so
+  so it installs in the distribution phase. furyctl applies the distribution
+  phase again when the default StorageClass exists, for the storage-backed
+  modules. Flatcar ships `iscsid` disabled, so
   `furyctl.yaml` enables it and loads `iscsi_tcp` on the Kubernetes nodes.
 - **Concurrency**: only one e2e runs on the worker at a time. The VM gate also
   counts VMs that are shut off, because this pipeline creates its VMs powered off.
