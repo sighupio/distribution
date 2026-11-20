@@ -1545,7 +1545,7 @@ steps: # e2e-immutable
         path: /var/run/libvirt
     commands:
       - eval "$(mise activate bash --shims)"
-      - apt-get update && apt-get install -y --no-install-recommends libvirt-clients
+      - apt-get update && apt-get install -y --no-install-recommends libvirt-clients xsltproc
       - bash tests/e2e/onpremises/scripts/wait-for-free-worker.sh
       # furyctl writes the public key (same path + .pub) into every node's ignition
       - ssh-keygen -N '' -t ed25519 -C "sighup" -f /cache/ci-ssh-key
@@ -1726,7 +1726,7 @@ steps: # e2e-immutable-upgrades-1.35.1-1.36.0
         path: /var/run/libvirt
     commands:
       - eval "$(mise activate bash --shims)"
-      - apt-get update && apt-get install -y --no-install-recommends libvirt-clients
+      - apt-get update && apt-get install -y --no-install-recommends libvirt-clients xsltproc
       - bash tests/e2e/onpremises/scripts/wait-for-free-worker.sh
       # furyctl writes the public key (same path + .pub) into every node's ignition
       - ssh-keygen -N '' -t ed25519 -C "sighup" -f /cache/ci-ssh-key
