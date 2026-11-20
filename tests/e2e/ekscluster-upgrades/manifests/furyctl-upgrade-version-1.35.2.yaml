@@ -15,7 +15,7 @@ kind: EKSCluster
 metadata:
   name: e2e-eks-upgrades
 spec:
-  distributionVersion: v1.35.1
+  distributionVersion: v1.35.2
   toolsConfiguration:
     opentofu:
       state:
