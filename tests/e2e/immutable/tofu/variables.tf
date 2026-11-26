@@ -26,13 +26,13 @@ variable "octet_span" {
 
 variable "distribution_version" {
   type        = string
-  default     = "v1.36.0"
+  default     = "v1.36.1"
   description = "distributionVersion of furyctl.yaml, the version that the install step applies."
 }
 
 variable "upgrade_version" {
   type        = string
-  default     = "v1.36.0"
+  default     = "v1.36.1"
   description = "distributionVersion of furyctl_upgrade.yaml, the target of the upgrade pipeline."
 }
 

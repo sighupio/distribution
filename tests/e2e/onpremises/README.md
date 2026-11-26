@@ -26,9 +26,9 @@ number so concurrent runs don't collide):
    supporting files are rendered from `tofu output`; ingress certs are generated.
 3. **prepare-nodes** — installs open-iscsi on every node (longhorn needs it to
    attach volumes).
-4. **install** — `furyctl create pki` then `furyctl apply`, followed by a second
-   `furyctl apply --phase distribution` once the longhorn StorageClass exists, so
-   the storage-backed components (minio/velero/loki/prometheus) come up.
+4. **install** — `furyctl create pki` then `furyctl apply`. When the longhorn
+   StorageClass appears, furyctl applies the distribution phase again, so the
+   storage-backed components (minio/velero/loki/prometheus) come up.
 5. **bats-test-distribution** — bats checks that the distribution components are running.
 6. **kube-bench** — CIS benchmark on a control-plane and the worker node.
 7. **delete** — `tofu destroy` (always, on success or failure).
@@ -54,7 +54,7 @@ onpremises/
 ## Notes
 - **Config**: cilium, kyverno, loki, prometheus, velero; tracing off — mimir/tempo
   (distributed + minio) are too heavy for the single worker.
-- **Storage**: longhorn (replica 1). The install applies twice so storage-backed
-  components come up once the StorageClass is ready.
+- **Storage**: longhorn (replica 1). furyctl applies the distribution phase again
+  when the StorageClass is ready, so the storage-backed components come up.
 - **Concurrency**: each run gets its own libvirt network, subnet and pool, and runs
   serialize (VM gate) so only one is active at a time.

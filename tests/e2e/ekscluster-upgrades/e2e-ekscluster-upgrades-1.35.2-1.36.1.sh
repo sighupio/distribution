@@ -21,8 +21,8 @@ wait_for_eks_active() {
 }
 
 echo "----------------------------------------------------------------------------"
-echo "Executing furyctl for the initial setup 1.35.1 with alinux2023"
-FURYCTL_YAML=tests/e2e/ekscluster-upgrades/manifests/furyctl-upgrade-version-1.35.1.yaml
+echo "Executing furyctl for the initial setup 1.35.2 with alinux2023"
+FURYCTL_YAML=tests/e2e/ekscluster-upgrades/manifests/furyctl-upgrade-version-1.35.2.yaml
 tests/e2e/ekscluster/replace_variables.sh --cluster-name "$CLUSTER_NAME" --furyctl-yaml "$FURYCTL_YAML"
 if ! furyctl apply \
   --outdir /furyctl-outdir \
@@ -70,8 +70,8 @@ EKS_REGION=$(yq '.spec.region' "$FURYCTL_YAML")
 wait_for_eks_active "$CLUSTER_NAME" "$EKS_REGION"
 
 echo "----------------------------------------------------------------------------"
-echo "Executing version upgrade to 1.36.0 (with alinux2023)"
-FURYCTL_YAML=tests/e2e/ekscluster-upgrades/manifests/furyctl-upgrade-version-1.36.0.yaml
+echo "Executing version upgrade to 1.36.1 (with alinux2023)"
+FURYCTL_YAML=tests/e2e/ekscluster-upgrades/manifests/furyctl-upgrade-version-1.36.1.yaml
 tests/e2e/ekscluster/replace_variables.sh --cluster-name "$CLUSTER_NAME" --furyctl-yaml "$FURYCTL_YAML"
 
 # About 18 minutes after its creation EKS replaces the control plane instances of
@@ -103,11 +103,11 @@ while true; do
     break
   fi
   if ! grep -q "Cannot VersionUpdate because cluster ${CLUSTER_NAME} currently has an update in progress" upgrade_output.txt; then
-    echo "Upgrade to 1.36.0 failed."
+    echo "Upgrade to 1.36.1 failed."
     exit 1
   fi
   if [ "$attempt" -ge "$UPGRADE_MAX_ATTEMPTS" ]; then
-    echo "Upgrade to 1.36.0 still blocked by the EKS update in progress after ${attempt} attempts."
+    echo "Upgrade to 1.36.1 still blocked by the EKS update in progress after ${attempt} attempts."
     exit 1
   fi
   echo "EKS has an update in progress on the cluster, retrying the upgrade in ${UPGRADE_RETRY_DELAY}s..."

@@ -11,7 +11,7 @@
 <p align="center">SIGHUP Distribution (SD) is a certified battle-tested Kubernetes distribution based purely on upstream Kubernetes.</p>
 <!-- markdownlint-enable MD033 MD045 -->
 
-[![Release](https://img.shields.io/badge/release-v1.36.0-blue?label=Latest%20Release)](https://github.com/sighupio/distribution/releases/latest)
+[![Release](https://img.shields.io/badge/release-v1.36.1-blue?label=Latest%20Release)](https://github.com/sighupio/distribution/releases/latest)
 [![Slack](https://img.shields.io/badge/slack-@kubernetes/fury-yellow.svg?logo=slack)](https://kubernetes.slack.com/archives/C0154HYTAQH)
 [![License](https://img.shields.io/github/license/sighupio/distribution)](https://github.com/sighupio/distribution/blob/main/LICENSE)
 
@@ -109,7 +109,7 @@ Current supported versions of SD are:
 
 |                                SD Version                                 | Kubernetes Version |
 |:-------------------------------------------------------------------------:|:------------------:|
-| [`1.36.0`](https://github.com/sighupio/distribution/releases/tag/v1.36.0) |      `1.36.x`      |
+| [`1.36.1`](https://github.com/sighupio/distribution/releases/tag/v1.36.1) |      `1.36.x`      |
 | [`1.35.2`](https://github.com/sighupio/distribution/releases/tag/v1.35.2) |      `1.35.x`      |
 | [`1.34.3`](https://github.com/sighupio/distribution/releases/tag/v1.34.3) |      `1.34.x`      |
 
