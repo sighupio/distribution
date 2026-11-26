@@ -1,0 +1,64 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+---
+# furyctl apply --reinstall-node: join one reinstalled worker again, like apply.yaml.
+# furyctl_reinstall_target, not --limit: the join token comes from the first control plane host.
+- name: Check the worker to join again
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  any_errors_fatal: true
+  tasks:
+    # One exact host: a pattern could select more machines.
+    - name: Check that furyctl_reinstall_target is one worker of the inventory
+      ansible.builtin.assert:
+        that:
+          - furyctl_reinstall_target is defined
+          - furyctl_reinstall_target in groups['nodes'] | default([])
+          - furyctl_reinstall_target not in groups['control_plane'] | default([])
+          - furyctl_reinstall_target not in groups['etcd'] | default([])
+        fail_msg: "furyctl_reinstall_target must be one worker of the inventory group nodes."
+        quiet: true
+
+# The same token and CA hash that the kube-control-plane role creates for apply.yaml.
+- name: Create a join token on the first control plane host
+  hosts: control_plane[0]
+  gather_facts: false
+  become: true
+  tasks:
+    - name: Create a bootstrap token
+      ansible.builtin.command: "kubeadm token create --ttl=30m"
+      register: kubernetes_bootstrap_token
+      changed_when: true
+      no_log: true
+
+    - name: Get the Kubernetes CA hash
+      ansible.builtin.shell: >
+        set -o pipefail &&
+        openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt |
+        openssl rsa -pubin -outform der 2>/dev/null |
+        openssl dgst -sha256 -hex |
+        sed 's/^.* /sha256:/'
+      register: kubernetes_ca_hash
+      changed_when: false
+
+    # The labels play needs admin.conf in the working directory.
+    - name: Fetch admin.conf for the labels and annotations
+      ansible.builtin.fetch:
+        src: /etc/kubernetes/admin.conf
+        dest: "{{ kubernetes_kubeconfig_path }}/admin.conf"
+        flat: true
+
+- name: Join the worker
+  hosts: "{{ furyctl_reinstall_target | default([]) }}"
+  become: true
+  vars:
+    kubernetes_bootstrap_token: "{{ hostvars[groups.control_plane[0]].kubernetes_bootstrap_token.stdout }}"
+    kubernetes_ca_hash: "{{ hostvars[groups.control_plane[0]].kubernetes_ca_hash.stdout }}"
+  roles:
+    - containerd
+    - kube-worker
+
+- name: Set the labels and annotations of the nodes
+  import_playbook: nodes-labels-annotations.yaml

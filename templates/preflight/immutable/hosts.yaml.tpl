@@ -15,6 +15,14 @@ all:
           delete_mac: "{{ $n.macAddress | lower | replace "-" ":" }}"
           delete_disk: "{{ $n.storage.installDisk }}"
         {{- end }}
+    # The single-host delete accepts only a worker or a load balancer.
+    workers:
+      hosts:
+        {{- range $g := .spec.kubernetes | digAny "nodeGroups" list }}
+        {{- range $h := $g.nodes }}
+        {{ $h.hostname }}:
+        {{- end }}
+        {{- end }}
     load_balancers:
       hosts:
         {{- if hasKeyAny .spec.infrastructure "loadBalancers" }}

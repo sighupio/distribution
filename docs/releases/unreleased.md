@@ -5,6 +5,7 @@ Welcome to the latest release of SD maintained by SIGHUP by ReeVo team.
 ## New features 🌟
 
 - [[#644](https://github.com/sighupio/distribution/pull/644)] Immutable: adds what `furyctl delete cluster` ([furyctl#819](https://github.com/sighupio/furyctl/pull/819)) needs to delete the cluster: delete scripts for the plugins and the distribution, and a playbook that erases the partition table of the install disk of every node.
+- [[#645](https://github.com/sighupio/distribution/pull/645)] Immutable: the playbooks that `furyctl apply --reinstall-node` and `furyctl delete node` ([furyctl#824](https://github.com/sighupio/furyctl/pull/824)) need. The delete playbook can now drain and erase a single worker or load balancer, and two new `reinstall-node.yaml` playbooks configure the host again and join a worker back to the cluster.
 
 ## Breaking changes 💔
 
