@@ -1,0 +1,209 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: loki-distributed-ingester
+  namespace: logging
+spec:
+  template:
+    spec:
+      nodeSelector:
+        node.kubernetes.io/role: infra
+      tolerations:
+        - effect: NoSchedule
+          key: node.kubernetes.io/role
+          value: infra
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loki-distributed-querier
+  namespace: logging
+spec:
+  template:
+    spec:
+      nodeSelector:
+        node.kubernetes.io/role: infra
+      tolerations:
+        - effect: NoSchedule
+          key: node.kubernetes.io/role
+          value: infra
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: loki-distributed-compactor
+  namespace: logging
+spec:
+  template:
+    spec:
+      nodeSelector:
+        node.kubernetes.io/role: infra
+      tolerations:
+        - effect: NoSchedule
+          key: node.kubernetes.io/role
+          value: infra
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loki-distributed-distributor
+  namespace: logging
+spec:
+  template:
+    spec:
+      nodeSelector:
+        node.kubernetes.io/role: infra
+      tolerations:
+        - effect: NoSchedule
+          key: node.kubernetes.io/role
+          value: infra
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loki-distributed-gateway
+  namespace: logging
+spec:
+  template:
+    spec:
+      nodeSelector:
+        node.kubernetes.io/role: infra
+      tolerations:
+        - effect: NoSchedule
+          key: node.kubernetes.io/role
+          value: infra
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loki-distributed-query-scheduler
+  namespace: logging
+spec:
+  template:
+    spec:
+      nodeSelector:
+        node.kubernetes.io/role: infra
+      tolerations:
+        - effect: NoSchedule
+          key: node.kubernetes.io/role
+          value: infra
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loki-distributed-query-frontend
+  namespace: logging
+spec:
+  template:
+    spec:
+      nodeSelector:
+        node.kubernetes.io/role: infra
+      tolerations:
+        - effect: NoSchedule
+          key: node.kubernetes.io/role
+          value: infra
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loki-distributed-query-frontend
+  namespace: logging
+spec:
+  template:
+    spec:
+      nodeSelector:
+        node.kubernetes.io/role: infra
+      tolerations:
+        - effect: NoSchedule
+          key: node.kubernetes.io/role
+          value: infra
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: loki-distributed-index-gateway
+  namespace: logging
+spec:
+  template:
+    spec:
+      nodeSelector:
+        node.kubernetes.io/role: infra
+      tolerations:
+        - effect: NoSchedule
+          key: node.kubernetes.io/role
+          value: infra
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: minio-logging
+  namespace: logging
+spec:
+  template:
+    spec:
+      nodeSelector:
+        node.kubernetes.io/role: infra
+      tolerations:
+        - effect: NoSchedule
+          key: node.kubernetes.io/role
+          value: infra
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: minio-logging-buckets-setup
+  namespace: logging
+spec:
+  template:
+    spec:
+      nodeSelector:
+        node.kubernetes.io/role: infra
+      tolerations:
+        - effect: NoSchedule
+          key: node.kubernetes.io/role
+          value: infra
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: infra
+spec:
+  fluentd:
+    nodeSelector:
+      node.kubernetes.io/role: infra
+    tolerations:
+      - effect: NoSchedule
+        key: node.kubernetes.io/role
+        value: infra
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logging-operator
+  namespace: logging
+spec:
+  template:
+    spec:
+      nodeSelector:
+        node.kubernetes.io/role: infra
+      tolerations:
+        - effect: NoSchedule
+          key: node.kubernetes.io/role
+          value: infra
+---
+apiVersion: logging-extensions.banzaicloud.io/v1alpha1
+kind: EventTailer
+metadata:
+  name: kubernetes
+spec:
+  workloadOverrides:
+    nodeSelector:
+      node.kubernetes.io/role: infra
+    tolerations:
+      - effect: NoSchedule
+        key: node.kubernetes.io/role
+        value: infra

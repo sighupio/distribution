@@ -1,0 +1,114 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sd-spec
+  namespace: headlamp
+data:
+  info.json: |
+    {
+      "cluster": {
+        "kind": "OnPremises",
+        "name": "sd-spec-links-cilium-opensearch"
+      },
+      "distributionVersion": "v1.36.1",
+      "links": [
+        {
+          "module": "auth",
+          "name": "Gangplank",
+          "url": "https://kubeconfig.custom.example.com"
+        },
+        {
+          "module": "ingress",
+          "name": "Forecastle",
+          "url": "https://directory.internal.example.com"
+        },
+        {
+          "module": "logging",
+          "name": "OpenSearch Dashboards",
+          "url": "https://logs.custom.example.com"
+        },
+        {
+          "module": "logging",
+          "name": "MinIO",
+          "url": "https://minio-logging.internal.example.com"
+        },
+        {
+          "module": "monitoring",
+          "name": "Grafana",
+          "url": "https://grafana.custom.example.com"
+        },
+        {
+          "module": "monitoring",
+          "name": "Prometheus",
+          "url": "https://prometheus.internal.example.com"
+        },
+        {
+          "module": "monitoring",
+          "name": "Alertmanager",
+          "url": "https://alertmanager.internal.example.com"
+        },
+        {
+          "module": "networking",
+          "name": "Hubble UI",
+          "url": "https://hubble.internal.example.com"
+        }
+      ],
+      "moduleVersions": {
+        "auth": "v0.9.0",
+        "aws": "v5.4.0",
+        "dr": "v3.5.0",
+        "ingress": "v5.3.0",
+        "logging": "v5.5.1",
+        "monitoring": "v4.3.0",
+        "networking": "v4.1.0",
+        "opa": "v1.19.0",
+        "tracing": "v1.6.0",
+        "utilities": "v1.0.0"
+      },
+      "modules": {
+        "auth": {
+          "provider": {
+            "type": "none"
+          }
+        },
+        "dr": {
+          "type": "on-premises"
+        },
+        "ingress": {
+          "haproxy": {
+            "type": "dual"
+          },
+          "nginx": {
+            "type": "none"
+          }
+        },
+        "logging": {
+          "opensearch": {
+            "type": "single"
+          },
+          "type": "opensearch"
+        },
+        "monitoring": {
+          "type": "prometheus"
+        },
+        "networking": {
+          "type": "cilium"
+        },
+        "policy": {
+          "type": "kyverno"
+        },
+        "tracing": {
+          "type": "tempo"
+        },
+        "utilities": {
+          "headlamp": {
+            "type": "token-auth"
+          }
+        }
+      }
+    }

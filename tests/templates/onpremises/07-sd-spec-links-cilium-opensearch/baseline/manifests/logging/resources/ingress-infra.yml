@@ -1,0 +1,84 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    cluster.kfd.sighup.io/useful-link.enable: "true"
+  annotations:
+    cluster.kfd.sighup.io/useful-link.url: https://logs.custom.example.com
+    cluster.kfd.sighup.io/useful-link.name: "Opensearch Dashboards"
+    forecastle.stakater.com/expose: "true"
+    forecastle.stakater.com/appName: "Opensearch Dashboards"
+    
+    forecastle.stakater.com/icon: "https://opensearch.org/assets/brand/PNG/Mark/opensearch_mark_default.png"
+    
+    cert-manager.io/cluster-issuer: letsencrypt-fury
+    
+
+  name: opensearch-dashboards
+  
+  namespace: logging
+  
+spec:
+  ingressClassName: haproxy-internal
+  rules:
+    - host: logs.custom.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+            
+              service:
+                name: opensearch-dashboards
+                port:
+                  name: http
+            
+  tls:
+    - hosts:
+      - logs.custom.example.com
+      secretName: opensearch-dashboards-tls
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    cluster.kfd.sighup.io/useful-link.enable: "true"
+  annotations:
+    cluster.kfd.sighup.io/useful-link.url: https://minio-logging.internal.example.com
+    cluster.kfd.sighup.io/useful-link.name: "MinIO Logging"
+    forecastle.stakater.com/expose: "true"
+    forecastle.stakater.com/appName: "MinIO Logging"
+    
+    forecastle.stakater.com/icon: "https://min.io/resources/img/logo/MINIO_Bird.png"
+    
+    cert-manager.io/cluster-issuer: letsencrypt-fury
+    
+
+
+  
+  name: minio
+  namespace: logging
+  
+spec:
+  ingressClassName: haproxy-internal
+  rules:
+    - host: minio-logging.internal.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+            
+              service:
+                name: minio-logging-console
+                port:
+                  name: http
+            
+  tls:
+    - hosts:
+      - minio-logging.internal.example.com
+      secretName: minio-logging-tls
