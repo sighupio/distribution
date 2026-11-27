@@ -1,4 +1,4 @@
 # Contributing guidelines
 
-Please refer to <https://docs.sighup.io/docs/contribute/>.
+Please refer to <https://docs.sighup.io/docs/internals/developer-guide/>.
 

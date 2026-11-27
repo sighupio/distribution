@@ -91,7 +91,7 @@ Add-on modules provide additional functionality to the distribution. Their relea
 
 ## Get started with SD 🚀
 
-To get started with SD, please head to the [quickstart guides on the documentation site](https://docs.sighup.io/docs/getting-started/).
+To get started with SD, see the tutorials in the [User manual on the documentation site](https://docs.sighup.io/docs/manual/).
 
 ## Issues 🐛
 
@@ -181,7 +181,7 @@ SD is open-source software, and it's released under the following [LICENSE](LICE
 
 <!-- Misc -->
 
-[sd-docs-requirements]: https://docs.sighup.io/docs/installation/requirements/
+[sd-docs-requirements]: https://docs.sighup.io/docs/manual/plan/requirements/
 [furyctl]: https://github.com/sighupio/furyctl
 [furyctl-plugins]: https://github.com/sighupio/furyctl?tab=readme-ov-file#plugins
 [sighup-site]: https://sighup.io

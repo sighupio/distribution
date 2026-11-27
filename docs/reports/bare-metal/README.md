@@ -2,7 +2,7 @@
 
 This folder contains configuration files used to run stress tests on a bare-metal environent.
 
-You can read about our findings in the [documentation website](https://docs.sighup.io/reports/bare-metal).
+You can read about our findings in the [documentation website](https://docs.sighup.io/docs/internals/reports/bare-metal).
 
 ## Setup
 

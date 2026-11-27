@@ -40,7 +40,7 @@ SD modules deployed on top of an existing Kubernetes cluster.
 
 ### Description
 
-Persistent furyctl command flags, see the documentation for more details: https://docs.sighup.io/furyctl/flags-configuration
+Persistent furyctl command flags, see the documentation for more details: https://docs.sighup.io/reference/furyctl/flags-configuration
 
 ## .kind
 

@@ -40,7 +40,7 @@ A SD Cluster deployed on top of a set of existing VMs.
 
 ### Description
 
-Persistent furyctl command flags, see the documentation for more details: https://docs.sighup.io/furyctl/flags-configuration
+Persistent furyctl command flags, see the documentation for more details: https://docs.sighup.io/reference/furyctl/flags-configuration
 
 ## .kind
 

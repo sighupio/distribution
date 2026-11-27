@@ -64,7 +64,7 @@ With no further ado, the steps to release a new version are:
       1. Add an "Upgrade paths" section with one row for each version that furyctl can upgrade from (the `<from>-<to>` folders in furyctl's `configs/upgrades/<kind>/`). For each row, write what changes for a user who comes from that version:
          - From the previous release of the same minor: only the changes in the new note.
          - From a backport release of another minor (for example `v1.35.2` to `v1.36.1`): the changes in the new note, plus what the backport does not include. The note of the backport lists these differences (for example the Kubernetes minor and the modules that only the newer minor has). Do not send the user to the full note of the newer minor: the backport already has most of its changes.
-         - After the table, link to the [upgrade docs](https://docs.sighup.io/docs/installation/upgrades/). This section replaces the "Upgrade procedure" section at the end of older release notes.
+         - After the table, link to the [upgrade docs](https://docs.sighup.io/docs/manual/upgrade/). This section replaces the "Upgrade procedure" section at the end of older release notes.
          - If a new furyctl upgrade path ends at a version that is already released (for example `1.35.3-1.36.1`, added after `v1.36.1`), add a row for it to the note of that version on `main`. Give the minimum furyctl version that has the path in the "From" column. Then update the text of its GitHub release with `gh release edit vx.y.z --notes-file docs/releases/vx.y.z.md`, because the CI copies the note only when the tag is pushed.
 7. Use the `e2e-all-*` tag pattern to trigger all the e2e tests, fix eventual problems and finally tag a release candidate
 
@@ -105,5 +105,5 @@ At this point, you'll need to switch to pushing some changes in furyctl
 After the release of the distribution and furyctl have been done, there are some other places that need to be updated to reflect the new releases, in no particular order:
 
 1. Update the quick-start guides in https://github.com/sighupio/getting-started/
-2. Update SD's documentation site with the new versions https://github.com/sighupio/docs/
+2. Update SD's documentation site with the new versions https://github.com/sighupio/docs/. Follow the release checklist in its README: https://github.com/sighupio/docs#release-checklist
 3. Run the CVE patching pipeline by adding the newly released SIGHUP versions https://github.com/sighupio/container-image-sync/
